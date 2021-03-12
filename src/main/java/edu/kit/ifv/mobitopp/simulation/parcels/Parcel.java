@@ -24,6 +24,8 @@ public class Parcel {
 	
 	@Setter(value = lombok.AccessLevel.NONE)
 	private ParcelState state = ParcelState.UNDEFINED;
+	@Getter(value = lombok.AccessLevel.NONE)
+	@Setter(value = lombok.AccessLevel.NONE)
 	private DeliveryResults results;
 	@Setter(value = lombok.AccessLevel.NONE)
 	private int deliveryAttempts = 0;
