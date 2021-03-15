@@ -20,11 +20,10 @@ import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class DeliveryActivity represents the activity of delivering a parcel.
+ * The Class DeliveryActivity represents the activity of delivering a set of parcels.
+ * It decorates an existing activity.
  */
-
 @Getter
 public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 
@@ -33,12 +32,12 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	private final DeliveryPerson person;
 
 	/**
-	 * Instantiates a new delivery activity for the given parcel based on the given
+	 * Instantiates a new delivery activity for the given parcels and delivery person based on the given
 	 * activity.
 	 *
 	 * @param activity the activity
 	 * @param parcels the parcels
-	 * @param person the person
+	 * @param person the delivery person
 	 */
 	private DeliveryActivity(ActivityAsLinkedListElement activity, List<Parcel> parcels,
 		DeliveryPerson person) {
@@ -53,7 +52,7 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	}
 
 	/**
-	 * Instantiates a new delivery activity for the given parcel.
+	 * Instantiates a new delivery activity for the given parcels and delivery person.
 	 *
 	 * @param oid                  the oid
 	 * @param activityNrOfWeek     the activity nr of week
@@ -76,7 +75,7 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	}
 
 	/**
-	 * Instantiates a new delivery activity.
+	 * Instantiates a new delivery activity for the given parcels and delivery person.
 	 *
 	 * @param oid the oid
 	 * @param activityNrOfWeek the activity nr of week
@@ -85,7 +84,7 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	 * @param endFlexibility the end flexibility
 	 * @param durationFlexibility the duration flexibility
 	 * @param parcels the parcels
-	 * @param person the person
+	 * @param person the delivery person
 	 */
 	public DeliveryActivity(int oid, byte activityNrOfWeek, Time startDate, float startFlexibility,
 		float endFlexibility, float durationFlexibility, List<Parcel> parcels,
@@ -98,15 +97,15 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	}
 
 	/**
-	 * Duration.
+	 * Estimates the duration of delivering the given parcels based on the given {@link DeliveryEfficiencyProfile}.
 	 *
 	 * @param parcels the parcels
-	 * @param efficiency the efficiency
-	 * @return the int
+	 * @param efficiency the efficiency profile
+	 * @return the estimated duration
 	 */
 	private static int duration(List<Parcel> parcels, DeliveryEfficiencyProfile efficiency) {
 		return max(1, round(
-			efficiency.getDeliveryDurAdd() + efficiency.getDeliveryDurMul() * parcels.size()));
+			efficiency.getDeliveryDurBase() + efficiency.getDeliveryDurPerParcel() * parcels.size()));
 	}
 
 	/**

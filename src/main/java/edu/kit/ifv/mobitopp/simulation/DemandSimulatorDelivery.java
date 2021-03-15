@@ -22,26 +22,17 @@ import edu.kit.ifv.mobitopp.simulation.person.PublicTransportBehaviour;
 import edu.kit.ifv.mobitopp.simulation.person.TripFactory;
 import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class DemandSimulatorDelivery extends the DemandSimulatorPassenger by
  * introducing parcel orders and delivery persons.
  */
 public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 
-	/** The parcel order model. */
 	private final ParcelOrderModel parcelOrderModel;
-	
-	/** The parcels. */
 	private final Collection<Parcel> parcels;
-	
-	/** The delivery person factory. */
 	private final DeliveryPersonFactory deliveryPersonFactory;
-	
-	/** The person filter. */
 	private final Predicate<Person> personFilter;
-	
-	/** The delivery results. */
 	private final DeliveryResults deliveryResults;
 	
 
@@ -59,7 +50,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param context                    the simulation context
 	 * @param personFactory              the person factory
 	 * @param parcelOrderModel           the parcel order model
-	 * @param personFilter the person filter
+	 * @param personFilter 				 the person filter do determine which persons should be simulated
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
@@ -140,10 +131,6 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	protected Collection<Parcel> createParcelOrder(PickUpParcelPerson p) {
 		Collection<Parcel> parcels = this.parcelOrderModel.createParcelOrdes(p, this.deliveryResults);
 		this.parcels.addAll(parcels);
-		
-		for (Parcel pc : parcels) {
-			System.out.println(pc);
-		}
 
 		return parcels;
 	}

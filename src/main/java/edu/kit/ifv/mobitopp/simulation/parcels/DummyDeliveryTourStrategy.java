@@ -29,7 +29,7 @@ public class DummyDeliveryTourStrategy implements DeliveryTourAssignmentStrategy
 		List<Parcel> toBeDelivered = dc.getAvailableParcels(work.startDate());
 		
 		
-		int maxNumOfParcels = (int) Math.floorDiv(work.duration() - efficiency.getLoadDuration() - efficiency.getUnloadDuration(), (int) (efficiency.getTripDuration()+efficiency.getDeliveryDurAdd()) );
+		int maxNumOfParcels = (int) Math.floorDiv(work.duration() - efficiency.getLoadDuration() - efficiency.getUnloadDuration(), (int) (efficiency.getTripDuration()+efficiency.getDeliveryDurBase()) );
 		maxNumOfParcels = Math.max(maxNumOfParcels, 1);
 		
 		List<Parcel> assigned = toBeDelivered.stream().limit(maxNumOfParcels).collect(Collectors.toList());

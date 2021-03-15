@@ -5,7 +5,6 @@ import java.util.List;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface DeliveryTourAssignmentStrategy provides a method for assigning parcel deliveries to delivery persons.
  */

@@ -51,6 +51,17 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this.activityDurationRandomizer = activityDurationRandomizer;
 	}
 
+	/**
+	 * Customize this {@link SimulationOptionsCustomization} with the given options.
+	 *
+	 * @param destinationChoiceModel the destination choice model
+	 * @param modeChoiceModel the mode choice model
+	 * @param rescheduling the rescheduling
+	 * @param routeChoice the route choice
+	 * @param impedance the impedance
+	 * @param rideSharingOffers the ride sharing offers
+	 * @param activityDurationRandomizer the activity duration randomizer
+	 */
 	public void customize(DestinationChoiceModel destinationChoiceModel, TourBasedModeChoiceModel modeChoiceModel,
 			ReschedulingStrategy rescheduling, ZoneBasedRouteChoice routeChoice, ImpedanceIfc impedance,
 			RideSharingOffers rideSharingOffers, ActivityStartAndDurationRandomizer activityDurationRandomizer) {
@@ -63,6 +74,11 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this.activityDurationRandomizer = activityDurationRandomizer;
 	}
 
+	/**
+	 * Sets the delegate {@link SimulationOptions}.
+	 *
+	 * @param options the new delegate
+	 */
 	public void setDelegate(SimulationOptions options) {
 		this.delegateSimulationOptions = options;
 	}
@@ -76,6 +92,10 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this(delegate, null, null, null, null, null, null, null);
 	}
 	
+	/**
+	 * Resets the customization.
+	 * Now, all simulation options are provided by the delegate.
+	 */
 	public void reset() {
 		this.destinationChoiceModel = null;
 		this.modeChoiceModel = null;
@@ -97,6 +117,11 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this(delegate, destinationChoiceModel, null, null, null, null, null, null);
 	}
 	
+	/**
+	 * Customize this {@link SimulationOptionsCustomization} with the given {@link DestinationChoiceModel}.
+	 *
+	 * @param destinationChoiceModel the destination choice model
+	 */
 	public void customize(DestinationChoiceModel destinationChoiceModel) {
 		this.destinationChoiceModel = destinationChoiceModel;
 	}
@@ -113,6 +138,11 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this(delegate, null, modeChoiceModel, null, null, null, null, null);
 	}
 	
+	/**
+	 * Customize this {@link SimulationOptionsCustomization} with the given {@link TourBasedModeChoiceModel}.
+	 *
+	 * @param modeChoiceModel the mode choice model
+	 */
 	public void customize(TourBasedModeChoiceModel modeChoiceModel) {
 		this.modeChoiceModel = modeChoiceModel;
 	}
@@ -128,6 +158,11 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this(delegate, null, null, rescheduling, null, null, null, null);
 	}
 	
+	/**
+	 * Customize this {@link SimulationOptionsCustomization} with the given {@link ReschedulingStrategy}.
+	 *
+	 * @param rescheduling the rescheduling
+	 */
 	public void customize(ReschedulingStrategy rescheduling) {
 		this.rescheduling = rescheduling;
 	}
@@ -143,6 +178,11 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this(delegate, null, null, null, routeChoice, null, null, null);
 	}
 	
+	/**
+	 * Customize this {@link SimulationOptionsCustomization} with the given {@link ZoneBasedRouteChoice}.
+	 *
+	 * @param routeChoice the route choice
+	 */
 	public void customize(ZoneBasedRouteChoice routeChoice) {
 		this.routeChoice = routeChoice;
 	}
@@ -157,6 +197,11 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this(delegate, null, null, null, null, impedance, null, null);
 	}
 	
+	/**
+	 * Customize this {@link SimulationOptionsCustomization} with the given {@link ImpedanceIfc}.
+	 *
+	 * @param impedance the impedance
+	 */
 	public void customize(ImpedanceIfc impedance) {
 		this.impedance = impedance;
 	}
@@ -172,6 +217,11 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this(delegate, null, null, null, null, null, rideSharingOffers, null);
 	}
 	
+	/**
+	 * Customize this {@link SimulationOptionsCustomization} with the given {@link RideSharingOffers}.
+	 *
+	 * @param rideSharingOffers the ride sharing offers
+	 */
 	public void customize(RideSharingOffers rideSharingOffers) {
 		this.rideSharingOffers = rideSharingOffers;
 	}
@@ -188,6 +238,11 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this(delegate, null, null, null, null, null, null, activityDurationRandomizer);
 	}
 	
+	/**
+	 * Customize this {@link SimulationOptionsCustomization} with the given {@link ActivityStartAndDurationRandomizer}.
+	 *
+	 * @param activityDurationRandomizer the activity duration randomizer
+	 */
 	public void customize(ActivityStartAndDurationRandomizer activityDurationRandomizer) {
 		this.activityDurationRandomizer = activityDurationRandomizer;
 	}
@@ -273,7 +328,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @return the int
 	 */
 	@Override
-	public int maxDifferenceMinutes() { // TODO: customizable?
+	public int maxDifferenceMinutes() {
 		return delegateSimulationOptions.maxDifferenceMinutes();
 	}
 
@@ -298,7 +353,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @return the simulation start
 	 */
 	@Override
-	public Time simulationStart() { // TODO: customizable?
+	public Time simulationStart() {
 		return delegateSimulationOptions.simulationStart();
 	}
 
@@ -308,7 +363,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @return the simulation end
 	 */
 	@Override
-	public Time simulationEnd() { // TODO: customizable?
+	public Time simulationEnd() {
 		return delegateSimulationOptions.simulationEnd();
 	}
 

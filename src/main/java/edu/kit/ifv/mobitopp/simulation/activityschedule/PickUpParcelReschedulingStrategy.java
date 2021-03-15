@@ -6,6 +6,11 @@ import edu.kit.ifv.mobitopp.simulation.ReschedulingStrategy;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
+/**
+ * The Class PickUpParcelReschedulingStrategy is a {@link ReschedulingStrategy} for {@link PickUpParcelPerson}s.
+ * It inserts a PickUpParcel {@link ActivityIfc} if the person has parcels waiting at a pack station.
+ * It decorates a {@link ReschedulingStrategy} which will be applied after inserting parcel pick-ups.
+ */
 public class PickUpParcelReschedulingStrategy implements ReschedulingStrategy  {
 
 	private PickUpParcelPerson person;
@@ -13,11 +18,25 @@ public class PickUpParcelReschedulingStrategy implements ReschedulingStrategy  {
 	private boolean isPickupPlanned = false;
 	
 	
+	/**
+	 * Instantiates a new pick up parcel rescheduling strategy.
+	 *
+	 * @param person the person
+	 * @param defaultRescheduling the default rescheduling
+	 */
 	public PickUpParcelReschedulingStrategy(PickUpParcelPerson person, ReschedulingStrategy defaultRescheduling) {
 		this.person = person;
 		this.defaultRescheduling = defaultRescheduling;
 	}
 	
+	/**
+	 * Adjust the schedule. Insert PickUpParcel {@link ActivityIfc activities} if the person has parcels waiting at the packstation.
+	 *
+	 * @param activitySchedule the activity schedule
+	 * @param beginningActivity the beginning activity
+	 * @param plannedStartTime the planned start time
+	 * @param currentTime the current time
+	 */
 	@Override
 	public void adjustSchedule(ModifiableActivitySchedule activitySchedule, ActivityIfc beginningActivity,
 			Time plannedStartTime, Time currentTime) {

@@ -65,7 +65,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		
 		Parcel prev = it.next();
 		Parcel next = null;
-		float tripDuration = 2 * travelTime(person, dc.getZone(), prev.getZone(), work.startDate()) + efficiency.getDeliveryDurAdd();
+		float tripDuration = 2 * travelTime(person, dc.getZone(), prev.getZone(), work.startDate()) + efficiency.getDeliveryDurBase();
 		int parcels = 1;
 		assigned.add(prev);
 		
@@ -90,18 +90,18 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		
 		if (!next.getLocation().equals(prev.getLocation())) {
 			dur += travelTime(person, prev.getZone(), next.getZone(), time);
-			dur += efficiency.getDeliveryDurAdd();
+			dur += efficiency.getDeliveryDurBase();
 			return dur;
 		}
 		
 		if (next.getDestinationType().equals(ParcelDestinationType.PACK_STATION) && prev.getDestinationType().equals(prev.getDestinationType())) {
-			dur += efficiency.getDeliveryDurMul();
+			dur += efficiency.getDeliveryDurPerParcel();
 			
 		} else if (next.getPerson().household().equals(prev.getPerson().household())) {
-			dur += efficiency.getDeliveryDurMul();
+			dur += efficiency.getDeliveryDurPerParcel();
 			
 		} else {
-			dur += efficiency.getDeliveryDurAdd();
+			dur += efficiency.getDeliveryDurBase();
 		}
 		
 		

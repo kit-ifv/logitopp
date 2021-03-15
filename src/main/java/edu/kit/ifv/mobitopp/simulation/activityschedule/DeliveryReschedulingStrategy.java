@@ -21,36 +21,23 @@ import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class DeliveryReschedulingStrategy is a ReschedulingStrategy for persons carrying out deliveries.
  * It generates the delivery person's delivery activities once he arrives at work.
+ * Furthermore, the activity schedule is simplified to a work-home-work-home-... schedule and recalculated every evening.
  * The rest of the time a default rescheduling strategy is used.
  * 
  * This strategy is not state-less since it depends on the delivery person and their unload-activities.
  */
 public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	
-	/** The replaced activity id. */
 	private static int replacedActivityId = -1;
-	
-	/** The center. */
 	private DistributionCenter center;
-	
-	/** The person. */
 	private DeliveryPerson person;
-	
-	/** The default rescheduling. */
 	private ReschedulingStrategy defaultRescheduling;
-	
-	/** The next unload. */
 	private ActivityIfc nextUnload = null;
-	
-	/** The results. */
 	private DeliveryResults results;
-	
-	
-	/** The first rescheduling. */
+
 	private boolean firstRescheduling = true;
 
 	/**
@@ -59,7 +46,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	 * @param center the center
 	 * @param person the person
 	 * @param defaultRescheduling the default rescheduling strategy
-	 * @param results the results
+	 * @param results the delivery results
 	 */
 	public DeliveryReschedulingStrategy(DistributionCenter center, DeliveryPerson person, ReschedulingStrategy defaultRescheduling, DeliveryResults results) {
 		this.person = person;
@@ -71,7 +58,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	/**
 	 * Adjusts the delivery person's schedule.
 	 * At the first work aktivity fo the day: split the work activity into loading, small delivery activities and unloading.
-	 * For every delivery activity: check if the person is running late. Abort delivery if the end of the working shift is almost reached.
+	 * For every delivery activity: check if the person is running late. Abort delivery after 19:30 pm.
 	 * When the next work activity after loading is reached: unload the parcels that are returning.
 	 *
 	 * @param activitySchedule the activity schedule
@@ -143,7 +130,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	}
 
 	/**
-	 * Unload.
+	 * Unload the returning parcels at the distribution center.
 	 *
 	 * @param currentTime the current time
 	 */
@@ -165,7 +152,8 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	}
 
 	/**
-	 * Creates the tour and load.
+	 * Creates the tour and loads the parcels.
+	 * Wait at the distribution center until 8:00 am before starting the deliveries.
 	 *
 	 * @param activitySchedule the activity schedule
 	 * @param beginningActivity the beginning activity
@@ -220,7 +208,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	}
 
 	/**
-	 * Activity type sequence.
+	 * Returns a String representation of the activity type sequence.
 	 *
 	 * @param activitySchedule the activity schedule
 	 * @param beginningActivity the beginning activity
@@ -236,7 +224,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	}
 	
 	/**
-	 * Activity sequence.
+	 * Returns a String representation of the activity sequence.
 	 *
 	 * @param activitySchedule the activity schedule
 	 * @param beginningActivity the beginning activity
@@ -253,7 +241,8 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	}
 
 	/**
-	 * Activity time string.
+	 * Returns a String representation of the given activity with the following format:
+	 * '([start day] [start hour]:[start minute] - [activity type] - [end day] [end hour]:[end minute])'
 	 *
 	 * @param a the a
 	 * @return the string
@@ -265,7 +254,8 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	}
 
 	/**
-	 * Skip rest of tour.
+	 * Skip the rest of the current tour, 
+	 * abort the remaining delivery activities and remove them from the schedule.
 	 *
 	 * @param activitySchedule the activity schedule
 	 * @param beginningActivity the beginning activity
@@ -292,7 +282,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	
 	
 	/**
-	 * Replace schedule.
+	 * Replace the current schedule by work-home-work-home...
 	 *
 	 * @param activitySchedule the activity schedule
 	 * @param beginningActivity the beginning activity
@@ -354,12 +344,12 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	}
 	
 	/**
-	 * Insert home activity.
+	 * Insert a new home activity after the given last activity.
 	 *
 	 * @param activitySchedule the activity schedule
 	 * @param lastActivity the last activity
 	 * @param ids the ids
-	 * @return the activity ifc
+	 * @return the new home activity
 	 */
 	private ActivityIfc insertHomeActivity(ModifiableActivitySchedule activitySchedule, ActivityIfc lastActivity, List<Integer> ids) {
 		
@@ -381,12 +371,12 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	}
 	
 	/**
-	 * Insert work activity.
+	 * Insert a work activity after the given last activity.
 	 *
 	 * @param activitySchedule the activity schedule
 	 * @param lastActivity the last activity
 	 * @param ids the ids
-	 * @return the activity ifc
+	 * @return the new work activity
 	 */
 	private ActivityIfc insertWorkActivity(ModifiableActivitySchedule activitySchedule, ActivityIfc lastActivity, List<Integer> ids) {
 		
@@ -408,7 +398,8 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	}
 	
 	/**
-	 * New id.
+	 * Returns a new activity id.
+	 * If the given list of ids is not empty, the will be recycled.
 	 *
 	 * @param ids the ids
 	 * @return the int

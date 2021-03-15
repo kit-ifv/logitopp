@@ -110,24 +110,24 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 		
 		if (prev == null) {
 			dur += travelTime(person, dc.getZone(), next.getZone(), time);
-			dur += efficiency.getDeliveryDurAdd();
+			dur += efficiency.getDeliveryDurBase();
 			return dur;
 		}
 		
 		if (!next.getLocation().equals(prev.getLocation())) {
 			dur += travelTime(person, prev.getZone(), next.getZone(), time);
-			dur += efficiency.getDeliveryDurAdd();
+			dur += efficiency.getDeliveryDurBase();
 			return dur;
 		}
 		
 		if (next.getDestinationType().equals(ParcelDestinationType.PACK_STATION) && prev.getDestinationType().equals(prev.getDestinationType())) {
-			dur += efficiency.getDeliveryDurMul();
+			dur += efficiency.getDeliveryDurPerParcel();
 			
 		} else if (next.getPerson().household().equals(prev.getPerson().household())) {
 			dur += 0;
 			
 		} else {
-			dur += efficiency.getDeliveryDurAdd();
+			dur += efficiency.getDeliveryDurPerParcel();
 		}
 		
 		
@@ -142,7 +142,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	
 	private int selectCapacity(DeliveryPerson person) {
 		double stdGauss = new Random((long) (person.getNextRandom() * Long.MAX_VALUE)).nextGaussian();
-		double scaledGauss = CAPACITY_STD_DEV *stdGauss + MAX_CAPACITY;
+		double scaledGauss = CAPACITY_STD_DEV *stdGauss + MEAN_CAPACITY;
 
 		return Math.min(Math.max(MIN_CAPACITY, (int) round(scaledGauss)), MAX_CAPACITY);
 	}

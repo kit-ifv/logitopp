@@ -9,9 +9,8 @@ import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
-// TODO: Auto-generated Javadoc
 /**
- * A factory for creating DeliveryActivity objects.
+ * A factory for creating {@link DeliveryActivity DeliveryActivities}.
  */
 public class DeliveryActivityFactory {
 
@@ -26,10 +25,10 @@ public class DeliveryActivityFactory {
 	 * delivery duration. The activities flexibilities are determined by the given
 	 * work activity.
 	 *
-	 * @param parcels the parcels
+	 * @param parcels         the parcels to be delivered
 	 * @param work            the work
 	 * @param startDate       the start date
-	 * @param person the person
+	 * @param person 		  the delivery person
 	 * @return the delivery activity
 	 */
 	public static ActivityIfc createDeliveryActivity(List<Parcel> parcels, ActivityIfc work, Time startDate, DeliveryPerson person) {
@@ -45,9 +44,9 @@ public class DeliveryActivityFactory {
 	 * given efficiency profile. The efficiency profile determines the trip and
 	 * unload duration.
 	 *
-	 * @param work       the work
-	 * @param efficiency the efficiency
-	 * @return the activity ifc
+	 * @param work       the work activity
+	 * @param efficiency the efficiency profile
+	 * @return the unload activity
 	 */
 	public static ActivityIfc createUnloadParcelsActivity(ActivityIfc work, DeliveryEfficiencyProfile efficiency) {
 		return createUnloadParcelsActivity(work, efficiency.getTripDuration(), efficiency.getUnloadDuration());
@@ -60,7 +59,7 @@ public class DeliveryActivityFactory {
 	 * @param work           the work
 	 * @param tripDuration   the trip duration
 	 * @param unloadDuration the unload duration
-	 * @return the activity ifc
+	 * @return the unload activity
 	 */
 	public static ActivityIfc createUnloadParcelsActivity(ActivityIfc work, int tripDuration, int unloadDuration) {
 		Time startUnloadTime = work.startDate().plusMinutes(work.duration() - unloadDuration);
@@ -89,20 +88,4 @@ public class DeliveryActivityFactory {
 		return activity;
 	}
 	
-	/**
-	 * Creates a new DeliveryActivity object.
-	 *
-	 * @param next the next
-	 * @param tripDuration the trip duration
-	 * @return the activity ifc
-	 */
-	public static ActivityIfc createSaturdayWorkActivity(ActivityIfc next, int tripDuration) {
-		Time startTime = next.startDate();
-
-		ActivityIfc activity = new ActivityAsLinkedListElement(activityCounter--, next.getActivityNrOfWeek(),
-				ActivityType.WORK, startTime, tripDuration, 420, next.startFlexibility(),
-				next.endFlexibility(), next.durationFlexibility());
-
-		return activity;
-	}
 }
