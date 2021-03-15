@@ -28,13 +28,8 @@ import lombok.Getter;
 @Getter
 public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 
-	/** The wrapped/decorated activity. */
 	private ActivityAsLinkedListElement activity;
-
-	/** The parcel to be delivered. */
 	private final Collection<Parcel> parcels;
-	
-	/** The person. */
 	private final DeliveryPerson person;
 
 	/**
