@@ -25,11 +25,6 @@ import lombok.Getter;
  * The Class DeliveryActivity represents the activity of delivering a parcel.
  */
 
-/**
- * Gets the person.
- *
- * @return the person
- */
 @Getter
 public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 
