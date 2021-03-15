@@ -22,16 +22,26 @@ import edu.kit.ifv.mobitopp.simulation.person.PublicTransportBehaviour;
 import edu.kit.ifv.mobitopp.simulation.person.TripFactory;
 import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class DemandSimulatorDelivery extends the DemandSimulatorPassenger by
  * introducing parcel orders and delivery persons.
  */
 public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 
+	/** The parcel order model. */
 	private final ParcelOrderModel parcelOrderModel;
+	
+	/** The parcels. */
 	private final Collection<Parcel> parcels;
+	
+	/** The delivery person factory. */
 	private final DeliveryPersonFactory deliveryPersonFactory;
+	
+	/** The person filter. */
 	private final Predicate<Person> personFilter;
+	
+	/** The delivery results. */
 	private final DeliveryResults deliveryResults;
 	
 
@@ -49,6 +59,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param context                    the simulation context
 	 * @param personFactory              the person factory
 	 * @param parcelOrderModel           the parcel order model
+	 * @param personFilter the person filter
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
@@ -99,6 +110,18 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 				+ ppps.size() + " unique persons.");
 	}
 
+	/**
+	 * Creates the simulated person.
+	 *
+	 * @param queue the queue
+	 * @param boarder the boarder
+	 * @param seed the seed
+	 * @param p the p
+	 * @param listener the listener
+	 * @param modesInSimulation the modes in simulation
+	 * @param initialState the initial state
+	 * @return the pick up parcel person
+	 */
 	protected PickUpParcelPerson createSimulatedPerson(EventQueue queue,
 			PublicTransportBehaviour boarder, long seed, Person p, PersonListener listener,
 			Set<Mode> modesInSimulation, PersonState initialState) {

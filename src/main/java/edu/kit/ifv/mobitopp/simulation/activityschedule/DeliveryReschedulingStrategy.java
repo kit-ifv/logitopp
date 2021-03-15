@@ -21,6 +21,7 @@ import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class DeliveryReschedulingStrategy is a ReschedulingStrategy for persons carrying out deliveries.
  * It generates the delivery person's delivery activities once he arrives at work.
@@ -29,15 +30,27 @@ import edu.kit.ifv.mobitopp.time.Time;
  * This strategy is not state-less since it depends on the delivery person and their unload-activities.
  */
 public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
+	
+	/** The replaced activity id. */
 	private static int replacedActivityId = -1;
 	
+	/** The center. */
 	private DistributionCenter center;
+	
+	/** The person. */
 	private DeliveryPerson person;
+	
+	/** The default rescheduling. */
 	private ReschedulingStrategy defaultRescheduling;
+	
+	/** The next unload. */
 	private ActivityIfc nextUnload = null;
+	
+	/** The results. */
 	private DeliveryResults results;
 	
 	
+	/** The first rescheduling. */
 	private boolean firstRescheduling = true;
 
 	/**
@@ -46,7 +59,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	 * @param center the center
 	 * @param person the person
 	 * @param defaultRescheduling the default rescheduling strategy
-	 * @param efficiency the efficiency profile
+	 * @param results the results
 	 */
 	public DeliveryReschedulingStrategy(DistributionCenter center, DeliveryPerson person, ReschedulingStrategy defaultRescheduling, DeliveryResults results) {
 		this.person = person;
@@ -129,6 +142,11 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 
 	}
 
+	/**
+	 * Unload.
+	 *
+	 * @param currentTime the current time
+	 */
 	private void unload(Time currentTime) {
 		Collection<Parcel> returning  = this.person.getCurrentTour().stream().filter(p -> p.getState().equals(ParcelState.RETURNING)).collect(Collectors.toList());
 		Collection<Parcel> stillOnDelivery = this.person.getCurrentTour().stream().filter(p -> p.getState().equals(ParcelState.ONDELIVERY)).collect(Collectors.toList());
@@ -146,6 +164,13 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		this.nextUnload = null;
 	}
 
+	/**
+	 * Creates the tour and load.
+	 *
+	 * @param activitySchedule the activity schedule
+	 * @param beginningActivity the beginning activity
+	 * @param currentTime the current time
+	 */
 	private void createTourAndLoad(ModifiableActivitySchedule activitySchedule,
 		ActivityIfc beginningActivity, Time currentTime) {
 		List<List<Parcel>> parcelChunks = center.assignParcels(person, beginningActivity, currentTime);
@@ -194,6 +219,13 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		System.out.println("Person " + person.getOid() + " loads truck with " + parcelChunks.stream().mapToInt(l -> l.size()).sum() + ": planned unload at " + nextUnload.startDate().toString());
 	}
 
+	/**
+	 * Activity type sequence.
+	 *
+	 * @param activitySchedule the activity schedule
+	 * @param beginningActivity the beginning activity
+	 * @return the string
+	 */
 	private String activityTypeSequence(ModifiableActivitySchedule activitySchedule,
 		ActivityIfc beginningActivity) {
 		return beginningActivity.activityType().getTypeAsInt() + "," +
@@ -203,6 +235,13 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 							   .collect(Collectors.joining(","));
 	}
 	
+	/**
+	 * Activity sequence.
+	 *
+	 * @param activitySchedule the activity schedule
+	 * @param beginningActivity the beginning activity
+	 * @return the string
+	 */
 	private String activitySequence(ModifiableActivitySchedule activitySchedule,
 		ActivityIfc beginningActivity) {
 		
@@ -213,12 +252,25 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 							   .collect(Collectors.joining(","));
 	}
 
+	/**
+	 * Activity time string.
+	 *
+	 * @param a the a
+	 * @return the string
+	 */
 	private String activityTimeString(ActivityIfc a) {
 		return "(" + a.startDate().getDay() + " " + a.startDate().getHour() + ":" + a.startDate().getMinute() +
 			         " - " +   a.activityType().name() + " - " + 
 			         a.calculatePlannedEndDate().getDay() + " " + a.calculatePlannedEndDate().getHour() + ":" + a.calculatePlannedEndDate().getMinute() + ")";
 	}
 
+	/**
+	 * Skip rest of tour.
+	 *
+	 * @param activitySchedule the activity schedule
+	 * @param beginningActivity the beginning activity
+	 * @param currentTime the current time
+	 */
 	private void skipRestOfTour(ModifiableActivitySchedule activitySchedule,
 		ActivityIfc beginningActivity, Time currentTime) {
 		
@@ -239,6 +291,14 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	}
 	
 	
+	/**
+	 * Replace schedule.
+	 *
+	 * @param activitySchedule the activity schedule
+	 * @param beginningActivity the beginning activity
+	 * @param plannedStartTime the planned start time
+	 * @param currentTime the current time
+	 */
 	private void replaceSchedule(ModifiableActivitySchedule activitySchedule, ActivityIfc beginningActivity,
 		Time plannedStartTime, Time currentTime) {
 		String before = activitySequence(activitySchedule, beginningActivity);
@@ -293,6 +353,14 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		
 	}
 	
+	/**
+	 * Insert home activity.
+	 *
+	 * @param activitySchedule the activity schedule
+	 * @param lastActivity the last activity
+	 * @param ids the ids
+	 * @return the activity ifc
+	 */
 	private ActivityIfc insertHomeActivity(ModifiableActivitySchedule activitySchedule, ActivityIfc lastActivity, List<Integer> ids) {
 		
 		Time time = lastActivity.calculatePlannedEndDate().plusMinutes(15);
@@ -312,6 +380,14 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		return home;
 	}
 	
+	/**
+	 * Insert work activity.
+	 *
+	 * @param activitySchedule the activity schedule
+	 * @param lastActivity the last activity
+	 * @param ids the ids
+	 * @return the activity ifc
+	 */
 	private ActivityIfc insertWorkActivity(ModifiableActivitySchedule activitySchedule, ActivityIfc lastActivity, List<Integer> ids) {
 		
 		Time time = lastActivity.calculatePlannedEndDate().plusMinutes(15);
@@ -331,6 +407,12 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		return work;
 	}
 	
+	/**
+	 * New id.
+	 *
+	 * @param ids the ids
+	 * @return the int
+	 */
 	private int newId(List<Integer> ids) {
 		if (ids == null || ids.isEmpty()) {
 			return replacedActivityId--;
@@ -372,10 +454,20 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		return this.person.getEfficiency();
 	}
 
+	/**
+	 * Gets the trip duration.
+	 *
+	 * @return the trip duration
+	 */
 	private int getTripDuration() {
 		return getEfficiency().getTripDuration();
 	}
 
+	/**
+	 * Gets the load duration.
+	 *
+	 * @return the load duration
+	 */
 	private int getLoadDuration() {
 		return getEfficiency().getLoadDuration();
 	}
