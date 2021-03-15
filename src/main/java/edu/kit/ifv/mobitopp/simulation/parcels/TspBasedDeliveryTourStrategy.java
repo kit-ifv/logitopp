@@ -39,7 +39,6 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 	 * @param dc the distribution center
 	 * @param person the person
 	 * @param work the work
-	 * @param efficiency the efficiency
 	 * @return the collection
 	 */
 	@Override

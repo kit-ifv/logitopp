@@ -1,5 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Interface ParcelDeliveryPolicy provides methods deciding whether parcels can be delivered or should be updated.
  */
@@ -19,6 +20,7 @@ public interface ParcelDeliveryPolicy {
 	 * E.g. if the delivery was attempted 3 times, the delivery can be sent to a pack station.
 	 *
 	 * @param parcel the parcel
+	 * @return true, if successful
 	 */
 	public boolean updateParcelDelivery(Parcel parcel);
 	

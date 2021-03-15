@@ -9,6 +9,7 @@ import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
+// TODO: Auto-generated Javadoc
 /**
  * A factory for creating DeliveryActivity objects.
  */
@@ -25,11 +26,10 @@ public class DeliveryActivityFactory {
 	 * delivery duration. The activities flexibilities are determined by the given
 	 * work activity.
 	 *
-	 * @param parcel          the parcel
+	 * @param parcels the parcels
 	 * @param work            the work
 	 * @param startDate       the start date
-	 * @param deliverDuration the deliver duration
-	 * @param tripDuration    the trip duration
+	 * @param person the person
 	 * @return the delivery activity
 	 */
 	public static ActivityIfc createDeliveryActivity(List<Parcel> parcels, ActivityIfc work, Time startDate, DeliveryPerson person) {
@@ -89,6 +89,13 @@ public class DeliveryActivityFactory {
 		return activity;
 	}
 	
+	/**
+	 * Creates a new DeliveryActivity object.
+	 *
+	 * @param next the next
+	 * @param tripDuration the trip duration
+	 * @return the activity ifc
+	 */
 	public static ActivityIfc createSaturdayWorkActivity(ActivityIfc next, int tripDuration) {
 		Time startTime = next.startDate();
 
