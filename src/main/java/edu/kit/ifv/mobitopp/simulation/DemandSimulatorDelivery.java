@@ -43,6 +43,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param destinationChoiceModel     the destination choice model
 	 * @param modeChoiceModel            the mode choice model
 	 * @param routeChoice                the route choice model
+	 * @param activityPeriodFixer        the activity period fixer
 	 * @param activityDurationRandomizer the activity duration randomizer
 	 * @param tripFactory                the trip factory
 	 * @param rescheduling               the rescheduling strategy

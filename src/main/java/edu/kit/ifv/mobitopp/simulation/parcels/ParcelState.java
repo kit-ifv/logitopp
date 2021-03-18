@@ -3,8 +3,8 @@ package edu.kit.ifv.mobitopp.simulation.parcels;
 
 /**
  * The Enum ParcelState describes the delivery life cycle of a parcel.
- * Undefined -> on delivery -> returning -> undefined.
- * Delivered -> delivered.
+ * Undefined - on delivery - returning - undefined.
+ * Delivered - delivered.
  */
 public enum ParcelState {
 	
