@@ -36,7 +36,7 @@ public class DefaultParcelOrderModel implements ParcelOrderModel {
 	}
 	
 
-	public Collection<Parcel> createParcelOrdes(PickUpParcelPerson person,
+	public Collection<Parcel> createParcelOrders(PickUpParcelPerson person,
 		DeliveryResults results) {
 		int numOfParcels = numberOfParcelsSelector.select(person, person.getNextRandom());
 

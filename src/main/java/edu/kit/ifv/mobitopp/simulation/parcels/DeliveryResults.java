@@ -50,7 +50,7 @@ public class DeliveryResults {
 		msg += parcel.getDeliveryAttempts() + "; ";
 		msg += String.valueOf(parcel.getDeliveryTime()) + ";";
 		msg += deliveryGuy.currentActivity().zone().getId() + ";";
-		msg += parcel.getZone().getId() + ";";
+		msg += parcel.getZone().getId();
 		
 		this.results.write(resultCategoryState, msg);
 	}
@@ -79,6 +79,7 @@ public class DeliveryResults {
 		msg += parcel.getDestinationType().name() + "; ";
 		msg += parcel.getPlannedArrivalDate().getDay() + "; ";
 		msg += parcel.getDistributionCenter().getName() + ";";
+		msg += parcel.getDeliveryService();
 		
 		this.results.write(resultCategoryOrder, msg);
 	}
@@ -89,7 +90,7 @@ public class DeliveryResults {
 	 * @return the category
 	 */
 	public static Category createResultCategoryOrder() {
-		return new Category("parcel-orders", Arrays.asList("ParcelID", "RecipientID", "DestinationType", "ArrivalDay", "DistributionCenter"));
+		return new Category("parcel-orders", Arrays.asList("ParcelID", "RecipientID", "DestinationType", "ArrivalDay", "DistributionCenter", "DeliveryService"));
 	}
 	
 	
@@ -105,7 +106,7 @@ public class DeliveryResults {
 		msg += person.getId().getOid() + "; ";
 		msg += distributionCenter.getName() + "; ";
 		msg += distributionCenter.getOrganization() + "; ";
-		msg += person.employment().name() + ";";
+		msg += person.employment().name();
 		
 		this.results.write(resultCategoryEmployee, msg);
 	}

@@ -1,6 +1,5 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface ParcelDeliveryPolicy provides methods deciding whether parcels can be delivered or should be updated.
  */

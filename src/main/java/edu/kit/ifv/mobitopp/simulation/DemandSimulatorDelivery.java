@@ -129,7 +129,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @return the collection of parcels ordered by the given person
 	 */
 	protected Collection<Parcel> createParcelOrder(PickUpParcelPerson p) {
-		Collection<Parcel> parcels = this.parcelOrderModel.createParcelOrdes(p, this.deliveryResults);
+		Collection<Parcel> parcels = this.parcelOrderModel.createParcelOrders(p, this.deliveryResults);
 		this.parcels.addAll(parcels);
 
 		return parcels;

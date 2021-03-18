@@ -5,9 +5,14 @@ import static java.lang.Math.min;
 
 import java.util.Random;
 
+import edu.kit.ifv.mobitopp.simulation.Person;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 
+/**
+ * The Class NormalDistributedNumberOfParcelsSelector is a {@link NumberOfParcelsSelector}.
+ * It selects a number drawn from a capped normal distribution.
+ */
 public class NormalDistributedNumberOfParcelsSelector implements NumberOfParcelsSelector {
 
 	private double mean;
@@ -16,10 +21,27 @@ public class NormalDistributedNumberOfParcelsSelector implements NumberOfParcels
 	private int capMax;
 
 
+	/**
+	 * Instantiates a new {@link NormalDistributedNumberOfParcelsSelector}
+	 * with the given mean, standard deviation and upper bound.
+	 * The lower bound is set to 0.
+	 *
+	 * @param mean the mean
+	 * @param stdDev the standard deviation
+	 * @param capMax the cap max
+	 */
 	public NormalDistributedNumberOfParcelsSelector(double mean, double stdDev, int capMax) {
 		this(mean, stdDev, 0, capMax);
 	}
 	
+	/**
+	 * Instantiates a new {@link NormalDistributedNumberOfParcelsSelector}
+	 * with the given mean, standard deviation and lower and upper bound.
+	 * @param mean the mean
+	 * @param stdDev the standard deviation
+	 * @param capMin the lower bound
+	 * @param capMax the upper bound
+	 */
 	public NormalDistributedNumberOfParcelsSelector(double mean, double stdDev, int capMin, int capMax) {
 		this.mean = mean;
 		this.stdDev = stdDev;
@@ -30,6 +52,12 @@ public class NormalDistributedNumberOfParcelsSelector implements NumberOfParcels
 		this.capMax = capMax;
 	}
 
+	/**
+	 * Validates the given lower and upper bound.
+	 *
+	 * @param capMin the lower bound
+	 * @param capMax the upper bound
+	 */
 	private void validate(int capMin, int capMax) {
 		if (capMin < 0) {
 			throw new IllegalArgumentException("CapMin should not be less than 0. Otherwise a negative amount of parcels could be ordered.");
@@ -40,6 +68,15 @@ public class NormalDistributedNumberOfParcelsSelector implements NumberOfParcels
 		}
 	}
 	
+
+	/**
+	 * Selects the number of parcels, the given {@link Person} orders
+	 * from the normal distribution.
+	 *
+	 * @param person the person
+	 * @param randomNumber a random number
+	 * @return the selected number of parcels
+	 */
 	@Override
 	public int select(PickUpParcelPerson person, double randomNumber) {
 		double standardGauss = new Random((long) (randomNumber * Long.MAX_VALUE)).nextGaussian();

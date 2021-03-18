@@ -7,15 +7,13 @@ import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class DummyDeliveryTourStrategy is an exemplary implementation of the DeliveryTourAssignmentStrategy interface.
- * To be replaced!
  */
 public class DummyDeliveryTourStrategy implements DeliveryTourAssignmentStrategy {
 
 	/**
-	 * Assign parcels to the given delivery person based on the duration of the working activity and the time required per parcel.
+	 * Assign parcels to the given delivery person based on the duration of the working activity and the delivery duration per parcel.
 	 *
 	 * @param dc the dc
 	 * @param person the person

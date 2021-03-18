@@ -18,6 +18,7 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 import edu.kit.ifv.mobitopp.data.Zone;
+import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
@@ -28,8 +29,14 @@ import edu.kit.ifv.mobitopp.time.SimpleTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
- * The Class DummyDeliveryTourStrategy is an exemplary implementation of the DeliveryTourAssignmentStrategy interface.
- * To be replaced!
+ * The Class ZoneTspDeliveryTourStrategy is a DeliveryTourAssignmentStrategy.
+ * When assigning parcels, a 'giant tour' containing all parcels is planned.
+ * This is accomplished by solving a (2-approximation) TSP on all delivery locations.
+ * Within the zone, parcels are grouped by destination type and household.
+ * A delivery person is assigned parcels in the computed order, until their capacity is reached,
+ * or the estimated duration of the tour reaches 8h.
+ * The giant tour is recalculated every hour with the current impedance to consider the new trip durations.
+ * The delivery persons capacity is drawn from a normal distribution.
  */
 public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrategy {
 
@@ -45,15 +52,15 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	private static final boolean SKIP_SUNDAY = true;
 	
 	/**
-	 * Assign parcels to the given delivery person based on the duration of the working activity and the time required per parcel.
+	 * Assign parcels to the given delivery person.
 	 *
 	 * @param dc the distribution center
 	 * @param person the person
-	 * @param work the work
-	 * @return the collection
+	 * @param work the work activity
+	 * @return the list of assigned parcels
 	 */
 	@Override
-	public List<Parcel> assignParcels(DistributionCenter dc, DeliveryPerson person,  ActivityIfc work) { //Maybe assign delivery activities instead of parcels?
+	public List<Parcel> assignParcels(DistributionCenter dc, DeliveryPerson person,  ActivityIfc work) {
 		DeliveryEfficiencyProfile efficiency = person.getEfficiency();
 		
 		if (SKIP_SUNDAY && startsOnSunday(work) || startsAfter1800(work)) {
@@ -64,9 +71,6 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			planZoneTour(dc, person, work.startDate());
 		}
 
-		long start = System.currentTimeMillis();
-		System.out.println("Start assigning parcels");
-		
 		Iterator<Parcel> it = parcelTour.stream().filter(p -> p.isUndefined()).iterator();
 		
 		ArrayList<Parcel> assigned = new ArrayList<Parcel>();
@@ -87,24 +91,46 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			prev = next;
 		}
 		
-		long end = System.currentTimeMillis();
-		System.out.println("Finished assigning parcels (" + parcels +"/" + capacity + " parcels;" + tourDuration + " min): took " + (end-start) + " ms");
+
 				
 		return assigned;
 		
 	}
 
 
+	/**
+	 * Checks if the given work activity starts after 1800.
+	 *
+	 * @param work the work
+	 * @return true, if successful
+	 */
 	private boolean startsAfter1800(ActivityIfc work) {
 		return work.startDate().isAfter(work.startDate().startOfDay().plusHours(18));
 	}
 
 
+	/**
+	 * Checks if the given work activity starts on sunday.
+	 *
+	 * @param work the work
+	 * @return true, if successful
+	 */
 	private boolean startsOnSunday(ActivityIfc work) {
 		return work.startDate().weekDay().equals(DayOfWeek.SUNDAY);
 	}
 	
 	
+	/**
+	 * Estimates the duration of the delivery.
+	 *
+	 * @param dc the {@link DistributionCenter}
+	 * @param person the {@link DeliveryPerson}
+	 * @param time the current time
+	 * @param efficiency the {@link DeliveryEfficiencyProfile}
+	 * @param next the next {@link Parcel} to deliver
+	 * @param prev the previous {@link Parcel} to deliver
+	 * @return the estimate duration
+	 */
 	private float duration(DistributionCenter dc, DeliveryPerson person, Time time, DeliveryEfficiencyProfile efficiency, Parcel next, Parcel prev) {
 		float dur = 0.0f;
 		
@@ -136,10 +162,25 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	
 	
 	
+	/**
+	 * Returns the travel time form origin to destination.
+	 *
+	 * @param person the person
+	 * @param origin the origin
+	 * @param destination the destination
+	 * @param time the time
+	 * @return the float
+	 */
 	private float travelTime(DeliveryPerson person, Zone origin, Zone destination, Time time) {
 		return person.options().impedance().getTravelTime(origin.getId(), destination.getId(), StandardMode.TRUCK, time);
 	}
 	
+	/**
+	 * Selects a capacity from a normal distribution.
+	 *
+	 * @param person the person
+	 * @return the capacity
+	 */
 	private int selectCapacity(DeliveryPerson person) {
 		double stdGauss = new Random((long) (person.getNextRandom() * Long.MAX_VALUE)).nextGaussian();
 		double scaledGauss = CAPACITY_STD_DEV *stdGauss + MEAN_CAPACITY;
@@ -150,14 +191,17 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	
 	
 	
+	/**
+	 * Plan giant tour through all delivery zones using a TSP 2 approximation.
+	 *
+	 * @param dc the {@link DistributionCenter}
+	 * @param person the {@link DeliveryPerson}
+	 * @param currentTime the current {@link Time}
+	 */
 	private void planZoneTour(DistributionCenter dc, DeliveryPerson person, Time currentTime) {
-		System.out.println("Plan giant tour for " + currentTime.toString());
-		long time = System.currentTimeMillis();
-		
-		
+
 		List<Parcel> toBeDelivered = dc.getAvailableParcels(currentTime);
-		System.out.println("Plan for " + toBeDelivered.size() + " parcels. (" + toBeDelivered.size() + "current, " + toBeDelivered.stream().filter(p -> p.getPlannedArrivalDate().startOfDay().isBefore(currentTime.startOfDay())).count() + " old, "+ dc.getDelivered().size() + " delivered)");
-			
+	
 		SimpleWeightedGraph<Zone, DefaultWeightedEdge> graph = new SimpleWeightedGraph<Zone, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 		Zone start = dc.getZone();
 		graph.addVertex(start);
@@ -183,8 +227,6 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			
 		}
 		
-		long end = System.currentTimeMillis();
-		System.out.println("Creating the graph took " + (end-time) + " ms");
 
 		//Use 2-approx algorithm for solving tsp
 		TwoApproxMetricTSP<Zone, DefaultWeightedEdge> tspAlg = new TwoApproxMetricTSP<>();
@@ -214,18 +256,19 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			
 		}
 		
-		long end2 = System.currentTimeMillis();
-		System.out.println("Solving tsp took " + (end2-end) + " ms");
-		System.out.println("Finished planning giant tour: took " + (end2-time) + " ms");
-		
 		this.parcelTour.clear();
 		this.parcelTour.addAll(prefix);
 		this.parcelTour.addAll(suffix);
 		this.parcelTour = this.parcelTour.stream().distinct().collect(toList());
-		System.out.println("Tour contains " + parcelTour.size() + " parcels.");
 
 	}
 	
+	/**
+	 * Sort parcels by {@link ParcelDestinationType} and {@link Household}.
+	 *
+	 * @param parcels the parcels to be sorted
+	 * @return the list of sorted parcels
+	 */
 	private List<Parcel> sortParcelsByDestination(List<Parcel> parcels) {
 		return parcels.stream()
 				 	  .sorted(Comparator.comparing(Parcel::getDestinationType)

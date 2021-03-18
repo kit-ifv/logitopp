@@ -21,8 +21,13 @@ import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
- * The Class DummyDeliveryTourStrategy is an exemplary implementation of the DeliveryTourAssignmentStrategy interface.
- * To be replaced!
+ * The Class TspBasedDeliveryTourStrategy is an exemplary implementation of the DeliveryTourAssignmentStrategy interface.
+ * When assigning parcels, a 'giant tour' containing all parcels is planned.
+ * This is accomplished by solving a TSP on all delivery zones.
+ * Within the zone, parcels are grouped by location and destination type.
+ * A delivery person is assigned parcels in the computed order, until their capacity (160 parcels) is reached,
+ * or the estimated duration of the tour reaches 8h.
+ * The giant tour is recalculated every day.
  */
 public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrategy {
 
@@ -53,9 +58,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		if (work.startDate().isAfter(nextPlan)) {
 			planGiantTour(dc, work.startDate());
 		}
-		
-		long start = System.currentTimeMillis();
-		System.out.println("Start assigning parcels");
+
 		
 		Iterator<Parcel> it = parcelTour.stream().filter(p -> p.isUndefined()).iterator();
 		
@@ -76,15 +79,21 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 			parcels++;
 			prev = next;
 		}
-		
-		long end = System.currentTimeMillis();
-		System.out.println("Finished assigning parcels (" + parcels +"/" + MAX_CAPACITY + " parcels;" + tripDuration + " min): took " + (end-start) + " ms");
-				
+
 		return assigned;
 		
 	}
 	
-	
+	/**
+	 * Estimates the duration of the delivery.
+	 *
+	 * @param person the {@link DeliveryPerson}
+	 * @param time the current {@link Time}
+	 * @param efficiency the {@link DeliveryEfficiencyProfile}
+	 * @param next the next {@link Parcel} to deliver
+	 * @param prev the previous {@link Parcel} to deliver
+	 * @return the estimate duration
+	 */
 	private float duration(DeliveryPerson person, Time time, DeliveryEfficiencyProfile efficiency, Parcel next, Parcel prev) {
 		float dur = 0.0f;
 		
@@ -107,22 +116,33 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		
 		return dur;
 	}
-		
+	
+	/**
+	 * Returns the travel time form origin to destination.
+	 *
+	 * @param person the person
+	 * @param origin the origin
+	 * @param destination the destination
+	 * @param time the time
+	 * @return the float
+	 */
 	private float travelTime(DeliveryPerson person, Zone origin, Zone destination, Time time) {
 		return person.options().impedance().getTravelTime(origin.getId(), destination.getId(), StandardMode.CAR, time);
 	}
 	
 	
 	
-	
+	/**
+	 * Plan giant tour through all delivery locations using a TSP 2 approximation.
+	 *
+	 * @param dc the {@link DistributionCenter}
+	 * @param person the {@link DeliveryPerson}
+	 * @param currentTime the current {@link Time}
+	 */
 	private void planGiantTour(DistributionCenter dc, Time plannedTime) {
-		System.out.println("Plan giant tour for " + plannedTime.toString());
-		long time = System.currentTimeMillis();
-		
 		
 		List<Parcel> toBeDelivered = dc.getAvailableParcels(plannedTime);
-		System.out.println("Plan for " + toBeDelivered.size() + " parcels. (" + toBeDelivered.size() + "current, " + toBeDelivered.stream().filter(p -> p.getPlannedArrivalDate().startOfDay().isBefore(plannedTime.startOfDay())).count() + " old, "+ dc.getDelivered().size() + " delivered)");
-			
+	
 		SimpleWeightedGraph<Location, DefaultWeightedEdge> graph = new SimpleWeightedGraph<Location, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 		Location start = dc.getLocation();
 		graph.addVertex(start);
@@ -148,7 +168,6 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		}
 		
 		long end = System.currentTimeMillis();
-		System.out.println("Creating the graph took " + (end-time) + " ms");
 
 		//Use 2-approx algorithm for solving tsp
 		TwoApproxMetricTSP<Location, DefaultWeightedEdge> tspAlg = new TwoApproxMetricTSP<>();
@@ -171,19 +190,13 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 			}
 			
 		}
-		
-		long end2 = System.currentTimeMillis();
-		System.out.println("Solving tsp took " + (end2-end) + " ms");
-		System.out.println("Finished planning giant tour: took " + (end2-time) + " ms");
+
 		
 		this.parcelTour.clear();
 		this.parcelTour.addAll(prefix);
 		this.parcelTour.addAll(suffix);
 		this.parcelTour = this.parcelTour.stream().distinct().collect(Collectors.toList());
-		System.out.println("Tour contains " + parcelTour.size() + " parcels.");
-		
-		
-		
+
 		this.nextPlan = nextPlan.plusDays(1);
 	}
 	

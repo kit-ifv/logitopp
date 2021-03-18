@@ -10,12 +10,12 @@ public class DummyDeliveryPolicy implements ParcelDeliveryPolicy {
 
 	/**
 	 * Checks whether the given parcel can be delivered.
-	 * Home delivery: check if the recipient is at home.
+	 * Home delivery: check if the recipient (or another household member) is at home.
 	 * Work delivery: check if the recipient is working.
-	 * Pack-station delivery: true (maybe later capacity?) (TODO: notify recipient)
+	 * Pack-station delivery: true
 	 *
 	 * @param parcel the parcel
-	 * @return true, if successful
+	 * @return true, if the parcel can be delivered
 	 */
 	@Override
 	public boolean canDeliver(Parcel parcel) {
@@ -54,6 +54,7 @@ public class DummyDeliveryPolicy implements ParcelDeliveryPolicy {
 	 * After three delivery attempts: send the parcel to a pack station.
 	 *
 	 * @param parcel the parcel
+	 * @return true, if the parcel order was updated
 	 */
 	@Override
 	public boolean updateParcelDelivery(Parcel parcel) {
