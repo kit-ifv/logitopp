@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityPeriodFixer;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.randomizer.ActivityStartAndDurationRandomizer;
 import edu.kit.ifv.mobitopp.simulation.destinationChoice.DestinationChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
@@ -54,15 +55,16 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
+			final ActivityPeriodFixer activityPeriodFixer,
 			final ActivityStartAndDurationRandomizer activityDurationRandomizer,
 			final TripFactory tripFactory, final ReschedulingStrategy rescheduling,
 			final Set<Mode> modesInSimulation, final PersonState initialState,
 			final SimulationContext context, final DeliveryPersonFactory personFactory,
 			final ParcelOrderModel parcelOrderModel, final Predicate<Person> personFilter) {
 		
-		super(destinationChoiceModel, modeChoiceModel, routeChoice, activityDurationRandomizer,
-				tripFactory, rescheduling, modesInSimulation, initialState, context,
-				personFactory.getDefaultFactory());
+		super(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, 
+			  activityDurationRandomizer, tripFactory, rescheduling, modesInSimulation,
+			  initialState, context, personFactory.getDefaultFactory());
 		
 		this.parcelOrderModel = parcelOrderModel;
 		this.parcels = new ArrayList<Parcel>();

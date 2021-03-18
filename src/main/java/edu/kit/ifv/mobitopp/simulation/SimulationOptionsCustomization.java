@@ -1,5 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation;
 
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityPeriodFixer;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.randomizer.ActivityStartAndDurationRandomizer;
 import edu.kit.ifv.mobitopp.simulation.destinationChoice.DestinationChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.person.SimulationOptions;
@@ -22,6 +23,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	private ZoneBasedRouteChoice routeChoice;
 	private ImpedanceIfc impedance;
 	private RideSharingOffers rideSharingOffers;
+	private ActivityPeriodFixer activityPeriodFixer;
 	private ActivityStartAndDurationRandomizer activityDurationRandomizer;
 
 	/**
@@ -34,12 +36,13 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @param routeChoice                the route choice
 	 * @param impedance                  the impedance
 	 * @param rideSharingOffers          the ride sharing offers
+	 * @param activityPeriodFixer the activity period fixer
 	 * @param activityDurationRandomizer the activity duration randomizer
 	 */
 	public SimulationOptionsCustomization(SimulationOptions delegate, DestinationChoiceModel destinationChoiceModel,
 			TourBasedModeChoiceModel modeChoiceModel, ReschedulingStrategy rescheduling,
 			ZoneBasedRouteChoice routeChoice, ImpedanceIfc impedance, RideSharingOffers rideSharingOffers,
-			ActivityStartAndDurationRandomizer activityDurationRandomizer) {
+			 ActivityPeriodFixer activityPeriodFixer, ActivityStartAndDurationRandomizer activityDurationRandomizer) {
 
 		this.delegateSimulationOptions = delegate;
 		this.destinationChoiceModel = destinationChoiceModel;
@@ -48,6 +51,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this.routeChoice = routeChoice;
 		this.impedance = impedance;
 		this.rideSharingOffers = rideSharingOffers;
+		this.activityPeriodFixer = activityPeriodFixer;
 		this.activityDurationRandomizer = activityDurationRandomizer;
 	}
 
@@ -60,17 +64,20 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @param routeChoice the route choice
 	 * @param impedance the impedance
 	 * @param rideSharingOffers the ride sharing offers
+	 * @param activityPeriodFixer the activity period fixer
 	 * @param activityDurationRandomizer the activity duration randomizer
 	 */
 	public void customize(DestinationChoiceModel destinationChoiceModel, TourBasedModeChoiceModel modeChoiceModel,
 			ReschedulingStrategy rescheduling, ZoneBasedRouteChoice routeChoice, ImpedanceIfc impedance,
-			RideSharingOffers rideSharingOffers, ActivityStartAndDurationRandomizer activityDurationRandomizer) {
+			RideSharingOffers rideSharingOffers, ActivityPeriodFixer activityPeriodFixer, 
+			ActivityStartAndDurationRandomizer activityDurationRandomizer) {
 		this.destinationChoiceModel = destinationChoiceModel;
 		this.modeChoiceModel = modeChoiceModel;
 		this.rescheduling = rescheduling;
 		this.routeChoice = routeChoice;
 		this.impedance = impedance;
 		this.rideSharingOffers = rideSharingOffers;
+		this.activityPeriodFixer = activityPeriodFixer;
 		this.activityDurationRandomizer = activityDurationRandomizer;
 	}
 
@@ -89,7 +96,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @param delegate the delegate
 	 */
 	public SimulationOptionsCustomization(SimulationOptions delegate) {
-		this(delegate, null, null, null, null, null, null, null);
+		this(delegate, null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -103,6 +110,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 		this.routeChoice = null;
 		this.impedance = null;
 		this.rideSharingOffers = null;
+		this.activityPeriodFixer = null;
 		this.activityDurationRandomizer = null;
 	}
 
@@ -114,7 +122,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @param destinationChoiceModel the destination choice model
 	 */
 	public SimulationOptionsCustomization(SimulationOptions delegate, DestinationChoiceModel destinationChoiceModel) {
-		this(delegate, destinationChoiceModel, null, null, null, null, null, null);
+		this(delegate, destinationChoiceModel, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -135,7 +143,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @param modeChoiceModel the mode choice model
 	 */
 	public SimulationOptionsCustomization(SimulationOptions delegate, TourBasedModeChoiceModel modeChoiceModel) {
-		this(delegate, null, modeChoiceModel, null, null, null, null, null);
+		this(delegate, null, modeChoiceModel, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -155,7 +163,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @param rescheduling the rescheduling strategy
 	 */
 	public SimulationOptionsCustomization(SimulationOptions delegate, ReschedulingStrategy rescheduling) {
-		this(delegate, null, null, rescheduling, null, null, null, null);
+		this(delegate, null, null, rescheduling, null, null, null, null, null);
 	}
 	
 	/**
@@ -175,7 +183,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @param routeChoice the route choice model
 	 */
 	public SimulationOptionsCustomization(SimulationOptions delegate, ZoneBasedRouteChoice routeChoice) {
-		this(delegate, null, null, null, routeChoice, null, null, null);
+		this(delegate, null, null, null, routeChoice, null, null, null, null);
 	}
 	
 	/**
@@ -194,7 +202,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @param impedance the impedance
 	 */
 	public SimulationOptionsCustomization(SimulationOptions delegate, ImpedanceIfc impedance) {
-		this(delegate, null, null, null, null, impedance, null, null);
+		this(delegate, null, null, null, null, impedance, null, null, null);
 	}
 	
 	/**
@@ -214,7 +222,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 * @param rideSharingOffers the ride sharing offers
 	 */
 	public SimulationOptionsCustomization(SimulationOptions delegate, RideSharingOffers rideSharingOffers) {
-		this(delegate, null, null, null, null, null, rideSharingOffers, null);
+		this(delegate, null, null, null, null, null, rideSharingOffers, null, null);
 	}
 	
 	/**
@@ -228,6 +236,27 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 
 	/**
 	 * Instantiates a new simulation options customization with a custom activity
+	 * period fixer.
+	 *
+	 * @param delegate              the delegate
+	 * @param activityPeriodFixer   the activity duration randomizer
+	 */
+	public SimulationOptionsCustomization(SimulationOptions delegate,
+			ActivityPeriodFixer activityPeriodFixer) {
+		this(delegate, null, null, null, null, null, null, activityPeriodFixer, null);
+	}
+	
+	/**
+	 * Customize this {@link SimulationOptionsCustomization} with the given {@link ActivityPeriodFixer}.
+	 *
+	 * @param activityPeriodFixer the activity period fixer
+	 */
+	public void customize(ActivityPeriodFixer activityPeriodFixer) {
+		this.activityPeriodFixer = activityPeriodFixer;
+	}
+	
+	/**
+	 * Instantiates a new simulation options customization with a custom activity
 	 * duration randomizer.
 	 *
 	 * @param delegate                   the delegate
@@ -235,7 +264,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	 */
 	public SimulationOptionsCustomization(SimulationOptions delegate,
 			ActivityStartAndDurationRandomizer activityDurationRandomizer) {
-		this(delegate, null, null, null, null, null, null, activityDurationRandomizer);
+		this(delegate, null, null, null, null, null, null, null, activityDurationRandomizer);
 	}
 	
 	/**
@@ -246,6 +275,8 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 	public void customize(ActivityStartAndDurationRandomizer activityDurationRandomizer) {
 		this.activityDurationRandomizer = activityDurationRandomizer;
 	}
+	
+
 
 	
 	/**
@@ -381,6 +412,15 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 			return delegateSimulationOptions.activityDurationRandomizer();
 		}
 
+	}
+
+	@Override
+	public ActivityPeriodFixer activityPeriodFixer() {
+		if (activityDurationRandomizer != null) {
+			return activityPeriodFixer;
+		} else {
+			return delegateSimulationOptions.activityPeriodFixer();
+		}
 	}
 
 }
