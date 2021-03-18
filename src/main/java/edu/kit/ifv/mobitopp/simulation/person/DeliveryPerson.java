@@ -26,6 +26,7 @@ import edu.kit.ifv.mobitopp.simulation.RideSharingOffers;
 import edu.kit.ifv.mobitopp.simulation.Trip;
 import edu.kit.ifv.mobitopp.simulation.ZoneBasedRouteChoice;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityPeriodFixer;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityScheduleWithState;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.randomizer.ActivityStartAndDurationRandomizer;
 import edu.kit.ifv.mobitopp.simulation.bikesharing.Bike;
@@ -233,9 +234,10 @@ public class DeliveryPerson implements SimulationPerson {
 	}
 
 	@Override
-	public void initSchedule(TourFactory tourFactory, ActivityStartAndDurationRandomizer activityDurationRandomizer,
-			List<Time> days) {
-		this.person.initSchedule(tourFactory, activityDurationRandomizer, days);
+	public void initSchedule(TourFactory tourFactory, ActivityPeriodFixer fixer,
+		ActivityStartAndDurationRandomizer  activityDurationRandomizer, List<Time> days) {
+		
+		this.person.initSchedule(tourFactory, fixer, activityDurationRandomizer, days);
 	}
 
 	@Override

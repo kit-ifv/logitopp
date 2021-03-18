@@ -28,6 +28,7 @@ import edu.kit.ifv.mobitopp.simulation.SimulationOptionsCustomization;
 import edu.kit.ifv.mobitopp.simulation.Trip;
 import edu.kit.ifv.mobitopp.simulation.ZoneBasedRouteChoice;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityPeriodFixer;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityScheduleWithState;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.PickUpParcelReschedulingStrategy;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.randomizer.ActivityStartAndDurationRandomizer;
@@ -247,9 +248,9 @@ public class PickUpParcelPerson implements SimulationPerson {
 	}
 
 	@Override
-	public void initSchedule(TourFactory tourFactory, ActivityStartAndDurationRandomizer activityDurationRandomizer,
+	public void initSchedule(TourFactory tourFactory,ActivityPeriodFixer fixer, ActivityStartAndDurationRandomizer activityDurationRandomizer,
 			List<Time> days) {
-		this.person.initSchedule(tourFactory, activityDurationRandomizer, days);
+		this.person.initSchedule(tourFactory, fixer, activityDurationRandomizer, days);
 	}
 
 	@Override
