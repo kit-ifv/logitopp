@@ -3,15 +3,16 @@ package edu.kit.ifv.mobitopp.simulation.person;
 import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivity;
 import edu.kit.ifv.mobitopp.simulation.events.DemandSimulationEventIfc;
 import edu.kit.ifv.mobitopp.simulation.events.Event;
 import edu.kit.ifv.mobitopp.time.Time;
 
+/**
+ * A {@link PersonState} state machine for {@link DeliveryPerson}s.
+ * In the {@link PersonStateDelivery#EXECUTE_ACTIVITY} state, delivery activities are executed.
+ */
 public enum PersonStateDelivery implements PersonState {
-
-
 
 	FINISHED(false) {
 
@@ -60,7 +61,7 @@ public enum PersonStateDelivery implements PersonState {
 		@Override
 		public void doActionAtEnd(SimulationPerson person, Time currentTime) {
 				
-			if (person.currentActivity().activityType().equals(ActivityType.DELIVER_PARCEL)) { //TODO move to activity after refactoring
+			if (person.currentActivity().activityType().equals(ActivityType.DELIVER_PARCEL)) {
 				System.out.println("Try delivery by " + person.getOid());
 				
 				((DeliveryActivity) person.currentActivity()).tryDelivery(currentTime);
@@ -133,21 +134,6 @@ public enum PersonStateDelivery implements PersonState {
 	public Optional<DemandSimulationEventIfc> nextEvent(
 			SimulationPerson person, Time currentDate) {
 		throw new AssertionError("No next event for this state configured: " + person.currentState());
-	}
-
-	private static Time dateForDestinationAndModeChoice(
-		ActivityIfc currentActivity,
-		int minutes_before
-	) {
-
-		Time activityStart = currentActivity.startDate();
-
-		if (currentActivity.duration() > minutes_before) {
-
-			return activityStart.plusMinutes( currentActivity.duration() - minutes_before);
-		} else {
-			return activityStart;
-		}
 	}
 
 }

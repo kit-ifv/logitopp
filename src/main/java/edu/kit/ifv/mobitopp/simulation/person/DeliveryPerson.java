@@ -42,31 +42,49 @@ import edu.kit.ifv.mobitopp.simulation.tour.TourFactory;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
+/**
+ * The Class DeliveryPerson decorates {@link SimulationPerson}
+ * by adding the functionality of loading, delivering  and unloading {@link Parcel}s.
+ */
 public class DeliveryPerson implements SimulationPerson {
-
 	
 	private final SimulationPerson person;
-	@Getter
-	private final Collection<Parcel> currentTour;
-//	@Getter
-//	private final Collection<Parcel> delivered;
+	@Getter	private final Collection<Parcel> currentTour;
 	private final Random random;
-	@Getter
-	private final DeliveryEfficiencyProfile efficiency;
+	@Getter	private final DeliveryEfficiencyProfile efficiency;
 	
+	/**
+	 * Instantiates a new {@link DeliveryPerson}
+	 * with the given {@link DeliveryEfficiencyProfile}.
+	 *
+	 * @param person the person
+	 * @param efficiency the efficiency
+	 * @param seed the seed
+	 */
 	public DeliveryPerson(SimulationPerson person, DeliveryEfficiencyProfile efficiency, long seed) {
 		this.person = person;
 		this.currentTour = new ArrayList<Parcel>();
-//		this.delivered = new ArrayList<Parcel>();
 		this.random = new Random(seed);
 		this.efficiency = efficiency;
 	}
 	
+	/**
+	 * Loads the given parcels and updates their state (now on delivery).
+	 *
+	 * @param parcels the parcels
+	 * @param currentTime the current time
+	 */
 	public void load(Collection<Parcel> parcels, Time currentTime) {
 		this.currentTour.addAll(parcels);
 		parcels.forEach(p -> p.updateState(currentTime, this, false));
 	}
 	
+	/**
+	 * Unloads parcels from the current tour and updates their state (now undefined).
+	 *
+	 * @param currentTime the current time
+	 * @return the unloaded parcels
+	 */
 	public Collection<Parcel> unload(Time currentTime) {
 		Collection<Parcel> parcels = new ArrayList<>(currentTour);
 		parcels.forEach(p -> p.updateState(currentTime, this, false));
@@ -74,13 +92,20 @@ public class DeliveryPerson implements SimulationPerson {
 		return parcels;
 	}
 	
-	
-	
+	/**
+	 * Removes the delivered parcel from the current tour.
+	 *
+	 * @param parcel the parcel
+	 */
 	public void delivered(Parcel parcel) {
 		this.currentTour.remove(parcel);
-//		this.delivered.add(parcel);
 	}
 	
+	/**
+	 * Gets the next random number.
+	 *
+	 * @return the next random number
+	 */
 	public double getNextRandom() {
 		return this.random.nextDouble();
 	}

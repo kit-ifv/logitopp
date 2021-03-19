@@ -3,6 +3,9 @@ package edu.kit.ifv.mobitopp.simulation.person;
 import edu.kit.ifv.mobitopp.simulation.Person;
 import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
 
+/**
+ * DummyDeliveryEfficiencyModel is an exemplary implementation of the {@link DeliveryEfficiencyModel}.
+ */
 public class DummyDeliveryEfficiencyModel implements DeliveryEfficiencyModel {
 
 	@Override
@@ -10,8 +13,8 @@ public class DummyDeliveryEfficiencyModel implements DeliveryEfficiencyModel {
 		return new DeliveryEfficiencyProfile(selectLoadingDuration(center, person),
 												selectUnloadingDuration(center, person), 
 												selectTripDuration(center, person),
-												selectDeliveryDurationAdd(center, person),
-												selectDeliveryDurationMul(center, person)
+												selectBaseDeliveryDuration(center, person),
+												selectDeliveryDurationPerParcel(center, person)
 											);
 	}
 
@@ -26,12 +29,12 @@ public class DummyDeliveryEfficiencyModel implements DeliveryEfficiencyModel {
 	}
 
 	@Override
-	public float selectDeliveryDurationAdd(DistributionCenter center, Person person) {
+	public float selectBaseDeliveryDuration(DistributionCenter center, Person person) {
 		return 1.0f;
 	}
 	
 	@Override
-	public float selectDeliveryDurationMul(DistributionCenter center, Person person) {
+	public float selectDeliveryDurationPerParcel(DistributionCenter center, Person person) {
 		return 0.5f;
 	}
 

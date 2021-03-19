@@ -15,7 +15,7 @@ import edu.kit.ifv.mobitopp.time.Time;
 public interface DistributionCenterSelector {
 
 	/**
-	 * Select.´s a distribution center from where a parcel will be delivered.
+	 * Selects a distribution center from where a parcel will be delivered.
 	 *
 	 * @param recipient the recipient
 	 * @param numOfParcels the number of parcels the recipient will order

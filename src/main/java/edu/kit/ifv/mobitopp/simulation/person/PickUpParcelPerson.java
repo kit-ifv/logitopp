@@ -44,6 +44,10 @@ import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.tour.TourFactory;
 import edu.kit.ifv.mobitopp.time.Time;
 
+/**
+ * The Class PickUpParcelPerson decorates a {@link SimulationPerson}
+ * by adding the functionalyity of ordering, receiving and picking up {@link Parcel}s.
+ */
 public class PickUpParcelPerson implements SimulationPerson {
 	private SimulationPerson person;
 	private Collection<Parcel> ordered;
@@ -51,6 +55,14 @@ public class PickUpParcelPerson implements SimulationPerson {
 	private Collection<Parcel> inPackstation;
 	private Random random;
 	
+	/**
+	 * Instantiates a new {@link PickUpParcelPerson}
+	 * decorating the given {@link SimulationPerson}.
+	 * 
+	 * @param person the person
+	 * @param options the options
+	 * @param seed the seed
+	 */
 	public PickUpParcelPerson(SimulationPerson person, SimulationOptionsCustomization options, long seed) {	
 		this.person = person;
 		
@@ -67,35 +79,62 @@ public class PickUpParcelPerson implements SimulationPerson {
 	
 	
 	
+	/**
+	 * Checks for parcels in the pack station.
+	 *
+	 * @return true, if the person has parcels in the pack station
+	 */
 	public boolean hasParcelInPackstation() {
 		return !this.inPackstation.isEmpty();
 	}
 	
+	/**
+	 * Adds the given parcel to the person's parcel orders.
+	 *
+	 * @param parcel the parcel
+	 */
 	public void order(Parcel parcel) {
 		this.ordered.add(parcel);
 	}
 	
+	/**
+	 * Cancels the given parcel order.
+	 *
+	 * @param parcel the parcel order to be canceled
+	 */
 	public void cancelOrder(Parcel parcel) {
 		this.ordered.remove(parcel);
 	}
 
+	/**
+	 * Receive the given parcel.
+	 *
+	 * @param parcel the parcel
+	 */
 	public void receive(Parcel parcel) {
 		this.received.add(parcel);
 		parcel.getDistributionCenter().getDelivered().add(parcel);
 	}
 	
+	/**
+	 * Notify the person about a new parcel in pack station.
+	 *
+	 * @param parcel the parcel
+	 */
 	public void notifyParcelInPackStation(Parcel parcel) {
 		this.inPackstation.add(parcel);
 		System.out.println("Person " + this.getOid() + " is notified about parcel " + parcel.getOId() + " being added to the pack station.");
 	}
 
+	/**
+	 * Pick up parcels from the pack station.
+	 */
 	public void pickUpParcels() {
 		System.out.println("Person " + this.getOid() + " picks up their parcels at a pack station. Parcel ids: " + this.inPackstation.stream().map(p -> "" + p.getOId()).collect(Collectors.joining(",")) );
 		
 		this.received.addAll(this.inPackstation);
 		this.inPackstation.clear();
 	}
-	
 	
 	@Override
 	public SimulationOptions options() {
@@ -535,7 +574,12 @@ public class PickUpParcelPerson implements SimulationPerson {
 	public boolean hasPublicTransportVehicleDeparted(Time time) {
 		return this.person.hasPublicTransportVehicleDeparted(time);
 	}
-	
+
+	/**
+	 * Gets the next random number.
+	 *
+	 * @return the next random number
+	 */
 	public double getNextRandom() {
 		return this.random.nextDouble();
 	}

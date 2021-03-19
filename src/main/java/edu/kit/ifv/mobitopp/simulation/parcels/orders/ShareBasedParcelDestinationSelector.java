@@ -16,15 +16,22 @@ import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
+/**
+ * ShareBasedParcelDestinationSelector is a {@link ParcelDestinationSelector} extending {@link ShareBasedSelector}.
+ * Additionally a fallback selector without work is used for persons working outside the survey area.
+ */
 public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<ParcelDestinationType> implements ParcelDestinationSelector {
 
 	private final ShareBasedSelector<ParcelDestinationType> fallback;
 	private final Predicate<Zone> workZoneFilter;
-
-	public ShareBasedParcelDestinationSelector(Map<ParcelDestinationType, Double> shares) {
-		this(shares, z -> true);
-	}
 	
+	/**
+	 * Instantiates a new {@link ShareBasedParcelDestinationSelector}
+	 * with the given shares and work zone filter.
+	 *
+	 * @param shares the shares
+	 * @param workZoneFilter the work zone filter
+	 */
 	public ShareBasedParcelDestinationSelector(Map<ParcelDestinationType, Double> shares, Predicate<Zone> workZoneFilter) {
 		super(shares);
 		Map<ParcelDestinationType, Double> fallbakMap = new LinkedHashMap<ParcelDestinationType, Double>(shares);
@@ -33,10 +40,31 @@ public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<Parc
 		this.workZoneFilter = workZoneFilter;
 	}
 	
+	/**
+	 * Instantiates a new {@link ShareBasedParcelDestinationSelector}
+	 * with the given shares and no work zone filter.
+	 *
+	 * @param shares the shares
+	 */
+	public ShareBasedParcelDestinationSelector(Map<ParcelDestinationType, Double> shares) {
+		this(shares, z -> true);
+	}
+	
+	/**
+	 * Instantiates a default {@link ShareBasedParcelDestinationSelector}
+	 * with no zone filter.
+	 */
 	public ShareBasedParcelDestinationSelector() {
 		this(z -> true);
 	}
 	
+	/**
+	 * Instantiates a new {@link ShareBasedParcelDestinationSelector}
+	 * with equal shares for each {@link ParcelDestinationType}
+	 * and the given work zone filter.
+	 *
+	 * @param workZoneFilter the work zone filter
+	 */
 	public ShareBasedParcelDestinationSelector(Predicate<Zone> workZoneFilter) {
 		super(Arrays.asList(ParcelDestinationType.values()));
 		this.fallback = new ShareBasedSelector<ParcelDestinationType>(Arrays.asList(HOME, PACK_STATION));
@@ -44,6 +72,17 @@ public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<Parc
 	}
 
 
+	/**
+	 * Selects the {@link ParcelDestinationType} for a parcel.
+	 * Uses fallback selector without {@link ParcelDestinationType#WORK}
+	 * if the recipient's work zone does not pass the work zone filter.
+	 *
+	 * @param recipient the recipient
+	 * @param numOfParcels the number of parcels the recipient will order
+	 * @param otherParcels the other {@link Parcel}s the recipient already ordered
+	 * @param randomNumber a random number
+	 * @return the selected {@link ParcelDestinationType}
+	 */
 	@Override
 	public ParcelDestinationType select(PickUpParcelPerson recipient, int numOfParcels, Collection<Parcel> otherParcels, double randomNumber) {
 		

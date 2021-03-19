@@ -10,14 +10,15 @@ import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
- * The Class ShareBasedDeliveryServiceSelector.
+ * ShareBasedDeliveryServiceSelector is a {@link DeliveryServiceSelector} extending {@link ShareBasedSelector}.
  */
 public class ShareBasedDeliveryServiceSelector extends ShareBasedSelector<String> implements DeliveryServiceSelector {
 
 	/**
-	 * Instantiates a new share based delivery service selector.
+	 * Instantiates a new {@link ShareBasedSelector}
+	 * with the given shares.
 	 *
-	 * @param shares the shares
+	 * @param shares the shares of delivery service tags
 	 */
 	public ShareBasedDeliveryServiceSelector(Map<String, Double> shares) {
 		super(shares);
@@ -25,9 +26,10 @@ public class ShareBasedDeliveryServiceSelector extends ShareBasedSelector<String
 	
 	
 	/**
-	 * Instantiates a new share based delivery service selector.
+	 * Instantiates a new {@link ShareBasedDeliveryServiceSelector}
+	 * with the given delivery service tags and equal shares for all items.
 	 *
-	 * @param values the values
+	 * @param values the delivery service tags
 	 */
 	public ShareBasedDeliveryServiceSelector(List<String> values) {
 		super(values);
@@ -35,15 +37,15 @@ public class ShareBasedDeliveryServiceSelector extends ShareBasedSelector<String
 
 
 	/**
-	 * Select.
+	 * Selects a delivery service for a parcel order.
 	 *
 	 * @param recipient the recipient
-	 * @param numOfParcels the num of parcels
-	 * @param destination the destination
-	 * @param arrivalDate the arrival date
-	 * @param otherParcels the other parcels
-	 * @param randomNumber the random number
-	 * @return the string
+	 * @param numOfParcels the number of parcels the recipient will order
+	 * @param destination the parcel's {@link ParcelDestinationType}
+	 * @param arrivalDate the planned arrival date
+	 * @param otherParcels the other {@link Parcel}s the recipient already ordered
+	 * @param randomNumber a random number
+	 * @return the delivery service tag
 	 */
 	@Override
 	public String select(PickUpParcelPerson recipient, int numOfParcels, ParcelDestinationType destination, Time arrivalDate, Collection<Parcel> otherParcels, double randomNumber) {

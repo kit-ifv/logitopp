@@ -32,7 +32,7 @@ public class DistributionCenter {
 	private Location location;
 	private int numEmployees;
 	private Collection<DeliveryPerson> employees;
-	private float relativeShare;
+	private double relativeShare;
 	
 	@Getter(value = lombok.AccessLevel.NONE)
 	private Collection<Parcel> currentParcels;
@@ -53,7 +53,7 @@ public class DistributionCenter {
 	 * @param tourStrategy the tour assignment strategy
 	 * @param policy the delivery policy
 	 */
-	public DistributionCenter(String name, String organization, Zone zone, Location location, int numEmployees, float share, DeliveryTourAssignmentStrategy tourStrategy, ParcelDeliveryPolicy policy) {
+	public DistributionCenter(String name, String organization, Zone zone, Location location, int numEmployees, double share, DeliveryTourAssignmentStrategy tourStrategy, ParcelDeliveryPolicy policy) {
 		this.name = name;
 		this.organization = organization;
 		

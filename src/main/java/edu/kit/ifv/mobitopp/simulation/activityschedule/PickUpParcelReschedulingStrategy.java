@@ -30,7 +30,7 @@ public class PickUpParcelReschedulingStrategy implements ReschedulingStrategy  {
 	}
 	
 	/**
-	 * Adjust the schedule. Insert PickUpParcel {@link ActivityIfc activities} if the person has parcels waiting at the packstation.
+	 * Adjust the schedule. Insert PickUpParcel {@link ActivityIfc activities} if the person has parcels waiting at the pack station.
 	 *
 	 * @param activitySchedule the activity schedule
 	 * @param beginningActivity the beginning activity
