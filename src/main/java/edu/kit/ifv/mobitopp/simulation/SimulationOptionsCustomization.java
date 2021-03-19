@@ -416,7 +416,7 @@ public class SimulationOptionsCustomization implements SimulationOptions {
 
 	@Override
 	public ActivityPeriodFixer activityPeriodFixer() {
-		if (activityDurationRandomizer != null) {
+		if (activityPeriodFixer != null) {
 			return activityPeriodFixer;
 		} else {
 			return delegateSimulationOptions.activityPeriodFixer();

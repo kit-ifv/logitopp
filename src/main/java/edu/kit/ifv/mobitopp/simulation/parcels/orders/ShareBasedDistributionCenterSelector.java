@@ -1,7 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.orders;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
