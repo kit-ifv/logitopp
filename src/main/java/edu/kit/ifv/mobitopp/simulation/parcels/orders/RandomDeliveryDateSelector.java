@@ -17,15 +17,14 @@ import edu.kit.ifv.mobitopp.time.Time;
  */
 public class RandomDeliveryDateSelector implements DeliveryDateSelector {
 	public static final Function<Time, Time> DAY_PRECISION = time -> Time.start.plusDays(time.getDay());
-	public static final Function<Time, Time> HOUR_PRECISION = time -> Time.start.plusHours(time.getHour());
-	public static final Function<Time, Time> MINUTE_PRECISION = time -> Time.start.plusHours(time.getMinute());
-	public static final Function<Time, Time> SECOND_PRECISION = time -> Time.start.plusHours(time.getSecond());
+	public static final Function<Time, Time> HOUR_PRECISION = time -> DAY_PRECISION.apply(time).plusHours(time.getHour());
+	public static final Function<Time, Time> MINUTE_PRECISION = time -> HOUR_PRECISION.apply(time).plusMinutes(time.getMinute());
+	public static final Function<Time, Time> SECOND_PRECISION = time -> MINUTE_PRECISION.apply(time).plusSeconds(time.getSecond());
 	
 	
 	private final Time from;
 	private final Time until;
 	private final Function<Time, Time> precisionFilter;
-	
 	
 	/**
 	 * Instantiates a new {@link RandomDeliveryDateSelector}
@@ -39,9 +38,30 @@ public class RandomDeliveryDateSelector implements DeliveryDateSelector {
 	public RandomDeliveryDateSelector(Time from, Time untilExclusive,
 		Function<Time, Time> precision) {
 		this.precisionFilter = precision;
-		
+	
 		this.from = precisionFilter.apply(from);
 		this.until = precisionFilter.apply(untilExclusive);
+	}
+	
+	/**
+	 * Instantiates a new {@link RandomDeliveryDateSelector}
+	 * with the given time interval [from, untilExcusive)
+	 * and day precision.
+	 *
+	 * @param from the from
+	 * @param untilExclusive the until exclusive
+	 */
+	public RandomDeliveryDateSelector(Time from, Time untilExclusive) {
+		this(from, untilExclusive, DAY_PRECISION);
+	}
+	
+	/**
+	 * Instantiates a new {@link RandomDeliveryDateSelector}
+	 * with the interval [Monday,Sunday) = [Monday,Saturday]
+	 * and the given precision.
+	 */
+	public RandomDeliveryDateSelector(Function<Time, Time> precision) {
+		this(Time.start, Time.start.plusDays(6), precision);
 	}
 	
 	/**
@@ -50,7 +70,7 @@ public class RandomDeliveryDateSelector implements DeliveryDateSelector {
 	 * and day precision.
 	 */
 	public RandomDeliveryDateSelector() {
-		this(Time.start, Time.start.plusDays(6), DAY_PRECISION);
+		this(DAY_PRECISION);
 	}
 
 	/**

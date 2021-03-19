@@ -21,7 +21,7 @@ public class ShareBasedDeliveryServiceSelectorTest {
 	
 	private Map<String, Double> sharesA;
 	private Map<String, Double> sharesB;
-	private List<String> centers;
+	private List<String> services;
 	
 	
 	@BeforeEach
@@ -30,13 +30,13 @@ public class ShareBasedDeliveryServiceSelectorTest {
 		serviceB = "ServiceB";
 		sharesA = Map.of(serviceA, 1.0, serviceB, 0.0);
 		sharesB = Map.of(serviceA, 0.0, serviceB, 1.0);
-		centers = List.of(serviceA, serviceB);
+		services = List.of(serviceA, serviceB);
 	}
 	
 	@Test
 	public void equalShares() {
 		DeliveryServiceSelector selector =
-			new ShareBasedDeliveryServiceSelector(centers);
+			new ShareBasedDeliveryServiceSelector(services);
 		
 		Random rand = new Random(42);
 		List<String> selected = selectNCenters(selector, 10, rand);
