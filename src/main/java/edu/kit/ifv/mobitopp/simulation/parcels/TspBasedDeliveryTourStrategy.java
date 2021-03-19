@@ -166,8 +166,6 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 			}
 			
 		}
-		
-		long end = System.currentTimeMillis();
 
 		//Use 2-approx algorithm for solving tsp
 		TwoApproxMetricTSP<Location, DefaultWeightedEdge> tspAlg = new TwoApproxMetricTSP<>();

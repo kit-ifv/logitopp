@@ -25,8 +25,8 @@ import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
-import edu.kit.ifv.mobitopp.time.SimpleTime;
 import edu.kit.ifv.mobitopp.time.Time;
+import lombok.AllArgsConstructor;
 
 /**
  * The Class ZoneTspDeliveryTourStrategy is a DeliveryTourAssignmentStrategy.
@@ -40,16 +40,54 @@ import edu.kit.ifv.mobitopp.time.Time;
  */
 public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrategy {
 
-	private List<Parcel> parcelTour = new ArrayList<Parcel>();
-	private Time lastPlan = SimpleTime.start;
+	private List<Parcel> parcelTour;
+	private Time lastPlan;
 	
-	private static final int MEAN_CAPACITY = 160;
-	private static final double CAPACITY_STD_DEV = 16;
-	private static final int MIN_CAPACITY = 100;
-	private static final int MAX_CAPACITY = 200;
+	private final int meanCapacity;
+	private final double capacityStdDev;
+	private final int minCapacity;
+	private final int maxCapacity;
 	
-	private static final int MAX_HOURS = 8;
-	private static final boolean SKIP_SUNDAY = true;
+	private final int maxHours;
+	private final boolean skipSunday;
+	
+	/**
+	 * Instantiates a new {@link ZoneTspDeliveryTourStrategy}
+	 * with the given oprtions.
+	 *
+	 * @param meanCapacity the mean capacity
+	 * @param capacityStdDev the capacity standard deviation
+	 * @param minCapacity the minimum capacity
+	 * @param maxCapacity the maximum capacity
+	 * @param maxHours the maximum tour delivery in hours
+	 * @param skipSunday whether sunday should be skipped
+	 */
+	public ZoneTspDeliveryTourStrategy(int meanCapacity, double capacityStdDev, int minCapacity,
+		int maxCapacity, int maxHours, boolean skipSunday) {
+		this.meanCapacity = meanCapacity;
+		this.capacityStdDev = capacityStdDev;
+		this.minCapacity = minCapacity;
+		this.maxCapacity = maxCapacity;
+		this.maxHours = maxHours;
+		this.skipSunday = skipSunday;
+		
+		this.lastPlan = Time.start;
+		this.parcelTour = new ArrayList<>();
+	}
+	
+	/**
+	 * Instantiates a default {@link ZoneTspDeliveryTourStrategy} 
+	 * with:
+	 * <br> a mean capacity of 160
+	 * <br> a capacity standard deviation of 16
+	 * <br> a minimum capacity of 100
+	 * <br> a maximum capacity of 200
+	 * <br> a maximum tour duration of 8 hours
+	 * <br> and no deliveries on sunday.
+	 */
+	public ZoneTspDeliveryTourStrategy() {
+		this(160, 16, 100, 200, 8, true);
+	}
 	
 	/**
 	 * Assign parcels to the given delivery person.
@@ -63,7 +101,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	public List<Parcel> assignParcels(DistributionCenter dc, DeliveryPerson person,  ActivityIfc work) {
 		DeliveryEfficiencyProfile efficiency = person.getEfficiency();
 		
-		if (SKIP_SUNDAY && startsOnSunday(work) || startsAfter1800(work)) {
+		if (skipSunday && startsOnSunday(work) || startsAfter1800(work)) {
 			return Arrays.asList();
 		}
 		
@@ -83,7 +121,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 		int parcels = 0;
 		int capacity = selectCapacity(person);
 		
-		while (it.hasNext() && tourDuration < MAX_HOURS*60 && parcels < capacity) {
+		while (it.hasNext() && tourDuration < maxHours*60 && parcels < capacity) {
 			next = it.next();
 			assigned.add(next);
 			tourDuration += duration(dc, person, work.startDate().plusMinutes((int)tourDuration), efficiency, next, prev);
@@ -183,9 +221,9 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 */
 	private int selectCapacity(DeliveryPerson person) {
 		double stdGauss = new Random((long) (person.getNextRandom() * Long.MAX_VALUE)).nextGaussian();
-		double scaledGauss = CAPACITY_STD_DEV *stdGauss + MEAN_CAPACITY;
+		double scaledGauss = capacityStdDev *stdGauss + meanCapacity;
 
-		return Math.min(Math.max(MIN_CAPACITY, (int) round(scaledGauss)), MAX_CAPACITY);
+		return Math.min(Math.max(minCapacity, (int) round(scaledGauss)), maxCapacity);
 	}
 	
 	
