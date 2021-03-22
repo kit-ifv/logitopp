@@ -1,5 +1,5 @@
 # logiTopp
-logiTopp is an extension of the agent-based travel demand model [mobiTopp](http://mobitopp.ifv.kit.edu/) developed at the [Institute for transport studies at the Karlsruhe Institute of Technology](http://www.ifv.kit.edu/english/index.php) for modeling parcel orders and last-mile deliveries. TODO publications
+logiTopp is an extension of the agent-based travel demand model [mobiTopp](http://mobitopp.ifv.kit.edu/) developed at the [Institute for transport studies at the Karlsruhe Institute of Technology](http://www.ifv.kit.edu/english/index.php) for modeling parcel orders and last-mile deliveries.
 
 ## New ActivityTypes in mobiTopp
 Code | Description
@@ -107,7 +107,3 @@ The simulation produces several result files concerning the simulated deliveries
   3. delivery-rescheduling.csv: Rescheduling events of delivery persons indication their work activities.
   
   4. parcel-states.csv: all state changes of parcels (UNDEFINED, ON_DELIVERY, RETURNING, DELIVERED).
-
-## Open Questions and Planned Features
-  - Neighborhood relationship for delivery policy
-  - Legacy parcels?
