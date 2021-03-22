@@ -59,6 +59,8 @@ public class RandomDeliveryDateSelector implements DeliveryDateSelector {
 	 * Instantiates a new {@link RandomDeliveryDateSelector}
 	 * with the interval [Monday,Sunday) = [Monday,Saturday]
 	 * and the given precision.
+	 *
+	 * @param precision the precision
 	 */
 	public RandomDeliveryDateSelector(Function<Time, Time> precision) {
 		this(Time.start, Time.start.plusDays(6), precision);
