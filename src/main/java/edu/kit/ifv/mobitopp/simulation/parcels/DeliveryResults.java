@@ -49,7 +49,7 @@ public class DeliveryResults {
 		msg += parcel.getDistributionCenter().getName() + "; ";
 		msg += parcel.getDeliveryAttempts() + "; ";
 		msg += String.valueOf(parcel.getDeliveryTime()) + ";";
-		msg += deliveryGuy.currentActivity().zone().getId() + ";";
+		msg += ((deliveryGuy != null) ? deliveryGuy.currentActivity().zone().getId() : "NULL") + "; ";
 		msg += parcel.getZone().getId();
 		
 		this.results.write(resultCategoryState, msg);

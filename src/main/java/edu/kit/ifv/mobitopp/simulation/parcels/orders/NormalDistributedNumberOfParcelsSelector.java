@@ -2,6 +2,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels.orders;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.Math.round;
 
 import java.util.Random;
 
@@ -83,7 +84,7 @@ public class NormalDistributedNumberOfParcelsSelector implements NumberOfParcels
 		
 		double scaledGauss = stdDev*standardGauss + mean;
 		
-		return (int) min(max(capMin, scaledGauss), capMax);
+		return (int) min(max(capMin, round(scaledGauss)), capMax);
 	}
 
 }
