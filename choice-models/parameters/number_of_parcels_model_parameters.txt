@@ -1,0 +1,14 @@
+asc_pkg1 = -1.8366
+asc_pkg2 = -3.3311
+asc_pkg3 = -4.0946
+asc_pkg4 = -6.3392
+asc_pkg5 = -5.5133
+asc_pkg6 = -5.4478
+asc_pkg7 = -6.3787
+b_male = 0.3511
+b_income2 = 0.4031
+b_income3 = 0.7382
+b_job1 = 0.2112
+b_age2 = 0.3591
+b_age3 = -0.3774
+b_age4 = -0.9983

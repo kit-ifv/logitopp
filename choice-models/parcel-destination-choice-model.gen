@@ -1,0 +1,37 @@
+ProbabilityClass edu.kit.ifv.mobitopp.simulation.parcels.orders.destination.generated.GeneratedBasicParcelDestinationSelector
+
+Interface        edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelDestinationSelector
+Signature        select(edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson recipient,
+							int numOfParcels,
+							java.util.Collection<edu.kit.ifv.mobitopp.simulation.parcels.Parcel> otherParcels,
+							double randomNumber):edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType
+
+UtilityClass     edu.kit.ifv.mobitopp.simulation.parcels.orders.destination.generated.GeneratedBasicParcelDestinationUtility
+HelperClass      edu.kit.ifv.mobitopp.simulation.parcels.orders.destination.generated.GeneratedBasicParcelDestinationHelper
+
+root: {
+	<home:U_home>
+	<work:U_work>
+	<locker:U_locker>
+}
+
+HOME: U_home = 0
+
+WORK: U_work = asc_work
+				+ b_male * IS_GENDER_MALE
+				+ b_income2 * [HOUSEHOLD_INCOME_CLASS == 2]
+				+ b_income3 * [HOUSEHOLD_INCOME_CLASS == 3]
+				+ b_job1 * IS_EMPLOYMENT_FULLTIME
+				+ b_age2 * [18 <= AGE <= 29] 
+				+ b_age3 * [30 <= AGE <= 39]
+				+ b_age4 * [40 <= AGE <= 49]
+
+
+PACK_STATION: U_locker = asc_locker
+				+ b_male * IS_GENDER_MALE
+				+ b_income2 * [HOUSEHOLD_INCOME_CLASS == 2]
+				+ b_income3 * [HOUSEHOLD_INCOME_CLASS == 3]
+				+ b_job1 * IS_EMPLOYMENT_FULLTIME
+				+ b_age2 * [18 <= AGE <= 29] 
+				+ b_age3 * [30 <= AGE <= 39]
+				+ b_age4 * [40 <= AGE <= 49]

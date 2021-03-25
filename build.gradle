@@ -1,9 +1,16 @@
 buildscript {
     repositories {
-        mavenLocal()
+      
+        maven { url 'http://nexus.ifv.kit.edu/repository/maven-central/' }
+        maven { url 'https://nexus.ifv.kit.edu/repository/maven-releases/' }
+        maven { url 'https://nexus.ifv.kit.edu/repository/maven-snapshots/' }
+          mavenLocal()
         mavenCentral()
         jcenter()
     }
+    //dependencies {
+	//  classpath "edu.kit.ifv.codegen.gradle.plugin:code-gen-gradle-plugin:latest.integration"
+  	//}
 }
 
 
@@ -28,18 +35,13 @@ repositories {
     mavenCentral()
     maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
     maven { url "https://jitpack.io" }
+    flatDir {
+       dirs 'libs'
+   }
 }
 
 configurations.all {
     exclude group: 'xerces', module: 'xerces'
-}
-
-
-
-repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
 }
 
 dependencies {
@@ -55,7 +57,16 @@ dependencies {
                        'org.junit.vintage:junit-vintage-engine:5.7.0',
                        'org.mockito:mockito-core:3.0.0',
                        'org.assertj:assertj-core:3.13.2'
-} 
+}
+
+//def choiceModelsDirectory = "${rootDir}/choice-models"
+//apply plugin: 'edu.kit.ifv.codegen.gradle.plugin'
+//codeGenInp {
+//  outputDir = "${rootDir}/src/main/java"
+//  files = ["${choiceModelsDirectory}/number-of-parcels-choice-model.gen", 
+//           "${choiceModelsDirectory}/parcel-destination-choice-model.gen"]
+//}
+//compileJava.dependsOn('generateCode')
 
 
 test {
