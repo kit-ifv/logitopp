@@ -18,11 +18,14 @@ As a first step, the number of parcel orders (per person) is determined.
 This can also result to 0, in which case that person has no parels ordered during the simulated week.
 LogiTopp provides a generic NumberOfParcelsSelector which draws a number from a normal distribution (e.g. mean 0.75, stdDev 0.5). This number is capped by a lower and upper bound (e.g. [0,10]).
 
+The file [number-of-parcels-choice-model.gen](choice-models/number-of-parcels-choice-model.gen) contains the definition of a basic NumberOfParcels choice model. A set of concrete Parameters can be found in [number_of_parcels_model_parameters.txt](choice-models/parameters/number_of_parcels_model_parameters.txt).
+
 ### Parcel Destination
 Each parcel is assigned a destination type (HOME, WORK or PACKSTATION) which determines where the parcel will be delivered to. Each type determines the delivery location by the recipients fixed destination for ActivityType Home, Work resp. Pick-Up-Parcel. The fixed destination for this third ActivityType is set during population synthesis (e.g. to the centroid location of a persons home zone). 
 
 LogiTopp provides a generic, share based ParcelDestinationSelector. A share of each type can be specified. However, since we want to simulate the deliveries in the survey area, WORK deliveries are not allowed if a persons work zone is outside the survey area. Therefore, a zone filter can be provided. 
 
+The file [parcel-destination-choice-model.gen](choice-models/parcel-destination-choice-model.gen) contains the definition of a basic NumberOfParcels choice model. A set of concrete Parameters can be found in [parcel_destination_choice_parameters.txt](choice-models/parameters/parcel_destination_choice_parameters.txt).
 
 ### Planned Delivery Date
 Parcels  can arrive at distribution centers on different days. So the third model step determines a planned delivery date from which on the parcel is available for distribution. 
