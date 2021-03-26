@@ -35,9 +35,6 @@ repositories {
     mavenCentral()
     maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
     maven { url "https://jitpack.io" }
-    flatDir {
-       dirs 'libs'
-   }
 }
 
 configurations.all {

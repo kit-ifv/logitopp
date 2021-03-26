@@ -64,7 +64,7 @@ public class Parcel {
 	 * @return the location
 	 */
 	public Location getLocation() {
-		return this.destinationType.getLocation(this);
+		return this.destinationType.getLocation(this.person);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class Parcel {
 	 * @return the zone
 	 */
 	public Zone getZone() {
-		return this.destinationType.getZone(this);
+		return this.destinationType.getZone(this.person);
 	}
 
 	/**
