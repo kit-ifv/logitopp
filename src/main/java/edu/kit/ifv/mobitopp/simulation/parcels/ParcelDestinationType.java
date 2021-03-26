@@ -63,7 +63,7 @@ public enum ParcelDestinationType {
 	/**
 	 * Gets the {@link Zone} of the given parcel's delivery.
 	 *
-	 * @param parcel the parcel
+	 * @param person the person
 	 * @return the zone
 	 */
 	public Zone getZone(Person person) {
@@ -73,7 +73,7 @@ public enum ParcelDestinationType {
 	/**
 	 * Gets the {@link ZoneAndLocation} of the given parcel's delivery.
 	 *
-	 * @param parcel the parcel
+	 * @param person the person
 	 * @return the zone and location
 	 */
 	public ZoneAndLocation getZoneAndLocation(Person person) {
