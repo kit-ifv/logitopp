@@ -23,63 +23,63 @@ Zero: U_noPkg = 0
 
 One: U_onePkg = asc_pkg1
 				+ b_male * IS_GENDER_MALE
-				+ b_income2 * [HOUSEHOLD_INCOME_CLASS == 2]
-				+ b_income3 * [HOUSEHOLD_INCOME_CLASS == 3]
-				+ b_job1 * IS_EMPLOYMENT_FULLTIME
-				+ b_age2 * [18 <= AGE <= 29] 
-				+ b_age3 * [30 <= AGE <= 39]
-				+ b_age4 * [40 <= AGE <= 49]
+				+ b_income2 * [2000 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 3600]
+				+ b_income3 * [3600 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2 * [25 <= AGE <= 44] 
+				+ b_age3 * [45 <= AGE <= 64]
+				+ b_age4 * [65 <= AGE]
 
 Two: U_twoPkg = asc_pkg2
 				+ b_male * IS_GENDER_MALE
-				+ b_income2 * [HOUSEHOLD_INCOME_CLASS == 2]
-				+ b_income3 * [HOUSEHOLD_INCOME_CLASS == 3]
-				+ b_job1 * IS_EMPLOYMENT_FULLTIME
-				+ b_age2 * [18 <= AGE <= 29] 
-				+ b_age3 * [30 <= AGE <= 39]
-				+ b_age4 * [40 <= AGE <= 49]
+				+ b_income2 * [2000 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 3600]
+				+ b_income3 * [3600 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2 * [25 <= AGE <= 44] 
+				+ b_age3 * [45 <= AGE <= 64]
+				+ b_age4 * [65 <= AGE]
 				
 Three: U_threePkg = asc_pkg3
 				+ b_male * IS_GENDER_MALE
-				+ b_income2 * [HOUSEHOLD_INCOME_CLASS == 2]
-				+ b_income3 * [HOUSEHOLD_INCOME_CLASS == 3]
-				+ b_job1 * IS_EMPLOYMENT_FULLTIME
-				+ b_age2 * [18 <= AGE <= 29] 
-				+ b_age3 * [30 <= AGE <= 39]
-				+ b_age4 * [40 <= AGE <= 49]
+				+ b_income2 * [2000 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 3600]
+				+ b_income3 * [3600 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2 * [25 <= AGE <= 44] 
+				+ b_age3 * [45 <= AGE <= 64]
+				+ b_age4 * [65 <= AGE]
 				
 Four: U_fourPkg = asc_pkg4
 				+ b_male * IS_GENDER_MALE
-				+ b_income2 * [HOUSEHOLD_INCOME_CLASS == 2]
-				+ b_income3 * [HOUSEHOLD_INCOME_CLASS == 3]
-				+ b_job1 * IS_EMPLOYMENT_FULLTIME
-				+ b_age2 * [18 <= AGE <= 29] 
-				+ b_age3 * [30 <= AGE <= 39]
-				+ b_age4 * [40 <= AGE <= 49]
+				+ b_income2 * [2000 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 3600]
+				+ b_income3 * [3600 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2 * [25 <= AGE <= 44] 
+				+ b_age3 * [45 <= AGE <= 64]
+				+ b_age4 * [65 <= AGE]
 
 Five: U_fivePkg = asc_pkg5
 				+ b_male * IS_GENDER_MALE
-				+ b_income2 * [HOUSEHOLD_INCOME_CLASS == 2]
-				+ b_income3 * [HOUSEHOLD_INCOME_CLASS == 3]
-				+ b_job1 * IS_EMPLOYMENT_FULLTIME
-				+ b_age2 * [18 <= AGE <= 29] 
-				+ b_age3 * [30 <= AGE <= 39]
-				+ b_age4 * [40 <= AGE <= 49]
+				+ b_income2 * [2000 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 3600]
+				+ b_income3 * [3600 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2 * [25 <= AGE <= 44] 
+				+ b_age3 * [45 <= AGE <= 64]
+				+ b_age4 * [65 <= AGE]
 				
 Six: U_sixPkg = asc_pkg6
 				+ b_male * IS_GENDER_MALE
-				+ b_income2 * [HOUSEHOLD_INCOME_CLASS == 2]
-				+ b_income3 * [HOUSEHOLD_INCOME_CLASS == 3]
-				+ b_job1 * IS_EMPLOYMENT_FULLTIME
-				+ b_age2 * [18 <= AGE <= 29] 
-				+ b_age3 * [30 <= AGE <= 39]
-				+ b_age4 * [40 <= AGE <= 49]
+				+ b_income2 * [2000 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 3600]
+				+ b_income3 * [3600 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2 * [25 <= AGE <= 44] 
+				+ b_age3 * [45 <= AGE <= 64]
+				+ b_age4 * [65 <= AGE]
 				
 SevenOrMore: U_overSevenPkg = asc_pkg7
 				+ b_male * IS_GENDER_MALE
-				+ b_income2 * [HOUSEHOLD_INCOME_CLASS == 2]
-				+ b_income3 * [HOUSEHOLD_INCOME_CLASS == 3]
-				+ b_job1 * IS_EMPLOYMENT_FULLTIME
-				+ b_age2 * [18 <= AGE <= 29] 
-				+ b_age3 * [30 <= AGE <= 39]
-				+ b_age4 * [40 <= AGE <= 49]
+				+ b_income2 * [2000 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 3600]
+				+ b_income3 * [3600 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2 * [25 <= AGE <= 44] 
+				+ b_age3 * [45 <= AGE <= 64]
+				+ b_age4 * [65 <= AGE]

@@ -7,3 +7,4 @@ b_job1 = 0.2845
 b_age2 = -0.2272   
 b_age3 = -1.0022  
 b_age4 = -1.3015
+lambda_root = 1.0
