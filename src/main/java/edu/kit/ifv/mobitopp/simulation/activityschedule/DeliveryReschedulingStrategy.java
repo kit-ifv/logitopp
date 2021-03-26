@@ -139,9 +139,6 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		Collection<Parcel> stillOnDelivery = this.person.getCurrentTour().stream().filter(p -> p.getState().equals(ParcelState.ONDELIVERY)).collect(Collectors.toList());
 		
 		System.out.println("Person " + person.getOid() + " is unloading truck: (" + returning.size() + "/" + this.person.getCurrentTour().size()  + ")");
-		for (Parcel p: person.getCurrentTour()) {
-			System.out.println(p.toString() + " (" + p.getState().name() + ")");
-		}
 		
 		if (!stillOnDelivery.isEmpty()) {
 			System.out.println("Person " + person.getOid() + " should also unload: (" + stillOnDelivery.size() + "/" + this.person.getCurrentTour().size() + ") but they are still marked as 'ON_DELIVERY' !!");

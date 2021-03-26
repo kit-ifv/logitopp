@@ -1,5 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.person;
 
+import static edu.kit.ifv.mobitopp.simulation.ActivityType.WORK;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -46,11 +48,9 @@ public class DeliveryPersonFactory {
 		PublicTransportBehaviour boarder, long seed, PersonListener listener, DeliveryResults results) {
 
 		List<DistributionCenter> nonSaturatedDistributionCenters = new ArrayList<DistributionCenter>();
-		try {
+		if (person.hasFixedZoneFor(WORK)) {
 			Zone work = person.fixedZoneFor(ActivityType.WORK);
 			nonSaturatedDistributionCenters = getNonSaturatedDistributionCenters(work);
-
-		} catch (NoSuchElementException e) {
 		}
 
 		if (nonSaturatedDistributionCenters.isEmpty()

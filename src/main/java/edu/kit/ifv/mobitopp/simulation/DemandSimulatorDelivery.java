@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -93,15 +92,22 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		
 		Function<Person, PickUpParcelPerson> createAgent = p -> createSimulatedPerson(queue,
 				boarder, seed, p, listener, modesInSimulation, initialState);
-		Consumer<PickUpParcelPerson> createParcelOrders = p -> createParcelOrder(p);
+		Function<PickUpParcelPerson, Collection<Parcel>> createParcelOrders = p -> createParcelOrder(p);
 
 		List<PickUpParcelPerson> ppps = personLoader().households().flatMap(Household::persons)
 				.filter(personFilter).map(createAgent).collect(Collectors.toList());
-		ppps.forEach(createParcelOrders);
+		
+		int[] counts = new int[11];
+		ppps.forEach(ppp -> {counts[createParcelOrders.apply(ppp).size()]++;});
 
 		System.out.println("Generated " + this.parcels.size() + " parcels for "
 				+ this.parcels.stream().map(p -> p.getPerson().getOid()).distinct().count() + "/"
 				+ ppps.size() + " unique persons.");
+		
+		System.out.println("Number of parcels distribution: ");
+		for (int i = 0; i < 11; i++) {
+			System.out.println("Order size " + i + ": " + counts[i]);
+		}
 	}
 
 	/**

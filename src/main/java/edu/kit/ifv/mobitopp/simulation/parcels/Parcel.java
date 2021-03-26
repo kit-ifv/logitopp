@@ -157,9 +157,7 @@ public class Parcel {
 		this.deliveryTime = currentTime;
 		deliveryGuy.delivered(this);
 		
-		String before = this.state.name(); 
 		this.state = ParcelState.DELIVERED;
-		System.out.println(before + " -> " + this.state.name());
 				
 		if (this.destinationType.equals(ParcelDestinationType.PACK_STATION)) {
 			this.person.notifyParcelInPackStation(this);
