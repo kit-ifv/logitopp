@@ -92,10 +92,16 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		
 		Function<Person, PickUpParcelPerson> createAgent = p -> createSimulatedPerson(queue,
 				boarder, seed, p, listener, modesInSimulation, initialState);
-		Function<PickUpParcelPerson, Collection<Parcel>> createParcelOrders = p -> createParcelOrder(p);
 
 		List<PickUpParcelPerson> ppps = personLoader().households().flatMap(Household::persons)
 				.filter(personFilter).map(createAgent).collect(Collectors.toList());
+		
+		createParcelOrders(ppps);
+	}
+
+	private void createParcelOrders(List<PickUpParcelPerson> ppps) {
+		
+		Function<PickUpParcelPerson, Collection<Parcel>> createParcelOrders = p -> createParcelOrder(p);
 		
 		int[] counts = new int[11];
 		ppps.forEach(ppp -> {counts[createParcelOrders.apply(ppp).size()]++;});

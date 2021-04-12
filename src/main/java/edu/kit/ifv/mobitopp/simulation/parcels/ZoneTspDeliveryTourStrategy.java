@@ -26,7 +26,6 @@ import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.Time;
-import lombok.AllArgsConstructor;
 
 /**
  * The Class ZoneTspDeliveryTourStrategy is a DeliveryTourAssignmentStrategy.

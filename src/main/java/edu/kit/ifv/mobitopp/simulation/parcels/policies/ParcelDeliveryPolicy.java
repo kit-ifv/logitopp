@@ -1,4 +1,6 @@
-package edu.kit.ifv.mobitopp.simulation.parcels;
+package edu.kit.ifv.mobitopp.simulation.parcels.policies;
+
+import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
 
 /**
  * The Interface ParcelDeliveryPolicy provides methods deciding whether parcels can be delivered or should be updated.
