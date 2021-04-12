@@ -17,29 +17,34 @@ public class KdTree<O> {
 	@Getter
 	private Node<O> root = null;
 	@Getter
-	private List<Leaf<O>> leafs = new ArrayList<Leaf<O>>();
+	private List<Leaf<O>> leafs;
 	
-	private int nodeCapacity = 4;
+	private int nodeCapacity;
+	private DistanceMetric metric;
 	
 	
-	public KdTree(List<Leaf<O>> nodes, int nodeCapacity) {
+	public KdTree(List<Leaf<O>> nodes, int nodeCapacity, DistanceMetric metric) {
+		nodes.forEach(n -> n.setMetric(metric));
+		this.leafs = new ArrayList<Leaf<O>>();
 		this.leafs.addAll(nodes);
-		this.root = buildTree(nodes);
 		this.nodeCapacity = nodeCapacity;
+		this.root = buildTree(nodes);
+		this.metric = metric;
+		
 	}
 	
-	public KdTree(Collection<Point2D> points, int nodeCapacity) {
+	public KdTree(Collection<Point2D> points, int nodeCapacity, DistanceMetric metric) {
 		this(points.stream()
 				   .map(p -> new Leaf<O>(p))
 				   .collect(toList()),
-			nodeCapacity);
+			nodeCapacity, metric);
 	}
 	
-	public KdTree(Collection<O> objects, Function<O, Point2D> coordMap, int nodeCapacity) {
+	public KdTree(Collection<O> objects, Function<O, Point2D> coordMap, int nodeCapacity, DistanceMetric metric) {
 		this(objects.stream()
 				   .map(o -> new Leaf<O>(o, coordMap))
 				   .collect(toList()),
-			nodeCapacity);
+			nodeCapacity, metric);
 	}
 	
 	
@@ -68,7 +73,7 @@ public class KdTree<O> {
 		
 		
 		
-		InnerNode<O> innerNode = new InnerNode<O>(new Rectangle2D.Double(minX, maxY, dx, dy));
+		InnerNode<O> innerNode = new InnerNode<O>(new Rectangle2D.Double(minX, minY, dx, dy), metric);
 		
 		if (leafs.size() <= nodeCapacity) {
 			leafs.forEach(l -> innerNode.addChild(l));

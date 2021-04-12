@@ -25,11 +25,9 @@ public class KNNSearch<O> {
 		queue.add(tree.getRoot(), 0.0f);
 		
 		Collection<Leaf<O>> neighbors = new ArrayList<Leaf<O>>();
-		
-		int step = 0;
+
 		while (!queue.isEmpty() && neighbors.size() < k) {
-			//System.out.println("Step " + (step++) + ": q-size = " + queue.size() + ", result = " + neighbors.size() + "/" + k);
-			
+
 			Node<O> minNode = queue.deleteMin();
 			
 			if (minNode.distance(target) <= maxDist) {

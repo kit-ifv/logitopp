@@ -1,13 +1,13 @@
 package edu.kit.ifv.mobitopp.populationsynthesis.neighborhood;
 
-import static java.lang.Math.max;
-import static java.lang.Math.sqrt;
-
 import java.awt.geom.Point2D;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 
 import edu.kit.ifv.mobitopp.routing.util.PriorityQueue;
 import lombok.Getter;
+import lombok.Setter;
 
 public class Leaf<O> implements Node<O> {
 	
@@ -16,6 +16,9 @@ public class Leaf<O> implements Node<O> {
 	@Getter
 	private O object = null;
 
+	@Setter
+	private DistanceMetric metric = new EuclidDistanceMetric();
+	
 	//Constructors for Leafs
 	public Leaf(Point2D point) {
 		this.point = point;
@@ -31,8 +34,12 @@ public class Leaf<O> implements Node<O> {
 	}
 	
 	public Leaf(O object, Point2D point) {
-		this(point);
-		this.object = object;
+		this(object, o -> point);
+	}
+	
+	@Override
+	public Collection<Leaf<O>> getNestedLeaves() {
+		return List.of(this);
 	}
 	
 	
@@ -43,24 +50,12 @@ public class Leaf<O> implements Node<O> {
 	
 	@Override
 	public float distanceTo(Leaf<O> leaf) {
-		return (float) this.point.distance(leaf.point);
+		return metric.distance(this.getPoint(), leaf.getPoint());
 	}
 
 	@Override
 	public float distanceTo(InnerNode<O> innerNode) {
-		if (innerNode.getRect().contains(point)) {
-			return 0.0f;
-		
-		} else {
-			
-			double dx = max(innerNode.getRect().getMinX() - point.getX(), point.getX() - innerNode.getRect().getMaxX());
-			dx = max(0, dx);
-			double dy = max(innerNode.getRect().getMinY() - point.getY(), point.getY() - innerNode.getRect().getMaxY());
-			dy = max(0, dy);
-			
-			return (float) sqrt(dx*dx + dy*dy);
-			
-		}
+		return metric.distance(this.getPoint(), innerNode.getRect());
 	}
 	
 	@Override
@@ -79,8 +74,6 @@ public class Leaf<O> implements Node<O> {
 			
 	public String treeFormat(String indent) {
 		return indent + this.point.toString() + "\n";
-	}
-
-	
+	}	
 
 }

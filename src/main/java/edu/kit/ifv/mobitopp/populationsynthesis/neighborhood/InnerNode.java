@@ -1,8 +1,5 @@
 package edu.kit.ifv.mobitopp.populationsynthesis.neighborhood;
 
-import static java.lang.Math.max;
-import static java.lang.Math.sqrt;
-
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,10 +16,12 @@ public class InnerNode<O> implements Node<O> {
 	@Getter
 	private List<Node<O>> children = new ArrayList<Node<O>>();
 	
+	private DistanceMetric metric;
 	
 	//Constructor for inner Nodes
-	public InnerNode(Rectangle2D area) {
+	public InnerNode(Rectangle2D area, DistanceMetric metric) {
 		this.rect = area;
+		this.metric = metric;
 	}
 	
 	
@@ -39,35 +38,25 @@ public class InnerNode<O> implements Node<O> {
 		this.children.addAll(nodes);
 	}
 	
+	public Collection<Leaf<O>> getNestedLeaves() {
+		List<Leaf<O>> leaves = new ArrayList<>();
+		
+		for (Node<O> child : getChildren()) {
+			leaves.addAll(child.getNestedLeaves());			
+		}
+		
+		return leaves;
+	}
+	
 	
 	@Override
 	public float distanceTo(Leaf<O> leaf) {
-		
-		if (this.rect.contains(leaf.getPoint())) {
-			return 0.0f;
-		
-		} else {
-
-			double dx = max(rect.getMinX() - leaf.getPoint().getX(), leaf.getPoint().getX() - rect.getMaxX());
-			dx = max(0, dx);
-			double dy = max(rect.getMinY() - leaf.getPoint().getY(), leaf.getPoint().getY() - rect.getMaxY());
-			dy = max(0, dy);
-			
-			return (float) sqrt(dx*dx + dy*dy);
-			
-		}
+		return metric.distance(this.getRect(), leaf.getPoint());
 	}
 
 	@Override
 	public float distanceTo(InnerNode<O> innerNode) {
-		throw new RuntimeException("is this supported or used?");
-//		if (this.rect.contains(innerNode.getRect())) {
-//			return 0.0f;
-//		}
-		
-		
-		
-		//return 0.0f;
+		return metric.distance(this.getRect(), innerNode.getRect());
 	}
 		
 
