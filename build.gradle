@@ -21,6 +21,7 @@ plugins {
     id "com.jfrog.bintray" version "1.8.5"
     id "com.jfrog.artifactory" version "4.15.2"
     id "maven-publish"
+    id 'jacoco'
 }
 
 group = 'edu.kit.ifv.mobitopp'
