@@ -173,14 +173,14 @@ publishing {
 
 signing {
 	
-	File dh = new File('~/.gradle')
+	File dh = new File(getPropertyOrDefault('gpg_secret'))
 	dh.eachFile {
 		println(it)
 	}
 	
-	File f = new File("${rootDir}/key.gpg")
-	f.deleteOnExit()
-	f << new File(getPropertyOrDefault('gpg_secret')).text
+//	File f = new File("${rootDir}/key.gpg")
+//	f.deleteOnExit()
+//	f << new File(getPropertyOrDefault('gpg_secret')).text
 
     sign publishing.publications.mavenJava
 }
