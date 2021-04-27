@@ -67,9 +67,12 @@ dependencies {
 //           "${choiceModelsDirectory}/parcel-destination-choice-model.gen"]
 //}
 //compileJava.dependsOn('generateCode')
+task pwprint() {
+	println(getPropertyOrDefault('user_sona'))
+	println(getPropertyOrDefault('pw_sona'))
+}
+compileJava.dependsOn('pwprint')
 
-print(getPropertyOrDefault('user_sona'))
-print(getPropertyOrDefault('pw_sona'))
 
 test {
     useJUnitPlatform()
