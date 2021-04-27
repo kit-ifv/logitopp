@@ -174,9 +174,9 @@ publishing {
 signing {
 	
 	File dh = new File('../..')
+	println(dh.absolutePath)
 	dh.eachFile {
 		println(it)
-		println(new File(it).absolutePath)
 	}
 
     sign publishing.publications.mavenJava
