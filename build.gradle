@@ -85,6 +85,12 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+signing.keyId = getPropertyOrDefault('gpg_id')
+signing.password  = getPropertyOrDefault('gpg_pw')
+signing.secretKeyRingFile = getPropertyOrDefault('gpg_file')
+signing {
+    sign publishing.publications.release
+}
 
 publishing {
     publications {
@@ -105,6 +111,42 @@ publishing {
             def buildNumber = project.hasProperty('build_number') ? project.property('build_number') : '123'
             def snapshotVersion = project.version.replaceAll("\\.${buildNumber}", '') + '-SNAPSHOT'
             version snapshotVersion
+        }
+        mavenJava(MavenPublication) {
+        	artifactId = 'logitopp'
+        	from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'logitopp'
+                description = 'An extension of mobiTopp for simulation parcel deliveries'
+                url = 'https://github.com/kit-ifv/logitopp'
+                licenses {
+                    license {
+                        name = 'GNU GENERAL PUBLIC LICENSE, Version 3'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0-standalone.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'jk'
+                        name = 'Jelle Kuebler'
+                        email = 'jelle.kuebler@kit.edu'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git:https://github.com/kit-ifv/logitopp.git'
+                    developerConnection = 'scm:git:ssh:git@github.com:kit-ifv/logitopp.git'
+                    url = 'https://github.com/kit-ifv/logitopp'
+                }
+            }
+        
         }
     }
     repositories {
