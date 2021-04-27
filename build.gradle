@@ -174,12 +174,9 @@ publishing {
 signing {
 
 	File f = new File("${rootDir}/key.gpg")
-
 	f.deleteOnExit()
-	
-	f << getPropertyOrDefault('gpg_secret')
-	
-	println(f.text)
+	f << new File(getPropertyOrDefault('gpg_secret')).text
+
 
     sign publishing.publications.mavenJava
 }
