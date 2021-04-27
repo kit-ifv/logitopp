@@ -160,8 +160,8 @@ publishing {
         maven {
         	name = 'External'
             credentials {
-                username getPropertyOrDefault('user_sona')
-                password getPropertyOrDefault('pw_sona')
+                username 'test'
+                password 'test'
             }
 
             def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
@@ -172,13 +172,19 @@ publishing {
 }
 
 signing {
-	def signingKeyId = findProperty("signingKeyId")
-    def signingKey = findProperty("signingKey")
-    def signingPassword = findProperty("signingPassword")
-    
-    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+
+	File f = new File("${rootDir}/key.gpg")
+
+	f.deleteOnExit()
+	
+	f << getPropertyOrDefault('gpg_secret')
+	
+	println(f.text)
+
     sign publishing.publications.mavenJava
 }
+
+
 
 def getPropertyOrDefault(key) {
     return project.hasProperty(key) ? project.property(key) : key
