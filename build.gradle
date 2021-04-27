@@ -176,7 +176,7 @@ signing {
     def signingKey = getPropertyOrDefault('gpg_file')
     def signingPassword = getPropertyOrDefault('gpg_pw')
     useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-    sign publishing.publications.release
+    sign publishing.publications.mavenJava
 }
 
 def getPropertyOrDefault(key) {
