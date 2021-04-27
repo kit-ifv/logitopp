@@ -85,12 +85,8 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
-signing.keyId = getPropertyOrDefault('gpg_id')
-signing.password  = getPropertyOrDefault('gpg_pw')
-signing.secretKeyRingFile = getPropertyOrDefault('gpg_file')
-signing {
-    sign publishing.publications.release
-}
+
+
 
 publishing {
     publications {
@@ -175,6 +171,13 @@ publishing {
     }
 }
 
+signing {
+    sign publishing.publications.release
+}
+
+signing.keyId = getPropertyOrDefault('gpg_id')
+signing.password  = getPropertyOrDefault('gpg_pw')
+signing.secretKeyRingFile = getPropertyOrDefault('gpg_file')
 
 def getPropertyOrDefault(key) {
     return project.hasProperty(key) ? project.property(key) : key
