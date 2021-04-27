@@ -18,6 +18,7 @@ plugins {
     id 'java'
     id 'eclipse'
     id 'maven'
+    id 'signing'
     id "com.jfrog.bintray" version "1.8.5"
     id "com.jfrog.artifactory" version "4.15.2"
     id "maven-publish"
@@ -25,6 +26,7 @@ plugins {
 }
 
 group = 'edu.kit.ifv.mobitopp'
+archivesBaseName = "logitopp"
 version = project.hasProperty('next_version') ? project.property('next_version') : '0.0-SNAPSHOT'
 wrapper.gradleVersion = '6.3'
 
@@ -66,6 +68,8 @@ dependencies {
 //}
 //compileJava.dependsOn('generateCode')
 
+print("${USER_SONATYPE}")
+print("${PW_SONATYPE}")
 
 test {
     useJUnitPlatform()
@@ -85,79 +89,53 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 
-publishing {
-    publications {
-        release(MavenPublication) {
-            from components.java
-            artifact sourcesJar
-            artifact javadocJar
-            groupId project.group
-            artifactId project.name
-            version project.version
-        }
-        snapshot(MavenPublication) {
-            from components.java
-            artifact sourcesJar
-            artifact javadocJar
-            groupId project.group
-            artifactId project.name
-            def buildNumber = project.hasProperty('build_number') ? project.property('build_number') : '123'
-            def snapshotVersion = project.version.replaceAll("\\.${buildNumber}", '') + '-SNAPSHOT'
-            version snapshotVersion
-        }
-    }
-    repositories {
-        maven {
-            credentials {
-                username getPropertyOrDefault('repositoryUsername')
-                password getPropertyOrDefault('repositoryPassword')
-            }
-            def repositoryUrl = getPropertyOrDefault('repositoryUrl')
-            def releasesRepoUrl = "${repositoryUrl}/repository/maven-releases"
-            def snapshotsRepoUrl = "${repositoryUrl}/repository/maven-snapshots"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-        }
-    }
-}
-
-artifactory {
-    contextUrl = 'http://oss.jfrog.org'
-    publish {
-        repository {
-            repoKey = 'oss-snapshot-local'
-            username = project.hasProperty('user') ? project.property('user') : 'user'
-            password = project.hasProperty('key') ? project.property('key') : 'key'
-        }
-        defaults {
-            publications('snapshot')
-            publishArtifacts = true
-            publishPom = true
-        }
-    }
-    resolve {
-        repoKey = 'jcenter'
-    }
-    def buildnumber = project.hasProperty('build.number') ? project.property('build.number') : '' 
-    clientConfig.info.setBuildNumber(buildnumber)
-}
-
-//bintray {
-//    user = project.hasProperty('user') ? project.property('user') : 'user'
-//    key = project.hasProperty('key')? project.property('key') : 'key'
-//    publications = ['release']
-//    pkg {
-//        repo = 'ifv-mobitopp'
-//        name = project.name
-//        userOrg = 'ifv-mobitopp'
-//        licenses = ['GPL-3.0']
-//        vcsUrl = 'https://github.com/ifv-mobitopp/logitopp'
-//        version {
-//          name = project.version
-//          description = project.version
-//          released = new Date()
+//publishing {
+//    publications {
+//        release(MavenPublication) {
+//            from components.java
+//            artifact sourcesJar
+//            artifact javadocJar
+//            groupId project.group
+//            artifactId project.name
+//            version project.version
+//        }
+//        snapshot(MavenPublication) {
+//            from components.java
+//            artifact sourcesJar
+//            artifact javadocJar
+//            groupId project.group
+//            artifactId project.name
+//            def buildNumber = project.hasProperty('build_number') ? project.property('build_number') : '123'
+//            def snapshotVersion = project.version.replaceAll("\\.${buildNumber}", '') + '-SNAPSHOT'
+//            version snapshotVersion
+//        }
+//    }
+//    repositories {
+//        maven {
+//        	name = 'internal'
+//            credentials {
+//                username getPropertyOrDefault('repositoryUsername')
+//                password getPropertyOrDefault('repositoryPassword')
+//            }
+//            def repositoryUrl = getPropertyOrDefault('repositoryUrl')
+//            def releasesRepoUrl = "${repositoryUrl}/repository/maven-releases"
+//            def snapshotsRepoUrl = "${repositoryUrl}/repository/maven-snapshots"
+//            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+//        }
+//        maven {
+//        	name = 'external'
+//            credentials {
+//                username getPropertyOrDefault('ossrhUsername')
+//                password getPropertyOrDefault('ossrhPassword')
+//            }
+//
+//            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+//            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+//            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 //        }
 //    }
 //}
+
 
 def getPropertyOrDefault(key) {
     return project.hasProperty(key) ? project.property(key) : key
