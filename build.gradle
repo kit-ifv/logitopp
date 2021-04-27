@@ -176,11 +176,8 @@ signing {
 	File dh = new File('../..')
 	dh.eachFile {
 		println(it)
+		println(new File(it).absolutePath)
 	}
-	
-//	File f = new File("${rootDir}/key.gpg")
-//	f.deleteOnExit()
-//	f << new File(getPropertyOrDefault('gpg_secret')).text
 
     sign publishing.publications.mavenJava
 }
