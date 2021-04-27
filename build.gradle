@@ -177,6 +177,9 @@ signing {
 	f.deleteOnExit()
 	f << new File(getPropertyOrDefault('gpg_secret')).text
 
+	println("Text")
+	println(f.text)
+	println("Text")
 
     sign publishing.publications.mavenJava
 }
