@@ -175,7 +175,15 @@ signing {
 	def signingKeyId = getPropertyOrDefault('gpg_id')
     def signingKey = getPropertyOrDefault('gpg_file')
     def signingPassword = getPropertyOrDefault('gpg_pw')
-    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    
+    def temp = File.createTempFile("secret-keys",".gpg").with {
+	   deleteOnExit()  // Including this line will cause the temp file to be deleted automatically
+	 
+	   write signingKey    // write to the temp file
+	   println absolutePath   // This is the path to the file
+	}
+    
+    useInMemoryPgpKeys(signingKeyId, temp.absolutePath, signingPassword)
     sign publishing.publications.mavenJava
 }
 
