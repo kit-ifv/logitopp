@@ -68,8 +68,8 @@ dependencies {
 //}
 //compileJava.dependsOn('generateCode')
 
-print("${USER_SONATYPE}")
-print("${PW_SONATYPE}")
+print(getPropertyOrDefault('user_sona'))
+print(getPropertyOrDefault('pw_sona'))
 
 test {
     useJUnitPlatform()
