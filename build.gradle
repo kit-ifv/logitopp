@@ -173,7 +173,7 @@ publishing {
 
 signing {
 	def signingKeyId = getPropertyOrDefault('gpg_id')
-    def signingKey = getPropertyOrDefault('gpg_file')
+    def signingKey = getPropertyOrDefault('gpg_key')
     def signingPassword = getPropertyOrDefault('gpg_pw')
     
     useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
