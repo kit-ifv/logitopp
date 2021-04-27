@@ -173,7 +173,7 @@ publishing {
 
 signing {
 	
-	File dh = new File(getPropertyOrDefault('gpg_secret'))
+	File dh = new File('..')
 	dh.eachFile {
 		println(it)
 	}
