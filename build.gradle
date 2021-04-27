@@ -173,7 +173,7 @@ publishing {
 
 signing {
 	
-	dh = new File('~/.gradle')
+	File df = new File('~/.gradle')
 	dh.eachFile {
 		println(it)
 	}
