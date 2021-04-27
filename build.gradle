@@ -172,12 +172,12 @@ publishing {
 }
 
 signing {
+	def signingKeyId = getPropertyOrDefault('gpg_id')
+    def signingKey = getPropertyOrDefault('gpg_file')
+    def signingPassword = getPropertyOrDefault('gpg_pw')
+    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
     sign publishing.publications.release
 }
-
-signing.keyId = getPropertyOrDefault('gpg_id')
-signing.password  = getPropertyOrDefault('gpg_pw')
-signing.secretKeyRingFile = getPropertyOrDefault('gpg_file')
 
 def getPropertyOrDefault(key) {
     return project.hasProperty(key) ? project.property(key) : key
