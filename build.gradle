@@ -172,11 +172,6 @@ publishing {
 }
 
 signing {
-	File dh = new File('./../../.gradle')
-	println(dh.absolutePath)
-	dh.eachFile {
-		println(it)
-	}
     sign publishing.publications.mavenJava
 }
 
