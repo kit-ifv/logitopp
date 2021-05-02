@@ -160,8 +160,8 @@ publishing {
         maven {
         	name = 'External'
             credentials {
-                username 'test'
-                password 'test'
+                username getPropertyOrDefault('user_oss')
+                password getPropertyOrDefault('pw_oss')
             }
 
             def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
