@@ -109,16 +109,12 @@ publishing {
             version snapshotVersion
         }
         mavenJava(MavenPublication) {
-        	artifactId = 'logitopp'
         	from components.java
-            versionMapping {
-                usage('java-api') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-                usage('java-runtime') {
-                    fromResolutionResult()
-                }
-            }
+            artifact sourcesJar
+            artifact javadocJar
+            groupId project.group
+            artifactId project.name
+            version project.version
             pom {
                 name = 'logitopp'
                 description = 'An extension of mobiTopp for simulation parcel deliveries'
