@@ -3,6 +3,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
+import edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -28,6 +29,7 @@ public class Parcel {
 	private DeliveryResults results;
 	@Getter private int deliveryAttempts = 0;
 	@Getter private Time deliveryTime = Time.future;
+	@Getter private RecipientType recipientType = null;
 
 	/**
 	 * Instantiates a new parcel ordered by the given {@link PickUpParcelPerson}.
@@ -152,9 +154,11 @@ public class Parcel {
 	 *
 	 * @param currentTime the current time
 	 * @param deliveryGuy the delivery guy
+	 * @param recipientType the type of recipient that took the parcel (e.g. personal or neighbor)
 	 */
-	public void deliver(Time currentTime, DeliveryPerson deliveryGuy) {
+	public void deliver(Time currentTime, DeliveryPerson deliveryGuy, RecipientType recipientType) {
 		this.deliveryTime = currentTime;
+		this.recipientType = recipientType;
 		deliveryGuy.delivered(this);
 		
 		this.state = ParcelState.DELIVERED;

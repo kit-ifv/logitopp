@@ -69,63 +69,63 @@ public class BaseDeliveryPolicyTest {
 	public void canDeliverHomeWhileHome() {
 		personIsHome();
 		
-		assertTrue(policy.canDeliver(parcelHome));
+		assertTrue(policy.canDeliver(parcelHome).isPresent());
 	}
 	
 	@Test
 	public void canDeliverHomeWhileWorking() {
 		personIsWorking();
 		
-		assertTrue(!policy.canDeliver(parcelHome));
+		assertTrue(policy.canDeliver(parcelHome).isEmpty());
 	}
 	
 	@Test
 	public void canDeliverHomeWhileElsewhere() {
 		personIsElsewhere();
 		
-		assertTrue(!policy.canDeliver(parcelHome));
+		assertTrue(policy.canDeliver(parcelHome).isEmpty());
 	}
 	
 	@Test
 	public void canDeliverWorkWhileHome() {
 		personIsHome();
 		
-		assertTrue(!policy.canDeliver(parcelWork));
+		assertTrue(policy.canDeliver(parcelWork).isEmpty());
 	}
 	
 	@Test
 	public void canDeliverWorkWhileWorking() {
 		personIsWorking();
 		
-		assertTrue(policy.canDeliver(parcelWork));
+		assertTrue(policy.canDeliver(parcelWork).isPresent());
 	}
 	
 	@Test
 	public void canDeliverWorkWhileElsewhere() {
 		personIsElsewhere();
 		
-		assertTrue(!policy.canDeliver(parcelWork));
+		assertTrue(policy.canDeliver(parcelWork).isEmpty());
 	}
 	
 	@Test
 	public void canDeliverPackstationWhileHome() {
 		personIsHome();
 		
-		assertTrue(policy.canDeliver(parcelPackStation));
+		assertTrue(policy.canDeliver(parcelPackStation).isPresent());
 	}
 	
 	@Test
 	public void canDeliverPackstationWhileWorking() {
 		personIsWorking();
 		
-		assertTrue(policy.canDeliver(parcelPackStation));
+		assertTrue(policy.canDeliver(parcelPackStation).isPresent());
 	}
 	
 	@Test
 	public void canDeliverPackstationWhileElsewhere() {
 		personIsElsewhere();
 		
-		assertTrue(policy.canDeliver(parcelPackStation));
+		assertTrue(policy.canDeliver(parcelPackStation).isPresent());
 	}
 	
 	@Test

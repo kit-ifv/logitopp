@@ -6,6 +6,7 @@ import static java.lang.Math.round;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
@@ -15,6 +16,7 @@ import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.ActivityAsLinkedListElement;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.LinkedListElement;
 import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -127,8 +129,9 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	private void tryDelivery(DeliveryPerson person, Parcel parcel, Time currentTime) {
 		String msg = "";
 
-		if (parcel.getDistributionCenter().getPolicy().canDeliver(parcel)) {
-			parcel.deliver(currentTime, person);
+		Optional<RecipientType> canDeliver = parcel.getDistributionCenter().getPolicy().canDeliver(parcel);
+		if (canDeliver.isPresent()) {
+			parcel.deliver(currentTime, person, canDeliver.get());
 			msg = "Successful delivery of ";
 
 		} else {

@@ -1,5 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
+import java.util.Optional;
+
 import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
 
 /**
@@ -12,9 +14,9 @@ public interface ParcelDeliveryPolicy {
 	 * E.g. may check if the recipient or a neighbor is at home.
 	 *
 	 * @param parcel the parcel
-	 * @return true, if it can be delivered
+	 * @return an optional {@link RecipientType} if the parcel can be delivered, an empty {@link Optional} otherwise
 	 */
-	public boolean canDeliver(Parcel parcel);
+	public Optional<RecipientType> canDeliver(Parcel parcel);
 	
 	/**
 	 * Update the parcel delivery.

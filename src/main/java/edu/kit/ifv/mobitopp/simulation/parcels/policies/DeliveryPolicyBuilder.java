@@ -14,6 +14,11 @@ public class DeliveryPolicyBuilder {
 		this.policy = policy;
 		return this;
 	}
+	
+	public DeliveryPolicyBuilder checkOtherHouseholdMembers(NeighborhoodRelationship neighborhood) {
+		this.policy = new HouseholdDeliveryPolicy(policy);
+		return this;
+	}
 		
 	public DeliveryPolicyBuilder checkNeighbors(NeighborhoodRelationship neighborhood) {
 		this.policy = new NeighborhoodDeliveryPolicy(policy, neighborhood);

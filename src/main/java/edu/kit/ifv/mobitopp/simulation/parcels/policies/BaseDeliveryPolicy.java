@@ -4,6 +4,8 @@ import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
 
+import java.util.Optional;
+
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.Person;
 import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
@@ -15,7 +17,6 @@ import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
 public class BaseDeliveryPolicy implements ParcelDeliveryPolicy {
 	
 	public BaseDeliveryPolicy() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	/**
@@ -25,32 +26,28 @@ public class BaseDeliveryPolicy implements ParcelDeliveryPolicy {
 	 * Pack-station delivery: true
 	 *
 	 * @param parcel the parcel
-	 * @return true, if the parcel can be delivered
+	 * @return an optional {@link RecipientType} if the parcel can be delivered, an empty {@link Optional} otherwise
 	 */
 	@Override
-	public boolean canDeliver(Parcel parcel) {
+	public Optional<RecipientType> canDeliver(Parcel parcel) {
 
 		if (parcel.getDestinationType().equals(HOME)) {
 
-			return isHome(parcel.getPerson());						
+			return optionalRecipient(isHome(parcel.getPerson()), RecipientType.PERSONAL);						
 								
 			
 		} else if (parcel.getDestinationType().equals(WORK)) {
 			
-			if (isWorking(parcel.getPerson())) {
-				return true;
-				
-			} else {
-				return false;
-			}
+			return optionalRecipient(isWorking(parcel.getPerson()), RecipientType.PERSONAL);
+
 			
 			
 		} else if (parcel.getDestinationType().equals(PACK_STATION)) {
 			
-			return true;
+			return optionalRecipient(true, RecipientType.PACKSTATION);
 		}
 		
-		return false;
+		return Optional.empty();
 	}
 
 
@@ -76,6 +73,14 @@ public class BaseDeliveryPolicy implements ParcelDeliveryPolicy {
 	@Override
 	public boolean updateParcelDelivery(Parcel parcel) {
 		return false;
+	}
+	
+	private Optional<RecipientType> optionalRecipient(boolean check, RecipientType recipientType) {
+		if (check) {
+			return Optional.of(recipientType);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 }

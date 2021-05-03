@@ -2,6 +2,8 @@ package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
 
+import java.util.Optional;
+
 import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
 
 public class DeliveryAttemptsPolicy implements ParcelDeliveryPolicy {
@@ -15,7 +17,7 @@ public class DeliveryAttemptsPolicy implements ParcelDeliveryPolicy {
 	}
 	
 	@Override
-	public boolean canDeliver(Parcel parcel) {
+	public Optional<RecipientType> canDeliver(Parcel parcel) {
 		return policy.canDeliver(parcel);
 	}
 

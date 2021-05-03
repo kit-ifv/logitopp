@@ -14,14 +14,12 @@ import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
 /**
  * The Class DummyDeliveryPolicy is an exemplary implementation of the ParcelDeliveryPolicy interface.
  */
-public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy {
+public class HouseholdDeliveryPolicy implements ParcelDeliveryPolicy {
 
 	private final ParcelDeliveryPolicy policy;
-	private final NeighborhoodRelationship neighborhood;
 	
-	public NeighborhoodDeliveryPolicy(ParcelDeliveryPolicy policy, NeighborhoodRelationship neighborhood) {
+	public HouseholdDeliveryPolicy(ParcelDeliveryPolicy policy) {
 		this.policy = policy;
-		this.neighborhood = neighborhood;
 	}
 	
 	/**
@@ -40,15 +38,10 @@ public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy {
 		Optional<RecipientType> canDeliver = policy.canDeliver(parcel);
 		
 		if (canDeliver.isEmpty() && parcel.getDestinationType().equals(HOME)) {
-			Collection<Household> neighbors = neighborhood.getNeighborsOf(parcel.getPerson().household());
-			System.out.println("Found " + neighbors.size() + " neighbors. incl? " + (neighbors.contains(parcel.getPerson().household())));
 			
-			boolean anybodyHome = neighbors
-									.stream()
-									.flatMap(Household::persons)
-									.anyMatch(p -> p.currentActivity().activityType().equals(ActivityType.HOME));
+			boolean anybodyHome = parcel.getPerson().household().persons().anyMatch(p -> p.currentActivity().equals(ActivityType.HOME));
 			
-			return optionalRecipient(anybodyHome, RecipientType.NEIGHBOR);
+			return optionalRecipient(anybodyHome, RecipientType.HOUSEHOLDMEMBER);
 		}
  
 		

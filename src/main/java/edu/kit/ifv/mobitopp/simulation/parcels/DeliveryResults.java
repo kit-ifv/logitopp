@@ -49,6 +49,7 @@ public class DeliveryResults {
 		msg += parcel.getDistributionCenter().getName() + "; ";
 		msg += parcel.getDeliveryAttempts() + "; ";
 		msg += String.valueOf(parcel.getDeliveryTime()) + ";";
+		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + "; ";
 		msg += ((deliveryGuy != null) ? deliveryGuy.currentActivity().zone().getId() : "NULL") + "; ";
 		msg += parcel.getZone().getId();
 		
@@ -61,7 +62,7 @@ public class DeliveryResults {
 	 * @return the category
 	 */
 	public static Category createResultCategoryState() {
-		return new Category("parcel-states", Arrays.asList("Time", "ParcelID", "RecipientID", "DestinationType", "State", "IsDeliveryAttempt", "DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "CurrentDeliveryGuyZone", "ParcelDestinationZone"));
+		return new Category("parcel-states", Arrays.asList("Time", "ParcelID", "RecipientID", "DestinationType", "State", "IsDeliveryAttempt", "DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "RecipientType", "CurrentDeliveryGuyZone", "ParcelDestinationZone"));
 	}
 	
 	
