@@ -30,6 +30,11 @@ public class DeliveryPolicyBuilder {
 		return this;
 	}
 
+	public DeliveryPolicyBuilder wrapWith(DeliveryPolicyDecorator decorator) {
+		this.policy = decorator.of(this.policy);
+		return this;
+	}
+	
 	public ParcelDeliveryPolicy build() {
 		return this.policy;
 	}
