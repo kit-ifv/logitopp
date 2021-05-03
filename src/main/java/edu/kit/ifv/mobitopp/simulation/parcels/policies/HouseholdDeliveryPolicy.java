@@ -39,7 +39,7 @@ public class HouseholdDeliveryPolicy implements ParcelDeliveryPolicy {
 		
 		if (canDeliver.isEmpty() && parcel.getDestinationType().equals(HOME)) {
 			
-			boolean anybodyHome = parcel.getPerson().household().persons().anyMatch(p -> p.currentActivity().equals(ActivityType.HOME));
+			boolean anybodyHome = parcel.getPerson().household().persons().anyMatch(p -> p.currentActivity().activityType().equals(ActivityType.HOME));
 			
 			return optionalRecipient(anybodyHome, RecipientType.HOUSEHOLDMEMBER);
 		}
