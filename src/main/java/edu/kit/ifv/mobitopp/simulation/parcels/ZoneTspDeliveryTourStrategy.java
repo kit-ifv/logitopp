@@ -20,6 +20,7 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
@@ -49,6 +50,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	
 	private final int maxHours;
 	private final boolean skipSunday;
+	private final Mode mode;
 	
 	/**
 	 * Instantiates a new {@link ZoneTspDeliveryTourStrategy}
@@ -62,13 +64,14 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 * @param skipSunday whether sunday should be skipped
 	 */
 	public ZoneTspDeliveryTourStrategy(int meanCapacity, double capacityStdDev, int minCapacity,
-		int maxCapacity, int maxHours, boolean skipSunday) {
+		int maxCapacity, int maxHours, boolean skipSunday, Mode mode) {
 		this.meanCapacity = meanCapacity;
 		this.capacityStdDev = capacityStdDev;
 		this.minCapacity = minCapacity;
 		this.maxCapacity = maxCapacity;
 		this.maxHours = maxHours;
 		this.skipSunday = skipSunday;
+		this.mode = mode;
 		
 		this.lastPlan = Time.start;
 		this.parcelTour = new ArrayList<>();
@@ -85,7 +88,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 * <br> and no deliveries on sunday.
 	 */
 	public ZoneTspDeliveryTourStrategy() {
-		this(160, 16, 100, 200, 8, true);
+		this(160, 16, 100, 200, 8, true, StandardMode.TRUCK);
 	}
 	
 	/**
@@ -209,7 +212,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 * @return the float
 	 */
 	private float travelTime(DeliveryPerson person, Zone origin, Zone destination, Time time) {
-		return person.options().impedance().getTravelTime(origin.getId(), destination.getId(), StandardMode.TRUCK, time);
+		return person.options().impedance().getTravelTime(origin.getId(), destination.getId(), mode, time);
 	}
 	
 	/**
