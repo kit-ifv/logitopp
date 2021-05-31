@@ -60,7 +60,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			final TripFactory tripFactory, final ReschedulingStrategy rescheduling,
 			final Set<Mode> modesInSimulation, final PersonState initialState,
 			final SimulationContext context, final DeliveryPersonFactory personFactory,
-			final ParcelOrderModel parcelOrderModel, final Predicate<Person> personFilter) {
+			final ParcelOrderModel parcelOrderModel, final DeliveryResults results, final Predicate<Person> personFilter) {
 		
 		super(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, 
 			  activityDurationRandomizer, tripFactory, rescheduling, modesInSimulation,
@@ -70,7 +70,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		this.parcels = new ArrayList<Parcel>();
 		this.deliveryPersonFactory = personFactory;
 		this.personFilter = personFilter;
-		this.deliveryResults = new DeliveryResults(context().results());
+		this.deliveryResults = results;
 
 	}
 

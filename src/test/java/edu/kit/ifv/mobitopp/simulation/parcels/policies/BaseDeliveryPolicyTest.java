@@ -69,74 +69,74 @@ public class BaseDeliveryPolicyTest {
 	public void canDeliverHomeWhileHome() {
 		personIsHome();
 		
-		assertTrue(policy.canDeliver(parcelHome).isPresent());
+		assertTrue(policy.canDeliver(parcelHome, null).isPresent());
 	}
 	
 	@Test
 	public void canDeliverHomeWhileWorking() {
 		personIsWorking();
 		
-		assertTrue(policy.canDeliver(parcelHome).isEmpty());
+		assertTrue(policy.canDeliver(parcelHome, null).isEmpty());
 	}
 	
 	@Test
 	public void canDeliverHomeWhileElsewhere() {
 		personIsElsewhere();
 		
-		assertTrue(policy.canDeliver(parcelHome).isEmpty());
+		assertTrue(policy.canDeliver(parcelHome, null).isEmpty());
 	}
 	
 	@Test
 	public void canDeliverWorkWhileHome() {
 		personIsHome();
 		
-		assertTrue(policy.canDeliver(parcelWork).isEmpty());
+		assertTrue(policy.canDeliver(parcelWork, null).isEmpty());
 	}
 	
 	@Test
 	public void canDeliverWorkWhileWorking() {
 		personIsWorking();
 		
-		assertTrue(policy.canDeliver(parcelWork).isPresent());
+		assertTrue(policy.canDeliver(parcelWork, null).isPresent());
 	}
 	
 	@Test
 	public void canDeliverWorkWhileElsewhere() {
 		personIsElsewhere();
 		
-		assertTrue(policy.canDeliver(parcelWork).isEmpty());
+		assertTrue(policy.canDeliver(parcelWork, null).isEmpty());
 	}
 	
 	@Test
 	public void canDeliverPackstationWhileHome() {
 		personIsHome();
 		
-		assertTrue(policy.canDeliver(parcelPackStation).isPresent());
+		assertTrue(policy.canDeliver(parcelPackStation, null).isPresent());
 	}
 	
 	@Test
 	public void canDeliverPackstationWhileWorking() {
 		personIsWorking();
 		
-		assertTrue(policy.canDeliver(parcelPackStation).isPresent());
+		assertTrue(policy.canDeliver(parcelPackStation, null).isPresent());
 	}
 	
 	@Test
 	public void canDeliverPackstationWhileElsewhere() {
 		personIsElsewhere();
 		
-		assertTrue(policy.canDeliver(parcelPackStation).isPresent());
+		assertTrue(policy.canDeliver(parcelPackStation, null).isPresent());
 	}
 	
 	@Test
 	public void updateParcel() {
-		assertFalse(policy.updateParcelDelivery(parcelHome));
+		assertFalse(policy.updateParcelDelivery(parcelHome, null));
 		Mockito.verifyZeroInteractions(parcelHome);
 		
-		assertFalse(policy.updateParcelDelivery(parcelWork));
+		assertFalse(policy.updateParcelDelivery(parcelWork, null));
 		Mockito.verifyZeroInteractions(parcelWork);
 		
-		assertFalse(policy.updateParcelDelivery(parcelPackStation));
+		assertFalse(policy.updateParcelDelivery(parcelPackStation, null));
 		Mockito.verifyZeroInteractions(parcelPackStation);
 	}
 

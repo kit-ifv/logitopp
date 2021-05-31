@@ -1,6 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
 import edu.kit.ifv.mobitopp.populationsynthesis.neighborhood.NeighborhoodRelationship;
+import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
 
 public class DeliveryPolicyBuilder {
 
@@ -20,8 +21,8 @@ public class DeliveryPolicyBuilder {
 		return this;
 	}
 		
-	public DeliveryPolicyBuilder checkNeighbors(NeighborhoodRelationship neighborhood) {
-		this.policy = new NeighborhoodDeliveryPolicy(policy, neighborhood);
+	public DeliveryPolicyBuilder checkNeighbors(NeighborhoodRelationship neighborhood, DeliveryResults results) {
+		this.policy = new NeighborhoodDeliveryPolicy(policy, neighborhood, results);
 		return this;
 	}
 	

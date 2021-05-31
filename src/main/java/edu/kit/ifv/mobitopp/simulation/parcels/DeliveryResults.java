@@ -2,6 +2,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels;
 
 import java.util.Arrays;
 
+import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.result.Category;
 import edu.kit.ifv.mobitopp.result.Results;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
@@ -17,6 +18,7 @@ public class DeliveryResults {
 	private final static Category resultCategoryOrder = createResultCategoryOrder();
 	private final static Category resultCategoryEmployee = createResultCategoryEmployee();
 	private final static Category resultCategoryRescheduling = createResultCategoryRescheduling();
+	private final static Category resultCategoryNeighbordeliveries = createResultCategoryNeighborDeliveries();
 
 	private Results results;
 	
@@ -153,4 +155,23 @@ public class DeliveryResults {
 		return new Category("delivery-rescheduling", Arrays.asList("PeronID", "Time", "Day", "Reason", "Before", "After"));
 	}
 	
+	
+	public void logNeighborDelivery(int id, Zone zone, Time currentTime, boolean success, int numOfneighbors, int checkedNeighbors) {
+		String msg = "";
+		
+		msg += id + ";";
+		msg += zone.getId().getExternalId() + ";";
+		msg += currentTime.toString() + ";";
+		msg += currentTime.weekDay().name() + ";";
+		msg += success + ";";
+		msg += numOfneighbors + ";";
+		msg += checkedNeighbors + ";";
+		
+		results.write(resultCategoryNeighbordeliveries, msg);
+	}
+	
+
+	private static Category createResultCategoryNeighborDeliveries() {
+		return new Category("neighbor-deliveries", Arrays.asList("Delivery", "Zone", "Time", "Day", "Success", "NumberOfNeighbors", "CheckedNeighbors"));
+	}
 }

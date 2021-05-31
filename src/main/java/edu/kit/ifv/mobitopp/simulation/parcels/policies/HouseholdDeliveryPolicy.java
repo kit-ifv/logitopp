@@ -9,6 +9,7 @@ import edu.kit.ifv.mobitopp.populationsynthesis.neighborhood.NeighborhoodRelatio
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.time.Time;
 
 
 /**
@@ -33,9 +34,9 @@ public class HouseholdDeliveryPolicy implements ParcelDeliveryPolicy {
 	 * @return true, if the parcel can be delivered
 	 */
 	@Override
-	public Optional<RecipientType> canDeliver(Parcel parcel) {
+	public Optional<RecipientType> canDeliver(Parcel parcel, Time currentTime) {
 
-		Optional<RecipientType> canDeliver = policy.canDeliver(parcel);
+		Optional<RecipientType> canDeliver = policy.canDeliver(parcel, currentTime);
 		
 		if (canDeliver.isEmpty() && parcel.getDestinationType().equals(HOME)) {
 			
@@ -57,8 +58,8 @@ public class HouseholdDeliveryPolicy implements ParcelDeliveryPolicy {
 	 * @return true, if the parcel order was updated
 	 */
 	@Override
-	public boolean updateParcelDelivery(Parcel parcel) {
-		return policy.updateParcelDelivery(parcel);
+	public boolean updateParcelDelivery(Parcel parcel, Time currentTime) {
+		return policy.updateParcelDelivery(parcel, currentTime);
 	}
 	
 	private Optional<RecipientType> optionalRecipient(boolean check, RecipientType recipientType) {

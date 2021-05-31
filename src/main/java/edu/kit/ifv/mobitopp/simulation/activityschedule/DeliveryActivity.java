@@ -129,13 +129,13 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	private void tryDelivery(DeliveryPerson person, Parcel parcel, Time currentTime) {
 		String msg = "";
 
-		Optional<RecipientType> canDeliver = parcel.getDistributionCenter().getPolicy().canDeliver(parcel);
+		Optional<RecipientType> canDeliver = parcel.getDistributionCenter().getPolicy().canDeliver(parcel, currentTime);
 		if (canDeliver.isPresent()) {
 			parcel.deliver(currentTime, person, canDeliver.get());
 			msg = "Successful delivery of ";
 
 		} else {
-			parcel.getDistributionCenter().getPolicy().updateParcelDelivery(parcel);
+			parcel.getDistributionCenter().getPolicy().updateParcelDelivery(parcel, currentTime);
 			msg = "Unable to deliver ";
 		}
 
