@@ -51,6 +51,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param context                    the simulation context
 	 * @param personFactory              the person factory
 	 * @param parcelOrderModel           the parcel order model
+	 * @param results                    the delivery results
 	 * @param personFilter 				 the person filter do determine which persons should be simulated
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,

@@ -62,6 +62,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 * @param maxCapacity the maximum capacity
 	 * @param maxHours the maximum tour delivery in hours
 	 * @param skipSunday whether sunday should be skipped
+	 * @param mode the delivery mode
 	 */
 	public ZoneTspDeliveryTourStrategy(int meanCapacity, double capacityStdDev, int minCapacity,
 		int maxCapacity, int maxHours, boolean skipSunday, Mode mode) {
