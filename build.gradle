@@ -171,6 +171,23 @@ signing {
     sign publishing.publications.mavenJava
 }
 
+task publishAndCheckRelease() {
+	dependsOn publishReleasePublicationToInternalRepository
+	
+	if (project.hasProperty('isRelease') && project.property('isRelease').toBoolean()) {
+		print('New Release')
+		dependsOn publishMavenJavaPublicationToExternalRepository
+	} else {
+		print('No Release')
+	}
+	
+}
+
+configure(publishAndCheckRelease) {
+	group = 'publishing'
+	description = 'Publish to internal repo. Also publish staging release to external repo if "isRelease" is set.'
+}
+
 
 
 def getPropertyOrDefault(key) {
