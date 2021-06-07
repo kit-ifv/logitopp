@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
+import edu.kit.ifv.mobitopp.simulation.Household;
+import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
@@ -78,17 +81,32 @@ public class DefaultParcelOrderModelTest {
 		
 		workZoneFilter = zone -> (zone == surveyZone);
 		
+		Household insideHousehold = mock(Household.class);
+		when(insideHousehold.homeZone()).thenReturn(surveyZone);
+		when(insideHousehold.homeLocation()).thenReturn(new Location(new Point2D.Double(1,1), 0, 0));
+		
+		Household outsideHousehold = mock(Household.class);
+		when(outsideHousehold.homeZone()).thenReturn(nonSurveyZone);
+		when(outsideHousehold.homeLocation()).thenReturn(new Location(new Point2D.Double(100,100), 0, 0));
+		
 		workInsidePerson = mock(PickUpParcelPerson.class);
+		when(workInsidePerson.household()).thenReturn(insideHousehold);
 		when(workInsidePerson.fixedZoneFor(ActivityType.WORK)).thenReturn(surveyZone);
 		when(workInsidePerson.hasFixedZoneFor(ActivityType.WORK)).thenReturn(true);
 		
 		workOutsidePerson = mock(PickUpParcelPerson.class);
+		when(workOutsidePerson.household()).thenReturn(outsideHousehold);
 		when(workOutsidePerson.fixedZoneFor(ActivityType.WORK)).thenReturn(nonSurveyZone);
 		when(workOutsidePerson.hasFixedZoneFor(ActivityType.WORK)).thenReturn(true);
 		
 		noWorkPerson = mock(PickUpParcelPerson.class);
+		when(noWorkPerson.fixedDestinationFor(ActivityType.PICK_UP_PARCEL)).thenReturn(new Location(new Point2D.Float(1,1), 0, 0));
+		when(noWorkPerson.household()).thenReturn(insideHousehold);
+		when(noWorkPerson.hasFixedZoneFor(ActivityType.PICK_UP_PARCEL)).thenReturn(true);
+		when(noWorkPerson.fixedZoneFor(ActivityType.PICK_UP_PARCEL)).thenReturn(surveyZone);
 		when(noWorkPerson.hasFixedZoneFor(ActivityType.WORK)).thenReturn(false);
 		
+				
 		
 		//Deliery Services
 		serviceA = "ServiceA";
