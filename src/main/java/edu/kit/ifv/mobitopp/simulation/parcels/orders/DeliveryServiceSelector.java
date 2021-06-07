@@ -2,7 +2,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels.orders;
 
 import java.util.Collection;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -20,10 +20,10 @@ public interface DeliveryServiceSelector {
 	 * @param numOfParcels the number of parcels the recipient will order
 	 * @param destination the parcel's {@link ParcelDestinationType}
 	 * @param arrivalDate the planned arrival date
-	 * @param otherParcels the other {@link Parcel}s the recipient already ordered
+	 * @param otherParcels the other {@link PrivateParcel}s the recipient already ordered
 	 * @param randomNumber a random number
 	 * @return the delivery service tag
 	 */
-	public String select(PickUpParcelPerson recipient, int numOfParcels, ParcelDestinationType destination, Time arrivalDate, Collection<Parcel> otherParcels, double randomNumber);
+	public String select(PickUpParcelPerson recipient, int numOfParcels, ParcelDestinationType destination, Time arrivalDate, Collection<PrivateParcel> otherParcels, double randomNumber);
 	
 }

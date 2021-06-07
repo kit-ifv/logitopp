@@ -105,7 +105,7 @@ public class DeliveryPersonFactory {
 
 		DeliveryEfficiencyProfile efficiency = this.efficiencyModel
 			.select(distributionCenter, person);
-		DeliveryPerson deliveryPerson = new DeliveryPerson(simPerson, efficiency, 42);
+		DeliveryPerson deliveryPerson = new DeliveryPerson(simPerson, distributionCenter, efficiency, seed);
 
 		ReschedulingStrategy customRescheduling = new DeliveryReschedulingStrategy(
 			distributionCenter, deliveryPerson, simulationOptions.rescheduling(), results);

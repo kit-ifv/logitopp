@@ -3,7 +3,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels.orders;
 import java.util.Collection;
 
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 /**
@@ -19,6 +19,6 @@ public interface ParcelOrderModel {
 	 * @param results the results
 	 * @return the collection
 	 */
-	public Collection<Parcel> createParcelOrders(PickUpParcelPerson person, DeliveryResults results);
+	public Collection<PrivateParcel> createParcelOrders(PickUpParcelPerson person, DeliveryResults results);
 	
 }

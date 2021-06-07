@@ -61,9 +61,7 @@ public enum PersonStateDelivery implements PersonState {
 		@Override
 		public void doActionAtEnd(SimulationPerson person, Time currentTime) {
 				
-			if (person.currentActivity().activityType().equals(ActivityType.DELIVER_PARCEL)) {
-				System.out.println("Try delivery by " + person.getOid());
-				
+			if (person.currentActivity().activityType().equals(ActivityType.DELIVER_PARCEL)) {			
 				((DeliveryActivity) person.currentActivity()).tryDelivery(currentTime);
 			}
 			

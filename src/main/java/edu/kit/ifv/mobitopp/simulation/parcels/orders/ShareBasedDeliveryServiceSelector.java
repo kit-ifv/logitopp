@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -43,12 +43,12 @@ public class ShareBasedDeliveryServiceSelector extends ShareBasedSelector<String
 	 * @param numOfParcels the number of parcels the recipient will order
 	 * @param destination the parcel's {@link ParcelDestinationType}
 	 * @param arrivalDate the planned arrival date
-	 * @param otherParcels the other {@link Parcel}s the recipient already ordered
+	 * @param otherParcels the other {@link PrivateParcel}s the recipient already ordered
 	 * @param randomNumber a random number
 	 * @return the delivery service tag
 	 */
 	@Override
-	public String select(PickUpParcelPerson recipient, int numOfParcels, ParcelDestinationType destination, Time arrivalDate, Collection<Parcel> otherParcels, double randomNumber) {
+	public String select(PickUpParcelPerson recipient, int numOfParcels, ParcelDestinationType destination, Time arrivalDate, Collection<PrivateParcel> otherParcels, double randomNumber) {
 
 		return this.select(randomNumber);
 	}

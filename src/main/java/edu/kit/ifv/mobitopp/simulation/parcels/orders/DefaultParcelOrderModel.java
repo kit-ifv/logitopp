@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -72,11 +72,11 @@ public class DefaultParcelOrderModel implements ParcelOrderModel {
 	 * @param results the {@link DeliveryResults}
 	 * @return the person's parcel orders
 	 */
-	public Collection<Parcel> createParcelOrders(PickUpParcelPerson person,	DeliveryResults results) {
+	public Collection<PrivateParcel> createParcelOrders(PickUpParcelPerson person,	DeliveryResults results) {
 		
 		int numOfParcels = numberOfParcelsSelector.select(person, person.getNextRandom());
 
-		Collection<Parcel> parcels = new ArrayList<Parcel>();
+		Collection<PrivateParcel> parcels = new ArrayList<PrivateParcel>();
 
 		for (int i = 0; i < numOfParcels; i++) {
 			
@@ -85,7 +85,7 @@ public class DefaultParcelOrderModel implements ParcelOrderModel {
 			String deliveryService = deliveryServiceSelector.select(person, numOfParcels, destination, date, parcels, person.getNextRandom());
 			DistributionCenter distributionCenter = distributionCenterSelector.select(person, numOfParcels, destination, date, deliveryService, parcels, person.getNextRandom());
 			
-			parcels.add(new Parcel(person, destination, date, distributionCenter, deliveryService, results));
+			parcels.add(new PrivateParcel(person, destination, destination.getZoneAndLocation(person), date, distributionCenter, deliveryService, results));
 
 		}
 

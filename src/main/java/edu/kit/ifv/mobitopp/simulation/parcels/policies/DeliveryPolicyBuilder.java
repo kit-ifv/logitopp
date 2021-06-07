@@ -2,16 +2,17 @@ package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
 import edu.kit.ifv.mobitopp.populationsynthesis.neighborhood.NeighborhoodRelationship;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 
 public class DeliveryPolicyBuilder {
 
-	private ParcelDeliveryPolicy policy;
+	private ParcelDeliveryPolicy<PrivateParcel> policy;
 	
 	public DeliveryPolicyBuilder() {
 		this.policy = new BaseDeliveryPolicy();
 	}
 	
-	public DeliveryPolicyBuilder basedOn(ParcelDeliveryPolicy policy) {
+	public DeliveryPolicyBuilder basedOn(ParcelDeliveryPolicy<PrivateParcel> policy) {
 		this.policy = policy;
 		return this;
 	}
@@ -22,7 +23,7 @@ public class DeliveryPolicyBuilder {
 	}
 		
 	public DeliveryPolicyBuilder checkNeighbors(NeighborhoodRelationship neighborhood, DeliveryResults results) {
-		this.policy = new NeighborhoodDeliveryPolicy(policy, neighborhood, results, true);
+		this.policy = new NeighborhoodDeliveryPolicy(policy, neighborhood, results);
 		return this;
 	}
 	
@@ -41,7 +42,7 @@ public class DeliveryPolicyBuilder {
 		return this;
 	}
 	
-	public ParcelDeliveryPolicy build() {
+	public ParcelDeliveryPolicy<PrivateParcel> build() {
 		return this.policy;
 	}
 	

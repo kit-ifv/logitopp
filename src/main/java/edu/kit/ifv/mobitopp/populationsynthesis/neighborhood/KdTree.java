@@ -89,7 +89,7 @@ public class KdTree<O> {
 		double splitValue = valueMap.apply(median);
 		
 		
-		
+		//TODO take n, drop n instead of  filter?
 		innerNode.addChild(
 				buildTree(leafs.stream().filter(node -> valueMap.apply(node) < splitValue).collect(toList()))
 		);

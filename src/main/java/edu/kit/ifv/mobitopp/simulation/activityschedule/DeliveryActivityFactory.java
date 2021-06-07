@@ -1,10 +1,12 @@
 package edu.kit.ifv.mobitopp.simulation.activityschedule;
 
+import java.util.Collection;
 import java.util.List;
 
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.ActivityAsLinkedListElement;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -31,12 +33,11 @@ public class DeliveryActivityFactory {
 	 * @param person 		  the delivery person
 	 * @return the delivery activity
 	 */
-	public static ActivityIfc createDeliveryActivity(List<Parcel> parcels, ActivityIfc work, Time startDate, DeliveryPerson person) {
+	public static DeliveryActivity createDeliveryActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate, int duration, DeliveryPerson person) {
 		
-		ActivityIfc activity = new DeliveryActivity(activityCounter--, work.getActivityNrOfWeek(), startDate,
+		return new DeliveryActivity(activityCounter--, work.getActivityNrOfWeek(), startDate, duration, person.getEfficiency().getTripDuration(),
 				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person);
 
-		return activity;
 	}
 
 	/**

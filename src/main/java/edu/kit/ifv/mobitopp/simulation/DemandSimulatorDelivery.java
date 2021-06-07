@@ -13,7 +13,8 @@ import edu.kit.ifv.mobitopp.simulation.activityschedule.randomizer.ActivityStart
 import edu.kit.ifv.mobitopp.simulation.destinationChoice.DestinationChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelOrderModel;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPersonFactory;
 import edu.kit.ifv.mobitopp.simulation.person.PersonState;
@@ -30,7 +31,7 @@ import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
 public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 
 	private final ParcelOrderModel parcelOrderModel;
-	private final Collection<Parcel> parcels;
+	private final Collection<IParcel> parcels;
 	private final DeliveryPersonFactory deliveryPersonFactory;
 	private final Predicate<Person> personFilter;
 	private final DeliveryResults deliveryResults;
@@ -68,7 +69,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			  initialState, context, personFactory.getDefaultFactory());
 		
 		this.parcelOrderModel = parcelOrderModel;
-		this.parcels = new ArrayList<Parcel>();
+		this.parcels = new ArrayList<IParcel>();
 		this.deliveryPersonFactory = personFactory;
 		this.personFilter = personFilter;
 		this.deliveryResults = results;
@@ -102,14 +103,12 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 
 	private void createParcelOrders(List<PickUpParcelPerson> ppps) {
 		
-		Function<PickUpParcelPerson, Collection<Parcel>> createParcelOrders = p -> createParcelOrder(p);
+		Function<PickUpParcelPerson, Collection<PrivateParcel>> createParcelOrders = p -> createParcelOrder(p);
 		
 		int[] counts = new int[11];
 		ppps.forEach(ppp -> {counts[createParcelOrders.apply(ppp).size()]++;});
 
-		System.out.println("Generated " + this.parcels.size() + " parcels for "
-				+ this.parcels.stream().map(p -> p.getPerson().getOid()).distinct().count() + "/"
-				+ ppps.size() + " unique persons.");
+		System.out.println("Generated " + this.parcels.size() + " parcels for "	+ ppps.size() + " persons.");
 		
 		System.out.println("Number of parcels distribution: ");
 		for (int i = 0; i < 11; i++) {
@@ -144,8 +143,8 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param p the person
 	 * @return the collection of parcels ordered by the given person
 	 */
-	protected Collection<Parcel> createParcelOrder(PickUpParcelPerson p) {
-		Collection<Parcel> parcels = this.parcelOrderModel.createParcelOrders(p, this.deliveryResults);
+	protected Collection<PrivateParcel> createParcelOrder(PickUpParcelPerson p) {
+		Collection<PrivateParcel> parcels = this.parcelOrderModel.createParcelOrders(p, this.deliveryResults);
 		this.parcels.addAll(parcels);
 
 		return parcels;

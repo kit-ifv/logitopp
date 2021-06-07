@@ -4,21 +4,22 @@ import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK
 
 import java.util.Optional;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.time.Time;
 
-public class DeliveryAttemptsPolicy implements ParcelDeliveryPolicy {
 
-	private final ParcelDeliveryPolicy policy;
+public class DeliveryAttemptsPolicy implements ParcelDeliveryPolicy<PrivateParcel> {
+
+	private final ParcelDeliveryPolicy<PrivateParcel> policy;
 	private final int maxAttempts;
 	
-	public DeliveryAttemptsPolicy(ParcelDeliveryPolicy policy, int maxAttempts) {
+	public DeliveryAttemptsPolicy(ParcelDeliveryPolicy<PrivateParcel> policy, int maxAttempts) {
 		this.policy = policy;
 		this.maxAttempts = maxAttempts;
 	}
 	
 	@Override
-	public Optional<RecipientType> canDeliver(Parcel parcel, Time currentTime) {
+	public Optional<RecipientType> canDeliver(PrivateParcel parcel, Time currentTime) {
 		return policy.canDeliver(parcel, currentTime);
 	}
 
@@ -31,7 +32,7 @@ public class DeliveryAttemptsPolicy implements ParcelDeliveryPolicy {
 	 * @return true, if the parcel order was updated
 	 */
 	@Override
-	public boolean updateParcelDelivery(Parcel parcel, Time currentTime) {
+	public boolean updateParcelDelivery(PrivateParcel parcel, Time currentTime) {
 		
 		if (parcel.getDeliveryAttempts() >= this.maxAttempts -1) {
 			parcel.setDestinationType(PACK_STATION);

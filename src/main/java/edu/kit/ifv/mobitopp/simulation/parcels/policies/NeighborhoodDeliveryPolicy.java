@@ -11,29 +11,28 @@ import edu.kit.ifv.mobitopp.populationsynthesis.neighborhood.NeighborhoodRelatio
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.time.Time;
+
 
 
 /**
  * The Class DummyDeliveryPolicy is an exemplary implementation of the ParcelDeliveryPolicy interface.
  */
-public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy {
+public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy<PrivateParcel> {
 
-	private final ParcelDeliveryPolicy policy;
+	private final ParcelDeliveryPolicy<PrivateParcel> policy;
 	private final NeighborhoodRelationship neighborhood;
 	private final DeliveryResults results;
-	private final boolean log;
-	
-	public NeighborhoodDeliveryPolicy(ParcelDeliveryPolicy policy, NeighborhoodRelationship neighborhood, DeliveryResults results, boolean logNeighbors) {
+
+	public NeighborhoodDeliveryPolicy(ParcelDeliveryPolicy<PrivateParcel> policy, NeighborhoodRelationship neighborhood, DeliveryResults results) {
 		this.policy = policy;
 		this.neighborhood = neighborhood;
 		this.results = results;
-		this.log = logNeighbors;
 	}
 	
-	public NeighborhoodDeliveryPolicy(ParcelDeliveryPolicy policy, NeighborhoodRelationship neighborhood) {
-		this(policy, neighborhood, null, false);
+	public NeighborhoodDeliveryPolicy(ParcelDeliveryPolicy<PrivateParcel> policy, NeighborhoodRelationship neighborhood) {
+		this(policy, neighborhood, null);
 	}
 	
 	/**
@@ -47,7 +46,7 @@ public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy {
 	 * @return true, if the parcel can be delivered
 	 */
 	@Override
-	public Optional<RecipientType> canDeliver(Parcel parcel, Time currentTime) {
+	public Optional<RecipientType> canDeliver(PrivateParcel parcel, Time currentTime) {
 
 		Optional<RecipientType> canDeliver = policy.canDeliver(parcel, currentTime);
 		
@@ -60,7 +59,7 @@ public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy {
 									.stream()
 									.flatMap(Household::persons)
 									.anyMatch(p -> p.currentActivity().activityType().equals(ActivityType.HOME));
-			if (log) {
+			if (results != null) {
 				this.logNeighbors(parcel, currentTime, neighbors, anybodyHome);
 			}
 			
@@ -72,7 +71,7 @@ public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy {
 		return canDeliver;
 	}
 
-	private void logNeighbors(Parcel parcel, Time currentTime, Collection<Household> neighbors, boolean anybodyHome) {
+	private void logNeighbors(PrivateParcel parcel, Time currentTime, Collection<Household> neighbors, boolean anybodyHome) {
 		Set<Household> checked = new HashSet<>();
 		neighbors
 			.stream()
@@ -91,7 +90,7 @@ public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy {
 	 * @return true, if the parcel order was updated
 	 */
 	@Override
-	public boolean updateParcelDelivery(Parcel parcel, Time currentTime) {
+	public boolean updateParcelDelivery(PrivateParcel parcel, Time currentTime) {
 		return policy.updateParcelDelivery(parcel, currentTime);
 	}
 	

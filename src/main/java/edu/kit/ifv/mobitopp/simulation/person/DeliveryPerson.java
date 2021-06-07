@@ -35,7 +35,9 @@ import edu.kit.ifv.mobitopp.simulation.destinationChoice.DestinationChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.events.DemandSimulationEventIfc;
 import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
 import edu.kit.ifv.mobitopp.simulation.modeChoice.ModeChoicePreferences;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.publictransport.model.Vehicle;
 import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.tour.TourFactory;
@@ -44,14 +46,15 @@ import lombok.Getter;
 
 /**
  * The Class DeliveryPerson decorates {@link SimulationPerson}
- * by adding the functionality of loading, delivering  and unloading {@link Parcel}s.
+ * by adding the functionality of loading, delivering  and unloading {@link PrivateParcel}s.
  */
 public class DeliveryPerson implements SimulationPerson {
 	
 	private final SimulationPerson person;
-	@Getter	private final Collection<Parcel> currentTour;
+	@Getter	private final Collection<IParcel> currentTour;
 	private final Random random;
 	@Getter	private final DeliveryEfficiencyProfile efficiency;
+	@Getter private final DistributionCenter distributionCenter;
 	
 	/**
 	 * Instantiates a new {@link DeliveryPerson}
@@ -61,11 +64,12 @@ public class DeliveryPerson implements SimulationPerson {
 	 * @param efficiency the efficiency
 	 * @param seed the seed
 	 */
-	public DeliveryPerson(SimulationPerson person, DeliveryEfficiencyProfile efficiency, long seed) {
+	public DeliveryPerson(SimulationPerson person, DistributionCenter distributionCenter, DeliveryEfficiencyProfile efficiency, long seed) {
 		this.person = person;
-		this.currentTour = new ArrayList<Parcel>();
+		this.currentTour = new ArrayList<IParcel>();
 		this.random = new Random(seed);
 		this.efficiency = efficiency;
+		this.distributionCenter = distributionCenter;
 	}
 	
 	/**
@@ -74,9 +78,9 @@ public class DeliveryPerson implements SimulationPerson {
 	 * @param parcels the parcels
 	 * @param currentTime the current time
 	 */
-	public void load(Collection<Parcel> parcels, Time currentTime) {
+	public void load(Collection<IParcel> parcels, Time currentTime) {
 		this.currentTour.addAll(parcels);
-		parcels.forEach(p -> p.updateState(currentTime, this, false));
+		parcels.forEach(p -> p.loaded(currentTime, this));
 	}
 	
 	/**
@@ -85,9 +89,9 @@ public class DeliveryPerson implements SimulationPerson {
 	 * @param currentTime the current time
 	 * @return the unloaded parcels
 	 */
-	public Collection<Parcel> unload(Time currentTime) {
-		Collection<Parcel> parcels = new ArrayList<>(currentTour);
-		parcels.forEach(p -> p.updateState(currentTime, this, false));
+	public Collection<IParcel> unload(Time currentTime) {
+		Collection<IParcel> parcels = new ArrayList<>(currentTour);
+		parcels.forEach(p -> p.unloaded(currentTime, this));
 		this.currentTour.clear();
 		return parcels;
 	}
@@ -97,7 +101,7 @@ public class DeliveryPerson implements SimulationPerson {
 	 *
 	 * @param parcel the parcel
 	 */
-	public void delivered(Parcel parcel) {
+	public void delivered(IParcel parcel) {
 		this.currentTour.remove(parcel);
 	}
 	

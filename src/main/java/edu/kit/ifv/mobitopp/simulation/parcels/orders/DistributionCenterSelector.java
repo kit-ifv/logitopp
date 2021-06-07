@@ -3,7 +3,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels.orders;
 import java.util.Collection;
 
 import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -22,12 +22,12 @@ public interface DistributionCenterSelector {
 	 * @param destination the {@link ParcelDestinationType}
 	 * @param arrivalDate the planned arrival date
 	 * @param deliveryService a delivery service tag
-	 * @param otherParcels the other {@link Parcel}s the recipient already ordered
+	 * @param otherParcels the other {@link PrivateParcel}s the recipient already ordered
 	 * @param randomNumber a random number
 	 * @return the selected distribution center
 	 */
 	public DistributionCenter select(PickUpParcelPerson recipient, int numOfParcels,
 		ParcelDestinationType destination, Time arrivalDate, String deliveryService,
-		Collection<Parcel> otherParcels, double randomNumber);
+		Collection<PrivateParcel> otherParcels, double randomNumber);
 
 }
