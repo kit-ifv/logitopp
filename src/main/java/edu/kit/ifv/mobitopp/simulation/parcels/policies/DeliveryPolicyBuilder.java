@@ -22,7 +22,12 @@ public class DeliveryPolicyBuilder {
 	}
 		
 	public DeliveryPolicyBuilder checkNeighbors(NeighborhoodRelationship neighborhood, DeliveryResults results) {
-		this.policy = new NeighborhoodDeliveryPolicy(policy, neighborhood, results);
+		this.policy = new NeighborhoodDeliveryPolicy(policy, neighborhood, results, true);
+		return this;
+	}
+	
+	public DeliveryPolicyBuilder checkNeighbors(NeighborhoodRelationship neighborhood) {
+		this.policy = new NeighborhoodDeliveryPolicy(policy, neighborhood);
 		return this;
 	}
 	

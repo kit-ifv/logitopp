@@ -23,11 +23,17 @@ public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy {
 	private final ParcelDeliveryPolicy policy;
 	private final NeighborhoodRelationship neighborhood;
 	private final DeliveryResults results;
+	private final boolean log;
 	
-	public NeighborhoodDeliveryPolicy(ParcelDeliveryPolicy policy, NeighborhoodRelationship neighborhood, DeliveryResults results) {
+	public NeighborhoodDeliveryPolicy(ParcelDeliveryPolicy policy, NeighborhoodRelationship neighborhood, DeliveryResults results, boolean logNeighbors) {
 		this.policy = policy;
 		this.neighborhood = neighborhood;
 		this.results = results;
+		this.log = logNeighbors;
+	}
+	
+	public NeighborhoodDeliveryPolicy(ParcelDeliveryPolicy policy, NeighborhoodRelationship neighborhood) {
+		this(policy, neighborhood, null, false);
 	}
 	
 	/**
@@ -49,13 +55,15 @@ public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy {
 			Collection<Household> neighbors = neighborhood.getNeighborsOf(parcel.getPerson().household());
 			System.out.println("Found " + neighbors.size() + " neighbors. incl? " + (neighbors.contains(parcel.getPerson().household())));
 			
-			Set<Household> checked = new HashSet<>();
+			
 			boolean anybodyHome = neighbors
 									.stream()
 									.flatMap(Household::persons)
-									.anyMatch(p -> {checked.add(p.household()); return p.currentActivity().activityType().equals(ActivityType.HOME);});
+									.anyMatch(p -> p.currentActivity().activityType().equals(ActivityType.HOME));
+			if (log) {
+				this.logNeighbors(parcel, currentTime, neighbors, anybodyHome);
+			}
 			
-			this.results.logNeighborDelivery(parcel.getOId(), parcel.getZone(), currentTime, anybodyHome, neighbors.size(), checked.size());
 			
 			return optionalRecipient(anybodyHome, RecipientType.NEIGHBOR);
 		}
@@ -64,6 +72,16 @@ public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy {
 		return canDeliver;
 	}
 
+	private void logNeighbors(Parcel parcel, Time currentTime, Collection<Household> neighbors, boolean anybodyHome) {
+		Set<Household> checked = new HashSet<>();
+		neighbors
+			.stream()
+			.flatMap(Household::persons)
+			.anyMatch(p -> {checked.add(p.household()); return p.currentActivity().activityType().equals(ActivityType.HOME);});
+		
+		this.results.logNeighborDelivery(parcel.getOId(), parcel.getZone(), currentTime, anybodyHome, neighbors.size(), checked.size());
+	}
+	
 	
 	/**
 	 * Update the parcel delivery.
