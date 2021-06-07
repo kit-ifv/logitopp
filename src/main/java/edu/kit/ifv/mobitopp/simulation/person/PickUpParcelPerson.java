@@ -38,7 +38,8 @@ import edu.kit.ifv.mobitopp.simulation.destinationChoice.DestinationChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.events.DemandSimulationEventIfc;
 import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
 import edu.kit.ifv.mobitopp.simulation.modeChoice.ModeChoicePreferences;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.publictransport.model.Vehicle;
 import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.tour.TourFactory;
@@ -46,13 +47,13 @@ import edu.kit.ifv.mobitopp.time.Time;
 
 /**
  * The Class PickUpParcelPerson decorates a {@link SimulationPerson}
- * by adding the functionalyity of ordering, receiving and picking up {@link Parcel}s.
+ * by adding the functionalyity of ordering, receiving and picking up {@link PrivateParcel}s.
  */
 public class PickUpParcelPerson implements SimulationPerson {
 	private SimulationPerson person;
-	private Collection<Parcel> ordered;
-	private Collection<Parcel> received;
-	private Collection<Parcel> inPackstation;
+	private Collection<IParcel> ordered;
+	private Collection<IParcel> received;
+	private Collection<IParcel> inPackstation;
 	private Random random;
 	
 	/**
@@ -66,9 +67,9 @@ public class PickUpParcelPerson implements SimulationPerson {
 	public PickUpParcelPerson(SimulationPerson person, SimulationOptionsCustomization options, long seed) {	
 		this.person = person;
 		
-		this.ordered = new ArrayList<Parcel>();
-		this.received = new ArrayList<Parcel>();
-		this.inPackstation = new ArrayList<Parcel>();
+		this.ordered = new ArrayList<IParcel>();
+		this.received = new ArrayList<IParcel>();
+		this.inPackstation = new ArrayList<IParcel>();
 		
 		this.random = new Random(getOid() + seed);
 		
@@ -93,7 +94,7 @@ public class PickUpParcelPerson implements SimulationPerson {
 	 *
 	 * @param parcel the parcel
 	 */
-	public void order(Parcel parcel) {
+	public void order(PrivateParcel parcel) {
 		this.ordered.add(parcel);
 	}
 	
@@ -102,7 +103,7 @@ public class PickUpParcelPerson implements SimulationPerson {
 	 *
 	 * @param parcel the parcel order to be canceled
 	 */
-	public void cancelOrder(Parcel parcel) {
+	public void cancelOrder(PrivateParcel parcel) {
 		this.ordered.remove(parcel);
 	}
 
@@ -111,7 +112,7 @@ public class PickUpParcelPerson implements SimulationPerson {
 	 *
 	 * @param parcel the parcel
 	 */
-	public void receive(Parcel parcel) {
+	public void receive(PrivateParcel parcel) {
 		this.received.add(parcel);
 		parcel.getDistributionCenter().getDelivered().add(parcel);
 	}
@@ -121,7 +122,7 @@ public class PickUpParcelPerson implements SimulationPerson {
 	 *
 	 * @param parcel the parcel
 	 */
-	public void notifyParcelInPackStation(Parcel parcel) {
+	public void notifyParcelInPackStation(PrivateParcel parcel) {
 		this.inPackstation.add(parcel);
 		System.out.println("Person " + this.getOid() + " is notified about parcel " + parcel.getOId() + " being added to the pack station.");
 	}

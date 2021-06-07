@@ -1,14 +1,16 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
+
 import java.util.Optional;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.Time;
+
 
 /**
  * The Interface ParcelDeliveryPolicy provides methods deciding whether parcels can be delivered or should be updated.
  */
-public interface ParcelDeliveryPolicy {
+public interface ParcelDeliveryPolicy<P extends IParcel> {
 
 	/**
 	 * Checks whether the parcel can be delivered.
@@ -18,7 +20,8 @@ public interface ParcelDeliveryPolicy {
 	 * @param currentTime the current time
 	 * @return an optional {@link RecipientType} if the parcel can be delivered, an empty {@link Optional} otherwise
 	 */
-	public Optional<RecipientType> canDeliver(Parcel parcel, Time currentTime);
+	public Optional<RecipientType> canDeliver(P parcel, Time currentTime);
+
 	
 	/**
 	 * Update the parcel delivery.
@@ -28,6 +31,6 @@ public interface ParcelDeliveryPolicy {
 	 * @param currentTime the current time
 	 * @return true, if successful
 	 */
-	public boolean updateParcelDelivery(Parcel parcel, Time currentTime);
+	public boolean updateParcelDelivery(P parcel, Time currentTime);
 	
 }

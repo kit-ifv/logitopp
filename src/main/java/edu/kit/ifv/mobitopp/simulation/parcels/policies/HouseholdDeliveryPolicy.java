@@ -2,24 +2,21 @@ package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
 
-import java.util.Collection;
 import java.util.Optional;
 
-import edu.kit.ifv.mobitopp.populationsynthesis.neighborhood.NeighborhoodRelationship;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
-import edu.kit.ifv.mobitopp.simulation.Household;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.time.Time;
 
 
 /**
  * The Class DummyDeliveryPolicy is an exemplary implementation of the ParcelDeliveryPolicy interface.
  */
-public class HouseholdDeliveryPolicy implements ParcelDeliveryPolicy {
+public class HouseholdDeliveryPolicy implements ParcelDeliveryPolicy<PrivateParcel> {
 
-	private final ParcelDeliveryPolicy policy;
+	private final ParcelDeliveryPolicy<PrivateParcel> policy;
 	
-	public HouseholdDeliveryPolicy(ParcelDeliveryPolicy policy) {
+	public HouseholdDeliveryPolicy(ParcelDeliveryPolicy<PrivateParcel> policy) {
 		this.policy = policy;
 	}
 	
@@ -34,7 +31,7 @@ public class HouseholdDeliveryPolicy implements ParcelDeliveryPolicy {
 	 * @return true, if the parcel can be delivered
 	 */
 	@Override
-	public Optional<RecipientType> canDeliver(Parcel parcel, Time currentTime) {
+	public Optional<RecipientType> canDeliver(PrivateParcel parcel, Time currentTime) {
 
 		Optional<RecipientType> canDeliver = policy.canDeliver(parcel, currentTime);
 		
@@ -58,7 +55,7 @@ public class HouseholdDeliveryPolicy implements ParcelDeliveryPolicy {
 	 * @return true, if the parcel order was updated
 	 */
 	@Override
-	public boolean updateParcelDelivery(Parcel parcel, Time currentTime) {
+	public boolean updateParcelDelivery(PrivateParcel parcel, Time currentTime) {
 		return policy.updateParcelDelivery(parcel, currentTime);
 	}
 	

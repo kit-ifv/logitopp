@@ -1,7 +1,9 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
-public interface DeliveryPolicyDecorator {
+import edu.kit.ifv.mobitopp.simulation.parcels.BaseParcel;
+
+public interface DeliveryPolicyDecorator<P extends BaseParcel> {
 	
-	public ParcelDeliveryPolicy of(ParcelDeliveryPolicy delegate);
+	public ParcelDeliveryPolicy<P> of(ParcelDeliveryPolicy<P> delegate);
 
 }

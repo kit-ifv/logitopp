@@ -28,7 +28,7 @@ import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.orders.DefaultParcelOrderModel;
 import edu.kit.ifv.mobitopp.simulation.parcels.orders.NormalDistributedNumberOfParcelsSelector;
@@ -120,12 +120,12 @@ public class DefaultParcelOrderModelTest {
 	public void noWorkPersonDefaultModel() {
 		ParcelOrderModel model = new DefaultParcelOrderModel(centers);
 		
-		List<Collection<Parcel>> orders = generateNParcels(model, noWorkPerson, 10);
+		List<Collection<PrivateParcel>> orders = generateNParcels(model, noWorkPerson, 10);
 		
-		for(Collection<Parcel> order : orders) {
+		for(Collection<PrivateParcel> order : orders) {
 			assertTrue(0 <= order.size() && order.size() <= 10);
 			
-			for(Parcel p: order) {
+			for(PrivateParcel p: order) {
 				assertNotEquals(WORK, p.getDestinationType());
 				assertEquals("Dummy Delivery Service", p.getDeliveryService());
 				assertIn(p.getPlannedArrivalDate(), Time.start, Time.start.plusDays(6));
@@ -140,12 +140,12 @@ public class DefaultParcelOrderModelTest {
 	public void workInsidePersonDefaultModel() {
 		ParcelOrderModel model = new DefaultParcelOrderModel(centers);
 		
-		List<Collection<Parcel>> orders = generateNParcels(model, workInsidePerson, 10);
+		List<Collection<PrivateParcel>> orders = generateNParcels(model, workInsidePerson, 10);
 		
-		for(Collection<Parcel> order : orders) {
+		for(Collection<PrivateParcel> order : orders) {
 			assertTrue(0 <= order.size() && order.size() <= 10);
 			
-			for(Parcel p: order) {
+			for(PrivateParcel p: order) {
 				assertEquals("Dummy Delivery Service", p.getDeliveryService());
 				assertIn(p.getPlannedArrivalDate(), Time.start, Time.start.plusDays(6));
 				assertDayPrecision(p.getPlannedArrivalDate());
@@ -159,12 +159,12 @@ public class DefaultParcelOrderModelTest {
 	public void workOutsidePersonDefaultModel() {
 		ParcelOrderModel model = new DefaultParcelOrderModel(centers);
 		
-		List<Collection<Parcel>> orders = generateNParcels(model, workOutsidePerson, 10);
+		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
-		for(Collection<Parcel> order : orders) {
+		for(Collection<PrivateParcel> order : orders) {
 			assertTrue(0 <= order.size() && order.size() <= 10);
 			
-			for(Parcel p: order) {
+			for(PrivateParcel p: order) {
 				assertEquals("Dummy Delivery Service", p.getDeliveryService());
 				assertIn(p.getPlannedArrivalDate(), Time.start, Time.start.plusDays(6));
 				assertDayPrecision(p.getPlannedArrivalDate());
@@ -178,12 +178,12 @@ public class DefaultParcelOrderModelTest {
 	public void workOutsidePersonDefaultModelWithZoneFilter() {
 		ParcelOrderModel model = new DefaultParcelOrderModel(centers, workZoneFilter);
 		
-		List<Collection<Parcel>> orders = generateNParcels(model, workOutsidePerson, 10);
+		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
-		for(Collection<Parcel> order : orders) {
+		for(Collection<PrivateParcel> order : orders) {
 			assertTrue(0 <= order.size() && order.size() <= 10);
 			
-			for(Parcel p: order) {
+			for(PrivateParcel p: order) {
 				assertNotEquals(WORK, p.getDestinationType());
 				assertEquals("Dummy Delivery Service", p.getDeliveryService());
 				assertIn(p.getPlannedArrivalDate(), Time.start, Time.start.plusDays(6));
@@ -204,12 +204,12 @@ public class DefaultParcelOrderModelTest {
 			new RandomDeliveryDateSelector(Time.start.plusDays(1), Time.start.plusDays(4), MINUTE_PRECISION)
 		);
 		
-		List<Collection<Parcel>> orders = generateNParcels(model, workOutsidePerson, 10);
+		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
-		for(Collection<Parcel> order : orders) {
+		for(Collection<PrivateParcel> order : orders) {
 			assertTrue(2 <= order.size() && order.size() <= 7);
 			
-			for(Parcel p: order) {
+			for(PrivateParcel p: order) {
 				assertNotEquals(WORK, p.getDestinationType());
 				assertEquals("ServiceB", p.getDeliveryService());
 				assertEquals(centerA, p.getDistributionCenter());
@@ -236,12 +236,12 @@ public class DefaultParcelOrderModelTest {
 			new RandomDeliveryDateSelector(Time.start.plusDays(1), Time.start.plusDays(4), MINUTE_PRECISION)
 		);
 		
-		List<Collection<Parcel>> orders = generateNParcels(model, workOutsidePerson, 10);
+		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
-		for(Collection<Parcel> order : orders) {
+		for(Collection<PrivateParcel> order : orders) {
 			assertTrue(2 <= order.size() && order.size() <= 7);
 			
-			for(Parcel p: order) {
+			for(PrivateParcel p: order) {
 				assertNotEquals(WORK, p.getDestinationType());
 				assertNotEquals(PACK_STATION, p.getDestinationType());
 				assertEquals(HOME, p.getDestinationType());
@@ -270,12 +270,12 @@ public class DefaultParcelOrderModelTest {
 			new RandomDeliveryDateSelector(Time.start.plusDays(1), Time.start.plusDays(4), MINUTE_PRECISION)
 		);
 		
-		List<Collection<Parcel>> orders = generateNParcels(model, workOutsidePerson, 10);
+		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
-		for(Collection<Parcel> order : orders) {
+		for(Collection<PrivateParcel> order : orders) {
 			assertTrue(2 <= order.size() && order.size() <= 7);
 			
-			for(Parcel p: order) {
+			for(PrivateParcel p: order) {
 				assertNotEquals(WORK, p.getDestinationType());
 				assertEquals("ServiceB", p.getDeliveryService());
 				assertEquals(centerA, p.getDistributionCenter());
@@ -292,8 +292,8 @@ public class DefaultParcelOrderModelTest {
 		
 	}
 	
-	private List<Collection<Parcel>> generateNParcels(ParcelOrderModel model, PickUpParcelPerson person, int n) {
-		List<Collection<Parcel>> parcels = new ArrayList<>();
+	private List<Collection<PrivateParcel>> generateNParcels(ParcelOrderModel model, PickUpParcelPerson person, int n) {
+		List<Collection<PrivateParcel>> parcels = new ArrayList<>();
 		
 		for(int i = 0; i < n; i++) {
 			parcels.add(model.createParcelOrders(person, results));

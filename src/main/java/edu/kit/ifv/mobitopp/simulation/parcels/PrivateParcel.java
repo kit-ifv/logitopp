@@ -1,5 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
+import java.util.Optional;
+
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
@@ -14,22 +16,10 @@ import lombok.Setter;
 /**
  * Parcel holds data about the current state of delivery of a parcel order.
  */
-public class Parcel {
-
-	private static int OID_CNT = 0;
-	@Getter private final int oId = OID_CNT++;
+public class PrivateParcel extends BaseParcel {
 
 	@Getter private PickUpParcelPerson person;
 	@Getter @Setter private ParcelDestinationType destinationType;
-	@Getter @Setter private Time plannedArrivalDate;
-	@Getter private DistributionCenter distributionCenter;
-	@Getter @Setter private String deliveryService;
-
-	@Getter private ParcelState state = ParcelState.UNDEFINED;
-	private DeliveryResults results;
-	@Getter private int deliveryAttempts = 0;
-	@Getter private Time deliveryTime = Time.future;
-	@Getter private RecipientType recipientType = null;
 
 	/**
 	 * Instantiates a new parcel ordered by the given {@link PickUpParcelPerson}.
@@ -45,18 +35,29 @@ public class Parcel {
 	 * @param deliveryService the delivery service
 	 * @param results the results to log state changes
 	 */
-	public Parcel(PickUpParcelPerson person, ParcelDestinationType destination, Time plannedArrival,
-		DistributionCenter distributionCenter, String deliveryService, DeliveryResults results) {
-		
+	public PrivateParcel(PickUpParcelPerson person, ParcelDestinationType destination, ZoneAndLocation location, Time plannedArrival, DistributionCenter distributionCenter,
+			String deliveryService, DeliveryResults results) {
+		super(location, plannedArrival, distributionCenter, deliveryService, results);
 		this.destinationType = destination;
-		this.plannedArrivalDate = plannedArrival;
-		this.setDistributionCenter(distributionCenter);
-		this.deliveryService = deliveryService;
-		this.results = results;
 		this.setPerson(person);
-		
-		this.results.logChange(this, null, Time.start, false);
-		this.results.logOrder(this);
+
+		this.logChange(Time.start, null, false);
+	}
+	
+	@Override
+	protected void logChange(Time currentTime, DeliveryPerson deliveryGuy, boolean isAttempt) {
+		this.results.logChange(this, deliveryGuy, currentTime, isAttempt);
+	}
+	
+
+	@Override
+	protected Optional<RecipientType> canDeliver(Time currentTime) {
+		return this.distributionCenter.getPolicyProvider().forPrivate().canDeliver(this, currentTime);
+	}
+
+	@Override
+	protected boolean updateParcelDelivery(Time currentTime) {
+		return this.distributionCenter.getPolicyProvider().forPrivate().updateParcelDelivery(this, currentTime);
 	}
 
 	/**
@@ -89,80 +90,21 @@ public class Parcel {
 		return new ZoneAndLocation(getZone(), getLocation());
 	}
 
-	
-	/**
-	 * Checks if the parcel is delivered.
-	 *
-	 * @return true, if is delivered
-	 */
-	public boolean isDelivered() {
-		return this.state.equals(ParcelState.DELIVERED);
-	}
-
-	/**
-	 * Checks if the parcel is on delivery.
-	 *
-	 * @return true, if is on delivery
-	 */
-	public boolean isOnDelivery() {
-		return this.state.equals(ParcelState.ONDELIVERY);
-	}
-
-	/**
-	 * Checks if the parcel is returning.
-	 *
-	 * @return true, if is returning
-	 */
-	public boolean isReturning() {
-		return this.state.equals(ParcelState.RETURNING);
-	}
-
-	/**
-	 * Checks if the parcel state is undefined
-	 * (in distribution center or not yet arrived).
-	 *
-	 * @return true, if is undefined
-	 */
-	public boolean isUndefined() {
-		return this.state.equals(ParcelState.UNDEFINED);
-	}
 
 
-
-	/**
-	 * Updates the parcel state.
-	 * If it is an delivery attempt, the number of attempts is increased.
-	 * Logs the state change at the given {@link Time}.
-	 *
-	 * @param currentTime the current time
-	 * @param deliveryGuy the delivery guy
-	 * @param isAttempt the is attempt
-	 * @return the parcel state
-	 */
-	public ParcelState updateState(Time currentTime, DeliveryPerson deliveryGuy, boolean isAttempt) {
-		if (isAttempt) {
-			this.deliveryAttempts++;
-		}
-		this.state = this.state.nextState();
-		results.logChange(this, deliveryGuy, currentTime, isAttempt);
-		return this.state;
-	}
-
-		
 	/**
 	 * Deliver.
 	 *
 	 * @param currentTime the current time
 	 * @param deliveryGuy the delivery guy
-	 * @param recipientType the type of recipient that took the parcel (e.g. personal or neighbor)
 	 */
-	public void deliver(Time currentTime, DeliveryPerson deliveryGuy, RecipientType recipientType) {
+	@Override
+	protected void deliver(Time currentTime, DeliveryPerson deliveryGuy) {
 		this.deliveryTime = currentTime;
-		this.recipientType = recipientType;
 		deliveryGuy.delivered(this);
-		
+
 		this.state = ParcelState.DELIVERED;
-				
+
 		if (this.destinationType.equals(ParcelDestinationType.PACK_STATION)) {
 			this.person.notifyParcelInPackStation(this);
 		} else {
@@ -187,22 +129,7 @@ public class Parcel {
 		this.person.order(this);
 	}
 
-	/**
-	 * Sets the {@link DistributionCenter} from where the parcel will be delivered.
-	 * Adds the parcel to the given {@link DistributionCenter}'s parcels.
-	 * If the current distribution center is not null, remove the parcel from the current distribution center.
-	 *
-	 * @param distributionCenter the new distribution center
-	 */
-	private void setDistributionCenter(DistributionCenter distributionCenter) {
-		if (this.distributionCenter != null) {
-			this.distributionCenter.removeParcelOrder(this);
-		}
 
-		this.distributionCenter = distributionCenter;
-		this.distributionCenter.addParcelOrder(this);
-	}
-	
 	/**
 	 * Returns a String representation of the parcel.
 	 *
@@ -213,6 +140,25 @@ public class Parcel {
 		return "Parcel(" + this.getOId() + ") for person " + this.getPerson().getOid()
 			+ " to " + String.valueOf(this.getLocation()) + " (" + this.getDestinationType().toString() + ") at "
 			+ this.getPlannedArrivalDate().toString();
+	}
+
+
+	@Override
+	public boolean canBeDeliveredTogether(IParcel other) {
+		if (other == this) {
+			return true;
+		}
+		
+		if (other == null) {
+			return false;
+		}
+		
+		if (other.getLocation().equals(this.getLocation())) {
+			return true; //TODO
+		} else {
+			return false;
+		}
+		
 	}
 
 }

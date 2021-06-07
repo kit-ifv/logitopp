@@ -1,12 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.activityschedule;
 
-import static java.lang.Math.max;
-import static java.lang.Math.round;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
@@ -15,9 +11,7 @@ import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.ActivityAsLinkedListElement;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.LinkedListElement;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
@@ -30,7 +24,7 @@ import lombok.Getter;
 public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 
 	private ActivityAsLinkedListElement activity;
-	private final Collection<Parcel> parcels;
+	private final List<IParcel> parcels;
 	private final DeliveryPerson person;
 
 	/**
@@ -41,14 +35,14 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	 * @param parcels the parcels
 	 * @param person the delivery person
 	 */
-	private DeliveryActivity(ActivityAsLinkedListElement activity, List<Parcel> parcels,
+	private DeliveryActivity(ActivityAsLinkedListElement activity, Collection<IParcel> parcels,
 		DeliveryPerson person) {
 		this.activity = activity;
-		this.parcels = new ArrayList<Parcel>(parcels);
+		this.parcels = new ArrayList<IParcel>(parcels);
 		this.person = person;
 
 		if (!parcels.isEmpty()) {
-			setLocation(parcels.get(0).getZoneAndLocation());
+			setLocation(this.parcels.get(0).getZoneAndLocation());
 		}
 
 	}
@@ -69,45 +63,11 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	 */
 	public DeliveryActivity(int oid, byte activityNrOfWeek, Time startDate, int duration,
 		int observedTripDuration, float startFlexibility, float endFlexibility,
-		float durationFlexibility, List<Parcel> parcels, DeliveryPerson person) {
+		float durationFlexibility, Collection<IParcel> parcels, DeliveryPerson person) {
 
 		this(new ActivityAsLinkedListElement(oid, activityNrOfWeek, ActivityType.DELIVER_PARCEL,
 			startDate, duration, observedTripDuration, startFlexibility, endFlexibility,
 			durationFlexibility), parcels, person);
-	}
-
-	/**
-	 * Instantiates a new delivery activity for the given parcels and delivery person.
-	 *
-	 * @param oid the oid
-	 * @param activityNrOfWeek the activity nr of week
-	 * @param startDate the start date
-	 * @param startFlexibility the start flexibility
-	 * @param endFlexibility the end flexibility
-	 * @param durationFlexibility the duration flexibility
-	 * @param parcels the parcels
-	 * @param person the delivery person
-	 */
-	public DeliveryActivity(int oid, byte activityNrOfWeek, Time startDate, float startFlexibility,
-		float endFlexibility, float durationFlexibility, List<Parcel> parcels,
-		DeliveryPerson person) {
-
-		this(new ActivityAsLinkedListElement(oid, activityNrOfWeek, ActivityType.DELIVER_PARCEL,
-			startDate, duration(parcels, person.getEfficiency()), person.getEfficiency().getTripDuration(),
-			startFlexibility, endFlexibility, durationFlexibility), parcels, person);
-
-	}
-
-	/**
-	 * Estimates the duration of delivering the given parcels based on the given {@link DeliveryEfficiencyProfile}.
-	 *
-	 * @param parcels the parcels
-	 * @param efficiency the efficiency profile
-	 * @return the estimated duration
-	 */
-	private static int duration(List<Parcel> parcels, DeliveryEfficiencyProfile efficiency) {
-		return max(1, round(
-			efficiency.getDeliveryDurBase() + efficiency.getDeliveryDurPerParcel() * parcels.size()));
 	}
 
 	/**
@@ -116,36 +76,7 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	 * @param currentTime the current time
 	 */
 	public void tryDelivery(Time currentTime) {
-		parcels.forEach(p -> this.tryDelivery(person, p, currentTime));
-	}
-
-	/**
-	 * Try delivery.
-	 *
-	 * @param person the person
-	 * @param parcel the parcel
-	 * @param currentTime the current time
-	 */
-	private void tryDelivery(DeliveryPerson person, Parcel parcel, Time currentTime) {
-		String msg = "";
-
-		Optional<RecipientType> canDeliver = parcel.getDistributionCenter().getPolicy().canDeliver(parcel, currentTime);
-		if (canDeliver.isPresent()) {
-			parcel.deliver(currentTime, person, canDeliver.get());
-			msg = "Successful delivery of ";
-
-		} else {
-			parcel.getDistributionCenter().getPolicy().updateParcelDelivery(parcel, currentTime);
-			msg = "Unable to deliver ";
-		}
-
-		parcel.updateState(currentTime, person, true);
-
-		System.out
-			.println(msg + "parcel " + parcel.getOId() + "(" + parcel.getState() + ")"
-				+ " to person " + parcel.getPerson().getOid() + " at "
-				+ parcel.getDestinationType().name() + " by delivery guy " + person.getOid()
-				+ ". (attempt " + parcel.getDeliveryAttempts() + ")");
+		parcels.forEach(p -> p.tryDelivery(currentTime, person));
 	}
 
 	/**
@@ -155,7 +86,7 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	 * @param currentTime the current time
 	 */
 	public void abortDelivery(DeliveryPerson person, Time currentTime) {
-		parcels.forEach(p -> p.updateState(currentTime, person, false));
+		parcels.forEach(p -> p.returning(currentTime, person));
 	}
 
 	/**

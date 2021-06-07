@@ -8,14 +8,15 @@ import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.Person;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.time.Time;
+
 
 
 /**
  * The Class DummyDeliveryPolicy is an exemplary implementation of the ParcelDeliveryPolicy interface.
  */
-public class BaseDeliveryPolicy implements ParcelDeliveryPolicy {
+public class BaseDeliveryPolicy implements ParcelDeliveryPolicy<PrivateParcel> {
 	
 	public BaseDeliveryPolicy() {
 	}
@@ -30,7 +31,8 @@ public class BaseDeliveryPolicy implements ParcelDeliveryPolicy {
 	 * @return an optional {@link RecipientType} if the parcel can be delivered, an empty {@link Optional} otherwise
 	 */
 	@Override
-	public Optional<RecipientType> canDeliver(Parcel parcel, Time currentTime) {
+	public Optional<RecipientType> canDeliver(PrivateParcel parcel, Time currentTime) {
+
 
 		if (parcel.getDestinationType().equals(HOME)) {
 
@@ -72,7 +74,7 @@ public class BaseDeliveryPolicy implements ParcelDeliveryPolicy {
 	 * @return true, if the parcel order was updated
 	 */
 	@Override
-	public boolean updateParcelDelivery(Parcel parcel, Time currentTime) {
+	public boolean updateParcelDelivery(PrivateParcel parcel, Time currentTime) {
 		return false;
 	}
 	

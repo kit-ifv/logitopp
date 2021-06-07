@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
@@ -79,12 +79,12 @@ public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<Parc
 	 *
 	 * @param recipient the recipient
 	 * @param numOfParcels the number of parcels the recipient will order
-	 * @param otherParcels the other {@link Parcel}s the recipient already ordered
+	 * @param otherParcels the other {@link PrivateParcel}s the recipient already ordered
 	 * @param randomNumber a random number
 	 * @return the selected {@link ParcelDestinationType}
 	 */
 	@Override
-	public ParcelDestinationType select(PickUpParcelPerson recipient, int numOfParcels, Collection<Parcel> otherParcels, double randomNumber) {
+	public ParcelDestinationType select(PickUpParcelPerson recipient, int numOfParcels, Collection<PrivateParcel> otherParcels, double randomNumber) {
 		
 		if (recipient.hasFixedZoneFor(ActivityType.WORK) && workZoneFilter.test(recipient.fixedZoneFor(ActivityType.WORK))) {
 			return this.select(randomNumber);

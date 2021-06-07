@@ -18,15 +18,15 @@ import org.mockito.Mockito;
 
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 public class BaseDeliveryPolicyTest {
 
 	private ParcelDeliveryPolicy policy;
-	private Parcel parcelHome;
-	private Parcel parcelWork;
-	private Parcel parcelPackStation;
+	private PrivateParcel parcelHome;
+	private PrivateParcel parcelWork;
+	private PrivateParcel parcelPackStation;
 	
 	private PickUpParcelPerson person;
 	private ActivityIfc activity;
@@ -35,9 +35,9 @@ public class BaseDeliveryPolicyTest {
 	public void setUp() {
 		policy = new BaseDeliveryPolicy();
 		
-		parcelHome = mock(Parcel.class);
-		parcelWork = mock(Parcel.class);
-		parcelPackStation = mock(Parcel.class);
+		parcelHome = mock(PrivateParcel.class);
+		parcelWork = mock(PrivateParcel.class);
+		parcelPackStation = mock(PrivateParcel.class);
 		
 		when(parcelHome.getDestinationType()).thenReturn(HOME);
 		when(parcelWork.getDestinationType()).thenReturn(WORK);

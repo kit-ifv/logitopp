@@ -1,7 +1,11 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
+import static java.lang.Math.floor;
+import static java.lang.Math.round;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,9 +19,11 @@ import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
+import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
@@ -31,13 +37,13 @@ import edu.kit.ifv.mobitopp.time.Time;
  */
 public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrategy {
 
-	private List<Parcel> parcelTour = new ArrayList<Parcel>();
+	private List<DeliveryActivityBuilder> deliveryTour = new ArrayList<>();
 	private Time nextPlan = Time.start;
 	
 	private static int MAX_CAPACITY = 160;
 	private static int MAX_HOURS = 8;
 	private static boolean SKIP_SUNDAY = true;
-	
+
 	/**
 	 * Assign parcels to the given delivery person based on the duration of the working activity and the time required per parcel.
 	 *
@@ -47,75 +53,47 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 	 * @return the collection
 	 */
 	@Override
-	public List<Parcel> assignParcels(DistributionCenter dc, DeliveryPerson person,  ActivityIfc work) { //Maybe assign delivery activities instead of parcels?
-		DeliveryEfficiencyProfile efficiency = person.getEfficiency();
+	public List<DeliveryActivityBuilder> assignParcels(Collection<DeliveryActivityBuilder> deliveries, DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime) {
 		
-		if (SKIP_SUNDAY && work.startDate().weekDay().equals(DayOfWeek.SUNDAY) || work.startDate().isAfter(work.startDate().startOfDay().plusHours(18))) {
+		if (SKIP_SUNDAY && currentTime.weekDay().equals(DayOfWeek.SUNDAY) || currentTime.isAfter(currentTime.startOfDay().plusHours(18))) {
 			return Arrays.asList();
 		}
 		
 		
-		if (work.startDate().isAfter(nextPlan)) {
-			planGiantTour(dc, work.startDate());
+		if (currentTime.isAfter(nextPlan)) {
+			planGiantTour(person.getDistributionCenter(), deliveries, currentTime);
 		}
 
+		ArrayList<DeliveryActivityBuilder> assigned = new ArrayList<>();
+
 		
-		Iterator<Parcel> it = parcelTour.stream().filter(p -> p.isUndefined()).iterator();
-		
-		ArrayList<Parcel> assigned = new ArrayList<Parcel>();
-		if (!it.hasNext()) {return assigned;}
-		
-		
-		Parcel prev = it.next();
-		Parcel next = null;
-		float tripDuration = 2 * travelTime(person, dc.getZone(), prev.getZone(), work.startDate()) + efficiency.getDeliveryDurBase();
-		int parcels = 1;
-		assigned.add(prev);
-		
-		while (it.hasNext() && tripDuration < MAX_HOURS*60 && parcels < MAX_CAPACITY) {
-			next = it.next();
-			assigned.add(next);
-			tripDuration += duration(person, work.startDate().plusMinutes((int)tripDuration), efficiency, next, prev);
-			parcels++;
-			prev = next;
+		int capacity = MAX_CAPACITY;
+		float duration = 0;
+		Zone lastZone = person.getDistributionCenter().getZone();
+		Time time = currentTime;
+
+		for (int i = 0; i < Math.min(capacity, deliveryTour.size()); i++) {
+			DeliveryActivityBuilder delivery = deliveryTour.get(i);
+			duration += travelTime(person, lastZone, delivery.getZone(), time);
+			duration += delivery.estimateDuration(person.getEfficiency());
+			
+			time = currentTime.plusMinutes(round(duration));
+			
+			float withReturn = duration + travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time);
+			if (floor(withReturn) <= remainingWorkTime.toMinutes()) {
+				assigned.add(delivery);
+			} else {
+				break;
+			}
+			
 		}
+		
+		deliveryTour.removeAll(assigned);
 
 		return assigned;
 		
 	}
 	
-	/**
-	 * Estimates the duration of the delivery.
-	 *
-	 * @param person the {@link DeliveryPerson}
-	 * @param time the current {@link Time}
-	 * @param efficiency the {@link DeliveryEfficiencyProfile}
-	 * @param next the next {@link Parcel} to deliver
-	 * @param prev the previous {@link Parcel} to deliver
-	 * @return the estimate duration
-	 */
-	private float duration(DeliveryPerson person, Time time, DeliveryEfficiencyProfile efficiency, Parcel next, Parcel prev) {
-		float dur = 0.0f;
-		
-		if (!next.getLocation().equals(prev.getLocation())) {
-			dur += travelTime(person, prev.getZone(), next.getZone(), time);
-			dur += efficiency.getDeliveryDurBase();
-			return dur;
-		}
-		
-		if (next.getDestinationType().equals(ParcelDestinationType.PACK_STATION) && prev.getDestinationType().equals(prev.getDestinationType())) {
-			dur += efficiency.getDeliveryDurPerParcel();
-			
-		} else if (next.getPerson().household().equals(prev.getPerson().household())) {
-			dur += efficiency.getDeliveryDurPerParcel();
-			
-		} else {
-			dur += efficiency.getDeliveryDurBase();
-		}
-		
-		
-		return dur;
-	}
 	
 	/**
 	 * Returns the travel time form origin to destination.
@@ -134,23 +112,25 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 	
 	/**
 	 * Plan giant tour through all delivery locations using a TSP 2 approximation.
+	 * @param distributionCenter 
+	 * @param currentTime 
+	 * @param deliveries 
 	 *
 	 * @param dc the {@link DistributionCenter}
 	 * @param person the {@link DeliveryPerson}
 	 * @param currentTime the current {@link Time}
 	 */
-	private void planGiantTour(DistributionCenter dc, Time plannedTime) {
-		
-		List<Parcel> toBeDelivered = dc.getAvailableParcels(plannedTime);
+	private void planGiantTour(DistributionCenter distributionCenter, Collection<DeliveryActivityBuilder> deliveries, Time currentTime) {
 	
 		SimpleWeightedGraph<Location, DefaultWeightedEdge> graph = new SimpleWeightedGraph<Location, DefaultWeightedEdge>(DefaultWeightedEdge.class);
-		Location start = dc.getLocation();
+		
+		Location start = distributionCenter.getLocation();
 		graph.addVertex(start);
 		
 		//Create complete graph: for each parcel add the location as vertex, also add edges to all existing vertices
 		//Use 2d distance as edge weight
-		for (Parcel p : toBeDelivered) {
-			Location newLocation = p.getLocation();
+		for (DeliveryActivityBuilder d : deliveries) {
+			Location newLocation = d.getLocation();
 			
 			if (graph.vertexSet().contains(newLocation)) {
 				continue;
@@ -171,8 +151,8 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		TwoApproxMetricTSP<Location, DefaultWeightedEdge> tspAlg = new TwoApproxMetricTSP<>();
 		GraphPath<Location, DefaultWeightedEdge> path = tspAlg.getTour(graph);
 		
-		List<Parcel> prefix = new ArrayList<Parcel>();
-		List<Parcel> suffix = new ArrayList<Parcel>();
+		List<DeliveryActivityBuilder> prefix = new ArrayList<>();
+		List<DeliveryActivityBuilder> suffix = new ArrayList<>();
 		boolean foundStart = false;
 		
 		for (Location l: path.getVertexList()) {
@@ -182,20 +162,22 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 			} 			
 				
 			if (!foundStart) {
-				suffix.addAll(toBeDelivered.stream().filter(p -> p.getLocation().equals(l)).collect(Collectors.toList()));
+				suffix.addAll(deliveries.stream().filter(p -> p.getLocation().equals(l)).collect(Collectors.toList()));
 			} else {
-				prefix.addAll(toBeDelivered.stream().filter(p -> p.getLocation().equals(l)).collect(Collectors.toList()));
+				prefix.addAll(deliveries.stream().filter(p -> p.getLocation().equals(l)).collect(Collectors.toList()));
 			}
 			
 		}
 
 		
-		this.parcelTour.clear();
-		this.parcelTour.addAll(prefix);
-		this.parcelTour.addAll(suffix);
-		this.parcelTour = this.parcelTour.stream().distinct().collect(Collectors.toList());
+		this.deliveryTour.clear();
+		this.deliveryTour.addAll(prefix);
+		this.deliveryTour.addAll(suffix);
+		this.deliveryTour = this.deliveryTour.stream().distinct().collect(Collectors.toList());
 
 		this.nextPlan = nextPlan.plusDays(1);
 	}
+
+
 	
 }

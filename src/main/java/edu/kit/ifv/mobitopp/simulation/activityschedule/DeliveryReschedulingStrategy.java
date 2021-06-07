@@ -15,10 +15,11 @@ import edu.kit.ifv.mobitopp.simulation.ReschedulingStrategy;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.ActivityAsLinkedListElement;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.parcels.Parcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelState;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
+import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
@@ -77,7 +78,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		
 		if (firstRescheduling) {
 			this.replaceSchedule(activitySchedule, beginningActivity, plannedStartTime, currentTime);
-			//this.addWorkOnSaturday(activitySchedule, beginningActivity, currentTime);
+
 			this.firstRescheduling = false;
 			
 		}
@@ -100,7 +101,6 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		} else if (isDelivery(beginningActivity)) {
 			
 			//Check whether the delivery trips should be interrupted, if the end of the workinghours is almost reached
-			//if (currentTime.differenceTo(this.nextUnload.startDate()).toMinutes() < this.efficiency.getTripDuration() + beginningActivity.duration()) {
 			if (currentTime.isAfter(currentTime.startOfDay().plusHours(19).plusMinutes(30))) {	
 				
 				skipRestOfTour(activitySchedule, beginningActivity, currentTime);
@@ -135,14 +135,9 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	 * @param currentTime the current time
 	 */
 	private void unload(Time currentTime) {
-		Collection<Parcel> returning  = this.person.getCurrentTour().stream().filter(p -> p.getState().equals(ParcelState.RETURNING)).collect(Collectors.toList());
-		Collection<Parcel> stillOnDelivery = this.person.getCurrentTour().stream().filter(p -> p.getState().equals(ParcelState.ONDELIVERY)).collect(Collectors.toList());
-		
-		System.out.println("Person " + person.getOid() + " is unloading truck: (" + returning.size() + "/" + this.person.getCurrentTour().size()  + ")");
-		
-		if (!stillOnDelivery.isEmpty()) {
-			System.out.println("Person " + person.getOid() + " should also unload: (" + stillOnDelivery.size() + "/" + this.person.getCurrentTour().size() + ") but they are still marked as 'ON_DELIVERY' !!");
-		}
+
+		System.out.println("Person " + person.getOid() + " is unloading truck: (" + this.person.getCurrentTour().size()  + ")");
+
 		
 		this.center.unloadParcels(this.person, currentTime);
 		this.nextUnload = null;
@@ -158,30 +153,38 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	 */
 	private void createTourAndLoad(ModifiableActivitySchedule activitySchedule,
 		ActivityIfc beginningActivity, Time currentTime) {
-		List<List<Parcel>> parcelChunks = center.assignParcels(person, beginningActivity, currentTime);
+		
+		Time _8am = beginningActivity.startDate().startOfDay().plusHours(8);
+		Time _1800pm = beginningActivity.startDate().startOfDay().plusHours(18);
+		
+		RelativeTime remainingTime = _1800pm.differenceTo(currentTime);
+		
+		List<DeliveryActivityBuilder> deliveries = center.assignParcels(person, beginningActivity, currentTime, remainingTime);
 				
 		beginningActivity.changeDuration(getLoadDuration());
 		ActivityIfc currentActivity = beginningActivity;
 		
-		int parcelCnt = parcelChunks.stream().mapToInt(l -> l.size()).sum();
-		System.out.println(person.getOid() + " is assigned " + parcelCnt + " parcels (" + parcelChunks.size() + " deliveries)");
+		int parcelCnt = deliveries.stream().mapToInt(l -> l.getParcels().size()).sum();
+		System.out.println(person.getOid() + " is assigned " + parcelCnt + " parcels (" + deliveries.size() + " deliveries)");
 		
-		Time _8am = currentActivity.startDate().startOfDay().plusHours(8);
-		Time _1800pm = currentActivity.startDate().startOfDay().plusHours(18);
 		
-		for (List<Parcel> p : parcelChunks) {
-			if (currentActivity.startDate().isBefore(_8am)) {
+		
+		if (currentActivity.startDate().isBefore(_8am)) {
 				int minDuration = Math.abs(_8am.differenceTo(currentActivity.startDate()).toMinutes());
 				int newDuration = Math.max(minDuration, currentActivity.duration());
 				
 				currentActivity.changeDuration(newDuration);
-			};
+		};
+			
+		for (DeliveryActivityBuilder d : deliveries) {
 			
 			Time startDate = currentActivity.startDate().plusMinutes(currentActivity.duration());
-						
 			startDate = startDate.plusMinutes(getTripDuration());
 			
-			ActivityIfc delivery = DeliveryActivityFactory.createDeliveryActivity(p, beginningActivity, startDate, this.person);
+			ActivityIfc delivery = d.deliveredBy(person)
+									.during(beginningActivity)
+									.plannedAt(startDate)
+									.build();
 			
 			activitySchedule.insertActivityAfter(currentActivity, delivery);
 			currentActivity = delivery;
@@ -201,7 +204,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 			this.nextUnload.changeDuration(nextUnload.duration() + restOfWork);
 		}
 
-		System.out.println("Person " + person.getOid() + " loads truck with " + parcelChunks.stream().mapToInt(l -> l.size()).sum() + ": planned unload at " + nextUnload.startDate().toString());
+		System.out.println("Person " + person.getOid() + " loads truck with " + deliveries.stream().mapToInt(l -> l.getParcels().size()).sum() + ": planned unload at " + nextUnload.startDate().toString());
 	}
 
 	/**
