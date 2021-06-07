@@ -3,9 +3,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;

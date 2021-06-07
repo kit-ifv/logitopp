@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 
 import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 

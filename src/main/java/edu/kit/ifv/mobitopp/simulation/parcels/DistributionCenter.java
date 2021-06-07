@@ -1,12 +1,10 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
@@ -14,7 +12,6 @@ import edu.kit.ifv.mobitopp.simulation.Person;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
-import edu.kit.ifv.mobitopp.simulation.parcels.policies.ParcelDeliveryPolicy;
 import edu.kit.ifv.mobitopp.simulation.parcels.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
@@ -46,14 +43,14 @@ public class DistributionCenter {
 	/**
 	 * Instantiates a new distribution center.
 	 *
-	 * @param name         the distribution centers name
-	 * @param organization the organizations name
-	 * @param zone         the zone
-	 * @param location     the location
-	 * @param numEmployees the number of employees
-	 * @param share        the share of parcels they receive
-	 * @param tourStrategy the tour assignment strategy
-	 * @param policy       the delivery policy
+	 * @param name           the distribution centers name
+	 * @param organization   the organizations name
+	 * @param zone           the zone
+	 * @param location       the location
+	 * @param numEmployees   the number of employees
+	 * @param share          the share of parcels they receive
+	 * @param tourStrategy   the tour assignment strategy
+	 * @param policyProvider the policy provider
 	 */
 	public DistributionCenter(String name, String organization, Zone zone, Location location, int numEmployees,
 			double share, DeliveryTourAssignmentStrategy tourStrategy, ParcelPolicyProvider policyProvider) {
@@ -77,13 +74,16 @@ public class DistributionCenter {
 	/**
 	 * Assign parcels to the given delivery person.
 	 *
-	 * @param person      the delivery person
-	 * @param work        the work
-	 * @param currentTime the current time
-	 * @return the list
+	 * @param person            the delivery person
+	 * @param work              the work
+	 * @param currentTime       the current time
+	 * @param remainingWorkTime the remaining work time
+	 * @return the list of assigned deliveries
 	 */
-	public List<DeliveryActivityBuilder> assignParcels(DeliveryPerson person, ActivityIfc work, Time currentTime, RelativeTime remainingWorkTime) {
-		List<DeliveryActivityBuilder> assigned = this.tourStrategy.assignParcels(this.getDeliveryActivities(currentTime), person, currentTime, remainingWorkTime);
+	public List<DeliveryActivityBuilder> assignParcels(DeliveryPerson person, ActivityIfc work, Time currentTime,
+			RelativeTime remainingWorkTime) {
+		List<DeliveryActivityBuilder> assigned = this.tourStrategy
+				.assignParcels(this.getDeliveryActivities(currentTime), person, currentTime, remainingWorkTime);
 
 		loadParcels(person, assigned, currentTime);
 
@@ -98,7 +98,7 @@ public class DistributionCenter {
 	 * @param currentTime the current time
 	 */
 	private void loadParcels(DeliveryPerson person, List<DeliveryActivityBuilder> assigned, Time currentTime) {
-		assigned.forEach(d ->  {
+		assigned.forEach(d -> {
 			person.load(d.getParcels(), currentTime);
 			this.currentParcels.removeAll(d.getParcels());
 		});
@@ -130,11 +130,11 @@ public class DistributionCenter {
 
 	public List<DeliveryActivityBuilder> getDeliveryActivities(Time currentTime) {
 		List<DeliveryActivityBuilder> deliveries = new ArrayList<>();
-		
+
 		List<IParcel> available = getAvailableParcels(currentTime);
 
 		CollectionsUtil.groupBy(available, IParcel::canBeDeliveredTogether)
-					   .forEach(pcls -> deliveries.add(new DeliveryActivityBuilder().addParcels(pcls)));
+				.forEach(pcls -> deliveries.add(new DeliveryActivityBuilder().addParcels(pcls)));
 
 		return deliveries;
 	}

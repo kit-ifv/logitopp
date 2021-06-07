@@ -12,8 +12,8 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 /**

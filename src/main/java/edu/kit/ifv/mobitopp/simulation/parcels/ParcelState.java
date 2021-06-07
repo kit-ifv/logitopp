@@ -7,7 +7,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels;
 public enum ParcelState {
 
 	/**
-	 * The state delivered describes a {@link Parcel} already being delivered.
+	 * The state delivered describes a {@link IParcel} already being delivered.
 	 */
 	DELIVERED {
 
@@ -19,7 +19,7 @@ public enum ParcelState {
 	},
 
 	/**
-	 * The state undefined describes a {@link Parcel} returning to the
+	 * The state undefined describes a {@link IParcel} returning to the
 	 * {@link DistributionCenter} as it could ot be delivered.
 	 */
 	RETURNING {
@@ -32,13 +32,13 @@ public enum ParcelState {
 	},
 
 	/**
-	 * The state on delivery describes a {@link Parcel} currently being on a
+	 * The state on delivery describes a {@link IParcel} currently being on a
 	 * delivery tour but prior to its own delivery.
 	 */
 	ONDELIVERY(RETURNING),
 
 	/**
-	 * The state undefined describes a {@link Parcel} being stored at a
+	 * The state undefined describes a {@link IParcel} being stored at a
 	 * {@link DistributionCenter} or prior to its arrival in that
 	 * {@link DistributionCenter}.
 	 */

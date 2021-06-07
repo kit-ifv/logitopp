@@ -45,46 +45,52 @@ import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
 /**
- * The Class DeliveryPerson decorates {@link SimulationPerson}
- * by adding the functionality of loading, delivering  and unloading {@link PrivateParcel}s.
+ * The Class DeliveryPerson decorates {@link SimulationPerson} by adding the
+ * functionality of loading, delivering and unloading {@link PrivateParcel}s.
  */
 public class DeliveryPerson implements SimulationPerson {
-	
+
 	private final SimulationPerson person;
-	@Getter	private final Collection<IParcel> currentTour;
+	@Getter
+	private final Collection<IParcel> currentTour;
 	private final Random random;
-	@Getter	private final DeliveryEfficiencyProfile efficiency;
-	@Getter private final DistributionCenter distributionCenter;
-	
+	@Getter
+	private final DeliveryEfficiencyProfile efficiency;
+	@Getter
+	private final DistributionCenter distributionCenter;
+
 	/**
-	 * Instantiates a new {@link DeliveryPerson}
-	 * with the given {@link DeliveryEfficiencyProfile}.
+	 * Instantiates a new {@link DeliveryPerson} with the given
+	 * {@link DeliveryEfficiencyProfile}.
 	 *
-	 * @param person the person
-	 * @param efficiency the efficiency
-	 * @param seed the seed
+	 * @param person             the person
+	 * @param distributionCenter the distribution center
+	 * @param efficiency         the efficiency
+	 * @param seed               the seed
 	 */
-	public DeliveryPerson(SimulationPerson person, DistributionCenter distributionCenter, DeliveryEfficiencyProfile efficiency, long seed) {
+	public DeliveryPerson(SimulationPerson person, DistributionCenter distributionCenter,
+			DeliveryEfficiencyProfile efficiency, long seed) {
 		this.person = person;
 		this.currentTour = new ArrayList<IParcel>();
 		this.random = new Random(seed);
 		this.efficiency = efficiency;
 		this.distributionCenter = distributionCenter;
 	}
-	
+
 	/**
 	 * Loads the given parcels and updates their state (now on delivery).
 	 *
-	 * @param parcels the parcels
+	 * @param parcels     the parcels
 	 * @param currentTime the current time
 	 */
 	public void load(Collection<IParcel> parcels, Time currentTime) {
 		this.currentTour.addAll(parcels);
 		parcels.forEach(p -> p.loaded(currentTime, this));
 	}
-	
+
 	/**
-	 * Unloads parcels from the current tour and updates their state (now undefined).
+	 * Unloads parcels from the current tour and updates their state (now
+	 * undefined).
 	 *
 	 * @param currentTime the current time
 	 * @return the unloaded parcels
@@ -95,7 +101,7 @@ public class DeliveryPerson implements SimulationPerson {
 		this.currentTour.clear();
 		return parcels;
 	}
-	
+
 	/**
 	 * Removes the delivered parcel from the current tour.
 	 *
@@ -104,7 +110,7 @@ public class DeliveryPerson implements SimulationPerson {
 	public void delivered(IParcel parcel) {
 		this.currentTour.remove(parcel);
 	}
-	
+
 	/**
 	 * Gets the next random number.
 	 *
@@ -113,10 +119,7 @@ public class DeliveryPerson implements SimulationPerson {
 	public double getNextRandom() {
 		return this.random.nextDouble();
 	}
-	
-	
-	
-	
+
 	@Override
 	public boolean isCarDriver() {
 		return this.person.isCarDriver();
@@ -264,8 +267,8 @@ public class DeliveryPerson implements SimulationPerson {
 
 	@Override
 	public void initSchedule(TourFactory tourFactory, ActivityPeriodFixer fixer,
-		ActivityStartAndDurationRandomizer  activityDurationRandomizer, List<Time> days) {
-		
+			ActivityStartAndDurationRandomizer activityDurationRandomizer, List<Time> days) {
+
 		this.person.initSchedule(tourFactory, fixer, activityDurationRandomizer, days);
 	}
 
@@ -556,7 +559,5 @@ public class DeliveryPerson implements SimulationPerson {
 	public boolean hasPublicTransportVehicleDeparted(Time time) {
 		return this.person.hasPublicTransportVehicleDeparted(time);
 	}
-
-
 
 }

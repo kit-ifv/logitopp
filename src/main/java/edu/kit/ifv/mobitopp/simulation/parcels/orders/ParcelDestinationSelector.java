@@ -2,8 +2,8 @@ package edu.kit.ifv.mobitopp.simulation.parcels.orders;
 
 import java.util.Collection;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 /**

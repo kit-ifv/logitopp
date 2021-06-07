@@ -56,6 +56,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 * @param minCapacity    the minimum capacity
 	 * @param maxCapacity    the maximum capacity
 	 * @param skipSunday     whether sunday should be skipped
+	 * @param mode           the delivery mode
 	 */
 	public ZoneTspDeliveryTourStrategy(int meanCapacity, double capacityStdDev, int minCapacity, int maxCapacity,
 			boolean skipSunday, Mode mode) {
@@ -87,28 +88,26 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	/**
 	 * Assign parcels to the given delivery person.
 	 *
-	 * @param dc the distribution center
-	 * @param person the person
-	 * @param work the work activity
+	 * @param deliveries        the deliveries
+	 * @param person            the person
+	 * @param currentTime       the current time
+	 * @param remainingWorkTime the remaining work time
 	 * @return the list of assigned parcels
 	 */
-	
 	@Override
 	public List<DeliveryActivityBuilder> assignParcels(Collection<DeliveryActivityBuilder> deliveries,
 			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime) {
-		
+
 		if (skipSunday && isSunday(currentTime) || startsAfter1800(currentTime)) {
 			return Arrays.asList();
 		}
-		
+
 		if (currentTime.isAfter(lastPlan.plusHours(1))) {
 			planZoneTour(person.getDistributionCenter(), person, deliveries, currentTime);
 		}
 
-		
 		ArrayList<DeliveryActivityBuilder> assigned = new ArrayList<>();
 
-		
 		int capacity = selectCapacity(person);
 		float duration = 0;
 		Zone lastZone = person.getDistributionCenter().getZone();
@@ -118,22 +117,23 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			DeliveryActivityBuilder delivery = parcelTour.get(i);
 			duration += travelTime(person, lastZone, delivery.getZone(), time);
 			duration += delivery.estimateDuration(person.getEfficiency());
-			
+
 			time = currentTime.plusMinutes(round(duration));
-			
-			float withReturn = duration + travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time);
+
+			float withReturn = duration
+					+ travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time);
 			if (floor(withReturn) <= remainingWorkTime.toMinutes()) {
 				assigned.add(delivery);
 			} else {
 				break;
 			}
-			
+
 		}
-		
+
 		parcelTour.removeAll(assigned);
 
 		return assigned;
-		
+
 	}
 
 	/**
