@@ -33,13 +33,14 @@ public class DeliveryAttemptsPolicy implements ParcelDeliveryPolicy<PrivateParce
 	 */
 	@Override
 	public boolean updateParcelDelivery(PrivateParcel parcel, Time currentTime) {
+		boolean result = this.policy.updateParcelDelivery(parcel, currentTime);
 		
-		if (parcel.getDeliveryAttempts() >= this.maxAttempts -1) {
+		if (parcel.getDeliveryAttempts() >= this.maxAttempts) {
 			parcel.setDestinationType(PACK_STATION);
 			return true;
 		}
 		
-		return false;
+		return result;
 	}
 
 }

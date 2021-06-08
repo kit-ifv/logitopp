@@ -23,7 +23,7 @@ import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 public class BaseDeliveryPolicyTest {
 
-	private ParcelDeliveryPolicy policy;
+	private ParcelDeliveryPolicy<PrivateParcel> policy;
 	private PrivateParcel parcelHome;
 	private PrivateParcel parcelWork;
 	private PrivateParcel parcelPackStation;
