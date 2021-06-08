@@ -1,7 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.person;
 
 import edu.kit.ifv.mobitopp.simulation.Person;
-import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 
 /**
  * The Interface DeliveryEmploymentStrategy.

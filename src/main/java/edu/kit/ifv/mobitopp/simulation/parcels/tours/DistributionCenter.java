@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels;
+package edu.kit.ifv.mobitopp.simulation.parcels.tours;
 
 import static java.util.stream.Collectors.toList;
 
@@ -12,6 +12,7 @@ import edu.kit.ifv.mobitopp.simulation.Person;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;

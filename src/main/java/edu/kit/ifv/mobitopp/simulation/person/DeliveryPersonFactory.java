@@ -20,7 +20,7 @@ import edu.kit.ifv.mobitopp.simulation.SimulationPersonFactory;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryReschedulingStrategy;
 import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.tour.TourFactory;
 import edu.kit.ifv.mobitopp.time.Time;
 

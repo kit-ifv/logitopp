@@ -5,6 +5,7 @@ import java.util.Arrays;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.result.Category;
 import edu.kit.ifv.mobitopp.result.Results;
+import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -80,11 +81,6 @@ public class DeliveryResults {
 		this.logOrder(parcel.getOId(), parcel.getPerson().getOid() + "", parcel.getDestinationType().name(),
 				parcel.getPlannedArrivalDate().getDay() + "", parcel.getDistributionCenter().getName(),
 				parcel.getDeliveryService());
-	}
-
-	public void logOrder(BaseParcel parcel) {
-		this.logOrder(parcel.getOId(), "-1", "BUSINESS", parcel.getPlannedArrivalDate().getDay() + "",
-				parcel.getDistributionCenter().getName(), parcel.getDeliveryService());
 	}
 
 	private void logOrder(int pid, String recipient, String destination, String day, String distributioneCneter,

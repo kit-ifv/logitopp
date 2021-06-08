@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels;
+package edu.kit.ifv.mobitopp.simulation.parcels.tours;
 
 import java.util.Collection;
 import java.util.List;

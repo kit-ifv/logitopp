@@ -6,6 +6,7 @@ import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType;
+import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -47,6 +48,7 @@ public class PrivateParcel extends BaseParcel {
 		this.setPerson(person);
 
 		this.logChange(Time.start, null, false);
+		this.results.logOrder(this);
 	}
 
 	@Override

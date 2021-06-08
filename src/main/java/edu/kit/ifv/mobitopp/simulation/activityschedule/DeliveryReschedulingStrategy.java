@@ -14,7 +14,7 @@ import edu.kit.ifv.mobitopp.simulation.ModifiableActivitySchedule;
 import edu.kit.ifv.mobitopp.simulation.ReschedulingStrategy;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.ActivityAsLinkedListElement;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;

@@ -30,7 +30,6 @@ import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.parcels.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.orders.DefaultParcelOrderModel;
@@ -40,6 +39,7 @@ import edu.kit.ifv.mobitopp.simulation.parcels.orders.RandomDeliveryDateSelector
 import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedDeliveryServiceSelector;
 import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedDistributionCenterSelector;
 import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedParcelDestinationSelector;
+import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 

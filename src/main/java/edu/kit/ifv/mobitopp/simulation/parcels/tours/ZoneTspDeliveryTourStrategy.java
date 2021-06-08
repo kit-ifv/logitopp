@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels;
+package edu.kit.ifv.mobitopp.simulation.parcels.tours;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.round;
