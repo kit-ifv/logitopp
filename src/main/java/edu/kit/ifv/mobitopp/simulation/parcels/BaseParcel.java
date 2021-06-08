@@ -168,9 +168,19 @@ public abstract class BaseParcel implements IParcel {
 		return "Parcel(" + this.getOId() + ")  to " + String.valueOf(this.getLocation()) + " at "
 				+ this.getPlannedArrivalDate().toString();
 	}
+	
 
 	@Override
 	public boolean canBeDeliveredTogether(IParcel other) {
+		if (other == null) {
+			return this.couldBeDeliveredWith(other);
+		} else {
+			return this.couldBeDeliveredWith(other) && other.couldBeDeliveredWith(this);
+		}
+	}
+	
+	@Override
+	public boolean couldBeDeliveredWith(IParcel other) {
 		if (other == this) {
 			return true;
 		}
@@ -180,6 +190,6 @@ public abstract class BaseParcel implements IParcel {
 		}
 
 		return other.getLocation().equals(this.getLocation());
-
 	}
+	
 }

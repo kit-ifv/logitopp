@@ -18,7 +18,6 @@ public class CollectionsUtilTest {
 		BiPredicate<Integer, Integer> equals = (i,j) -> (i+j)%2 == 0;
 		Collection<List<Integer>> result = groupBy(list, equals);
 		
-		System.out.println(result);
 		verify(list, equals, result);
 	}
 	

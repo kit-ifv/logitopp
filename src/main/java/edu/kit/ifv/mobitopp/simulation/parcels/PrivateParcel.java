@@ -148,16 +148,9 @@ public class PrivateParcel extends BaseParcel {
 	}
 
 	@Override
-	public boolean canBeDeliveredTogether(IParcel other) {
-//		if (other == this) {
-//			return true;
-//		}
-//
-//		if (other == null) {
-//			return false;
-//		}
+	public boolean couldBeDeliveredWith(IParcel other) {
 
-		if (super.canBeDeliveredTogether(other)) {
+		if (super.couldBeDeliveredWith(other)) {
 			
 			if (other instanceof PrivateParcel) {
 				PrivateParcel that = (PrivateParcel) other;
@@ -167,10 +160,12 @@ public class PrivateParcel extends BaseParcel {
 					switch (this.getDestinationType()) {
 						case HOME: 
 							return this.getPerson().household().getOid() == that.getPerson().household().getOid();
+							
 						case PACK_STATION:
 							return true;
 						case WORK:
 							return true;
+							
 						default:
 							return false;
 					

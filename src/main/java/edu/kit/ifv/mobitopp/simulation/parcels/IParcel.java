@@ -30,6 +30,7 @@ public interface IParcel {
 	public Zone getZone();
 	public ZoneAndLocation getZoneAndLocation();
 	
+	public boolean couldBeDeliveredWith(IParcel other);
 	public boolean canBeDeliveredTogether(IParcel other);
 	
 	public boolean tryDelivery(Time currentTime, DeliveryPerson deliveryGuy);	
@@ -38,5 +39,9 @@ public interface IParcel {
 	public void unloaded(Time currentTime, DeliveryPerson deliveryGuy);
 	
 	public RecipientType getRecipientType();
+
+	
+
+	
 	
 }

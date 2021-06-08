@@ -134,7 +134,7 @@ public class DistributionCenter {
 
 		List<IParcel> available = getAvailableParcels(currentTime);
 
-		CollectionsUtil.groupBy(available, IParcel::canBeDeliveredTogether)
+		CollectionsUtil.groupBy(available, IParcel::couldBeDeliveredWith)
 				.forEach(pcls -> deliveries.add(new DeliveryActivityBuilder().addParcels(pcls)));
 
 		return deliveries;
