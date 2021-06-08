@@ -1,5 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
+import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
+
 /**
  * The Enum ParcelState describes the delivery life cycle of a parcel: Undefined
  * - on delivery - returning - undefined. Delivered - delivered.
@@ -20,7 +22,7 @@ public enum ParcelState {
 
 	/**
 	 * The state undefined describes a {@link IParcel} returning to the
-	 * {@link DistributionCenter} as it could ot be delivered.
+	 * {@link DistributionCenter} as it could not be delivered.
 	 */
 	RETURNING {
 
