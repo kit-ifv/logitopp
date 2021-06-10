@@ -51,7 +51,7 @@ public class PrivateParcel extends BaseParcel {
 		this.setPerson(person);
 
 		this.logChange(Time.start, null, false);
-		this.results.logOrder(this);
+		this.results.logPrivateOrder(this);
 	}
 
 	@Override
@@ -175,6 +175,9 @@ public class PrivateParcel extends BaseParcel {
 					return false;
 				}
 				
+				
+			} else if (other instanceof BusinessParcel) {
+				return this.getDestinationType().equals(WORK);				
 				
 			} else {
 				return false;

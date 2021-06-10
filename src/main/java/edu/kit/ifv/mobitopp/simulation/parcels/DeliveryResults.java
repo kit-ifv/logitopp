@@ -15,8 +15,10 @@ import edu.kit.ifv.mobitopp.time.Time;
  */
 public class DeliveryResults {
 
-	private final static Category resultCategoryState = createResultCategoryState();
-	private final static Category resultCategoryOrder = createResultCategoryOrder();
+	private final static Category resultCategoryStatePrivate = createResultCategoryStatePrivate();
+	private final static Category resultCategoryStateBusines = createResultCategoryStatePrivate();
+	private final static Category resultCategoryPrivateOrder = createResultCategoryPrivateOrder();
+	private final static Category resultCategoryBusinessOrder = createResultCategoryBusinessOrder();
 	private final static Category resultCategoryEmployee = createResultCategoryEmployee();
 	private final static Category resultCategoryRescheduling = createResultCategoryRescheduling();
 	private final static Category resultCategoryNeighbordeliveries = createResultCategoryNeighborDeliveries();
@@ -33,6 +35,9 @@ public class DeliveryResults {
 		this.results = results;
 	}
 
+	
+	
+	
 	/**
 	 * Log a parcels new state.
 	 *
@@ -57,7 +62,7 @@ public class DeliveryResults {
 		msg += ((deliveryGuy != null) ? deliveryGuy.currentActivity().zone().getId() : "NULL") + "; ";
 		msg += parcel.getZone().getId();
 
-		this.results.write(resultCategoryState, msg);
+		this.results.write(resultCategoryStatePrivate, msg);
 	}
 
 	/**
@@ -65,25 +70,55 @@ public class DeliveryResults {
 	 *
 	 * @return the category
 	 */
-	public static Category createResultCategoryState() {
+	public static Category createResultCategoryStatePrivate() {
 		return new Category("parcel-states",
 				Arrays.asList("Time", "ParcelID", "RecipientID", "DestinationType", "State", "IsDeliveryAttempt",
 						"DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "RecipientType",
 						"CurrentDeliveryGuyZone", "ParcelDestinationZone"));
 	}
 
+	
+	public void logChange(BusinessParcel parcel, DeliveryPerson deliveryGuy, Time currentTime, boolean isAttempt) {
+		String msg = "";
+		msg += currentTime.toString() + "; ";
+		msg += parcel.getOId() + "; ";
+		msg += parcel.getZone().getId().getExternalId() + "; ";
+		msg += parcel.getLocation().forLogging() + "; ";
+		msg += parcel.getState().name() + "; ";
+		msg += isAttempt + "; ";
+		msg += ((deliveryGuy != null) ? deliveryGuy.getOid() : "NULL") + "; ";
+		msg += parcel.getDistributionCenter().getName() + "; ";
+		msg += parcel.getDeliveryAttempts() + "; ";
+		msg += String.valueOf(parcel.getDeliveryTime()) + ";";
+		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + "; ";
+		msg += ((deliveryGuy != null) ? deliveryGuy.currentActivity().zone().getId() : "NULL") + "; ";
+		msg += parcel.getZone().getId();
+
+		this.results.write(resultCategoryStateBusines, msg);
+	}
+
+	
+	public static Category createResultCategoryStateBusiness() {
+		return new Category("business-parcel-states",
+				Arrays.asList("Time", "ParcelID", "ZoneId", "Location", "State", "IsDeliveryAttempt",
+						"DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "RecipientType",
+						"CurrentDeliveryGuyZone", "ParcelDestinationZone"));
+	}
+	
+	
+	
 	/**
 	 * Logs the order of the given parcel.
 	 *
 	 * @param parcel the ordered parcel
 	 */
-	public void logOrder(PrivateParcel parcel) {
-		this.logOrder(parcel.getOId(), parcel.getPerson().getOid() + "", parcel.getDestinationType().name(),
+	public void logPrivateOrder(PrivateParcel parcel) {
+		this.logPrivateOrder(parcel.getOId(), parcel.getPerson().getOid() + "", parcel.getDestinationType().name(),
 				parcel.getPlannedArrivalDate().getDay() + "", parcel.getDistributionCenter().getName(),
 				parcel.getDeliveryService());
 	}
 
-	private void logOrder(int pid, String recipient, String destination, String day, String distributioneCneter,
+	private void logPrivateOrder(int pid, String recipient, String destination, String day, String distributioneCneter,
 			String service) {
 		String msg = "";
 
@@ -94,19 +129,57 @@ public class DeliveryResults {
 		msg += distributioneCneter + "; ";
 		msg += service;
 
-		this.results.write(resultCategoryOrder, msg);
+		this.results.write(resultCategoryPrivateOrder, msg);
 	}
 
 	/**
-	 * Creates the result category order for parcel-orders results.
+	 * Creates the result category order for private parcel-orders results.
 	 *
 	 * @return the category
 	 */
-	public static Category createResultCategoryOrder() {
+	public static Category createResultCategoryPrivateOrder() {
 		return new Category("parcel-orders", Arrays.asList("ParcelID", "RecipientID", "DestinationType", "ArrivalDay",
 				"DistributionCenter", "DeliveryService"));
 	}
+	
+	
+	
+	
+	
+	public void logBusinessOrder(BusinessParcel parcel) {
+		this.logBusinessOrder(parcel.getOId(), parcel.getZone().getId().getExternalId(), parcel.getLocation().forLogging(),
+				parcel.getPlannedArrivalDate().getDay() + "", parcel.getDistributionCenter().getName(),
+				parcel.getDeliveryService());
+	}
 
+	private void logBusinessOrder(int pid, String zoneId, String location, String day, String distributioneCneter,
+			String service) {
+		String msg = "";
+
+		msg += pid + "; ";
+		msg += zoneId + "; ";
+		msg += location + "; ";
+		msg += day + "; ";
+		msg += distributioneCneter + "; ";
+		msg += service;
+
+		this.results.write(resultCategoryBusinessOrder, msg);
+	}
+	
+	/**
+	 * Creates the result category order for private parcel-orders results.
+	 *
+	 * @return the category
+	 */
+	public static Category createResultCategoryBusinessOrder() {
+		return new Category("parcel-orders", Arrays.asList("ParcelID", "ZoneId", "Location", "ArrivalDay",
+				"DistributionCenter", "DeliveryService"));
+	}
+
+	
+	
+	
+	
 	/**
 	 * Logs the given employee of the given distribution center.
 	 *
@@ -134,6 +207,10 @@ public class DeliveryResults {
 				Arrays.asList("PeronID", "DistributionCenter", "Organization", "EmploymentType"));
 	}
 
+	
+	
+	
+	
 	/**
 	 * Logs a delivery rescheduling event.
 	 *
@@ -168,6 +245,9 @@ public class DeliveryResults {
 	}
 	
 	
+	
+	
+	
 	public void logNeighborDelivery(int id, Zone zone, Time currentTime, boolean success, int numOfneighbors, int checkedNeighbors) {
 		String msg = "";
 		
@@ -182,7 +262,6 @@ public class DeliveryResults {
 		results.write(resultCategoryNeighbordeliveries, msg);
 	}
 	
-
 	private static Category createResultCategoryNeighborDeliveries() {
 		return new Category("neighbor-deliveries", Arrays.asList("Delivery", "Zone", "Time", "Day", "Success", "NumberOfNeighbors", "CheckedNeighbors"));
 	}

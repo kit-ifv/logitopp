@@ -1,16 +1,22 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
+import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
-import lombok.AllArgsConstructor;
+import lombok.Setter;
 
-@AllArgsConstructor
+@Setter
 public class ParcelPolicyProvider {
 
-	private final ParcelDeliveryPolicy<PrivateParcel> privateParcelPolicy;
+	private ParcelDeliveryPolicy<PrivateParcel> privateParcelPolicy = new DummyDeliveryPolicy<>(RecipientType.PERSONAL);
+	private ParcelDeliveryPolicy<BusinessParcel> businessParcelPolicy = new DummyDeliveryPolicy<>(RecipientType.BUSINESS);
 	
 	
 	public ParcelDeliveryPolicy<PrivateParcel> forPrivate() {
 		return this.privateParcelPolicy;
+	}
+	
+	public ParcelDeliveryPolicy<BusinessParcel> forBusiness() {
+		return this.businessParcelPolicy;
 	}
 	
 	
