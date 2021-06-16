@@ -1,6 +1,6 @@
 ProbabilityClass edu.kit.ifv.mobitopp.simulation.parcels.orders.parcelnumber.generated.GeneratedBasicNumberOfParcelsSelector
 
-Interface        edu.kit.ifv.mobitopp.simulation.parcels.orders.NumberOfParcelsSelector
+Interface        edu.kit.ifv.mobitopp.simulation.parcels.orders.NumberOfParcelsSelector<edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson>
 Signature        select(edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson recipient,
 							double randomNumber
 				 ):int

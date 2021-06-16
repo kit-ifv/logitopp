@@ -6,7 +6,6 @@ import static edu.kit.ifv.mobitopp.simulation.parcel.orders.RandomDeliveryDateSe
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
-import static edu.kit.ifv.mobitopp.simulation.parcels.orders.RandomDeliveryDateSelector.MINUTE_PRECISION;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -30,15 +29,10 @@ import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.DefaultParcelOrderModel;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.NormalDistributedNumberOfParcelsSelector;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelOrderModel;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.RandomDeliveryDateSelector;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedDeliveryServiceSelector;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedDistributionCenterSelector;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedParcelDestinationSelector;
+import edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelOrderModelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -136,7 +130,7 @@ public class DefaultParcelOrderModelTest {
 
 	@Test
 	public void noWorkPersonDefaultModel() {
-		ParcelOrderModel model = new DefaultParcelOrderModel(centers);
+		ParcelOrderModel<PickUpParcelPerson> model = ParcelOrderModelBuilder.defaultPrivateParcelModel(centers, results);
 		
 		List<Collection<PrivateParcel>> orders = generateNParcels(model, noWorkPerson, 10);
 		
@@ -156,7 +150,7 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void workInsidePersonDefaultModel() {
-		ParcelOrderModel model = new DefaultParcelOrderModel(centers);
+		ParcelOrderModel<PickUpParcelPerson> model = ParcelOrderModelBuilder.defaultPrivateParcelModel(centers, results);
 		
 		List<Collection<PrivateParcel>> orders = generateNParcels(model, workInsidePerson, 10);
 		
@@ -175,7 +169,7 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void workOutsidePersonDefaultModel() {
-		ParcelOrderModel model = new DefaultParcelOrderModel(centers);
+		ParcelOrderModel<PickUpParcelPerson> model = ParcelOrderModelBuilder.defaultPrivateParcelModel(centers, results);
 		
 		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
@@ -194,7 +188,7 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void workOutsidePersonDefaultModelWithZoneFilter() {
-		ParcelOrderModel model = new DefaultParcelOrderModel(centers, workZoneFilter);
+		ParcelOrderModel<PickUpParcelPerson> model = ParcelOrderModelBuilder.defaultPrivateParcelModel(centers, workZoneFilter, results);
 		
 		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
@@ -214,14 +208,14 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void customModelStepsNoWork() {
-		ParcelOrderModel model = new DefaultParcelOrderModel(
-			new NormalDistributedNumberOfParcelsSelector(5.0, 2.0, 2, 7),
-			new ShareBasedParcelDestinationSelector(workZoneFilter),
-			new ShareBasedDistributionCenterSelector(sharesCenterA),
-			new ShareBasedDeliveryServiceSelector(sharesServiceB),
-			new RandomDeliveryDateSelector(Time.start.plusDays(1), Time.start.plusDays(4), MINUTE_PRECISION)
-		);
-		
+		ParcelOrderModel<PickUpParcelPerson> model = ParcelOrderModelBuilder.forPrivateParcels(results)
+																			.useNormalDistributionNumberSelector(5.0, 2.0, 2, 7)
+																			.equalParcelDestinationSelection(workZoneFilter)
+																			.customSharesDistributionCenterSelection(sharesCenterA)
+																			.shareBasedDeliveryServiceSelection(sharesServiceB)
+																			.randomDeliveryMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+																			.build();
+				
 		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
 		for(Collection<PrivateParcel> order : orders) {
@@ -246,14 +240,14 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void customModelStepsWorkInside() {
-		ParcelOrderModel model = new DefaultParcelOrderModel(
-			new NormalDistributedNumberOfParcelsSelector(5.0, 2.0, 2, 7),
-			new ShareBasedParcelDestinationSelector(onlyHomeShares, workZoneFilter),
-			new ShareBasedDistributionCenterSelector(sharesCenterA),
-			new ShareBasedDeliveryServiceSelector(sharesServiceB),
-			new RandomDeliveryDateSelector(Time.start.plusDays(1), Time.start.plusDays(4), MINUTE_PRECISION)
-		);
-		
+		ParcelOrderModel<PickUpParcelPerson> model = ParcelOrderModelBuilder.forPrivateParcels(results)
+				.useNormalDistributionNumberSelector(5.0, 2.0, 2, 7)
+				.shareBasedParcelDestinationSelection(onlyHomeShares, workZoneFilter)
+				.customSharesDistributionCenterSelection(sharesCenterA)
+				.shareBasedDeliveryServiceSelection(sharesServiceB)
+				.randomDeliveryMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.build();
+
 		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
 		for(Collection<PrivateParcel> order : orders) {
@@ -280,13 +274,13 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void customModelStepsWorkOutside() {
-		ParcelOrderModel model = new DefaultParcelOrderModel(
-			new NormalDistributedNumberOfParcelsSelector(5.0, 2.0, 2, 7),
-			new ShareBasedParcelDestinationSelector(workZoneFilter),
-			new ShareBasedDistributionCenterSelector(sharesCenterA),
-			new ShareBasedDeliveryServiceSelector(sharesServiceB),
-			new RandomDeliveryDateSelector(Time.start.plusDays(1), Time.start.plusDays(4), MINUTE_PRECISION)
-		);
+		ParcelOrderModel<PickUpParcelPerson> model = ParcelOrderModelBuilder.forPrivateParcels(results)
+				.useNormalDistributionNumberSelector(5.0, 2.0, 2, 7)
+				.equalParcelDestinationSelection(workZoneFilter)
+				.customSharesDistributionCenterSelection(sharesCenterA)
+				.shareBasedDeliveryServiceSelection(sharesServiceB)
+				.randomDeliveryMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.build();
 		
 		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
@@ -310,11 +304,11 @@ public class DefaultParcelOrderModelTest {
 		
 	}
 	
-	private List<Collection<PrivateParcel>> generateNParcels(ParcelOrderModel model, PickUpParcelPerson person, int n) {
+	private List<Collection<PrivateParcel>> generateNParcels(ParcelOrderModel<PickUpParcelPerson> model, PickUpParcelPerson person, int n) {
 		List<Collection<PrivateParcel>> parcels = new ArrayList<>();
 		
 		for(int i = 0; i < n; i++) {
-			parcels.add(model.createParcelOrders(person, results));
+			parcels.add(model.createParcelOrders(person).stream().map(p -> (PrivateParcel) p).collect(Collectors.toList()));
 		}
 		
 		return parcels;

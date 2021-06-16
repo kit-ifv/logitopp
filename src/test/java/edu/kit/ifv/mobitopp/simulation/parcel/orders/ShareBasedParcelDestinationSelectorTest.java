@@ -20,8 +20,9 @@ import org.junit.jupiter.api.Test;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelDestinationSelector;
+import edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelOrderStep;
 import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedParcelDestinationSelector;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
@@ -61,7 +62,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void equalSharesWorkingInside() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(workZoneFilter);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(workZoneFilter);
 		
 		Random rand = new Random(42);
 		
@@ -74,7 +75,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void equalSharesWorkingOutside() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(workZoneFilter);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(workZoneFilter);
 		
 		Random rand = new Random(42);
 		
@@ -87,7 +88,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void equalSharesNotWorking() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(workZoneFilter);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(workZoneFilter);
 		
 		Random rand = new Random(42);
 		
@@ -100,7 +101,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void customWorkSharesWorkingInside() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(onlyWorkShares, workZoneFilter);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(onlyWorkShares, workZoneFilter);
 		
 		Random rand = new Random(42);
 		
@@ -113,7 +114,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void customHomeSharesWorkingInside() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(onlyHomeShares, workZoneFilter);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(onlyHomeShares, workZoneFilter);
 		
 		Random rand = new Random(42);
 		
@@ -126,7 +127,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void customStationSharesWorkingInside() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(onlyStationShares, workZoneFilter);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(onlyStationShares, workZoneFilter);
 		
 		Random rand = new Random(42);
 		
@@ -139,7 +140,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void customHomeSharesWorkingOutside() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(onlyHomeShares, workZoneFilter);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(onlyHomeShares, workZoneFilter);
 		
 		Random rand = new Random(42);
 		
@@ -152,7 +153,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void customStationSharesWorkingOutside() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(onlyStationShares, workZoneFilter);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(onlyStationShares, workZoneFilter);
 		
 		Random rand = new Random(42);
 		
@@ -165,7 +166,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void customHomeSharesNotWorking() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(onlyHomeShares, workZoneFilter);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(onlyHomeShares, workZoneFilter);
 		
 		Random rand = new Random(42);
 		
@@ -178,7 +179,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void customStationSharesNotWorking() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(onlyStationShares, workZoneFilter);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(onlyStationShares, workZoneFilter);
 		
 		Random rand = new Random(42);
 		
@@ -191,7 +192,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void equalSharesNoZoneFilter() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector();
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector();
 		
 		Random rand = new Random(42);
 		
@@ -216,7 +217,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void customHomeSharesNoZoneFilter() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(onlyHomeShares);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(onlyHomeShares);
 		
 		Random rand = new Random(42);
 		
@@ -241,7 +242,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void customStationSharesNoZoneFilter() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(onlyStationShares);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(onlyStationShares);
 		
 		Random rand = new Random(42);
 		
@@ -266,7 +267,7 @@ public class ShareBasedParcelDestinationSelectorTest {
 	
 	@Test
 	public void customWorkSharesNoZoneFilter() {
-		ParcelDestinationSelector selector = new ShareBasedParcelDestinationSelector(onlyWorkShares);
+		ParcelOrderStep<ParcelDestinationType> selector = new ShareBasedParcelDestinationSelector(onlyWorkShares);
 		
 		Random rand = new Random(42);
 		
@@ -283,10 +284,12 @@ public class ShareBasedParcelDestinationSelectorTest {
 		assertFalse(types.contains(PACK_STATION));
 	}
 	
-	private List<ParcelDestinationType> selectNTypes(ParcelDestinationSelector selector, PickUpParcelPerson person, int n, Random rand) {
+	private List<ParcelDestinationType> selectNTypes(ParcelOrderStep<ParcelDestinationType> selector, PickUpParcelPerson person, int n, Random rand) {
 		List<ParcelDestinationType> types = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
-			ParcelDestinationType type = selector.select(person, 1, emptyList(), rand.nextDouble());
+			ParcelBuilder builder = new ParcelBuilder();
+			builder.setPerson(person);
+			ParcelDestinationType type = selector.select(builder, emptyList(), 1, rand.nextDouble());
 			types.add(type);
 		}
 		

@@ -1,21 +1,18 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.orders;
 
-import edu.kit.ifv.mobitopp.simulation.Person;
-import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
-
 /**
  * The Interface for NumberOfParcelsSelectors.
- * A model for selecting the number of parcels, a person will order during the simulation.
+ * A model for selecting the number of parcels, a generic recipient will order during the simulation.
  */
-public interface NumberOfParcelsSelector {
+public interface NumberOfParcelsSelector<R> {
 
 	/**
-	 * Selects the number of parcels, the given {@link Person} orders.
+	 * Selects the number of parcels, the given recipient orders.
 	 *
-	 * @param person the person
+	 * @param recipient the recipient
 	 * @param randomNumber a random number
 	 * @return the number of parcels
 	 */
-	public int select(PickUpParcelPerson person, double randomNumber);
+	public int select(R recipient, double randomNumber);
 	
 }

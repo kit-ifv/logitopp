@@ -1,9 +1,9 @@
 ProbabilityClass edu.kit.ifv.mobitopp.simulation.parcels.orders.destination.generated.GeneratedBasicParcelDestinationSelector
 
-Interface        edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelDestinationSelector
-Signature        select(edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson recipient,
+Interface        edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelOrderStep<edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType>
+Signature        select(edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder parcel,
+							java.util.Collection<edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder> otherParcels,
 							int numOfParcels,
-							java.util.Collection<edu.kit.ifv.mobitopp.simulation.parcels.Parcel> otherParcels,
 							double randomNumber):edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType
 
 UtilityClass     edu.kit.ifv.mobitopp.simulation.parcels.orders.destination.generated.GeneratedBasicParcelDestinationUtility

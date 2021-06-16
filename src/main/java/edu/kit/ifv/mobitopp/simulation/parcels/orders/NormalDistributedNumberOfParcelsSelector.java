@@ -7,14 +7,13 @@ import static java.lang.Math.round;
 import java.util.Random;
 
 import edu.kit.ifv.mobitopp.simulation.Person;
-import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 
 /**
- * The Class NormalDistributedNumberOfParcelsSelector is a {@link NumberOfParcelsSelector}.
+ * The Class NormalDistributedNumberOfParcelsSelector is a {@link NumberOfPrivateParcelsSelector}.
  * It selects a number drawn from a capped normal distribution.
  */
-public class NormalDistributedNumberOfParcelsSelector implements NumberOfParcelsSelector {
+public class NormalDistributedNumberOfParcelsSelector<R> implements NumberOfParcelsSelector<R> {
 
 	private double mean;
 	private double stdDev;
@@ -74,12 +73,12 @@ public class NormalDistributedNumberOfParcelsSelector implements NumberOfParcels
 	 * Selects the number of parcels, the given {@link Person} orders
 	 * from the normal distribution.
 	 *
-	 * @param person the person
+	 * @param recipient the recipient
 	 * @param randomNumber a random number
 	 * @return the selected number of parcels
 	 */
 	@Override
-	public int select(PickUpParcelPerson person, double randomNumber) {
+	public int select(R recipient, double randomNumber) {
 		double standardGauss = new Random((long) (randomNumber * Long.MAX_VALUE)).nextGaussian();
 		
 		double scaledGauss = stdDev*standardGauss + mean;

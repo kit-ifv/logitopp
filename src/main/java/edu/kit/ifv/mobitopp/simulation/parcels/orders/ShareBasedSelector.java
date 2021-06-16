@@ -6,6 +6,7 @@ import static java.util.function.Function.identity;
 import java.util.Collection;
 import java.util.Map;
 
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
 
 /**
@@ -14,7 +15,7 @@ import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
  *
  * @param <T> the generic type of the alternatives to be selected
  */
-public class ShareBasedSelector<T> {
+public class ShareBasedSelector<T> implements ParcelOrderStep<T> {
 
 	private final Map<T, Double> probabilities;
 
@@ -68,6 +69,12 @@ public class ShareBasedSelector<T> {
 		DiscreteRandomVariable<T> centerDistribution = new DiscreteRandomVariable<>(probabilities);
 
 		return centerDistribution.realization(randomNumber);
+	}
+
+	@Override
+	public T select(ParcelBuilder parcel, Collection<ParcelBuilder> otherParcels, int numOfParcels,
+			double randomNumber) {
+		return this.select(randomNumber);
 	}
 
 }

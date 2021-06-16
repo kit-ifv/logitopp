@@ -1,16 +1,12 @@
 buildscript {
     repositories {
-      
-        maven { url 'http://nexus.ifv.kit.edu/repository/maven-central/' }
-        maven { url 'https://nexus.ifv.kit.edu/repository/maven-releases/' }
-        maven { url 'https://nexus.ifv.kit.edu/repository/maven-snapshots/' }
-          mavenLocal()
+        mavenLocal()
         mavenCentral()
         jcenter()
     }
-    //dependencies {
-	//  classpath "edu.kit.ifv.codegen.gradle.plugin:code-gen-gradle-plugin:latest.integration"
-  	//}
+//    dependencies {
+//	  classpath "edu.kit.ifv.codegen.gradle.plugin:code-gen-gradle-plugin:latest.integration"
+//  	}
 }
 
 
@@ -19,8 +15,6 @@ plugins {
     id 'eclipse'
     id 'maven'
     id 'signing'
-    id "com.jfrog.bintray" version "1.8.5"
-    id "com.jfrog.artifactory" version "4.15.2"
     id "maven-publish"
     id 'jacoco'
 }

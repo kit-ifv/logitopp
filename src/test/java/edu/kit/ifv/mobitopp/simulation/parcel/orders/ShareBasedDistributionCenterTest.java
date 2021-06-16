@@ -12,8 +12,8 @@ import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.DistributionCenterSelector;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedDistributionCenterSelector;
+import edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelOrderStep;
+import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedSelector;
 import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 
 public class ShareBasedDistributionCenterTest {
@@ -37,8 +37,8 @@ public class ShareBasedDistributionCenterTest {
 	
 	@Test
 	public void equalShares() {
-		DistributionCenterSelector selector =
-			new ShareBasedDistributionCenterSelector(centers);
+		ParcelOrderStep<DistributionCenter> selector =
+			new ShareBasedSelector<>(centers);
 		
 		Random rand = new Random(42);
 		List<DistributionCenter> selected = selectNCenters(selector, 10, rand);
@@ -50,8 +50,8 @@ public class ShareBasedDistributionCenterTest {
 	
 	@Test
 	public void customSharesFavorA() {
-		DistributionCenterSelector selector =
-			new ShareBasedDistributionCenterSelector(sharesA);
+		ParcelOrderStep<DistributionCenter> selector =
+			new ShareBasedSelector<>(sharesA);
 		
 		Random rand = new Random(42);
 		List<DistributionCenter> selected = selectNCenters(selector, 10, rand);
@@ -63,8 +63,8 @@ public class ShareBasedDistributionCenterTest {
 	
 	@Test
 	public void customSharesFavorB() {
-		DistributionCenterSelector selector =
-			new ShareBasedDistributionCenterSelector(sharesB);
+		ParcelOrderStep<DistributionCenter> selector =
+			new ShareBasedSelector<>(sharesB);
 		
 		Random rand = new Random(42);
 		List<DistributionCenter> selected = selectNCenters(selector, 10, rand);
@@ -74,10 +74,10 @@ public class ShareBasedDistributionCenterTest {
 		
 	}
 	
-	private List<DistributionCenter> selectNCenters(DistributionCenterSelector selector, int n, Random rand) {
+	private List<DistributionCenter> selectNCenters(ParcelOrderStep<DistributionCenter> selector, int n, Random rand) {
 		List<DistributionCenter> centers = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
-			centers.add(selector.select(null, 1, null, null, null, null, rand.nextDouble()));
+			centers.add(selector.select(null, null, 1, rand.nextDouble()));
 		}
 		return centers;
 	}

@@ -7,15 +7,17 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityPeriodFixer;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.randomizer.ActivityStartAndDurationRandomizer;
 import edu.kit.ifv.mobitopp.simulation.destinationChoice.DestinationChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
+import edu.kit.ifv.mobitopp.simulation.opportunities.Opportunity;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelOrderModel;
+import edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelOrderModelBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPersonFactory;
 import edu.kit.ifv.mobitopp.simulation.person.PersonState;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
@@ -23,19 +25,18 @@ import edu.kit.ifv.mobitopp.simulation.person.PublicTransportBehaviour;
 import edu.kit.ifv.mobitopp.simulation.person.TripFactory;
 import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
 
-
 /**
  * The Class DemandSimulatorDelivery extends the DemandSimulatorPassenger by
  * introducing parcel orders and delivery persons.
  */
 public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 
-	private final ParcelOrderModel parcelOrderModel;
+	private final ParcelOrderModel<PickUpParcelPerson> privateOrderModel;
 	private final Collection<IParcel> parcels;
 	private final DeliveryPersonFactory deliveryPersonFactory;
 	private final Predicate<Person> personFilter;
 	private final DeliveryResults deliveryResults;
-	
+	private final ParcelOrderModel<Opportunity> businessOrderModel;
 
 	/**
 	 * Instantiates a new demand simulator delivery.
@@ -53,27 +54,54 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param personFactory              the person factory
 	 * @param parcelOrderModel           the parcel order model
 	 * @param results                    the delivery results
-	 * @param personFilter 				 the person filter do determine which persons should be simulated
+	 * @param personFilter               the person filter do determine which
+	 *                                   persons should be simulated
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
 			final ActivityPeriodFixer activityPeriodFixer,
-			final ActivityStartAndDurationRandomizer activityDurationRandomizer,
-			final TripFactory tripFactory, final ReschedulingStrategy rescheduling,
-			final Set<Mode> modesInSimulation, final PersonState initialState,
+			final ActivityStartAndDurationRandomizer activityDurationRandomizer, final TripFactory tripFactory,
+			final ReschedulingStrategy rescheduling, final Set<Mode> modesInSimulation, final PersonState initialState,
 			final SimulationContext context, final DeliveryPersonFactory personFactory,
-			final ParcelOrderModel parcelOrderModel, final DeliveryResults results, final Predicate<Person> personFilter) {
-		
-		super(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, 
-			  activityDurationRandomizer, tripFactory, rescheduling, modesInSimulation,
-			  initialState, context, personFactory.getDefaultFactory());
-		
-		this.parcelOrderModel = parcelOrderModel;
+			final ParcelOrderModel<PickUpParcelPerson> privateOrderModel,
+			final ParcelOrderModel<Opportunity> businessOrderModel, final DeliveryResults results,
+			final Predicate<Person> personFilter) {
+
+		super(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
+				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory.getDefaultFactory());
+
+		this.privateOrderModel = privateOrderModel;
+		this.businessOrderModel = businessOrderModel;
 		this.parcels = new ArrayList<IParcel>();
 		this.deliveryPersonFactory = personFactory;
 		this.personFilter = personFilter;
 		this.deliveryResults = results;
+	}
 
+	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
+			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
+			final ActivityPeriodFixer activityPeriodFixer,
+			final ActivityStartAndDurationRandomizer activityDurationRandomizer, final TripFactory tripFactory,
+			final ReschedulingStrategy rescheduling, final Set<Mode> modesInSimulation, final PersonState initialState,
+			final SimulationContext context, final DeliveryPersonFactory personFactory,
+			final ParcelOrderModel<Opportunity> businessOrderModel, final DeliveryResults results,
+			final Predicate<Person> personFilter) {
+		this(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
+				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory, ParcelOrderModelBuilder.nullPrivateParcelModel(results),
+				businessOrderModel, results, personFilter);
+	}
+	
+	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
+			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
+			final ActivityPeriodFixer activityPeriodFixer,
+			final ActivityStartAndDurationRandomizer activityDurationRandomizer, final TripFactory tripFactory,
+			final ReschedulingStrategy rescheduling, final Set<Mode> modesInSimulation, final PersonState initialState,
+			final SimulationContext context, final DeliveryPersonFactory personFactory,
+			final DeliveryResults results,
+			final Predicate<Person> personFilter) {
+		this(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
+				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory, ParcelOrderModelBuilder.nullPrivateParcelModel(results),
+				ParcelOrderModelBuilder.nullBusinessParcelOrderModel(context.zoneRepository(), results), results, personFilter);
 	}
 
 	/**
@@ -88,52 +116,64 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param initialState      the initial person state
 	 */
 	@Override
-	protected void initFractionOfHouseholds(EventQueue queue, PublicTransportBehaviour boarder,
-			long seed, PersonListener listener, Set<Mode> modesInSimulation,
-			PersonState initialState) {
-		
-		Function<Person, PickUpParcelPerson> createAgent = p -> createSimulatedPerson(queue,
-				boarder, seed, p, listener, modesInSimulation, initialState);
+	protected void initFractionOfHouseholds(EventQueue queue, PublicTransportBehaviour boarder, long seed,
+			PersonListener listener, Set<Mode> modesInSimulation, PersonState initialState) {
 
-		List<PickUpParcelPerson> ppps = personLoader().households().flatMap(Household::persons)
-				.filter(personFilter).map(createAgent).collect(Collectors.toList());
-		
+		Function<Person, PickUpParcelPerson> createAgent = p -> createSimulatedPerson(queue, boarder, seed, p, listener,
+				modesInSimulation, initialState);
+
+		List<PickUpParcelPerson> ppps = personLoader().households().flatMap(Household::persons).filter(personFilter)
+				.map(createAgent).collect(Collectors.toList());
+
 		createParcelOrders(ppps);
 	}
 
 	private void createParcelOrders(List<PickUpParcelPerson> ppps) {
-		
-		Function<PickUpParcelPerson, Collection<PrivateParcel>> createParcelOrders = p -> createParcelOrder(p);
-		
-		int[] counts = new int[11];
-		ppps.forEach(ppp -> {counts[createParcelOrders.apply(ppp).size()]++;});
 
-		System.out.println("Generated " + this.parcels.size() + " parcels for "	+ ppps.size() + " persons.");
-		
+		Function<PickUpParcelPerson, Collection<IParcel>> createParcelOrders = p -> createParcelOrder(p);
+
+		int[] counts = new int[11];
+		ppps.forEach(ppp -> {
+			counts[createParcelOrders.apply(ppp).size()]++;
+		});
+
+		System.out.println("Generated " + this.parcels.size() + " parcels for " + ppps.size() + " persons.");
+
 		System.out.println("Number of parcels distribution: ");
 		for (int i = 0; i < 11; i++) {
 			System.out.println("Order size " + i + ": " + counts[i]);
+		}
+
+		int[] countsBusiness = new int[11];
+		context().zoneRepository().getZones().forEach(
+				z -> z.getDemandData().opportunities().forEach(o -> countsBusiness[createBusinessOrders(o).size()]++));
+		int sum = IntStream.range(0, countsBusiness.length).map(i -> i * countsBusiness[i]).sum();
+		int amount = IntStream.of(countsBusiness).sum();
+
+		System.out.println("Generated " + sum + " business parcels for " + amount + " opportunities/businesses");
+
+		System.out.println("Number of business parcels distribution: ");
+		for (int i = 0; i < 30; i++) {
+			System.out.println("Order size " + i + ": " + countsBusiness[i]);
 		}
 	}
 
 	/**
 	 * Creates the simulated person.
 	 *
-	 * @param queue the queue
-	 * @param boarder the boarder
-	 * @param seed the seed
-	 * @param p the p
-	 * @param listener the listener
+	 * @param queue             the queue
+	 * @param boarder           the boarder
+	 * @param seed              the seed
+	 * @param p                 the p
+	 * @param listener          the listener
 	 * @param modesInSimulation the modes in simulation
-	 * @param initialState the initial state
+	 * @param initialState      the initial state
 	 * @return the pick up parcel person
 	 */
-	protected PickUpParcelPerson createSimulatedPerson(EventQueue queue,
-			PublicTransportBehaviour boarder, long seed, Person p, PersonListener listener,
-			Set<Mode> modesInSimulation, PersonState initialState) {
-		return deliveryPersonFactory.create(p, queue, simulationOptions(), simulationDays(),
-				modesInSimulation, tourFactory, tripFactory(), initialState, boarder, seed,
-				listener, this.deliveryResults);
+	protected PickUpParcelPerson createSimulatedPerson(EventQueue queue, PublicTransportBehaviour boarder, long seed,
+			Person p, PersonListener listener, Set<Mode> modesInSimulation, PersonState initialState) {
+		return deliveryPersonFactory.create(p, queue, simulationOptions(), simulationDays(), modesInSimulation,
+				tourFactory, tripFactory(), initialState, boarder, seed, listener, this.deliveryResults);
 	}
 
 	/**
@@ -143,8 +183,22 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param p the person
 	 * @return the collection of parcels ordered by the given person
 	 */
-	protected Collection<PrivateParcel> createParcelOrder(PickUpParcelPerson p) {
-		Collection<PrivateParcel> parcels = this.parcelOrderModel.createParcelOrders(p, this.deliveryResults);
+	protected Collection<IParcel> createParcelOrder(PickUpParcelPerson p) {
+		Collection<IParcel> parcels = this.privateOrderModel.createParcelOrders(p);
+		this.parcels.addAll(parcels);
+
+		return parcels;
+	}
+
+	/**
+	 * Creates the business parcel orders for the given opportunity by applying the
+	 * simulator's businessParcelOrderModel.
+	 *
+	 * @param opportunity the opportunity
+	 * @return the collection of parcels ordered by the given opportunity/business
+	 */
+	protected Collection<IParcel> createBusinessOrders(Opportunity opportunity) {
+		Collection<IParcel> parcels = this.businessOrderModel.createParcelOrders(opportunity);
 		this.parcels.addAll(parcels);
 
 		return parcels;

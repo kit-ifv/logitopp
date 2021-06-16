@@ -37,7 +37,7 @@ public class DeliveryPolicyBuilder {
 		return this;
 	}
 
-	public DeliveryPolicyBuilder wrapWith(DeliveryPolicyDecorator decorator) {
+	public DeliveryPolicyBuilder wrapWith(DeliveryPolicyDecorator<PrivateParcel> decorator) {
 		this.policy = decorator.of(this.policy);
 		return this;
 	}

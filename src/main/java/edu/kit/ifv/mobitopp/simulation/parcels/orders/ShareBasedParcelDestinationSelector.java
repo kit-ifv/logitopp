@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
@@ -20,7 +21,7 @@ import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
  * ShareBasedParcelDestinationSelector is a {@link ParcelDestinationSelector} extending {@link ShareBasedSelector}.
  * Additionally a fallback selector without work is used for persons working outside the survey area.
  */
-public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<ParcelDestinationType> implements ParcelDestinationSelector {
+public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<ParcelDestinationType> implements ParcelOrderStep<ParcelDestinationType> {
 
 	private final ShareBasedSelector<ParcelDestinationType> fallback;
 	private final Predicate<Zone> workZoneFilter;
@@ -77,14 +78,15 @@ public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<Parc
 	 * Uses fallback selector without {@link ParcelDestinationType#WORK}
 	 * if the recipient's work zone does not pass the work zone filter.
 	 *
-	 * @param recipient the recipient
-	 * @param numOfParcels the number of parcels the recipient will order
+	 * @param parcel the parcel for which a {@link ParcelDestinationType} is selected
 	 * @param otherParcels the other {@link PrivateParcel}s the recipient already ordered
+	 * @param numOfParcels the number of parcels the recipient will order
 	 * @param randomNumber a random number
 	 * @return the selected {@link ParcelDestinationType}
 	 */
 	@Override
-	public ParcelDestinationType select(PickUpParcelPerson recipient, int numOfParcels, Collection<PrivateParcel> otherParcels, double randomNumber) {
+	public ParcelDestinationType select(ParcelBuilder parcel, Collection<ParcelBuilder> otherParcels, int numOfParcels, double randomNumber) {
+		PickUpParcelPerson recipient = parcel.getPerson();
 		
 		if (recipient.hasFixedZoneFor(ActivityType.WORK) && workZoneFilter.test(recipient.fixedZoneFor(ActivityType.WORK))) {
 			return this.select(randomNumber);

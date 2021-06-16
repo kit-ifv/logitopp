@@ -11,8 +11,8 @@ import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.DeliveryServiceSelector;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedDeliveryServiceSelector;
+import edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelOrderStep;
+import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedSelector;
 
 public class ShareBasedDeliveryServiceSelectorTest {
 
@@ -35,8 +35,8 @@ public class ShareBasedDeliveryServiceSelectorTest {
 	
 	@Test
 	public void equalShares() {
-		DeliveryServiceSelector selector =
-			new ShareBasedDeliveryServiceSelector(services);
+		ParcelOrderStep<String> selector =
+			new ShareBasedSelector<>(services);
 		
 		Random rand = new Random(42);
 		List<String> selected = selectNCenters(selector, 10, rand);
@@ -48,8 +48,8 @@ public class ShareBasedDeliveryServiceSelectorTest {
 	
 	@Test
 	public void customSharesFavorA() {
-		DeliveryServiceSelector selector =
-			new ShareBasedDeliveryServiceSelector(sharesA);
+		ParcelOrderStep<String> selector =
+			new ShareBasedSelector<>(sharesA);
 		
 		Random rand = new Random(42);
 		List<String> selected = selectNCenters(selector, 10, rand);
@@ -61,8 +61,8 @@ public class ShareBasedDeliveryServiceSelectorTest {
 	
 	@Test
 	public void customSharesFavorB() {
-		DeliveryServiceSelector selector =
-			new ShareBasedDeliveryServiceSelector(sharesB);
+		ParcelOrderStep<String> selector =
+			new ShareBasedSelector<>(sharesB);
 		
 		Random rand = new Random(42);
 		List<String> selected = selectNCenters(selector, 10, rand);
@@ -72,10 +72,10 @@ public class ShareBasedDeliveryServiceSelectorTest {
 		
 	}
 	
-	private List<String> selectNCenters(DeliveryServiceSelector selector, int n, Random rand) {
+	private List<String> selectNCenters(ParcelOrderStep<String> selector, int n, Random rand) {
 		List<String> centers = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
-			centers.add(selector.select(null, 1, null, null, null, rand.nextDouble()));
+			centers.add(selector.select(null, null, 1, rand.nextDouble()));
 		}
 		return centers;
 	}
