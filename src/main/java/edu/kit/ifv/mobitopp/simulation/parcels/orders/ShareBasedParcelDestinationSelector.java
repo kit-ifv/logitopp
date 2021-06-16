@@ -18,7 +18,7 @@ import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 /**
- * ShareBasedParcelDestinationSelector is a {@link ParcelDestinationSelector} extending {@link ShareBasedSelector}.
+ * ShareBasedParcelDestinationSelector is a {@link ParcelOrderStep} extending {@link ShareBasedSelector}.
  * Additionally a fallback selector without work is used for persons working outside the survey area.
  */
 public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<ParcelDestinationType> implements ParcelOrderStep<ParcelDestinationType> {

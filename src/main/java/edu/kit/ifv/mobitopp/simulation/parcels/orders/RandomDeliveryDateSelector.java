@@ -10,7 +10,7 @@ import edu.kit.ifv.mobitopp.time.SimpleTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
- * The Class RandomDeliveryDateSelector is a {@link DeliveryDateSelector}.
+ * The Class RandomDeliveryDateSelector is a {@link ParcelOrderStep}.
  * A date is selected randomly from a time interval and then cast to a certain precision (e.g. hour or day).
  */
 public class RandomDeliveryDateSelector implements ParcelOrderStep<Time> {

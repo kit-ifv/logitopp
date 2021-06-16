@@ -10,7 +10,7 @@ import edu.kit.ifv.mobitopp.simulation.Person;
 
 
 /**
- * The Class NormalDistributedNumberOfParcelsSelector is a {@link NumberOfPrivateParcelsSelector}.
+ * The Class NormalDistributedNumberOfParcelsSelector is a {@link NumberOfParcelsSelector}.
  * It selects a number drawn from a capped normal distribution.
  */
 public class NormalDistributedNumberOfParcelsSelector<R> implements NumberOfParcelsSelector<R> {

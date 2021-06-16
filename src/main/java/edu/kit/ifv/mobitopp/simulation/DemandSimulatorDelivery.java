@@ -52,7 +52,8 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param initialState               the initial person state
 	 * @param context                    the simulation context
 	 * @param personFactory              the person factory
-	 * @param parcelOrderModel           the parcel order model
+	 * @param privateOrderModel          the private order model
+	 * @param businessOrderModel         the business order model
 	 * @param results                    the delivery results
 	 * @param personFilter               the person filter do determine which
 	 *                                   persons should be simulated
@@ -87,21 +88,22 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			final ParcelOrderModel<Opportunity> businessOrderModel, final DeliveryResults results,
 			final Predicate<Person> personFilter) {
 		this(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
-				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory, ParcelOrderModelBuilder.nullPrivateParcelModel(results),
-				businessOrderModel, results, personFilter);
+				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory,
+				ParcelOrderModelBuilder.nullPrivateParcelModel(results), businessOrderModel, results, personFilter);
 	}
-	
+
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
 			final ActivityPeriodFixer activityPeriodFixer,
 			final ActivityStartAndDurationRandomizer activityDurationRandomizer, final TripFactory tripFactory,
 			final ReschedulingStrategy rescheduling, final Set<Mode> modesInSimulation, final PersonState initialState,
-			final SimulationContext context, final DeliveryPersonFactory personFactory,
-			final DeliveryResults results,
+			final SimulationContext context, final DeliveryPersonFactory personFactory, final DeliveryResults results,
 			final Predicate<Person> personFilter) {
 		this(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
-				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory, ParcelOrderModelBuilder.nullPrivateParcelModel(results),
-				ParcelOrderModelBuilder.nullBusinessParcelOrderModel(context.zoneRepository(), results), results, personFilter);
+				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory,
+				ParcelOrderModelBuilder.nullPrivateParcelModel(results),
+				ParcelOrderModelBuilder.nullBusinessParcelOrderModel(context.zoneRepository(), results), results,
+				personFilter);
 	}
 
 	/**
