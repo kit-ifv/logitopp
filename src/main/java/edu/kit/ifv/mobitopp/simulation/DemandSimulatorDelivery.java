@@ -139,24 +139,24 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			counts[createParcelOrders.apply(ppp).size()]++;
 		});
 
-		System.out.println("Generated " + this.parcels.size() + " parcels for " + ppps.size() + " persons.");
-
-		System.out.println("Number of parcels distribution: ");
-		for (int i = 0; i < 11; i++) {
-			System.out.println("Order size " + i + ": " + counts[i]);
-		}
+		printDistribution(counts, "private");
 
 		int[] countsBusiness = new int[11];
 		context().zoneRepository().getZones().forEach(
 				z -> z.getDemandData().opportunities().forEach(o -> countsBusiness[createBusinessOrders(o).size()]++));
-		int sum = IntStream.range(0, countsBusiness.length).map(i -> i * countsBusiness[i]).sum();
-		int amount = IntStream.of(countsBusiness).sum();
+		
+		printDistribution(countsBusiness, "business");
+	}
+	
+	private void printDistribution(int[] orderSizes, String label) {
+		int sum = IntStream.range(0, orderSizes.length).map(i -> i * orderSizes[i]).sum();
+		int amount = IntStream.of(orderSizes).sum();
 
-		System.out.println("Generated " + sum + " business parcels for " + amount + " opportunities/businesses");
+		System.out.println("Generated " + sum + " " + label +" parcels for " + amount + " potential recipients");
 
-		System.out.println("Number of business parcels distribution: ");
-		for (int i = 0; i < 30; i++) {
-			System.out.println("Order size " + i + ": " + countsBusiness[i]);
+		System.out.println("Number of " + label + " parcels distribution: ");
+		for (int i = 0; i < orderSizes.length; i++) {
+			System.out.println("Order size " + i + ": " + orderSizes[i]);
 		}
 	}
 
