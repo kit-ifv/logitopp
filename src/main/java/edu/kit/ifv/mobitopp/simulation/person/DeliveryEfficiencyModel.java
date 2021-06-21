@@ -28,15 +28,6 @@ public interface DeliveryEfficiencyModel {
 	public int selectLoadingDuration(DistributionCenter center, Person person);
 	
 	/**
-	 * Selects an estimate trip duration.
-	 *
-	 * @param center the {@link DistributionCenter}
-	 * @param person the person
-	 * @return the estimate trip duration in minutes
-	 */
-	public int selectTripDuration(DistributionCenter center, Person person);
-	
-	/**
 	 * Selects a base duration of a delivery.
 	 *
 	 * @param center the {@link DistributionCenter}

@@ -32,7 +32,7 @@ public class DummyDeliveryTourStrategy implements DeliveryTourAssignmentStrategy
 		RelativeTime counter = RelativeTime.ofSeconds(remainingWorkTime.seconds());
 		
 		for (DeliveryActivityBuilder delivery : deliveries) {
-			counter = counter.minusMinutes(delivery.estimateDuration(efficiency) + efficiency.getTripDuration());
+			counter = counter.minusMinutes(delivery.estimateDuration(efficiency) + 5);
 			
 			if (!counter.isNegative()) {
 				assigned.add(delivery);

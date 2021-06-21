@@ -70,7 +70,7 @@ public class NormalDistributedNumberOfParcelsSelector<R> implements NumberOfParc
 	
 
 	/**
-	 * Selects the number of parcels, the given {@link Person} orders
+	 * Selects the number of parcels, the given recipient orders
 	 * from the normal distribution.
 	 *
 	 * @param recipient the recipient

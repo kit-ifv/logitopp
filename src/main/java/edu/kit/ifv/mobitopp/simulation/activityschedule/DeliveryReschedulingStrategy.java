@@ -174,14 +174,9 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 				currentActivity.changeDuration(newDuration);
 		};
 			
-		for (DeliveryActivityBuilder d : deliveries) {
-			
-			Time startDate = currentActivity.startDate().plusMinutes(currentActivity.duration());
-			startDate = startDate.plusMinutes(getTripDuration());
-			
+		for (DeliveryActivityBuilder d : deliveries) {		
 			ActivityIfc delivery = d.deliveredBy(person)
 									.during(beginningActivity)
-									.plannedAt(startDate)
 									.build();
 			
 			activitySchedule.insertActivityAfter(currentActivity, delivery);
@@ -190,7 +185,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		
 		
 		
-		ActivityIfc unload = DeliveryActivityFactory.createUnloadParcelsActivity(beginningActivity, getEfficiency());
+		ActivityIfc unload = DeliveryActivityFactory.createUnloadParcelsActivity(beginningActivity, getEfficiency(), 15);
 		unload.setLocation(this.center.getZoneAndLocation());
 		activitySchedule.insertActivityAfter(currentActivity, unload);
 		this.nextUnload = unload;
@@ -441,15 +436,6 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	 */
 	public DeliveryEfficiencyProfile getEfficiency() {
 		return this.person.getEfficiency();
-	}
-
-	/**
-	 * Gets the trip duration.
-	 *
-	 * @return the trip duration
-	 */
-	private int getTripDuration() {
-		return getEfficiency().getTripDuration();
 	}
 
 	/**

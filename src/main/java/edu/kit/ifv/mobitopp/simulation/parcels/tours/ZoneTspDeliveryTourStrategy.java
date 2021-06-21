@@ -109,18 +109,20 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 		ArrayList<DeliveryActivityBuilder> assigned = new ArrayList<>();
 
 		int capacity = selectCapacity(person);
-		float duration = 0;
 		Zone lastZone = person.getDistributionCenter().getZone();
 		Time time = currentTime;
 
 		for (int i = 0; i < Math.min(capacity, parcelTour.size()); i++) {
 			DeliveryActivityBuilder delivery = parcelTour.get(i);
-			duration += travelTime(person, lastZone, delivery.getZone(), time);
-			duration += delivery.estimateDuration(person.getEfficiency());
+			
+			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time);			
+			delivery.withTripDuration(round(tripDuration));
+			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
+			
+			float deliveryDuration = delivery.estimateDuration(person.getEfficiency());
+			time = time.plusMinutes(round(tripDuration + deliveryDuration));
 
-			time = currentTime.plusMinutes(round(duration));
-
-			float withReturn = duration
+			float withReturn = time.toMinutes()
 					+ travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time);
 			if (floor(withReturn) <= remainingWorkTime.toMinutes()) {
 				assigned.add(delivery);

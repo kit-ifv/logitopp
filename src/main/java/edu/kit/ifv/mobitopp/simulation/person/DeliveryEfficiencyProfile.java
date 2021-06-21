@@ -27,14 +27,6 @@ public class DeliveryEfficiencyProfile {
 	private int unloadDuration;
 
 	/**
-	 * Gets the estimated trip duration.
-	 *
-	 * @return the trip duration
-	 */
-	@Getter
-	private int tripDuration;
-
-	/**
 	 * Gets the base delivery duration (independent of the amount of parcels).
 	 *
 	 * @return the base delivery duration

@@ -20,10 +20,12 @@ public class DeliveryActivityBuilder {
 	private DeliveryPerson deliveryPerson;
 	private ActivityIfc work;
 	private Time plannedTime;
+	private int tripDuration;
 	private Collection<IParcel> parcels;
 
 	public DeliveryActivityBuilder() {
 		this.parcels = new ArrayList<>();
+		this.tripDuration = -1;
 	}
 
 	public DeliveryActivityBuilder addParcel(IParcel parcel) {
@@ -57,10 +59,17 @@ public class DeliveryActivityBuilder {
 		this.plannedTime = time;
 		return this;
 	}
+	
+	public DeliveryActivityBuilder withTripDuration(int tripDuration) {
+		this.tripDuration = tripDuration;
+		return this;
+	}
+	
 
 	public DeliveryActivity build() {
+		int tripDur = (tripDuration > 0) ? tripDuration : 5;
 		return DeliveryActivityFactory.createDeliveryActivity(parcels, work, plannedTime,
-				estimateDuration(deliveryPerson.getEfficiency()), deliveryPerson);
+				estimateDuration(deliveryPerson.getEfficiency()), tripDur, deliveryPerson);
 	}
 
 	private void verifyLocations() {

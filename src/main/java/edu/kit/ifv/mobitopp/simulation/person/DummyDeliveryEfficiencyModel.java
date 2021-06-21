@@ -12,7 +12,6 @@ public class DummyDeliveryEfficiencyModel implements DeliveryEfficiencyModel {
 	public DeliveryEfficiencyProfile select(DistributionCenter center, Person person) {
 		return new DeliveryEfficiencyProfile(selectLoadingDuration(center, person),
 												selectUnloadingDuration(center, person), 
-												selectTripDuration(center, person),
 												selectBaseDeliveryDuration(center, person),
 												selectDeliveryDurationPerParcel(center, person)
 											);
@@ -21,11 +20,6 @@ public class DummyDeliveryEfficiencyModel implements DeliveryEfficiencyModel {
 	@Override
 	public int selectLoadingDuration(DistributionCenter center, Person person) {
 		return 20;
-	}
-
-	@Override
-	public int selectTripDuration(DistributionCenter center, Person person) {
-		return 15;
 	}
 
 	@Override

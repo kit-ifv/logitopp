@@ -32,9 +32,9 @@ public class DeliveryActivityFactory {
 	 * @param person 		  the delivery person
 	 * @return the delivery activity
 	 */
-	public static DeliveryActivity createDeliveryActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate, int duration, DeliveryPerson person) {
+	public static DeliveryActivity createDeliveryActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate, int duration, int tripDuration, DeliveryPerson person) {
 		
-		return new DeliveryActivity(activityCounter--, work.getActivityNrOfWeek(), startDate, duration, person.getEfficiency().getTripDuration(),
+		return new DeliveryActivity(activityCounter--, work.getActivityNrOfWeek(), startDate, duration, tripDuration,
 				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person);
 
 	}
@@ -48,8 +48,8 @@ public class DeliveryActivityFactory {
 	 * @param efficiency the efficiency profile
 	 * @return the unload activity
 	 */
-	public static ActivityIfc createUnloadParcelsActivity(ActivityIfc work, DeliveryEfficiencyProfile efficiency) {
-		return createUnloadParcelsActivity(work, efficiency.getTripDuration(), efficiency.getUnloadDuration());
+	public static ActivityIfc createUnloadParcelsActivity(ActivityIfc work, DeliveryEfficiencyProfile efficiency, int tripDuration) {
+		return createUnloadParcelsActivity(work, tripDuration, efficiency.getUnloadDuration());
 	}
 
 	/**
