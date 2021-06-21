@@ -19,21 +19,22 @@ public class DeliveryActivityFactory {
 	 */
 	static int activityCounter = -1;// ?
 
-
 	/**
 	 * Creates a new DeliveryActivity for the given parcel with the given trip and
 	 * delivery duration. The activities flexibilities are determined by the given
 	 * work activity.
 	 *
-	 * @param parcels         the parcels to be delivered
-	 * @param work            the work
-	 * @param startDate       the start date
-	 * @param duration        the duration
-	 * @param person 		  the delivery person
+	 * @param parcels      the parcels to be delivered
+	 * @param work         the work
+	 * @param startDate    the start date
+	 * @param duration     the duration
+	 * @param tripDuration the trip duration
+	 * @param person       the delivery person
 	 * @return the delivery activity
 	 */
-	public static DeliveryActivity createDeliveryActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate, int duration, int tripDuration, DeliveryPerson person) {
-		
+	public static DeliveryActivity createDeliveryActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate,
+			int duration, int tripDuration, DeliveryPerson person) {
+
 		return new DeliveryActivity(activityCounter--, work.getActivityNrOfWeek(), startDate, duration, tripDuration,
 				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person);
 
@@ -44,11 +45,13 @@ public class DeliveryActivityFactory {
 	 * given efficiency profile. The efficiency profile determines the trip and
 	 * unload duration.
 	 *
-	 * @param work       the work activity
-	 * @param efficiency the efficiency profile
+	 * @param work         the work activity
+	 * @param efficiency   the efficiency profile
+	 * @param tripDuration the trip duration
 	 * @return the unload activity
 	 */
-	public static ActivityIfc createUnloadParcelsActivity(ActivityIfc work, DeliveryEfficiencyProfile efficiency, int tripDuration) {
+	public static ActivityIfc createUnloadParcelsActivity(ActivityIfc work, DeliveryEfficiencyProfile efficiency,
+			int tripDuration) {
 		return createUnloadParcelsActivity(work, tripDuration, efficiency.getUnloadDuration());
 	}
 
@@ -87,5 +90,5 @@ public class DeliveryActivityFactory {
 
 		return activity;
 	}
-	
+
 }
