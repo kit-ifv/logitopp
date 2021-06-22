@@ -236,6 +236,10 @@ public class ParcelOrderModelBuilder<R> {
 		return this.selectShareBased(shares, ParcelBuilder::setDeliveryService);
 	}
 	
+	public ParcelOrderModelBuilder<R> distributionCenterAsDeliveryService() {
+		return this.customDeliveryServiceSelection((parcel, otherParcels, numOfParcels, rand) -> parcel.getDistributionCenter().getName());
+	}
+	
 	
 	
 	
