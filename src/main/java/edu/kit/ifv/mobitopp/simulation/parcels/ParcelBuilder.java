@@ -22,8 +22,16 @@ public class ParcelBuilder {
 	
 	private Opportunity opportunity;
 
+	public ZoneAndLocation getDestinationAsLocation() {
+		if (destinationType != null && person != null) {
+			return destinationType.getZoneAndLocation(person);
+		} else {
+			throw new IllegalStateException("Cannot determine destination without a destination.");
+		}
+	}
+	
 	public PrivateParcel buildPrivateParcel(DeliveryResults results) {
-		return new PrivateParcel(person, destinationType, destinationType.getZoneAndLocation(person), plannedArrivalDate, distributionCenter, deliveryService, results);
+		return new PrivateParcel(person, destinationType, getDestinationAsLocation(), plannedArrivalDate, distributionCenter, deliveryService, results);
 	}
 	
 	public BusinessParcel buildBusinessParcel(ZoneRepository zoneRepo, DeliveryResults results) {
