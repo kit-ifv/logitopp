@@ -112,10 +112,10 @@ public abstract class BaseParcel implements IParcel {
 		
 		if (success) {
 			this.recipientType = recipient.get();
-			System.out.println("Successfully delivered " + this.oId + "(" + this.recipientType.name() + ")");
+			System.out.println(this.deliveryService + " successfully delivered " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ")");
 			this.deliver(currentTime, deliveryGuy);
 		} else {
-			System.out.println("Failed to deliver " + this.oId);
+			System.out.println(this.deliveryService + " failed to deliver " + this.oId + "(attempt " + this.deliveryAttempts + ")");
 			this.updateParcelDelivery(currentTime);
 		}
 
