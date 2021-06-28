@@ -111,6 +111,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 		int capacity = selectCapacity(person);
 		Zone lastZone = person.getDistributionCenter().getZone();
 		Time time = currentTime;
+		Time endOfWork = currentTime.plus(remainingWorkTime);
 
 		for (int i = 0; i < Math.min(capacity, parcelTour.size()); i++) {
 			DeliveryActivityBuilder delivery = parcelTour.get(i);
@@ -122,9 +123,9 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			float deliveryDuration = delivery.estimateDuration(person.getEfficiency());
 			time = time.plusMinutes(round(tripDuration + deliveryDuration));
 
-			float withReturn = time.toMinutes()
-					+ travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time);
-			if (floor(withReturn) <= remainingWorkTime.toMinutes()) {
+			float withReturn = travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time);
+			
+			if (time.plusMinutes(round(withReturn)).isBeforeOrEqualTo(endOfWork)) {
 				assigned.add(delivery);
 			} else {
 				break;
