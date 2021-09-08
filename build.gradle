@@ -111,7 +111,7 @@ publishing {
             version project.version
             pom {
                 name = 'logitopp'
-                description = 'An extension of mobiTopp for simulation parcel deliveries'
+                description = 'An extension of mobiTopp for simulating parcel deliveries'
                 url = 'https://github.com/kit-ifv/logitopp'
                 licenses {
                     license {
