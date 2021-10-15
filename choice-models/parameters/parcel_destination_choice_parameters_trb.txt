@@ -1,0 +1,12 @@
+b_age2_work = -2.0231   
+b_age3_work = -2.4295  
+b_age4_work = -3.0928
+b_single_hh_work = 1.5116
+
+b_age2_locker = -0.2674
+b_age3_locker = -1.9559  
+b_age4_locker = -1.5001
+b_trip_chaim_shopping_locker = -0.5035
+b_transit_pass_locker = 0.9868
+
+lambda_root = 1.0

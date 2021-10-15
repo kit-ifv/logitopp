@@ -1,0 +1,66 @@
+ProbabilityClass edu.kit.ifv.mobitopp.simulation.parcels.orders.parcelnumber.trb.generated.GeneratedNumberOfParcelsSelector
+
+Interface        edu.kit.ifv.mobitopp.simulation.parcels.orders.NumberOfParcelsSelector<edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson>
+Signature        select(edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson recipient,
+							double randomNumber
+				 ):int
+
+UtilityClass     edu.kit.ifv.mobitopp.simulation.parcels.orders.parcelnumber.trb.generated.GeneratedNumberOfParcelsUtility
+HelperClass      edu.kit.ifv.mobitopp.simulation.parcels.orders.parcelnumber.trb.generated.GeneratedNumberOfParcelsHelper
+
+root: {
+	<noPkg:U_noPkg>
+	<onePkg:U_onePkg>
+	<twoPkg:U_twoPkg>
+	<threePkg:U_threePkg>
+	<overFourPkg:U_overFourPkg>
+}
+
+Zero: U_noPkg = 0
+
+One: U_onePkg = asc_pkg1
+				+ b_male_pkg1 * IS_GENDER_MALE
+				+ b_income2_pkg1 * [2500 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 4000]
+				+ b_income3_pkg1 * [4000 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1_pkg1 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2_pkg1 * [25 <= AGE <= 44] 
+				+ b_age3_pkg1 * [45 <= AGE <= 64]
+				+ b_age4_pkg1 * [65 <= AGE]
+				+ b_shopping_freq_pkg1 * SHOPPING_FREQ
+				+ b_leisure_freq_pkg1 * LEISURE_FREQ
+
+Two: U_twoPkg = asc_pkg2
+				+ b_male_pkg2 * IS_GENDER_MALE
+				+ b_income2_pkg2 * [2500 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 4000]
+				+ b_income3_pkg2 * [4000 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1_pkg2 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2_pkg2 * [25 <= AGE <= 44] 
+				+ b_age3_pkg2 * [45 <= AGE <= 64]
+				+ b_age4_pkg2 * [65 <= AGE]
+				+ b_shopping_freq_pkg2 * SHOPPING_FREQ
+				+ b_leisure_freq_pkg2 * LEISURE_FREQ
+				
+Three: U_threePkg = asc_pkg3
+				+ b_male_pkg3 * IS_GENDER_MALE
+				+ b_income2_pkg3 * [2500 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 4000]
+				+ b_income3_pkg3 * [4000 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1_pkg3 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2_pkg3 * [25 <= AGE <= 44] 
+				+ b_age3_pkg3 * [45 <= AGE <= 64]
+				+ b_age4_pkg3 * [65 <= AGE]
+				+ b_weekend_shopping_pkg3 * WEEKEND_SHOPPING
+				+ b_shopping_freq_pkg3 * SHOPPING_FREQ
+				+ b_leisure_freq_pkg3 * LEISURE_FREQ
+				
+				
+FourOrMore: U_overFourPkg = asc_pkg4
+				+ b_male_pkg4 * IS_GENDER_MALE
+				+ b_income2_pkg4 * [2500 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 4000]
+				+ b_income3_pkg4 * [4000 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1_pkg4 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2_pkg4 * [25 <= AGE <= 44] 
+				+ b_age3_pkg4 * [45 <= AGE <= 64]
+				+ b_age4_pkg4 * [65 <= AGE]
+				+ b_weekend_shopping_pkg4 * WEEKEND_SHOPPING
+				+ b_shopping_freq_pkg4 * SHOPPING_FREQ
+				+ b_leisure_freq_pkg4 * LEISURE_FREQ

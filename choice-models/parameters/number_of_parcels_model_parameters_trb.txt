@@ -1,0 +1,47 @@
+asc_pkg1 = -1.68939
+b_male_pkg1 = 0.2847
+b_income2_pkg1 = 0.38312
+b_income3_pkg1 = 0.69815
+b_job1_pkg1 = 0.15019
+b_age2_pkg1 = 0.28452
+b_age3_pkg1 = -0.39706
+b_age4_pkg1 = -1.05464
+b_shopping_freq_pkg1 = 0.14012
+b_leisure_freq_pkg1 = 0.04588
+
+asc_pkg2 = -3.79780
+b_male_pkg2 = 0.46832
+b_income2_pkg2 = 0.56601
+b_income3_pkg2 = 1.05343
+b_job1_pkg2 = 0.21649
+b_age2_pkg2 = 0.65189
+b_age3_pkg2 = -0.32826
+b_age4_pkg2 = -1.26345
+b_shopping_freq_pkg2 = 0.14012
+b_leisure_freq_pkg2 = 0.04588
+
+asc_pkg3 = -4.49985
+b_male_pkg3 = 0.47191
+b_income2_pkg3 = 0.35145
+b_income3_pkg3 = 0.85325
+b_job1_pkg3 = 0.27532
+b_age2_pkg3 = 0.87286
+b_age3_pkg3 = -0.15835
+b_age4_pkg3 = -0.91552
+b_weekend_shopping_pkg3 = 0.42629
+b_shopping_freq_pkg3 = 0.14012
+b_leisure_freq_pkg3 = 0.04588
+
+asc_pkg4 = -4.68607
+b_male_pkg4 = 0.67957
+b_income2_pkg4 = 0.36510
+b_income3_pkg4 = 0.80213
+b_job1_pkg4 = 0.32728
+b_age2_pkg4 = 0.29665
+b_age3_pkg4 = -0.55952
+b_age4_pkg4 = -0.81168
+b_weekend_shopping_pkg4 = 0.42629
+b_shopping_freq_pkg4 = 0.14012
+b_leisure_freq_pkg4 = 0.04588
+
+lambda_root = 1.0
