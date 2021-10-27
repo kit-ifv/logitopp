@@ -1,0 +1,9 @@
+No e-commerce Participation: U_nopart	= 0 
+e-commerce participation: U_part		= asc_Part + 
+										b_male1*(gender == 1) + 
+										b_income2_1*(income == 2) + 
+										b_income3_1*(income == 3) + 
+										b_job1_1*(job == 1) + 
+										b_age2_1*(ageGroup == 2) + 
+										b_age3_1*(ageGroup ==3) + 
+										b_age4_1*(ageGroup == 4) 
