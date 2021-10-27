@@ -1,0 +1,28 @@
+One Package: U_onePkg = 0 
+
+Two Packages: U_twoPkg =  		asc_pkg2+ 
+								b_male2*(gender == 1) +  
+								b_income2_2*(income == 2) + 
+								b_income3_2*(income == 3) + 
+								b_job1_2*(job == 1) + 
+								b_age2_2*(ageGroup == 2) + 
+								b_age3_2*(ageGroup ==3) + 
+								b_age4_2*(ageGroup == 4)  
+								
+Three Packages: U_threePkg = 	asc_pkg3    + 
+								b_male3*(gender == 1) +  
+								b_income2_3*(income == 2) + 
+								b_income3_3*(income == 3) + 
+								b_job1_3*(job == 1) + 
+								b_age2_3*(ageGroup == 2) + 
+								b_age3_3*(ageGroup ==3) + 
+								b_age4_3*(ageGroup == 4)     
+								
+Four Packages: U_fourPkg  = 	asc_pkg4    + 
+								b_male4*(gender == 1) +  
+								b_income2_4*(income == 2) + 
+								b_income3_4*(income == 3) + 
+								b_job1_4*(job == 1) + 
+								b_age2_4*(ageGroup == 2) + 
+								b_age3_4*(ageGroup ==3) + 
+								b_age4_4*(ageGroup == 4)         
