@@ -130,6 +130,8 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			} else {
 				break;
 			}
+			
+			lastZone = delivery.getZone();
 
 		}
 

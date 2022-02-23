@@ -42,7 +42,7 @@ public class NullDeliveryPolicy implements ParcelDeliveryPolicy<PrivateParcel> {
 	 * No parcel updates
 	 *
 	 * @param parcel the parcel
-	 * @return true, if the parcel order was updated
+	 * @return false
 	 */
 	@Override
 	public boolean updateParcelDelivery(PrivateParcel parcel, Time currentTime) {
