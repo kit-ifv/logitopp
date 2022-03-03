@@ -1,8 +1,8 @@
-package edu.kit.ifv.mobitopp.simulation.parcels.orders;
+package edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity;
 
 import java.util.Random;
 
-public class RandomNumberOfParcelsSelector<R> implements NumberOfParcelsSelector<R> {
+public class RandomNumberOfParcelsSelector<R> implements ParcelQuantityModel<R> {
 
 	private final double percent;
 	private final int min;

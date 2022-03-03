@@ -5,9 +5,9 @@ import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK
 import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.opportunities.Opportunity;
+import edu.kit.ifv.mobitopp.simulation.businesses.Business;
+import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
@@ -15,12 +15,12 @@ import lombok.Getter;
 public class BusinessParcel extends BaseParcel {
 	
 	@Getter
-	private final Opportunity opportunity;
+	private final Business business;
 
-	public BusinessParcel(ZoneAndLocation location, Opportunity opportunity, Time plannedArrival, DistributionCenter distributionCenter,
-			String deliveryService, DeliveryResults results) {
-		super(location, plannedArrival, distributionCenter, deliveryService, results);
-		this.opportunity = opportunity;
+	public BusinessParcel(ZoneAndLocation location, Business business, Time plannedArrival, DistributionCenter distributionCenter,
+			String deliveryService, ShipmentSize shipmentSize, DeliveryResults results) {
+		super(location, plannedArrival, distributionCenter, results, shipmentSize);
+		this.business = business;
 		this.results.logBusinessOrder(this);
 		this.results.logChange(this, null, Time.start, false);
 	}

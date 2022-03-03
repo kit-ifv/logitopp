@@ -37,7 +37,7 @@ import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
 import edu.kit.ifv.mobitopp.simulation.modeChoice.ModeChoicePreferences;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.publictransport.model.Vehicle;
 import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.tour.TourFactory;

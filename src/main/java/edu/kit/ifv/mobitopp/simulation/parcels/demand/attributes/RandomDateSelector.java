@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels.orders;
+package edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes;
 
 import static java.lang.Math.round;
 
@@ -6,14 +6,15 @@ import java.util.Collection;
 import java.util.function.Function;
 
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
+import edu.kit.ifv.mobitopp.simulation.parcels.agents.ParcelAgent;
 import edu.kit.ifv.mobitopp.time.SimpleTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
- * The Class RandomDeliveryDateSelector is a {@link ParcelOrderStep}.
+ * The Class RandomDeliveryDateSelector is a {@link ParcelDemandModelStep}.
  * A date is selected randomly from a time interval and then cast to a certain precision (e.g. hour or day).
  */
-public class RandomDeliveryDateSelector implements ParcelOrderStep<Time> {
+public class RandomDateSelector<A extends ParcelAgent, P extends ParcelBuilder<A>> implements ParcelDemandModelStep<A, P, Time> {
 	
 	public static final Function<Time, Time> DAY_PRECISION = time -> Time.start.plusDays(time.getDay());
 	public static final Function<Time, Time> HOUR_PRECISION = time -> DAY_PRECISION.apply(time).plusHours(time.getHour());
@@ -26,7 +27,7 @@ public class RandomDeliveryDateSelector implements ParcelOrderStep<Time> {
 	private final Function<Time, Time> precisionFilter;
 	
 	/**
-	 * Instantiates a new {@link RandomDeliveryDateSelector}
+	 * Instantiates a new {@link RandomDateSelector}
 	 * with the given time interval [from, untilExcusive)
 	 * and the given date precision.
 	 *
@@ -34,7 +35,7 @@ public class RandomDeliveryDateSelector implements ParcelOrderStep<Time> {
 	 * @param untilExclusive the until exclusive
 	 * @param precision the precision
 	 */
-	public RandomDeliveryDateSelector(Time from, Time untilExclusive,
+	public RandomDateSelector(Time from, Time untilExclusive,
 		Function<Time, Time> precision) {
 		this.precisionFilter = precision;
 	
@@ -43,34 +44,34 @@ public class RandomDeliveryDateSelector implements ParcelOrderStep<Time> {
 	}
 	
 	/**
-	 * Instantiates a new {@link RandomDeliveryDateSelector}
+	 * Instantiates a new {@link RandomDateSelector}
 	 * with the given time interval [from, untilExcusive)
 	 * and day precision.
 	 *
 	 * @param from the from
 	 * @param untilExclusive the until exclusive
 	 */
-	public RandomDeliveryDateSelector(Time from, Time untilExclusive) {
+	public RandomDateSelector(Time from, Time untilExclusive) {
 		this(from, untilExclusive, DAY_PRECISION);
 	}
 	
 	/**
-	 * Instantiates a new {@link RandomDeliveryDateSelector}
+	 * Instantiates a new {@link RandomDateSelector}
 	 * with the interval [Monday,Sunday) = [Monday,Saturday]
 	 * and the given precision.
 	 *
 	 * @param precision the precision
 	 */
-	public RandomDeliveryDateSelector(Function<Time, Time> precision) {
+	public RandomDateSelector(Function<Time, Time> precision) {
 		this(Time.start, Time.start.plusDays(6), precision);
 	}
 	
 	/**
-	 * Instantiates a new {@link RandomDeliveryDateSelector}
+	 * Instantiates a new {@link RandomDateSelector}
 	 * with the interval [Monday,Sunday) = [Monday,Saturday]
 	 * and day precision.
 	 */
-	public RandomDeliveryDateSelector() {
+	public RandomDateSelector() {
 		this(DAY_PRECISION);
 	}
 
@@ -79,14 +80,14 @@ public class RandomDeliveryDateSelector implements ParcelOrderStep<Time> {
 	 * from the interval [from,until].
 	 * The selected date is cast to the models precision.
 	 *
-	 * @param parcel the {@link ParcelBuilder} for which an arrival date is selected
-	 * @param otherParcels the other {@link ParcelBuilder}s the recipient already ordered
+	 * @param parcel the {@link ParcelBuilders} for which an arrival date is selected
+	 * @param otherParcels the other {@link ParcelBuilders}s the recipient already ordered
 	 * @param numOfParcels the number of parcels the recipient will order
 	 * @param randomNumber a random number
 	 * @return the planned arrival date
 	 */
 	@Override
-	public Time select(ParcelBuilder parcel, Collection<ParcelBuilder> otherParcels, int numOfParcels, double randomNumber) {
+	public  Time select(P parcel, Collection<P> otherParcels, int numOfParcels, double randomNumber) {
 		int start = from.toSeconds();
 		int end = until.toSeconds();
 		

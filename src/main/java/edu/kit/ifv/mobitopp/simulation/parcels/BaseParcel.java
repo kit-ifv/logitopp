@@ -10,8 +10,8 @@ import java.util.Optional;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
+import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
@@ -25,23 +25,22 @@ public abstract class BaseParcel implements IParcel {
 
 	@Getter	@Setter	protected Time plannedArrivalDate;
 	@Getter	protected DistributionCenter distributionCenter;
-	@Getter	@Setter	protected String deliveryService;
 	@Getter	protected int deliveryAttempts = 0;
 	@Getter	protected Time deliveryTime = Time.future;
 	@Getter	protected ZoneAndLocation zoneAndLocation;
 	@Getter protected RecipientType recipientType;
+	@Getter protected ShipmentSize shipmentSize;
 
 	protected final DeliveryResults results;
 	@Getter protected ParcelState state = ParcelState.UNDEFINED;
 
 	public BaseParcel(ZoneAndLocation location, Time plannedArrival, DistributionCenter distributionCenter,
-			String deliveryService, DeliveryResults results) {
+			DeliveryResults results, ShipmentSize shipmentSize) {
 		this.results = results;
 		this.plannedArrivalDate = plannedArrival;
 		this.setDistributionCenter(distributionCenter);
-		this.deliveryService = deliveryService;
 		this.zoneAndLocation = location;
-
+		this.shipmentSize = shipmentSize;
 	}
 	
 	protected abstract void logChange(Time currentTime, DeliveryPerson deliveryGuy, boolean isAttempt);
@@ -112,10 +111,10 @@ public abstract class BaseParcel implements IParcel {
 		
 		if (success) {
 			this.recipientType = recipient.get();
-			System.out.println(this.deliveryService + " successfully delivered " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ")");
+			System.out.println(this.distributionCenter.getName() + " successfully delivered " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ")");
 			this.deliver(currentTime, deliveryGuy);
 		} else {
-			System.out.println(this.deliveryService + " failed to deliver " + this.oId + "(attempt " + this.deliveryAttempts + ")");
+			System.out.println(this.distributionCenter.getName() + " failed to deliver " + this.oId + "(attempt " + this.deliveryAttempts + ")");
 			this.updateParcelDelivery(currentTime);
 		}
 

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.result.Category;
 import edu.kit.ifv.mobitopp.result.Results;
-import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -114,20 +114,17 @@ public class DeliveryResults {
 	 */
 	public void logPrivateOrder(PrivateParcel parcel) {
 		this.logPrivateOrder(parcel.getOId(), parcel.getPerson().getOid() + "", parcel.getDestinationType().name(),
-				parcel.getPlannedArrivalDate().getDay() + "", parcel.getDistributionCenter().getName(),
-				parcel.getDeliveryService());
+				parcel.getPlannedArrivalDate().getDay() + "", parcel.getDistributionCenter().getName());
 	}
 
-	private void logPrivateOrder(int pid, String recipient, String destination, String day, String distributioneCneter,
-			String service) {
+	private void logPrivateOrder(int pid, String recipient, String destination, String day, String distributioneCneter) {
 		String msg = "";
 
 		msg += pid + "; ";
 		msg += recipient + "; ";
 		msg += destination + "; ";
 		msg += day + "; ";
-		msg += distributioneCneter + "; ";
-		msg += service;
+		msg += distributioneCneter;
 
 		this.results.write(resultCategoryPrivateOrder, msg);
 	}
@@ -148,20 +145,17 @@ public class DeliveryResults {
 	
 	public void logBusinessOrder(BusinessParcel parcel) {
 		this.logBusinessOrder(parcel.getOId(), parcel.getZone().getId().getExternalId(), parcel.getLocation().forLogging(),
-				parcel.getPlannedArrivalDate().getDay() + "", parcel.getDistributionCenter().getName(),
-				parcel.getDeliveryService());
+				parcel.getPlannedArrivalDate().getDay() + "", parcel.getDistributionCenter().getName());
 	}
 
-	private void logBusinessOrder(int pid, String zoneId, String location, String day, String distributioneCneter,
-			String service) {
+	private void logBusinessOrder(int pid, String zoneId, String location, String day, String distributioneCneter) {
 		String msg = "";
 
 		msg += pid + "; ";
 		msg += zoneId + "; ";
 		msg += location + "; ";
 		msg += day + "; ";
-		msg += distributioneCneter + "; ";
-		msg += service;
+		msg += distributioneCneter;
 
 		this.results.write(resultCategoryBusinessOrder, msg);
 	}

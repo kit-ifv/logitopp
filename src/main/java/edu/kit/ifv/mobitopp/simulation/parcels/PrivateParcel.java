@@ -1,6 +1,5 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
 
 import java.util.Optional;
@@ -8,8 +7,8 @@ import java.util.Optional;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
+import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -40,13 +39,12 @@ public class PrivateParcel extends BaseParcel {
 	 * @param location           the location
 	 * @param plannedArrival     the planned arrival date
 	 * @param distributionCenter the distribution center
-	 * @param deliveryService    the delivery service
 	 * @param results            the results to log state changes
+	 * @param deliveryService    the delivery service
 	 */
 	public PrivateParcel(PickUpParcelPerson person, ParcelDestinationType destination, ZoneAndLocation location,
-			Time plannedArrival, DistributionCenter distributionCenter, String deliveryService,
-			DeliveryResults results) {
-		super(location, plannedArrival, distributionCenter, deliveryService, results);
+			Time plannedArrival, DistributionCenter distributionCenter, ShipmentSize shipmentSize, DeliveryResults results) {
+		super(location, plannedArrival, distributionCenter, results, shipmentSize);
 		this.destinationType = destination;
 		this.setPerson(person);
 

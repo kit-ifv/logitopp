@@ -1,42 +1,46 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
-import edu.kit.ifv.mobitopp.data.Zone;
-import edu.kit.ifv.mobitopp.data.ZoneRepository;
-import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.opportunities.Opportunity;
-import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
+import edu.kit.ifv.mobitopp.simulation.parcels.agents.ParcelAgent;
+import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ValueProvider;
+import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionServiceProvider;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter 
-public class ParcelBuilder {
+public abstract class ParcelBuilder<P extends ParcelAgent> {
 	
-	private Time plannedArrivalDate;
-	private DistributionCenter distributionCenter;
-	private String deliveryService;
+	@Getter private final P agent;
+	@Getter private final DeliveryResults results;
 	
-	private PickUpParcelPerson person;
-	private ParcelDestinationType destinationType;
+	@Getter @Setter private ValueProvider<DistributionServiceProvider> serviceProvider;
+	@Getter @Setter private ValueProvider<DistributionCenter> distributionCenter;
+	@Getter @Setter private ValueProvider<ParcelAgent> consumer;
+	@Getter @Setter private ValueProvider<ParcelAgent> producer;
+	@Setter private ValueProvider<Time> arrivalDate;
+	@Getter @Setter private ValueProvider<ShipmentSize> size;
 	
-	private Opportunity opportunity;
+	private IParcel parcel;
+	
+	public ParcelBuilder(P agent, DeliveryResults results) {
+		this.agent = agent;
+		this.results = results;
+		notifyAgent();
+	}
 
-	public ZoneAndLocation getDestinationAsLocation() {
-		if (destinationType != null && person != null) {
-			return destinationType.getZoneAndLocation(person);
-		} else {
-			throw new IllegalStateException("Cannot determine destination without a destination.");
+	protected abstract void notifyAgent();
+	
+	public IParcel get() {
+		if (this.parcel == null) {
+			this.parcel = doBuild();
 		}
+		 return this.parcel;
+	}
+
+	protected abstract IParcel doBuild();
+	
+	public Time getArrivalDate() {
+		return this.arrivalDate.getValue();
 	}
 	
-	public PrivateParcel buildPrivateParcel(DeliveryResults results) {
-		return new PrivateParcel(person, destinationType, getDestinationAsLocation(), plannedArrivalDate, distributionCenter, deliveryService, results);
-	}
-	
-	public BusinessParcel buildBusinessParcel(ZoneRepository zoneRepo, DeliveryResults results) {
-		Zone zone = zoneRepo.getZoneById(opportunity.zone());
-		ZoneAndLocation location = new ZoneAndLocation(zone, opportunity.location());
-		return new BusinessParcel(location, opportunity, plannedArrivalDate, distributionCenter, deliveryService, results);
-	}
 }

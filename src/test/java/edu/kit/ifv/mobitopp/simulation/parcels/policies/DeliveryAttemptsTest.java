@@ -1,19 +1,16 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.any;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
@@ -68,7 +65,7 @@ public class DeliveryAttemptsTest {
 		boolean res = attemptsPolicy.updateParcelDelivery(parcel1, Time.start);
 		verify(delagate, times(1)).updateParcelDelivery(parcel1, Time.start);
 		verify(parcel1, times(0)).setDestinationType(any());
-		verify(parcel1, times(0)).setDeliveryService(any());
+//		verify(parcel1, times(0)).setDeliveryService(any());
 		verify(parcel1, times(0)).setDistributionCenter(any());
 		verify(parcel1, times(0)).setPlannedArrivalDate(any());
 		assertEquals(res, false);
@@ -76,7 +73,7 @@ public class DeliveryAttemptsTest {
 		res = attemptsPolicy.updateParcelDelivery(parcel2, Time.start);
 		verify(delagate, times(1)).updateParcelDelivery(parcel2, Time.start);
 		verify(parcel2, times(0)).setDestinationType(any());
-		verify(parcel2, times(0)).setDeliveryService(any());
+//		verify(parcel2, times(0)).setDeliveryService(any());
 		verify(parcel2, times(0)).setDistributionCenter(any());
 		verify(parcel2, times(0)).setPlannedArrivalDate(any());
 		assertEquals(res, false);
@@ -87,7 +84,7 @@ public class DeliveryAttemptsTest {
 		boolean res = attemptsPolicy.updateParcelDelivery(parcel3, Time.start);
 		verify(delagate, times(1)).updateParcelDelivery(parcel3, Time.start);
 		verify(parcel3, times(1)).setDestinationType(ParcelDestinationType.PACK_STATION);
-		verify(parcel3, times(0)).setDeliveryService(any());
+//		verify(parcel3, times(0)).setDeliveryService(any());
 		verify(parcel3, times(0)).setDistributionCenter(any());
 		verify(parcel3, times(0)).setPlannedArrivalDate(any());
 		assertEquals(res, true);

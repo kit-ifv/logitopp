@@ -1,6 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
 
 /**
  * The Enum ParcelState describes the delivery life cycle of a parcel: Undefined

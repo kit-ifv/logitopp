@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels.orders;
+package edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes;
 
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
@@ -12,18 +12,20 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 /**
- * ShareBasedParcelDestinationSelector is a {@link ParcelOrderStep} extending {@link ShareBasedSelector}.
+ * ShareBasedParcelDestinationSelector is a {@link ParcelDemandModelStep} extending {@link ShareBasedSelector}.
  * Additionally a fallback selector without work is used for persons working outside the survey area.
  */
-public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<ParcelDestinationType> implements ParcelOrderStep<ParcelDestinationType> {
+public class ShareBasedParcelDestinationSelector
+		extends ShareBasedSelector<PickUpParcelPerson, PrivateParcelBuilder, ParcelDestinationType> 
+		implements ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, ParcelDestinationType> {
 
-	private final ShareBasedSelector<ParcelDestinationType> fallback;
+	private final ShareBasedSelector<PickUpParcelPerson, PrivateParcelBuilder, ParcelDestinationType> fallback;
 	private final Predicate<Zone> workZoneFilter;
 	
 	/**
@@ -37,7 +39,7 @@ public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<Parc
 		super(shares);
 		Map<ParcelDestinationType, Double> fallbakMap = new LinkedHashMap<ParcelDestinationType, Double>(shares);
 		fallbakMap.remove(WORK);
-		this.fallback = new ShareBasedSelector<ParcelDestinationType>(fallbakMap);
+		this.fallback = new ShareBasedSelector<>(fallbakMap);
 		this.workZoneFilter = workZoneFilter;
 	}
 	
@@ -68,7 +70,7 @@ public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<Parc
 	 */
 	public ShareBasedParcelDestinationSelector(Predicate<Zone> workZoneFilter) {
 		super(Arrays.asList(ParcelDestinationType.values()));
-		this.fallback = new ShareBasedSelector<ParcelDestinationType>(Arrays.asList(HOME, PACK_STATION));
+		this.fallback = new ShareBasedSelector<>(Arrays.asList(HOME, PACK_STATION));
 		this.workZoneFilter = workZoneFilter;
 	}
 
@@ -85,8 +87,8 @@ public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<Parc
 	 * @return the selected {@link ParcelDestinationType}
 	 */
 	@Override
-	public ParcelDestinationType select(ParcelBuilder parcel, Collection<ParcelBuilder> otherParcels, int numOfParcels, double randomNumber) {
-		PickUpParcelPerson recipient = parcel.getPerson();
+	public ParcelDestinationType select(PrivateParcelBuilder parcel, Collection<PrivateParcelBuilder> otherParcels, int numOfParcels, double randomNumber) {
+		PickUpParcelPerson recipient = parcel.getAgent();
 		
 		if (recipient.hasFixedZoneFor(ActivityType.WORK) && workZoneFilter.test(recipient.fixedZoneFor(ActivityType.WORK))) {
 			return this.select(randomNumber);
@@ -95,5 +97,6 @@ public class ShareBasedParcelDestinationSelector extends ShareBasedSelector<Parc
 			return fallback.select(randomNumber);
 		}
 	}
+	
 
 }

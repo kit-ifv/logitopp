@@ -1,13 +1,13 @@
-package edu.kit.ifv.mobitopp.simulation.parcels.orders;
+package edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity;
 
 import java.util.function.Predicate;
 
-public class FilteredNumberOfParcelsSelector<R> implements NumberOfParcelsSelector<R> {
+public class FilteredNumberOfParcelsSelector<R> implements ParcelQuantityModel<R> {
 
 	private final Predicate<R> filter;
-	private final NumberOfParcelsSelector<R> other;
+	private final ParcelQuantityModel<R> other;
 	
-	public FilteredNumberOfParcelsSelector(NumberOfParcelsSelector<R> other, Predicate<R> filter) {
+	public FilteredNumberOfParcelsSelector(ParcelQuantityModel<R> other, Predicate<R> filter) {
 		this.filter = filter;
 		this.other = other;
 	}

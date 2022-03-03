@@ -9,8 +9,8 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.NormalDistributedNumberOfParcelsSelector;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.NumberOfParcelsSelector;
+import edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity.NormalDistributedNumberOfParcelsSelector;
+import edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity.ParcelQuantityModel;
 
 public class NormalDistributedNumberOfParcelsSelectorTest {
 
@@ -34,7 +34,7 @@ public class NormalDistributedNumberOfParcelsSelectorTest {
 	
 	@Test
 	public void minCapZero() {
-		NumberOfParcelsSelector selector =
+		ParcelQuantityModel selector =
 			new NormalDistributedNumberOfParcelsSelector(5.0, 3.0, 10);
 		
 		Random rand = new Random(42);
@@ -47,7 +47,7 @@ public class NormalDistributedNumberOfParcelsSelectorTest {
 	
 	@Test
 	public void customCaps() {
-		NumberOfParcelsSelector selector =
+		ParcelQuantityModel selector =
 			new NormalDistributedNumberOfParcelsSelector(5.0, 3.0, 4, 8);
 		
 		Random rand = new Random(42);
@@ -58,7 +58,7 @@ public class NormalDistributedNumberOfParcelsSelectorTest {
 		}
 	}
 	
-	private List<Integer> selectNNumbers(NumberOfParcelsSelector selector, int n, Random rand) {
+	private List<Integer> selectNNumbers(ParcelQuantityModel selector, int n, Random rand) {
 		List<Integer> numbers = new ArrayList<>();
 		
 		for (int i = 0; i < n; i++) {

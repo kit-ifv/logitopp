@@ -3,8 +3,8 @@ package edu.kit.ifv.mobitopp.simulation.parcels;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
+import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.parcels.tours.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -19,13 +19,12 @@ public interface IParcel {
 	
 	public Time getPlannedArrivalDate();
 	public void setPlannedArrivalDate(Time plannedArrivalDate);
-	
-	public String getDeliveryService();
-	public void setDeliveryService(String deliveryService);
-	
+		
 	public DistributionCenter getDistributionCenter();
 	public void setDistributionCenter(DistributionCenter distributionCenter);
 
+	public ShipmentSize getShipmentSize();
+	
 	public Location getLocation();
 	public Zone getZone();
 	public ZoneAndLocation getZoneAndLocation();
@@ -39,9 +38,5 @@ public interface IParcel {
 	public void unloaded(Time currentTime, DeliveryPerson deliveryGuy);
 	
 	public RecipientType getRecipientType();
-
-	
-
-	
 	
 }

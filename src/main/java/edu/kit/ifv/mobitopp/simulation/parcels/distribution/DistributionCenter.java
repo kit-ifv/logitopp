@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels.tours;
+package edu.kit.ifv.mobitopp.simulation.parcels.distribution;
 
 import static java.util.stream.Collectors.toList;
 
@@ -13,7 +13,9 @@ import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.agents.NullParcelProducer;
 import edu.kit.ifv.mobitopp.simulation.parcels.policies.ParcelPolicyProvider;
+import edu.kit.ifv.mobitopp.simulation.parcels.tours.DeliveryTourAssignmentStrategy;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -25,7 +27,7 @@ import lombok.Getter;
  * delivery persons start to deliver parcels.
  */
 @Getter
-public class DistributionCenter {
+public class DistributionCenter implements NullParcelProducer {
 	private String organization;
 	private String name;
 	private Zone zone;
@@ -196,5 +198,14 @@ public class DistributionCenter {
 	public ZoneAndLocation getZoneAndLocation() {
 		return new ZoneAndLocation(this.zone, this.location);
 	}
+	
+	
+	
+	
+	public DistributionServiceProvider getServiceProvider() {
+		return null;//TODO
+	}
+
+
 
 }

@@ -11,8 +11,8 @@ import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.ParcelOrderStep;
-import edu.kit.ifv.mobitopp.simulation.parcels.orders.ShareBasedSelector;
+import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ParcelDemandModelStep;
+import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ShareBasedSelector;
 
 public class ShareBasedDeliveryServiceSelectorTest {
 
@@ -35,7 +35,7 @@ public class ShareBasedDeliveryServiceSelectorTest {
 	
 	@Test
 	public void equalShares() {
-		ParcelOrderStep<String> selector =
+		ParcelDemandModelStep<String> selector =
 			new ShareBasedSelector<>(services);
 		
 		Random rand = new Random(42);
@@ -48,7 +48,7 @@ public class ShareBasedDeliveryServiceSelectorTest {
 	
 	@Test
 	public void customSharesFavorA() {
-		ParcelOrderStep<String> selector =
+		ParcelDemandModelStep<String> selector =
 			new ShareBasedSelector<>(sharesA);
 		
 		Random rand = new Random(42);
@@ -61,7 +61,7 @@ public class ShareBasedDeliveryServiceSelectorTest {
 	
 	@Test
 	public void customSharesFavorB() {
-		ParcelOrderStep<String> selector =
+		ParcelDemandModelStep<String> selector =
 			new ShareBasedSelector<>(sharesB);
 		
 		Random rand = new Random(42);
@@ -72,7 +72,7 @@ public class ShareBasedDeliveryServiceSelectorTest {
 		
 	}
 	
-	private List<String> selectNCenters(ParcelOrderStep<String> selector, int n, Random rand) {
+	private List<String> selectNCenters(ParcelDemandModelStep<String> selector, int n, Random rand) {
 		List<String> centers = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
 			centers.add(selector.select(null, null, 1, rand.nextDouble()));

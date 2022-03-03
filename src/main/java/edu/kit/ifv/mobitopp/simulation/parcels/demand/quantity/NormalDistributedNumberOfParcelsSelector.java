@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels.orders;
+package edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -10,10 +10,10 @@ import edu.kit.ifv.mobitopp.simulation.Person;
 
 
 /**
- * The Class NormalDistributedNumberOfParcelsSelector is a {@link NumberOfParcelsSelector}.
+ * The Class NormalDistributedNumberOfParcelsSelector is a {@link ParcelQuantityModel}.
  * It selects a number drawn from a capped normal distribution.
  */
-public class NormalDistributedNumberOfParcelsSelector<R> implements NumberOfParcelsSelector<R> {
+public class NormalDistributedNumberOfParcelsSelector<R> implements ParcelQuantityModel<R> {
 
 	private double mean;
 	private double stdDev;
