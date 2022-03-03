@@ -1,7 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.person;
 
 import edu.kit.ifv.mobitopp.simulation.Person;
-import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 
 /**
  * DummyDeliveryEfficiencyModel is an exemplary implementation of the {@link DeliveryEfficiencyModel}.

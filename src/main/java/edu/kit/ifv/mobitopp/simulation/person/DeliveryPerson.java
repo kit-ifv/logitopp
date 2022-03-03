@@ -32,12 +32,12 @@ import edu.kit.ifv.mobitopp.simulation.activityschedule.randomizer.ActivityStart
 import edu.kit.ifv.mobitopp.simulation.bikesharing.Bike;
 import edu.kit.ifv.mobitopp.simulation.car.PrivateCar;
 import edu.kit.ifv.mobitopp.simulation.destinationChoice.DestinationChoiceModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.events.DemandSimulationEventIfc;
 import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
 import edu.kit.ifv.mobitopp.simulation.modeChoice.ModeChoicePreferences;
-import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.parcels.model.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.publictransport.model.Vehicle;
 import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.tour.TourFactory;

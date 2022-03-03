@@ -1,8 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
-import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.HOME;
-import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.PACK_STATION;
-import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.WORK;
+import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
+import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
+import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -18,7 +18,9 @@ import org.mockito.Mockito;
 
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
-import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.distribution.policies.BaseDeliveryPolicy;
+import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelDeliveryPolicy;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 public class BaseDeliveryPolicyTest {

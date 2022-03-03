@@ -9,8 +9,8 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity.NormalDistributedNumberOfParcelsSelector;
-import edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity.ParcelQuantityModel;
+import edu.kit.ifv.mobitopp.simulation.demand.quantity.NormalDistributedNumberOfParcelsSelector;
+import edu.kit.ifv.mobitopp.simulation.demand.quantity.ParcelQuantityModel;
 
 public class NormalDistributedNumberOfParcelsSelectorTest {
 

@@ -19,11 +19,11 @@ import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.Person;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
-import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.parcels.model.BaseParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.model.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.BaseParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 

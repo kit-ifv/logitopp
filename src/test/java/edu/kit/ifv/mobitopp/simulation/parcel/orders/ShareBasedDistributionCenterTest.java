@@ -12,9 +12,9 @@ import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ParcelDemandModelStep;
-import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ShareBasedSelector;
-import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
+import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedSelector;
+import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 
 public class ShareBasedDistributionCenterTest {
 

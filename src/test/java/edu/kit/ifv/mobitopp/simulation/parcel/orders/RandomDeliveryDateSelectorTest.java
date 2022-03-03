@@ -1,8 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.parcel.orders;
 
-import static edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.RandomDateSelector.HOUR_PRECISION;
-import static edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.RandomDateSelector.MINUTE_PRECISION;
-import static edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.RandomDateSelector.SECOND_PRECISION;
+import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector.HOUR_PRECISION;
+import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector.MINUTE_PRECISION;
+import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector.SECOND_PRECISION;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -12,8 +12,8 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ParcelDemandModelStep;
-import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.RandomDateSelector;
+import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
+import edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class RandomDeliveryDateSelectorTest {

@@ -2,7 +2,7 @@ package edu.kit.ifv.mobitopp.simulation.person;
 
 import edu.kit.ifv.mobitopp.simulation.Employment;
 import edu.kit.ifv.mobitopp.simulation.Person;
-import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 
 /**
  * The Class DefaultEmploymentStrategy is an exemplary implementation of {@link DeliveryEmploymentStrategy}.
