@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels.policies;
+package edu.kit.ifv.mobitopp.simulation.distribution.policies;
 
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;

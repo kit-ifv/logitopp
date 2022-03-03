@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcel.orders;
+package edu.kit.ifv.mobitopp.simulation.demand.attributes;
 
 import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector.HOUR_PRECISION;
 import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector.MINUTE_PRECISION;

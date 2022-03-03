@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels.policies;
+package edu.kit.ifv.mobitopp.simulation.distribution.policies;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

@@ -1,8 +1,8 @@
-package edu.kit.ifv.mobitopp.simulation.parcel.orders;
+package edu.kit.ifv.mobitopp.simulation.demand;
 
-import static edu.kit.ifv.mobitopp.simulation.parcel.orders.RandomDeliveryDateSelectorTest.assertDayPrecision;
-import static edu.kit.ifv.mobitopp.simulation.parcel.orders.RandomDeliveryDateSelectorTest.assertIn;
-import static edu.kit.ifv.mobitopp.simulation.parcel.orders.RandomDeliveryDateSelectorTest.assertMinutePrecision;
+import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDeliveryDateSelectorTest.assertDayPrecision;
+import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDeliveryDateSelectorTest.assertIn;
+import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDeliveryDateSelectorTest.assertMinutePrecision;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;

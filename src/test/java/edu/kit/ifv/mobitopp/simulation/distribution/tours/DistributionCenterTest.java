@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcel.tours;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;

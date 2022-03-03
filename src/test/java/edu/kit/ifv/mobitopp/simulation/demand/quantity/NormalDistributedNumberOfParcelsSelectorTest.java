@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcel.orders;
+package edu.kit.ifv.mobitopp.simulation.demand.quantity;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
