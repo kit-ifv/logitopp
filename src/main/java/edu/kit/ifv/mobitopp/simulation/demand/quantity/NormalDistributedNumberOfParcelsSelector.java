@@ -6,8 +6,6 @@ import static java.lang.Math.round;
 
 import java.util.Random;
 
-import edu.kit.ifv.mobitopp.simulation.Person;
-
 
 /**
  * The Class NormalDistributedNumberOfParcelsSelector is a {@link ParcelQuantityModel}.

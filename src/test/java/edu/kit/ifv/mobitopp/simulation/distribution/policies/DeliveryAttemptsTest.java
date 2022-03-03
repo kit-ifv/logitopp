@@ -12,9 +12,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.distribution.policies.DeliveryAttemptsPolicy;
-import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelDeliveryPolicy;
-import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -26,6 +23,7 @@ public class DeliveryAttemptsTest {
 	private PrivateParcel parcel2;
 	private PrivateParcel parcel3;
 
+	@SuppressWarnings("unchecked")
 	@BeforeEach
 	public void setUp() {
 		delagate = (ParcelDeliveryPolicy<PrivateParcel>) mock(ParcelDeliveryPolicy.class);

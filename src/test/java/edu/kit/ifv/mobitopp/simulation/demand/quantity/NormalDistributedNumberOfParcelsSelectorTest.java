@@ -9,16 +9,13 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.demand.quantity.NormalDistributedNumberOfParcelsSelector;
-import edu.kit.ifv.mobitopp.simulation.demand.quantity.ParcelQuantityModel;
-
 public class NormalDistributedNumberOfParcelsSelectorTest {
 
 	@Test
 	public void negativeMinCap() {
 		assertThrows(IllegalArgumentException.class,
 			() -> {
-					new NormalDistributedNumberOfParcelsSelector(1.0, 0.5, -2, 4);
+					new NormalDistributedNumberOfParcelsSelector<String>(1.0, 0.5, -2, 4);
 				}
 		);
 	}
@@ -27,15 +24,15 @@ public class NormalDistributedNumberOfParcelsSelectorTest {
 	public void maxCapLessThanMinCap() {
 		assertThrows(IllegalArgumentException.class,
 			() -> {
-					new NormalDistributedNumberOfParcelsSelector(1.0, 0.5, 7, 4);
+					new NormalDistributedNumberOfParcelsSelector<String>(1.0, 0.5, 7, 4);
 				}
 		);
 	}
 	
 	@Test
 	public void minCapZero() {
-		ParcelQuantityModel selector =
-			new NormalDistributedNumberOfParcelsSelector(5.0, 3.0, 10);
+		ParcelQuantityModel<String> selector =
+			new NormalDistributedNumberOfParcelsSelector<>(5.0, 3.0, 10);
 		
 		Random rand = new Random(42);
 		List<Integer> numbers = selectNNumbers(selector, 100, rand);
@@ -47,8 +44,8 @@ public class NormalDistributedNumberOfParcelsSelectorTest {
 	
 	@Test
 	public void customCaps() {
-		ParcelQuantityModel selector =
-			new NormalDistributedNumberOfParcelsSelector(5.0, 3.0, 4, 8);
+		ParcelQuantityModel<String> selector =
+			new NormalDistributedNumberOfParcelsSelector<>(5.0, 3.0, 4, 8);
 		
 		Random rand = new Random(42);
 		List<Integer> numbers = selectNNumbers(selector, 100, rand);
@@ -58,7 +55,7 @@ public class NormalDistributedNumberOfParcelsSelectorTest {
 		}
 	}
 	
-	private List<Integer> selectNNumbers(ParcelQuantityModel selector, int n, Random rand) {
+	private List<Integer> selectNNumbers(ParcelQuantityModel<String> selector, int n, Random rand) {
 		List<Integer> numbers = new ArrayList<>();
 		
 		for (int i = 0; i < n; i++) {
