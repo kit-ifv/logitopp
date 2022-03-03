@@ -1,6 +1,7 @@
-package edu.kit.ifv.mobitopp.simulation.parcels;
+package edu.kit.ifv.mobitopp.simulation.parcels.model;
 
-import edu.kit.ifv.mobitopp.simulation.businesses.Business;
+import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
+import edu.kit.ifv.mobitopp.simulation.parcels.business.Business;
 
 public class BusinessParcelBuilder extends ParcelBuilder<Business> {
 
@@ -17,7 +18,7 @@ public class BusinessParcelBuilder extends ParcelBuilder<Business> {
 	}
 
 	@Override
-	protected IParcel doBuild() {
+	public IParcel doBuild() {
 		return new BusinessParcel(getAgent().location(),
 								  getAgent(),
 								  getArrivalDate(),

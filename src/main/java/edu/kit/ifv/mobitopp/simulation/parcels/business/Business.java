@@ -1,7 +1,7 @@
-package edu.kit.ifv.mobitopp.simulation.businesses;
+package edu.kit.ifv.mobitopp.simulation.parcels.business;
 
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.parcels.agents.ParcelAgent;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelAgent;
 
 public class Business implements ParcelAgent {
 

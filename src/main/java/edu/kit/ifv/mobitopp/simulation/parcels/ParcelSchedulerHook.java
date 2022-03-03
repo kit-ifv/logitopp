@@ -6,14 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.kit.ifv.mobitopp.simulation.Hook;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelBuilder;
 import edu.kit.ifv.mobitopp.time.Time;
 
-public class VirtualParcelVault implements Hook {
+public class ParcelSchedulerHook implements Hook {
 	
 	private final Map<Time, Collection<ParcelBuilder<?>>> parcels;
 	private final boolean keepSchedule;
 	
-	public VirtualParcelVault(boolean keepSchedule) {
+	public ParcelSchedulerHook(boolean keepSchedule) {
 		this.parcels = new HashMap<>();
 		this.keepSchedule = keepSchedule;
 	}

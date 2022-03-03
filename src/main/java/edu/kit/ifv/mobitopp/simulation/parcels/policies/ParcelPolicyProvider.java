@@ -1,7 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.BusinessParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
 import lombok.Setter;
 
 @Setter

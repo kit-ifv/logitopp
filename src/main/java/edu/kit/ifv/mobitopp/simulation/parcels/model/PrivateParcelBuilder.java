@@ -1,5 +1,6 @@
-package edu.kit.ifv.mobitopp.simulation.parcels;
+package edu.kit.ifv.mobitopp.simulation.parcels.model;
 
+import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class PrivateParcelBuilder extends ParcelBuilder<PickUpParcelPerson> {
 	}
 
 	@Override
-	protected IParcel doBuild() {
+	public IParcel doBuild() {
 		ParcelDestinationType destination = this.destinationType.getValue();
 		
 		return new PrivateParcel(getAgent(),

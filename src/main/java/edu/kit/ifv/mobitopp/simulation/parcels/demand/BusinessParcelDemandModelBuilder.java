@@ -5,11 +5,11 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.data.ZoneRepository;
-import edu.kit.ifv.mobitopp.simulation.businesses.Business;
-import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
+import edu.kit.ifv.mobitopp.simulation.parcels.business.Business;
 import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.BusinessParcelBuilder;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelBuilder;
 
 public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<Business, BusinessParcelBuilder> {
 	

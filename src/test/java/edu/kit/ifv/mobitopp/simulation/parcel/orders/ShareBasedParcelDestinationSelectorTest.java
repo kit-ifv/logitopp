@@ -1,8 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.parcel.orders;
 
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.HOME;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.PACK_STATION;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.WORK;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -21,9 +21,9 @@ import org.junit.jupiter.api.Test;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilders;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ShareBasedParcelDestinationSelector;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 public class ShareBasedParcelDestinationSelectorTest {

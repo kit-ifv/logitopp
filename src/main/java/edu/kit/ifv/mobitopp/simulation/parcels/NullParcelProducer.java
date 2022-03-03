@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels.agents;
+package edu.kit.ifv.mobitopp.simulation.parcels;
 
 public interface NullParcelProducer extends ParcelAgent {
 

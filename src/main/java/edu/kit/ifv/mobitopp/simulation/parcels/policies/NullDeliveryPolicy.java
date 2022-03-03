@@ -1,13 +1,13 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.PACK_STATION;
 import static edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType.PACKSTATION;
 import static edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType.PERSONAL;
 
 import java.util.Optional;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
 import edu.kit.ifv.mobitopp.time.Time;
 
 

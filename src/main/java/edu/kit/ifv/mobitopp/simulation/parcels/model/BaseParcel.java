@@ -1,8 +1,8 @@
-package edu.kit.ifv.mobitopp.simulation.parcels;
+package edu.kit.ifv.mobitopp.simulation.parcels.model;
 
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelState.DELIVERED;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelState.ONDELIVERY;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelState.RETURNING;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelState.DELIVERED;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelState.ONDELIVERY;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelState.RETURNING;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -10,6 +10,7 @@ import java.util.Optional;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
+import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.policies.RecipientType;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;

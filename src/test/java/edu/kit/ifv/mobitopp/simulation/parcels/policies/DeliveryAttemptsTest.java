@@ -12,8 +12,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class DeliveryAttemptsTest {

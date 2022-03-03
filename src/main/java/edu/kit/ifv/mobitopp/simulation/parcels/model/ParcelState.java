@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.parcels;
+package edu.kit.ifv.mobitopp.simulation.parcels.model;
 
 import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
 

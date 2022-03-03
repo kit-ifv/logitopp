@@ -1,6 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.IParcel;
 
 public interface DeliveryPolicyDecorator<P extends IParcel> {
 	

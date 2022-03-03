@@ -22,8 +22,8 @@ import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Person;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 

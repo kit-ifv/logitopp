@@ -3,7 +3,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
 import java.util.Optional;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.IParcel;
 import edu.kit.ifv.mobitopp.time.Time;
 
 

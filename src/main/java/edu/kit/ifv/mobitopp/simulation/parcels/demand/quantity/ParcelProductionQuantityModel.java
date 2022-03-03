@@ -1,6 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.agents.ParcelAgent;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelAgent;
 
 public class ParcelProductionQuantityModel<P extends ParcelAgent> implements ParcelQuantityModel<P> {
 	

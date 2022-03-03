@@ -1,14 +1,14 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.HOME;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.PACK_STATION;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.WORK;
 
 import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.Person;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
 import edu.kit.ifv.mobitopp.time.Time;
 
 

@@ -11,9 +11,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
-import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
-import edu.kit.ifv.mobitopp.simulation.parcels.agents.ParcelAgent;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.CopyProviderModelStep;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.RandomDateSelector;
@@ -25,6 +23,8 @@ import edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity.NullNumerOfParcel
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity.ParcelQuantityModel;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity.RandomNumberOfParcelsSelector;
 import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelBuilder;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ShipmentSize;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Setter;
 

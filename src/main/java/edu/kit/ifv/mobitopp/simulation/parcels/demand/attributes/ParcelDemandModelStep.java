@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
-import edu.kit.ifv.mobitopp.simulation.parcels.agents.ParcelAgent;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelAgent;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelBuilder;
 
 public interface ParcelDemandModelStep<A extends ParcelAgent, P extends ParcelBuilder<A>, T> {
 

@@ -10,13 +10,13 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ShareBasedParcelDestinationSelector;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelBuilder;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 public class PrivateParcelDemandModelBuilder extends ParcelDemandModelBuilder<PickUpParcelPerson, PrivateParcelBuilder> {

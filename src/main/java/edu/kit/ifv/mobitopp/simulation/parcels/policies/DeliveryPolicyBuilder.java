@@ -2,7 +2,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels.policies;
 
 import edu.kit.ifv.mobitopp.populationsynthesis.neighborhood.NeighborhoodRelationship;
 import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
 
 public class DeliveryPolicyBuilder {
 

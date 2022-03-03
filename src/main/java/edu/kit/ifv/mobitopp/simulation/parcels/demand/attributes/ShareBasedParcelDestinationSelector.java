@@ -1,8 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes;
 
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.HOME;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.PACK_STATION;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.WORK;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,9 +12,9 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
 /**

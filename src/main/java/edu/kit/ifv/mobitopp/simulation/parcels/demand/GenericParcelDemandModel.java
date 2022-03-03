@@ -7,11 +7,11 @@ import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
-import edu.kit.ifv.mobitopp.simulation.parcels.agents.ParcelAgent;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.quantity.ParcelQuantityModel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelBuilder;
 import edu.kit.ifv.mobitopp.util.functions.QuadConsumer;
 
 public class GenericParcelDemandModel<A extends ParcelAgent, P extends ParcelBuilder<A>> implements ParcelDemandModel<A, P> {

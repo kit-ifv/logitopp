@@ -6,6 +6,8 @@ import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.result.Category;
 import edu.kit.ifv.mobitopp.result.Results;
 import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.BusinessParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 

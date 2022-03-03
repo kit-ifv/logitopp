@@ -1,8 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.parcel.orders;
 
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.HOME;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.PACK_STATION;
+import static edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType.WORK;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,11 +18,11 @@ import org.mockito.Mockito;
 
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
-import edu.kit.ifv.mobitopp.simulation.parcels.BaseParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.BaseParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.BusinessParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.model.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.util.collections.CollectionsUtil;
 

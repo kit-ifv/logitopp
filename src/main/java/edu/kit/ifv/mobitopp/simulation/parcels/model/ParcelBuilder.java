@@ -1,6 +1,7 @@
-package edu.kit.ifv.mobitopp.simulation.parcels;
+package edu.kit.ifv.mobitopp.simulation.parcels.model;
 
-import edu.kit.ifv.mobitopp.simulation.parcels.agents.ParcelAgent;
+import edu.kit.ifv.mobitopp.simulation.parcels.DeliveryResults;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.parcels.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.distribution.DistributionServiceProvider;
@@ -37,7 +38,7 @@ public abstract class ParcelBuilder<P extends ParcelAgent> {
 		 return this.parcel;
 	}
 
-	protected abstract IParcel doBuild();
+	public abstract IParcel doBuild();
 	
 	public Time getArrivalDate() {
 		return this.arrivalDate.getValue();
