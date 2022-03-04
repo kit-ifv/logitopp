@@ -26,7 +26,7 @@ public class TripleTest {
 	public void getThird() {
 		Triple<String,String,String> triple = new Triple<>("hello", "world", "!");
 		
-		assertEquals("world", triple.getThird());
+		assertEquals("!", triple.getThird());
 	}
 	
 	@Test
