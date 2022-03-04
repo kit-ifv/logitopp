@@ -2,7 +2,6 @@ package edu.kit.ifv.mobitopp.simulation.demand;
 
 import static java.util.stream.Collectors.toMap;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -28,7 +27,6 @@ import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Setter;
 
-@Setter
 public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBuilder<A>> {
 
 	private ParcelQuantityModel<A> numberOfParcelsSelector;
@@ -155,6 +153,14 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 	
 	public ParcelDemandModelBuilder<A,P> useDistributionCenterAsProducer() {
 		return this.addStep(new CopyProviderModelStep<A, P, ParcelAgent>(ParcelBuilder::getDistributionCenter), ParcelBuilder::setProducer);
+	}
+	
+	public ParcelDemandModelBuilder<A, P> useAgentAsProducer() {
+		return this.addStep((parcel, otherParcels, numOfParcels, randomNumber) -> (ParcelAgent) parcel.getAgent(), ParcelBuilder::setProducer);
+	}
+	
+	public ParcelDemandModelBuilder<A, P> useAgentAsConsumer() {
+		return this.addStep((parcel, otherParcels, numOfParcels, randomNumber) -> (ParcelAgent) parcel.getAgent(), ParcelBuilder::setConsumer);
 	}
 	
 	

@@ -1,11 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.demand;
 
-import static java.util.stream.Collectors.toMap;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
@@ -14,7 +11,6 @@ import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedParcelDestinationSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
@@ -25,8 +21,8 @@ public class PrivateParcelDemandModelBuilder extends ParcelDemandModelBuilder<Pi
 	public static PrivateParcelDemandModelBuilder forPrivateParcels(DeliveryResults results) {
 		PrivateParcelDemandModelBuilder builder = new PrivateParcelDemandModelBuilder();
 		
-		builder.setRandomProvider(p -> p::getNextRandom);
-		builder.setParcelFactory(a -> new PrivateParcelBuilder(a, results));
+		builder.useRandom(p -> p::getNextRandom);
+		builder.useParcelFactory(a -> new PrivateParcelBuilder(a, results));
 		
 		return builder;
 	}
@@ -73,9 +69,11 @@ public class PrivateParcelDemandModelBuilder extends ParcelDemandModelBuilder<Pi
 		PrivateParcelDemandModelBuilder builder = forPrivateParcels(results);
 		
 		builder.useNormalDistributionNumberSelector(0.65, 0.5, 10);
-		builder.equalParcelDestinationSelection(workZoneFilter);
 		
-		return builder.shareBasedDistributionCenterSelection(distributionCenters)
+		return builder.equalParcelDestinationSelection(workZoneFilter)
+					  .shareBasedDistributionCenterSelection(distributionCenters)
+					  .useDistributionCenterAsProducer()
+					  .useAgentAsConsumer()
 					//.equalServiceProviderSelection(List.of("Dummy Delivery Service"))
 					  .randomArrivalDaySelectionExcludeSunday()
 					  .build();

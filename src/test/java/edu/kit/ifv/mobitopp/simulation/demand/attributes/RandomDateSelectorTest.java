@@ -12,11 +12,9 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
-import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
-import edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector;
 import edu.kit.ifv.mobitopp.time.Time;
 
-public class RandomDeliveryDateSelectorTest {
+public class RandomDateSelectorTest {
 	
 	private static final Time MONDAY = Time.start;
 	private static final Time WEDNESDAY = Time.start.plusDays(2);
@@ -25,7 +23,7 @@ public class RandomDeliveryDateSelectorTest {
 
 	@Test
 	public void defaultSelector() {
-		ParcelDemandModelStep<Time> selector = new RandomDateSelector();
+		ParcelDemandModelStep<?,?,Time> selector = new RandomDateSelector<>();
 		
 		Random rand = new Random(42);
 		List<Time> times = seletNDates(selector, 100, rand);
@@ -40,7 +38,7 @@ public class RandomDeliveryDateSelectorTest {
 	
 	@Test
 	public void hourPrecision() {
-		ParcelDemandModelStep<Time> selector = new RandomDateSelector(HOUR_PRECISION);
+		ParcelDemandModelStep<?,?,Time> selector = new RandomDateSelector<>(HOUR_PRECISION);
 		
 		Random rand = new Random(42);
 		List<Time> times = seletNDates(selector, 100, rand);
@@ -58,7 +56,7 @@ public class RandomDeliveryDateSelectorTest {
 	
 	@Test
 	public void minutePrecision() {
-		ParcelDemandModelStep<Time> selector = new RandomDateSelector(MINUTE_PRECISION);
+		ParcelDemandModelStep<?,?,Time> selector = new RandomDateSelector<>(MINUTE_PRECISION);
 		
 		Random rand = new Random(42);
 		List<Time> times = seletNDates(selector, 100, rand);
@@ -76,7 +74,7 @@ public class RandomDeliveryDateSelectorTest {
 	
 	@Test
 	public void secondPrecision() {
-		ParcelDemandModelStep<Time> selector = new RandomDateSelector(SECOND_PRECISION);
+		ParcelDemandModelStep<?,?,Time> selector = new RandomDateSelector<>(SECOND_PRECISION);
 		
 		Random rand = new Random(42);
 		List<Time> times = seletNDates(selector, 100, rand);
@@ -94,7 +92,7 @@ public class RandomDeliveryDateSelectorTest {
 	
 	@Test
 	public void customIntervalDayPrecision() {
-		ParcelDemandModelStep<Time> selector = new RandomDateSelector(WEDNESDAY, FRIDAY);
+		ParcelDemandModelStep<?,?,Time> selector = new RandomDateSelector<>(WEDNESDAY, FRIDAY);
 		
 		Random rand = new Random(42);
 		List<Time> times = seletNDates(selector, 100, rand);
@@ -109,7 +107,7 @@ public class RandomDeliveryDateSelectorTest {
 	
 	@Test
 	public void customIntervalHourPrecision() {
-		ParcelDemandModelStep<Time> selector = new RandomDateSelector(WEDNESDAY, FRIDAY, HOUR_PRECISION);
+		ParcelDemandModelStep<?,?,Time> selector = new RandomDateSelector<>(WEDNESDAY, FRIDAY, HOUR_PRECISION);
 		
 		Random rand = new Random(42);
 		List<Time> times = seletNDates(selector, 100, rand);
@@ -126,7 +124,7 @@ public class RandomDeliveryDateSelectorTest {
 	
 	@Test
 	public void customIntervalMinutePrecision() {
-		ParcelDemandModelStep<Time> selector = new RandomDateSelector(WEDNESDAY, FRIDAY, MINUTE_PRECISION);
+		ParcelDemandModelStep<?,?,Time> selector = new RandomDateSelector<>(WEDNESDAY, FRIDAY, MINUTE_PRECISION);
 		
 		Random rand = new Random(42);
 		List<Time> times = seletNDates(selector, 100, rand);
@@ -144,7 +142,7 @@ public class RandomDeliveryDateSelectorTest {
 	
 	@Test
 	public void customIntervalSecondPrecision() {
-		ParcelDemandModelStep<Time> selector = new RandomDateSelector(WEDNESDAY, FRIDAY, SECOND_PRECISION);
+		ParcelDemandModelStep<?,?,Time> selector = new RandomDateSelector<>(WEDNESDAY, FRIDAY, SECOND_PRECISION);
 		
 		Random rand = new Random(42);
 		List<Time> times = seletNDates(selector, 100, rand);
@@ -180,7 +178,7 @@ public class RandomDeliveryDateSelectorTest {
 		assertTrue(time.isBefore(toExcl));
 	}
 	
-	private List<Time> seletNDates(ParcelDemandModelStep<Time> selector, int n, Random rand) {
+	private List<Time> seletNDates(ParcelDemandModelStep<?, ?, Time> selector, int n, Random rand) {
 		List<Time> times = new ArrayList<>();
 		
 		for (int i = 0; i < n; i++) {

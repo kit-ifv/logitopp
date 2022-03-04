@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.util.collections.logitopp;
+package edu.kit.ifv.mobitopp.util.collections;
 
 import static edu.kit.ifv.mobitopp.util.collections.CollectionsUtil.groupBy;
 import static org.junit.Assert.assertTrue;

@@ -1,8 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.demand;
 
-import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDeliveryDateSelectorTest.assertDayPrecision;
-import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDeliveryDateSelectorTest.assertIn;
-import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDeliveryDateSelectorTest.assertMinutePrecision;
+import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelectorTest.assertDayPrecision;
+import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelectorTest.assertIn;
+import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelectorTest.assertMinutePrecision;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
@@ -29,11 +29,9 @@ import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
-import edu.kit.ifv.mobitopp.simulation.demand.ParcelDemandModel;
-import edu.kit.ifv.mobitopp.simulation.demand.ParcelDemandModelBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -49,14 +47,7 @@ public class DefaultParcelOrderModelTest {
 	private Map<ParcelDestinationType, Double> onlyWorkShares = Map.of(HOME, 0.0, WORK, 1.0, PACK_STATION, 0.0);
 	private Map<ParcelDestinationType, Double> onlyHomeShares = Map.of(HOME, 1.0, WORK, 0.0, PACK_STATION, 0.0);
 	private Map<ParcelDestinationType, Double> onlyStationShares = Map.of(HOME, 0.0, WORK, 0.0, PACK_STATION, 1.0);
-	
-	//Delivery Service
-	private String serviceA;
-	private String serviceB;
-	private Map<String, Double> sharesServiceA;
-	private Map<String, Double> sharesServiceB;
-	private List<String> services;
-	
+		
 	//Distribution Centers
 	private DistributionCenter centerA;
 	private DistributionCenter centerB;
@@ -99,16 +90,7 @@ public class DefaultParcelOrderModelTest {
 		when(noWorkPerson.hasFixedZoneFor(ActivityType.PICK_UP_PARCEL)).thenReturn(true);
 		when(noWorkPerson.fixedZoneFor(ActivityType.PICK_UP_PARCEL)).thenReturn(surveyZone);
 		when(noWorkPerson.hasFixedZoneFor(ActivityType.WORK)).thenReturn(false);
-		
-				
-		
-		//Deliery Services
-		serviceA = "ServiceA";
-		serviceB = "ServiceB";
-		sharesServiceA = Map.of(serviceA, 1.0, serviceB, 0.0);
-		sharesServiceB = Map.of(serviceA, 0.0, serviceB, 1.0);
-		services = List.of(serviceA, serviceB);
-		
+	
 		
 		//Distribution Centers
 		centerA = mock(DistributionCenter.class);
@@ -130,18 +112,17 @@ public class DefaultParcelOrderModelTest {
 
 	@Test
 	public void noWorkPersonDefaultModel() {
-		ParcelDemandModel<PickUpParcelPerson> model = ParcelDemandModelBuilder.defaultPrivateParcelModel(centers, results);
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = PrivateParcelDemandModelBuilder.defaultPrivateParcelModel(centers, results);
 		
-		List<Collection<PrivateParcel>> orders = generateNParcels(model, noWorkPerson, 10);
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, noWorkPerson, 10);
 		
-		for(Collection<PrivateParcel> order : orders) {
+		for(Collection<PrivateParcelBuilder> order : orders) {
 			assertTrue(0 <= order.size() && order.size() <= 10);
 			
-			for(PrivateParcel p: order) {
+			for(PrivateParcelBuilder p: order) {
 				assertNotEquals(WORK, p.getDestinationType());
-				assertEquals("Dummy Delivery Service", p.getDeliveryService());
-				assertIn(p.getPlannedArrivalDate(), Time.start, Time.start.plusDays(6));
-				assertDayPrecision(p.getPlannedArrivalDate());
+				assertIn(p.getArrivalDate(), Time.start, Time.start.plusDays(6));
+				assertDayPrecision(p.getArrivalDate());
 			}
 			
 		}
@@ -150,17 +131,16 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void workInsidePersonDefaultModel() {
-		ParcelDemandModel<PickUpParcelPerson> model = ParcelDemandModelBuilder.defaultPrivateParcelModel(centers, results);
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = PrivateParcelDemandModelBuilder.defaultPrivateParcelModel(centers, results);
 		
-		List<Collection<PrivateParcel>> orders = generateNParcels(model, workInsidePerson, 10);
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workInsidePerson, 10);
 		
-		for(Collection<PrivateParcel> order : orders) {
+		for(Collection<PrivateParcelBuilder> order : orders) {
 			assertTrue(0 <= order.size() && order.size() <= 10);
 			
-			for(PrivateParcel p: order) {
-				assertEquals("Dummy Delivery Service", p.getDeliveryService());
-				assertIn(p.getPlannedArrivalDate(), Time.start, Time.start.plusDays(6));
-				assertDayPrecision(p.getPlannedArrivalDate());
+			for(PrivateParcelBuilder p: order) {
+				assertIn(p.getArrivalDate(), Time.start, Time.start.plusDays(6));
+				assertDayPrecision(p.getArrivalDate());
 			}
 			
 		}
@@ -169,17 +149,16 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void workOutsidePersonDefaultModel() {
-		ParcelDemandModel<PickUpParcelPerson> model = ParcelDemandModelBuilder.defaultPrivateParcelModel(centers, results);
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = PrivateParcelDemandModelBuilder.defaultPrivateParcelModel(centers, results);
 		
-		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
-		for(Collection<PrivateParcel> order : orders) {
+		for(Collection<PrivateParcelBuilder> order : orders) {
 			assertTrue(0 <= order.size() && order.size() <= 10);
 			
-			for(PrivateParcel p: order) {
-				assertEquals("Dummy Delivery Service", p.getDeliveryService());
-				assertIn(p.getPlannedArrivalDate(), Time.start, Time.start.plusDays(6));
-				assertDayPrecision(p.getPlannedArrivalDate());
+			for(PrivateParcelBuilder p: order) {
+				assertIn(p.getArrivalDate(), Time.start, Time.start.plusDays(6));
+				assertDayPrecision(p.getArrivalDate());
 			}
 			
 		}
@@ -188,18 +167,17 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void workOutsidePersonDefaultModelWithZoneFilter() {
-		ParcelDemandModel<PickUpParcelPerson> model = ParcelDemandModelBuilder.defaultPrivateParcelModel(centers, workZoneFilter, results);
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = PrivateParcelDemandModelBuilder.defaultPrivateParcelModel(centers, workZoneFilter, results);
 		
-		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
-		for(Collection<PrivateParcel> order : orders) {
+		for(Collection<PrivateParcelBuilder> order : orders) {
 			assertTrue(0 <= order.size() && order.size() <= 10);
 			
-			for(PrivateParcel p: order) {
+			for(PrivateParcelBuilder p: order) {
 				assertNotEquals(WORK, p.getDestinationType());
-				assertEquals("Dummy Delivery Service", p.getDeliveryService());
-				assertIn(p.getPlannedArrivalDate(), Time.start, Time.start.plusDays(6));
-				assertDayPrecision(p.getPlannedArrivalDate());
+				assertIn(p.getArrivalDate(), Time.start, Time.start.plusDays(6));
+				assertDayPrecision(p.getArrivalDate());
 			}
 			
 		}
@@ -208,28 +186,29 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void customModelStepsNoWork() {
-		ParcelDemandModel<PickUpParcelPerson> model = ParcelDemandModelBuilder.forPrivateParcels(results)
-																			.useNormalDistributionNumberSelector(5.0, 2.0, 2, 7)
+		PrivateParcelDemandModelBuilder builder = PrivateParcelDemandModelBuilder.forPrivateParcels(results);
+		builder.useNormalDistributionNumberSelector(5.0, 2.0, 2, 7);
+		
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = builder
 																			.equalParcelDestinationSelection(workZoneFilter)
 																			.customSharesDistributionCenterSelection(sharesCenterA)
-																			.shareBasedDeliveryServiceSelection(sharesServiceB)
-																			.randomDeliveryMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+																			.useDistributionCenterAsProducer()
+																			.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
 																			.build();
 				
-		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
-		for(Collection<PrivateParcel> order : orders) {
+		for(Collection<PrivateParcelBuilder> order : orders) {
 			assertTrue(2 <= order.size() && order.size() <= 7);
 			
-			for(PrivateParcel p: order) {
-				assertNotEquals(WORK, p.getDestinationType());
-				assertEquals("ServiceB", p.getDeliveryService());
-				assertEquals(centerA, p.getDistributionCenter());
-				assertIn(p.getPlannedArrivalDate(), Time.start.plusDays(1), Time.start.plusDays(4));
-				assertMinutePrecision(p.getPlannedArrivalDate());
+			for(PrivateParcelBuilder p: order) {
+				assertNotEquals(WORK, p.getDestinationType().getValue());
+				assertEquals(centerA, p.getDistributionCenter().getValue());
+				assertIn(p.getArrivalDate(), Time.start.plusDays(1), Time.start.plusDays(4));
+				assertMinutePrecision(p.getArrivalDate());
 			}
 			
-			List<Time> times = order.stream().map(p -> p.getPlannedArrivalDate()).collect(Collectors.toList());
+			List<Time> times = order.stream().map(p -> p.getArrivalDate()).collect(Collectors.toList());
 		
 			assertTrue(times.stream().mapToInt(Time::getDay).anyMatch(i -> i != 0));
 			assertTrue(times.stream().mapToInt(Time::getHour).anyMatch(i -> i != 0));
@@ -240,30 +219,31 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void customModelStepsWorkInside() {
-		ParcelDemandModel<PickUpParcelPerson> model = ParcelDemandModelBuilder.forPrivateParcels(results)
-				.useNormalDistributionNumberSelector(5.0, 2.0, 2, 7)
+		PrivateParcelDemandModelBuilder builder = PrivateParcelDemandModelBuilder.forPrivateParcels(results);
+		builder.useNormalDistributionNumberSelector(5.0, 2.0, 2, 7);
+		
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = builder
 				.shareBasedParcelDestinationSelection(onlyHomeShares, workZoneFilter)
 				.customSharesDistributionCenterSelection(sharesCenterA)
-				.shareBasedDeliveryServiceSelection(sharesServiceB)
-				.randomDeliveryMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.useDistributionCenterAsProducer()
+				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
 				.build();
 
-		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
-		for(Collection<PrivateParcel> order : orders) {
+		for(Collection<PrivateParcelBuilder> order : orders) {
 			assertTrue(2 <= order.size() && order.size() <= 7);
 			
-			for(PrivateParcel p: order) {
+			for(PrivateParcelBuilder p: order) {
 				assertNotEquals(WORK, p.getDestinationType());
 				assertNotEquals(PACK_STATION, p.getDestinationType());
-				assertEquals(HOME, p.getDestinationType());
-				assertEquals("ServiceB", p.getDeliveryService());
-				assertEquals(centerA, p.getDistributionCenter());
-				assertIn(p.getPlannedArrivalDate(), Time.start.plusDays(1), Time.start.plusDays(4));
-				assertMinutePrecision(p.getPlannedArrivalDate());
+				assertEquals(HOME, p.getDestinationType().getValue());
+				assertEquals(centerA, p.getDistributionCenter().getValue());
+				assertIn(p.getArrivalDate(), Time.start.plusDays(1), Time.start.plusDays(4));
+				assertMinutePrecision(p.getArrivalDate());
 			}
 			
-			List<Time> times = order.stream().map(p -> p.getPlannedArrivalDate()).collect(Collectors.toList());
+			List<Time> times = order.stream().map(p -> p.getArrivalDate()).collect(Collectors.toList());
 		
 			assertTrue(times.stream().mapToInt(Time::getDay).anyMatch(i -> i != 0));
 			assertTrue(times.stream().mapToInt(Time::getHour).anyMatch(i -> i != 0));
@@ -274,28 +254,29 @@ public class DefaultParcelOrderModelTest {
 	
 	@Test
 	public void customModelStepsWorkOutside() {
-		ParcelDemandModel<PickUpParcelPerson> model = ParcelDemandModelBuilder.forPrivateParcels(results)
-				.useNormalDistributionNumberSelector(5.0, 2.0, 2, 7)
-				.equalParcelDestinationSelection(workZoneFilter)
-				.customSharesDistributionCenterSelection(sharesCenterA)
-				.shareBasedDeliveryServiceSelection(sharesServiceB)
-				.randomDeliveryMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
-				.build();
+		PrivateParcelDemandModelBuilder builder = PrivateParcelDemandModelBuilder.forPrivateParcels(results);
+		builder.useNormalDistributionNumberSelector(5.0, 2.0, 2, 7);
+				
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = 
+			builder.equalParcelDestinationSelection(workZoneFilter)
+				   .customSharesDistributionCenterSelection(sharesCenterA)
+				   .useDistributionCenterAsProducer()
+				   .randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				   .build();
 		
-		List<Collection<PrivateParcel>> orders = generateNParcels(model, workOutsidePerson, 10);
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
-		for(Collection<PrivateParcel> order : orders) {
+		for(Collection<PrivateParcelBuilder> order : orders) {
 			assertTrue(2 <= order.size() && order.size() <= 7);
 			
-			for(PrivateParcel p: order) {
-				assertNotEquals(WORK, p.getDestinationType());
-				assertEquals("ServiceB", p.getDeliveryService());
-				assertEquals(centerA, p.getDistributionCenter());
-				assertIn(p.getPlannedArrivalDate(), Time.start.plusDays(1), Time.start.plusDays(4));
-				assertMinutePrecision(p.getPlannedArrivalDate());
+			for(PrivateParcelBuilder p: order) {
+				assertNotEquals(WORK, p.getDestinationType().getValue());
+				assertEquals(centerA, p.getDistributionCenter().getValue());
+				assertIn(p.getArrivalDate(), Time.start.plusDays(1), Time.start.plusDays(4));
+				assertMinutePrecision(p.getArrivalDate());
 			}
 			
-			List<Time> times = order.stream().map(p -> p.getPlannedArrivalDate()).collect(Collectors.toList());
+			List<Time> times = order.stream().map(p -> p.getArrivalDate()).collect(Collectors.toList());
 		
 			assertTrue(times.stream().mapToInt(Time::getDay).anyMatch(i -> i != 0));
 			assertTrue(times.stream().mapToInt(Time::getHour).anyMatch(i -> i != 0));
@@ -304,11 +285,11 @@ public class DefaultParcelOrderModelTest {
 		
 	}
 	
-	private List<Collection<PrivateParcel>> generateNParcels(ParcelDemandModel<PickUpParcelPerson> model, PickUpParcelPerson person, int n) {
-		List<Collection<PrivateParcel>> parcels = new ArrayList<>();
+	private List<Collection<PrivateParcelBuilder>> generateNParcels(ParcelDemandModel<PickUpParcelPerson,PrivateParcelBuilder> model, PickUpParcelPerson person, int n) {
+		List<Collection<PrivateParcelBuilder>> parcels = new ArrayList<>();
 		
 		for(int i = 0; i < n; i++) {
-			parcels.add(model.createParcelDemand(person).stream().map(p -> (PrivateParcel) p).collect(Collectors.toList()));
+			parcels.add(model.createParcelDemand(person).stream().map(p -> (PrivateParcelBuilder) p).collect(Collectors.toList()));
 		}
 		
 		return parcels;

@@ -9,7 +9,6 @@ import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 
 public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<Business, BusinessParcelBuilder> {
 	
@@ -18,8 +17,8 @@ public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<B
 	public static BusinessParcelDemandModelBuilder forBusinessParcels(DeliveryResults results) {
 		BusinessParcelDemandModelBuilder builder = new BusinessParcelDemandModelBuilder();
 
-		builder.setRandomProvider(b -> b::getNextRandom);
-		builder.setParcelFactory(a -> new BusinessParcelBuilder(a, results));
+		builder.useRandom(b -> b::getNextRandom);
+		builder.useParcelFactory(a -> new BusinessParcelBuilder(a, results));
 
 		return builder;
 	}
