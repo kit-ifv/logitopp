@@ -44,15 +44,15 @@ public class DefaultParcelOrderModelTest {
 	private PickUpParcelPerson workInsidePerson;
 	private PickUpParcelPerson workOutsidePerson;
 	private PickUpParcelPerson noWorkPerson;
-	private Map<ParcelDestinationType, Double> onlyWorkShares = Map.of(HOME, 0.0, WORK, 1.0, PACK_STATION, 0.0);
+//	private Map<ParcelDestinationType, Double> onlyWorkShares = Map.of(HOME, 0.0, WORK, 1.0, PACK_STATION, 0.0);
 	private Map<ParcelDestinationType, Double> onlyHomeShares = Map.of(HOME, 1.0, WORK, 0.0, PACK_STATION, 0.0);
-	private Map<ParcelDestinationType, Double> onlyStationShares = Map.of(HOME, 0.0, WORK, 0.0, PACK_STATION, 1.0);
+//	private Map<ParcelDestinationType, Double> onlyStationShares = Map.of(HOME, 0.0, WORK, 0.0, PACK_STATION, 1.0);
 		
 	//Distribution Centers
 	private DistributionCenter centerA;
 	private DistributionCenter centerB;
 	private Map<DistributionCenter, Double> sharesCenterA;
-	private Map<DistributionCenter, Double> sharesCenterB;
+//	private Map<DistributionCenter, Double> sharesCenterB;
 	private List<DistributionCenter> centers;
 	
 	private Random random;
@@ -98,7 +98,7 @@ public class DefaultParcelOrderModelTest {
 		centerB = mock(DistributionCenter.class);
 		when(centerB.getRelativeShare()).thenReturn(0.5);
 		sharesCenterA = Map.of(centerA, 1.0, centerB, 0.0);
-		sharesCenterB = Map.of(centerA, 0.0, centerB, 1.0);
+//		sharesCenterB = Map.of(centerA, 0.0, centerB, 1.0);
 		centers = List.of(centerA, centerB);
 		
 		random = new Random(42);
