@@ -18,7 +18,10 @@ public class ParcelSchedulerHook implements Hook {
 		this.keepSchedule = keepSchedule;
 	}
 	
-	
+	public void register(DemandSimulatorPassenger simulator) {
+		simulator.addBeforeTimeSliceHook(this);
+	}
+		
 	public void addParcel(ParcelBuilder<?> parcel) {
 		Time time = parcel.getArrivalDate();
 		

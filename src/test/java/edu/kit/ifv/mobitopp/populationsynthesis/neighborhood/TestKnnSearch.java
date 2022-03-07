@@ -1,14 +1,20 @@
 package edu.kit.ifv.mobitopp.populationsynthesis.neighborhood;
 
+import static java.util.stream.Collectors.toList;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import edu.kit.ifv.mobitopp.simulation.demand.quantity.NormalDistributedNumberOfParcelsSelector;
 
 
 public class TestKnnSearch {
@@ -28,6 +34,28 @@ public class TestKnnSearch {
 		
 		geoPoints = rpp.nRandomPoints(8.3461,8.4488, 48.9871, 49.0261, 100000);
 		geoTarget = rpp.randomPoint(8.3461,8.4488, 48.9871, 49.0261);
+	}
+	
+	@Test
+	public void unknownTargetLeaf() {
+		KdTree<Point2D> tree = new KdTree<Point2D>(points, Function.identity(), 4, new EuclidDistanceMetric());
+		Leaf<Point2D> targetLeaf = new Leaf<Point2D>(-12,-12);
+		
+		assertThrows(IllegalArgumentException.class,
+			() -> {
+				 	KNNSearch.findKNN(tree, targetLeaf.getPoint(), 5, 100);
+				}
+		);
+	}
+	
+	@Test
+	public void testKnnTargetObject() {
+		KdTree<Point2D> tree = new KdTree<Point2D>(points, Function.identity(), 4, new EuclidDistanceMetric());
+		Leaf<Point2D> targetLeaf = tree.getLeafs().get(0);
+		
+		Collection<Point2D> knn = KNNSearch.findKNN(tree, targetLeaf.getObject(), 5, 100);
+		Collection<Leaf<Point2D>> leafs = tree.getLeafs().stream().filter(l -> knn.contains(l.getObject())).collect(toList());
+		assertCorrectNeighbors(leafs, tree, targetLeaf, 5, 100);
 	}
 	
 	@Test

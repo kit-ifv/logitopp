@@ -1,11 +1,16 @@
 package edu.kit.ifv.mobitopp.populationsynthesis.neighborhood;
 
 import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
 
@@ -25,6 +30,12 @@ public class TestKdTree {
 		points = new RandomPointProvider().nRandomPoints(50, 950, 1000);
 	}
 	
+	@Test
+	public void testSimpleTreeOfPoints() throws InterruptedException {
+		tree = new KdTree<Point2D>(points, NODE_CAPACITY, new EuclidDistanceMetric());
+		
+		assertContainment((InnerNode<Point2D>) tree.getRoot());
+	}
 	
 	@Test
 	public void testSimpleTree() throws InterruptedException {
@@ -36,8 +47,8 @@ public class TestKdTree {
 	private void assertContainment(InnerNode<Point2D> node) {
 		Rectangle2D rect = node.getRect();
 		
-		for (Point2D point : node.getNestedLeaves().stream().map(Leaf::getObject).collect(toList())) {
-			String msg = "rect " + rect.toString() + " does not contain leaf " +  point.toString();
+		for (Point2D point : node.getNestedLeaves().stream().map(Leaf::getPoint).collect(toList())) {
+			String msg = "rect " + rect.toString() + " does not contain leaf " +  String.valueOf(point);
 			
 			assertTrue(rect.getMinX() - EPS <= point.getX(), msg);
 			assertTrue(rect.getMinY() - EPS <= point.getY(), msg);
@@ -56,4 +67,22 @@ public class TestKdTree {
 		}
 		
 	}
+	
+	@Test
+	public void emptyTree() {
+		tree = new KdTree<Point2D>(new ArrayList<>(), Function.identity(), NODE_CAPACITY, new EuclidDistanceMetric());
+		
+		assertNull(tree.getRoot());
+		assertTrue(tree.isEmpty());
+	}
+	
+	@Test
+	public void singeltonTree() {
+		Leaf<Point2D> leaf = new Leaf<>(1,1);
+		tree = new KdTree<Point2D>(Arrays.asList(leaf), NODE_CAPACITY, new EuclidDistanceMetric());
+		
+		assertEquals(tree.getRoot(), leaf);
+		assertFalse(tree.isEmpty());
+	}
+	
 }

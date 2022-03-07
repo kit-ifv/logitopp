@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
 
-public class CollectionsUtil {
+public final class CollectionsUtil {
 	
 	public static <T> Collection<List<T>> groupBy(List<T> items, BiPredicate<T,T> equals) {
 		

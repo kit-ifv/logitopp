@@ -73,7 +73,7 @@ public class Leaf<O> implements Node<O> {
 	
 			
 	public String treeFormat(String indent) {
-		return indent + this.point.toString() + "\n";
+		return indent + String.valueOf(this.object) + " [" + this.point.getX() + "," + this.point.getY() + "]" + "\n";
 	}	
 
 }

@@ -73,7 +73,7 @@ public class InnerNode<O> implements Node<O> {
 		
 	
 	public String treeFormat(String indent) {
-		String str = indent + "Box " + this.rect.toString() + ":" + ": \n";
+		String str = indent + "Box [x=" + this.rect.getMinX() + ",y=" + this.rect.getMinY() + ",w=" + this.rect.getWidth() + ",h=" + this.rect.getHeight() + "]: \n";
 		
 		for (Node<O> child : this.children) {
 			str += child.treeFormat(indent + "  ");
