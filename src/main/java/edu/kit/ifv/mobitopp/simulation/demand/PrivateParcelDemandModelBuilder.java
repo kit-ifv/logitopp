@@ -68,7 +68,7 @@ public class PrivateParcelDemandModelBuilder extends ParcelDemandModelBuilder<Pi
 	public static ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> defaultPrivateParcelModel(Collection<DistributionCenter> distributionCenters, Predicate<Zone> workZoneFilter, DeliveryResults results) {
 		PrivateParcelDemandModelBuilder builder = forPrivateParcels(results);
 		
-		builder.useNormalDistributionNumberSelector(0.65, 0.5, 10);
+		builder.useNormalDistributionNumberSelector(0.65, 0.5, 1, 10);
 		
 		return builder.equalParcelDestinationSelection(workZoneFilter)
 					  .shareBasedDistributionCenterSelection(distributionCenters)

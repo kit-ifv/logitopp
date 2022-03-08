@@ -9,6 +9,7 @@ import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +30,7 @@ import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.demand.quantity.NormalDistributedNumberOfParcelsSelector;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
@@ -136,7 +138,7 @@ public class DefaultParcelOrderModelTest {
 		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workInsidePerson, 10);
 		
 		for(Collection<PrivateParcelBuilder> order : orders) {
-			assertTrue(0 <= order.size() && order.size() <= 10);
+			assertTrue(1 <= order.size() && order.size() <= 10);
 			
 			for(PrivateParcelBuilder p: order) {
 				assertIn(p.getArrivalDate(), Time.start, Time.start.plusDays(6));
@@ -154,7 +156,7 @@ public class DefaultParcelOrderModelTest {
 		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
 		for(Collection<PrivateParcelBuilder> order : orders) {
-			assertTrue(0 <= order.size() && order.size() <= 10);
+			assertTrue(1 <= order.size() && order.size() <= 10);
 			
 			for(PrivateParcelBuilder p: order) {
 				assertIn(p.getArrivalDate(), Time.start, Time.start.plusDays(6));
@@ -164,7 +166,7 @@ public class DefaultParcelOrderModelTest {
 		}
 		
 	}
-	
+		
 	@Test
 	public void workOutsidePersonDefaultModelWithZoneFilter() {
 		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = PrivateParcelDemandModelBuilder.defaultPrivateParcelModel(centers, workZoneFilter, results);
@@ -172,7 +174,7 @@ public class DefaultParcelOrderModelTest {
 		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
 		
 		for(Collection<PrivateParcelBuilder> order : orders) {
-			assertTrue(0 <= order.size() && order.size() <= 10);
+			assertTrue(1 <= order.size() && order.size() <= 10);
 			
 			for(PrivateParcelBuilder p: order) {
 				assertNotEquals(WORK, p.getDestinationType());
@@ -281,6 +283,140 @@ public class DefaultParcelOrderModelTest {
 			assertTrue(times.stream().mapToInt(Time::getDay).anyMatch(i -> i != 0));
 			assertTrue(times.stream().mapToInt(Time::getHour).anyMatch(i -> i != 0));
 			assertTrue(times.stream().mapToInt(Time::getMinute).anyMatch(i -> i != 0));
+		}
+		
+	}
+	
+	@Test
+	public void customModelStepsCustomNum() {
+		PrivateParcelDemandModelBuilder builder = PrivateParcelDemandModelBuilder.forPrivateParcels(results);
+		builder.useNumberSelector(new NormalDistributedNumberOfParcelsSelector<>(0.5, 0.65, 1, 10));
+				
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = builder
+				.shareBasedParcelDestinationSelection(onlyHomeShares, workZoneFilter)
+				.customSharesDistributionCenterSelection(sharesCenterA)
+				.useDistributionCenterAsProducer()
+				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.build();
+
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
+		
+		for(Collection<PrivateParcelBuilder> order : orders) {
+			assertTrue(1 <= order.size() && order.size() <= 10);
+		}
+		
+	}
+	
+	@Test
+	public void customModelStepsUseRandomNum() {
+		PrivateParcelDemandModelBuilder builder = PrivateParcelDemandModelBuilder.forPrivateParcels(results);
+		builder.useRandomNumberSelector(1, 8, 1.0);
+				
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = builder
+				.shareBasedParcelDestinationSelection(onlyHomeShares, workZoneFilter)
+				.customSharesDistributionCenterSelection(sharesCenterA)
+				.useDistributionCenterAsProducer()
+				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.build();
+
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
+		
+		for(Collection<PrivateParcelBuilder> order : orders) {
+			assertTrue(1 <= order.size() && order.size() <= 7);
+		}
+		
+	}
+	
+	@Test
+	public void customModelStepsUseNullNum() {
+		PrivateParcelDemandModelBuilder builder = PrivateParcelDemandModelBuilder.forPrivateParcels(results);
+		builder.useNullNumberSelector();
+				
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = builder
+				.shareBasedParcelDestinationSelection(onlyHomeShares, workZoneFilter)
+				.customSharesDistributionCenterSelection(sharesCenterA)
+				.useDistributionCenterAsProducer()
+				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.build();
+
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
+		
+		for(Collection<PrivateParcelBuilder> order : orders) {
+			assertTrue(0== order.size());
+		}
+		
+	}
+	
+	@Test
+	public void customModelStepsUseNumNoMin() {
+		PrivateParcelDemandModelBuilder builder = PrivateParcelDemandModelBuilder.forPrivateParcels(results);
+		builder.useNormalDistributionNumberSelector(5, 0.1, 10);
+				
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = builder
+				.shareBasedParcelDestinationSelection(onlyHomeShares, workZoneFilter)
+				.customSharesDistributionCenterSelection(sharesCenterA)
+				.useDistributionCenterAsProducer()
+				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.build();
+
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
+		
+		for(Collection<PrivateParcelBuilder> order : orders) {
+			assertTrue(0 <= order.size() && order.size() <= 10);
+		}
+		
+	}
+	
+	@Test
+	public void filterBeforeNumException() {
+		PrivateParcelDemandModelBuilder builder = PrivateParcelDemandModelBuilder.forPrivateParcels(results);
+		
+		assertThrows(IllegalStateException.class,
+			() -> {
+				builder.filterRecipients(null);
+			}
+		);
+		
+	}
+	
+	@Test
+	public void filterNoPersonModel() {
+		PrivateParcelDemandModelBuilder builder = PrivateParcelDemandModelBuilder.forPrivateParcels(results);
+		builder.useNormalDistributionNumberSelector(5, 0.1, 10);
+		builder.filterRecipients(p -> true);
+				
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = builder
+				.shareBasedParcelDestinationSelection(onlyHomeShares, workZoneFilter)
+				.customSharesDistributionCenterSelection(sharesCenterA)
+				.useDistributionCenterAsProducer()
+				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.build();
+
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
+		
+		for(Collection<PrivateParcelBuilder> order : orders) {
+			assertTrue(0 <= order.size() && order.size() <= 10);
+		}
+		
+	}
+	
+	@Test
+	public void filterAllPersonModel() {
+		PrivateParcelDemandModelBuilder builder = PrivateParcelDemandModelBuilder.forPrivateParcels(results);
+		builder.useNormalDistributionNumberSelector(5, 0.1, 10);
+		builder.filterRecipients(p -> false);
+				
+		ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> model = builder
+				.shareBasedParcelDestinationSelection(onlyHomeShares, workZoneFilter)
+				.customSharesDistributionCenterSelection(sharesCenterA)
+				.useDistributionCenterAsProducer()
+				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.build();
+
+		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
+		
+		for(Collection<PrivateParcelBuilder> order : orders) {
+			assertTrue(0 == order.size());
 		}
 		
 	}
