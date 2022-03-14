@@ -30,13 +30,13 @@ public class DeliveryActivityBuilder {
 
 	public DeliveryActivityBuilder addParcel(IParcel parcel) {
 		this.parcels.add(parcel);
-		verifyLocations();
+		verifyZone();
 		return this;
 	}
 
 	public DeliveryActivityBuilder addParcels(Collection<IParcel> parcels) {
 		this.parcels.addAll(parcels);
-		verifyLocations();
+		verifyZone();
 		return this;
 	}
 
@@ -72,10 +72,10 @@ public class DeliveryActivityBuilder {
 				estimateDuration(deliveryPerson.getEfficiency()), tripDur, deliveryPerson);
 	}
 
-	private void verifyLocations() {
-		if (this.parcels.stream().map(IParcel::getLocation).distinct().count() > 1) {
+	protected void verifyZone() {
+		if (this.parcels.stream().map(IParcel::getZone).distinct().count() > 1) {
 			throw new IllegalStateException(
-					"All parcels within a delivery activity should have the same delivery location.");
+					"All parcels within a delivery activity should have the same delivery zone.");
 		}
 	}
 	
@@ -93,6 +93,11 @@ public class DeliveryActivityBuilder {
 		}
 		
 		return parcels.iterator().next().getZone();
+	}
+	
+	
+	public DeliveryActivityBuilder merge(DeliveryActivityBuilder other) {
+		return new DeliveryActivityBuilder().addParcels(this.getParcels()).addParcels(other.getParcels());
 	}
 
 }
