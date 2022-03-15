@@ -17,11 +17,11 @@ import lombok.Getter;
 @Getter
 public class DeliveryActivityBuilder {
 
-	private DeliveryPerson deliveryPerson;
-	private ActivityIfc work;
-	private Time plannedTime;
-	private int tripDuration;
-	private Collection<IParcel> parcels;
+	protected DeliveryPerson deliveryPerson;
+	protected ActivityIfc work;
+	protected Time plannedTime;
+	protected int tripDuration;
+	protected Collection<IParcel> parcels;
 
 	public DeliveryActivityBuilder() {
 		this.parcels = new ArrayList<>();
