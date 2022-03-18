@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
+import edu.kit.ifv.mobitopp.simulation.demand.attributes.LatentModelStepWarpper;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedParcelDestinationSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
@@ -29,6 +30,15 @@ public class PrivateParcelDemandModelBuilder extends ParcelDemandModelBuilder<Pi
 	
 	public <T> PrivateParcelDemandModelBuilder addPrivateStep(ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, T> step, BiConsumer<PrivateParcelBuilder, ValueProvider<T>> propertySetter) {
 		verifyAndInitialize();
+		
+		ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, T> nextStep;
+		if (nextIsLatent) {
+			nextStep = new LatentModelStepWarpper<>(step);
+			
+		} else {
+			nextStep = step;
+		}
+		nextIsLatent = false;
 		
 		this.parcelOrderModel.add(step, propertySetter);
 		

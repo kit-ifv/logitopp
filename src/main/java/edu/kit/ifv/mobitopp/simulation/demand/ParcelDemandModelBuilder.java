@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.CopyProviderModelStep;
+import edu.kit.ifv.mobitopp.simulation.demand.attributes.LatentModelStepWarpper;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedSelector;
@@ -33,6 +34,7 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 	private Function<A, P> parcelFactory;
 	
 	protected GenericParcelDemandModel<A, P> parcelOrderModel;
+	protected boolean nextIsLatent = false;
 
 
 	public ParcelDemandModelBuilder<A,P> useRandom(Function<A, DoubleSupplier> randomProvider) {
@@ -101,10 +103,26 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 		this.parcelOrderModel = new GenericParcelDemandModel<>(numberOfParcelsSelector, randomProvider, parcelFactory);
 	}
 	
+	
+	
+	public ParcelDemandModelBuilder<A,P> asLatent() {
+		this.nextIsLatent  = true;
+		return this;
+	}
+	
 	public <T> ParcelDemandModelBuilder<A,P> addStep(ParcelDemandModelStep<A, P, T> step, BiConsumer<P, ValueProvider<T>> propertySetter) {
 		verifyAndInitialize();
 		
-		this.parcelOrderModel.add(step, propertySetter);
+		ParcelDemandModelStep<A, P, T> nextStep;
+		if (nextIsLatent) {
+			nextStep = new LatentModelStepWarpper<>(step);
+			
+		} else {
+			nextStep = step;
+		}
+		nextIsLatent = false;
+		
+		this.parcelOrderModel.add(nextStep, propertySetter);
 		
 		return this;
 	}
