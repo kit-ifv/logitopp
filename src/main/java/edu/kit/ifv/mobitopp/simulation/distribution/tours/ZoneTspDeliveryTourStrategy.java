@@ -1,6 +1,5 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours;
 
-import static java.lang.Math.floor;
 import static java.lang.Math.round;
 import static java.util.stream.Collectors.toList;
 

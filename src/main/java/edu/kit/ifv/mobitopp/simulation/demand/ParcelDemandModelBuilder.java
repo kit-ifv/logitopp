@@ -25,7 +25,6 @@ import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.time.Time;
-import lombok.Setter;
 
 public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBuilder<A>> {
 

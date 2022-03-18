@@ -2,50 +2,14 @@ package edu.kit.ifv.mobitopp.simulation.person;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import edu.kit.ifv.mobitopp.data.Zone;
-import edu.kit.ifv.mobitopp.data.person.PersonId;
-import edu.kit.ifv.mobitopp.data.tourbasedactivitypattern.TourBasedActivityPattern;
-import edu.kit.ifv.mobitopp.simulation.ActivityType;
-import edu.kit.ifv.mobitopp.simulation.Car;
-import edu.kit.ifv.mobitopp.simulation.Employment;
-import edu.kit.ifv.mobitopp.simulation.FixedDestination;
-import edu.kit.ifv.mobitopp.simulation.Gender;
-import edu.kit.ifv.mobitopp.simulation.Graduation;
-import edu.kit.ifv.mobitopp.simulation.Household;
-import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
-import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;
-import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
-import edu.kit.ifv.mobitopp.simulation.PersonAttributes;
-import edu.kit.ifv.mobitopp.simulation.ReschedulingStrategy;
-import edu.kit.ifv.mobitopp.simulation.RideSharingOffers;
 import edu.kit.ifv.mobitopp.simulation.SimulationOptionsCustomization;
-import edu.kit.ifv.mobitopp.simulation.Trip;
-import edu.kit.ifv.mobitopp.simulation.ZoneBasedRouteChoice;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityPeriodFixer;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityScheduleWithState;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.PickUpParcelReschedulingStrategy;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.randomizer.ActivityStartAndDurationRandomizer;
-import edu.kit.ifv.mobitopp.simulation.bikesharing.Bike;
-import edu.kit.ifv.mobitopp.simulation.car.PrivateCar;
-import edu.kit.ifv.mobitopp.simulation.destinationChoice.DestinationChoiceModel;
-import edu.kit.ifv.mobitopp.simulation.events.DemandSimulationEventIfc;
-import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
-import edu.kit.ifv.mobitopp.simulation.modeChoice.ModeChoicePreferences;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
-import edu.kit.ifv.mobitopp.simulation.publictransport.model.Vehicle;
-import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
-import edu.kit.ifv.mobitopp.simulation.tour.TourFactory;
-import edu.kit.ifv.mobitopp.time.Time;
 
 /**
  * The Class PickUpParcelPerson decorates a {@link SimulationPerson}
