@@ -27,7 +27,7 @@ public class CopyProviderModelStep<A extends ParcelAgent, P extends ParcelBuilde
 		ValueProvider<? extends T> source = getter.apply(parcel);
 		
 		if (source.isDetermined()) {
-			propertySetter.accept(parcel, new DeterminedValueProvider<>(source.getValue()));
+			propertySetter.accept(parcel, new InstantValueProvider<>(source.getValue()));
 			
 		} else {
 			propertySetter.accept(parcel, new LatentValueProvider<>(() -> (T) source.getValue()));

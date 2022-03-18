@@ -1,10 +1,10 @@
 package edu.kit.ifv.mobitopp.simulation.demand.attributes;
 
-public class DeterminedValueProvider<T> implements ValueProvider<T> {
+public class InstantValueProvider<T> implements ValueProvider<T> {
 	
 	private final T value;
 	
-	public DeterminedValueProvider(T value) {
+	public InstantValueProvider(T value) {
 		this.value = value;
 	}
 

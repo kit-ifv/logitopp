@@ -169,6 +169,10 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 		return this.addStep(step, ParcelBuilder::setArrivalDate);
 	}
 	
+	public ParcelDemandModelBuilder<A,P> shareBasedArrivalDateSelection(Map<Time,Double> shares) {
+		return this.selectShareBased(shares, ParcelBuilder::setArrivalDate);
+	}
+	
 	public ParcelDemandModelBuilder<A,P> randomArrivalDateSelection(Time from, Time untilExclusive, Function<Time, Time> precision) {
 		return this.customArrivalDateSelection(new RandomDateSelector<>(from, untilExclusive, precision));
 	}

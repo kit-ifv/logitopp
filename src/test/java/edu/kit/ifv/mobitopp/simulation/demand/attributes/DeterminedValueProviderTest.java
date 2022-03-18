@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 public class DeterminedValueProviderTest {
 
-	private DeterminedValueProvider<Element> provider;
+	private InstantValueProvider<Element> provider;
 	private Element value;
 	
 	class Element {
@@ -21,7 +21,7 @@ public class DeterminedValueProviderTest {
 	@BeforeEach
 	public void setUp() {
 		this.value = new Element();
-		this.provider = new DeterminedValueProvider<>(value);
+		this.provider = new InstantValueProvider<>(value);
 		
 	}
 	

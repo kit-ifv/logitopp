@@ -19,7 +19,7 @@ public interface ParcelDemandModelStep<A extends ParcelAgent, P extends ParcelBu
 		
 		if (determinePreSimulation(parcel, otherParcels, numOfParcels, randomNumber)) {
 			T result = select(parcel, otherParcels, numOfParcels, randomNumber);
-			propertySetter.accept(parcel, new DeterminedValueProvider<T>(result));
+			propertySetter.accept(parcel, new InstantValueProvider<T>(result));
 			
 		} else {
 			Supplier<T> provider = () -> select(parcel, otherParcels, numOfParcels, randomNumber);

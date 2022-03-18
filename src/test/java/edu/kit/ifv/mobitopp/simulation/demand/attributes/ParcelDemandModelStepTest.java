@@ -62,7 +62,7 @@ public class ParcelDemandModelStepTest {
 		
 		this.spiedStep.set(null, null, 2, 1.7, propertySetter);
 		
-		assertTrue(this.result instanceof DeterminedValueProvider);
+		assertTrue(this.result instanceof InstantValueProvider);
 		assertTrue(this.result.isDetermined());
 		assertEquals("hello", this.result.getValue());
 		verify(this.spiedStep, times(1)).select(null, null, 2, 1.7);

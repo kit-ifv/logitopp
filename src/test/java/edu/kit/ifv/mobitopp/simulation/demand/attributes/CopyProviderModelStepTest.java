@@ -37,7 +37,7 @@ public class CopyProviderModelStepTest {
 	
 	@Test
 	public void copyDeterminedProvider() {
-		this.source = new DeterminedValueProvider<>("start");
+		this.source = new InstantValueProvider<>("start");
 		assertTrue(this.source.isDetermined());
 		
 		this.step = new CopyProviderModelStep<>(p -> this.source);
@@ -45,7 +45,7 @@ public class CopyProviderModelStepTest {
 		
 		assertTrue(this.destination.isDetermined());
 		assertEquals("start", this.destination.getValue());
-		assertTrue(this.destination instanceof DeterminedValueProvider);
+		assertTrue(this.destination instanceof InstantValueProvider);
 		assertNotEquals(this.source, this.destination);		
 	}
 	
@@ -67,7 +67,7 @@ public class CopyProviderModelStepTest {
 		
 		assertTrue(this.destination.isDetermined());
 		assertEquals("changed", this.destination.getValue());
-		assertTrue(this.destination instanceof DeterminedValueProvider);
+		assertTrue(this.destination instanceof InstantValueProvider);
 		assertNotEquals(this.source, this.destination);	
 	}
 
