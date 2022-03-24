@@ -17,5 +17,10 @@ public interface NullParcelProducer extends ParcelAgent {
 		// Do nothing, no parcel production
 	}
 	
+	@Override
+	default int getPlannedProductionQuantity() {
+		return 0;
+	}
+	
 }
 

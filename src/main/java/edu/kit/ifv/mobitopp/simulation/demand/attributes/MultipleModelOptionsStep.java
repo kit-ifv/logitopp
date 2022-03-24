@@ -18,17 +18,17 @@ public abstract class MultipleModelOptionsStep<A extends ParcelAgent, P extends 
 	
 	@SafeVarargs
 	public MultipleModelOptionsStep(ParcelDemandModelStep<A, P, T> ... choiceSet) {
-		this.choiceSet = Arrays.asList(choiceSet);
+		this(Arrays.asList(choiceSet));
 	}
 		
 	@Override
 	public boolean determinePreSimulation(P parcel, Collection<P> otherParcels, int numOfParcels, double randomNumber) {
-		return false;
+		throw new UnsupportedOperationException("determinePreSimulation should not be called MultipleModelOptionsStep, since it is delegated in set");
 	}
 	
 	@Override
 	public T select(P parcel, Collection<P> otherParcels, int numOfParcels, double randomNumber) {
-		return null;
+		throw new UnsupportedOperationException("select should not be called MultipleModelOptionsStep, since it is delegated in set");
 	}
 	
 	@Override

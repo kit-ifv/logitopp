@@ -23,6 +23,11 @@ public class Business implements ParcelAgent {
 	public void addActualProductionQuantity(int quantity) {
 		this.coveredProductionQuantitiy += quantity;
 	}
+	
+	@Override
+	public int getPlannedProductionQuantity() {
+		return this.plannedProductionQuantitiy;
+	}
 
 	
 	
@@ -35,6 +40,8 @@ public class Business implements ParcelAgent {
 	public double getNextRandom() {
 		return 42.0;
 	}
+
+
 
 
 

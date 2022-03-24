@@ -1,5 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.demand;
 
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import edu.kit.ifv.mobitopp.simulation.demand.attributes.CopyProviderModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.LatentModelStepWarpper;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector;
+import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedMultipleModelOptionsStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.FilteredNumberOfParcelsSelector;
@@ -141,6 +143,17 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 	}
 	
 	
+	
+	@SuppressWarnings("unchecked")
+	public  <T> ParcelDemandModelBuilder<A,P> equalDistributionStepOptions(BiConsumer<P, ValueProvider<T>> propertySetter, ParcelDemandModelStep<A, P, T> ... steps) {
+		Map<ParcelDemandModelStep<A, P, T>, Double> shares = Arrays.asList(steps).stream().collect(toMap(identity(), e -> 1.0));
+		
+		return this.addStep(new ShareBasedMultipleModelOptionsStep<>(shares), propertySetter);
+	}
+	
+	public  <T> ParcelDemandModelBuilder<A,P> shareBasedStepOptions(Map<ParcelDemandModelStep<A, P, T>, Double> shares, BiConsumer<P, ValueProvider<T>> propertySetter) {		
+		return this.addStep(new ShareBasedMultipleModelOptionsStep<>(shares), propertySetter);
+	}
 	
 	
 	

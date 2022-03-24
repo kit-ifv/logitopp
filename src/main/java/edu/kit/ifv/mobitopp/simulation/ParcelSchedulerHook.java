@@ -1,6 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,10 @@ public class ParcelSchedulerHook implements Hook {
 	
 	public void register(DemandSimulatorPassenger simulator) {
 		simulator.addBeforeTimeSliceHook(this);
+	}
+	
+	public void addParcels(ParcelBuilder<?> ... parcels) {
+		Arrays.asList(parcels).forEach(this::addParcel);
 	}
 		
 	public void addParcel(ParcelBuilder<?> parcel) {
