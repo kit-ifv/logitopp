@@ -66,7 +66,7 @@ public class GenericParcelDemandModel<A extends ParcelAgent, P extends ParcelBui
 	
 	private void logQuantity(int q) {
 		this.recipients++;
-		int count = (statistics.containsKey(q)) ? 0 : statistics.get(q);
+		int count = (statistics.containsKey(q)) ? statistics.get(q) : 0;
 		this.statistics.put(q , count+1);
 	}
 	
