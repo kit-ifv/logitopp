@@ -127,6 +127,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			
 			if (time.plusMinutes(round(withReturn)).isBeforeOrEqualTo(endOfWork)) {
 				assigned.add(delivery);
+				lastZone = delivery.getZone();
 			} else {
 				break;
 			}
