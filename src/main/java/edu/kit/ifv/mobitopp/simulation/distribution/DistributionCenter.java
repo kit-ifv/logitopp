@@ -16,6 +16,7 @@ import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -142,23 +143,27 @@ public class DistributionCenter implements NullParcelProducer {
 		return deliveries;
 	}
 
-	/**
-	 * Adds the parcel order.
-	 *
-	 * @param parcel the parcel
-	 */
-	public void addParcelOrder(IParcel parcel) {
+	@Override
+	public void addParcel(IParcel parcel) {
 		this.currentParcels.add(parcel);
 	}
 
-	/**
-	 * Removes the parcel order.
-	 *
-	 * @param parcel the parcel
-	 */
-	public void removeParcelOrder(IParcel parcel) {
+
+	@Override
+	public void removeParcel(IParcel parcel) {
 		this.currentParcels.remove(parcel);
 	}
+	
+	@Override
+	public void addDelivered(PrivateParcel parcel) {
+		this.delivered.add(parcel);
+	}
+	
+	@Override
+	public ParcelPolicyProvider getPolicyProvider() {
+		return this.policyProvider;
+	}
+	
 
 	/**
 	 * Adds the employee.
@@ -198,16 +203,10 @@ public class DistributionCenter implements NullParcelProducer {
 	public ZoneAndLocation getZoneAndLocation() {
 		return new ZoneAndLocation(this.zone, this.location);
 	}
+
 	
-	
-	
-	
-	public DistributionServiceProvider getServiceProvider() {
-		return null;//TODO
+	@Override
+	public String toString() {
+		return this.name;
 	}
-
-	
-
-
-
 }

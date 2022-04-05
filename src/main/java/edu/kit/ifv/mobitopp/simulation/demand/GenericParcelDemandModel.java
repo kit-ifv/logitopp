@@ -25,7 +25,7 @@ public class GenericParcelDemandModel<A extends ParcelAgent, P extends ParcelBui
 	private final Function<A, P> parcelFactory;
 
 	private final Map<Integer, Integer> statistics;
-	private int recipients = 0;
+	private int agents = 0;
 
 	public GenericParcelDemandModel(ParcelQuantityModel<A> numberOfParcelsSelector,
 			Function<A, DoubleSupplier> randomProvider,
@@ -65,7 +65,7 @@ public class GenericParcelDemandModel<A extends ParcelAgent, P extends ParcelBui
 	}
 	
 	private void logQuantity(int q) {
-		this.recipients++;
+		this.agents++;
 		int count = (statistics.containsKey(q)) ? statistics.get(q) : 0;
 		this.statistics.put(q , count+1);
 	}
@@ -73,9 +73,9 @@ public class GenericParcelDemandModel<A extends ParcelAgent, P extends ParcelBui
 	public void printStatistics(String label) {
 		List<Integer> index = this.statistics.keySet().stream().sorted().collect(Collectors.toList());
 		
-		int sum = this.statistics.values().stream().mapToInt(i -> i).sum();
+		int sum = this.statistics.entrySet().stream().mapToInt(e -> e.getKey() * e.getValue()).sum();
 		
-		System.out.println("Generated " + sum + " " + label + " parcels for " + this.recipients + " potential recipients." );
+		System.out.println("\nGenerated " + sum + " " + label + " parcels for " + this.agents + " agents." );
 		System.out.println("Number of " + label + " parcel distribution:");
 		for (int i : index) {
 			System.out.println("Order size " + i + ": " + this.statistics.get(i));

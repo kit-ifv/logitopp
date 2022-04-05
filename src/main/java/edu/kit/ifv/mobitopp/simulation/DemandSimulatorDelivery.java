@@ -32,9 +32,9 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	private final DeliveryPersonFactory deliveryPersonFactory;
 	private final Predicate<Person> personFilter;
 	
-	private Collection<Business> businesses;
-	private Predicate<Business> businessDemandFilter;
-	private Predicate<Business> businessProductionFilter;
+	private final Collection<Business> businesses;
+	private final Predicate<Business> businessDemandFilter;
+	private final Predicate<Business> businessProductionFilter;
 	
 	private final ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> privateDemandModel;
 	private final ParcelDemandModel<Business, BusinessParcelBuilder> businessDemandModel;
@@ -63,6 +63,9 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param results                    the delivery results
 	 * @param personFilter               the person filter do determine which
 	 *                                   persons should be simulated
+	 * @param businesses 
+	 * @param businessDemandFilte 
+	 * @param businessProductionFilte 
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
@@ -76,10 +79,15 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			final ParcelDemandModel<Business, BusinessParcelBuilder> businessDemandModel,
 			final ParcelDemandModel<Business, BusinessParcelBuilder> businessProductionModel,
 			final DeliveryResults results,
-			final Predicate<Person> personFilter) {
+			final Predicate<Person> personFilter, 
+			final Predicate<Business> businessDemandFilter,
+			final Predicate<Business> businessProductionFilter, 
+			final Collection<Business> businesses) {
 
 		super(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
 				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory.getDefaultFactory());
+		this.businessDemandFilter = businessDemandFilter;
+		this.businessProductionFilter = businessProductionFilter;
 
 		this.privateDemandModel = privateDemandModel;
 		this.businessDemandModel = businessDemandModel;
@@ -88,6 +96,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		this.personFilter = personFilter;
 		this.deliveryResults = results;
 		this.schedulerHook = new ParcelSchedulerHook(false);
+		this.businesses = businesses;
 		
 		this.schedulerHook.register(this);
 	}
@@ -103,11 +112,12 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			final ParcelDemandModel<Business, BusinessParcelBuilder> businessDemandModel, 
 			final ParcelDemandModel<Business, BusinessParcelBuilder> businessProductionModel, 
 			final DeliveryResults results,
-			final Predicate<Person> personFilter) {
+			final Predicate<Person> personFilter, 
+			final Collection<Business> businesses) {
 		
 		this(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
 				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory,
-				PrivateParcelDemandModelBuilder.nullPrivateParcelModel(results), businessDemandModel, businessProductionModel, results, personFilter);
+				PrivateParcelDemandModelBuilder.nullPrivateParcelModel(results), businessDemandModel, businessProductionModel, results, personFilter, b -> true, b-> true, businesses);
 	}
 
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
@@ -119,14 +129,16 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			
 			final DeliveryPersonFactory personFactory, 
 			final DeliveryResults results,
-			final Predicate<Person> personFilter) {
+			final Predicate<Person> personFilter, Collection<Business> businesses) {
+		
 		this(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
 				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory,
 				PrivateParcelDemandModelBuilder.nullPrivateParcelModel(results),
 				BusinessParcelDemandModelBuilder.nullBusinessParcelOrderModel(results),
 				BusinessParcelDemandModelBuilder.nullBusinessParcelOrderModel(results),
 				results,
-				personFilter);
+				personFilter, b -> true, b-> true,
+				businesses);
 	}
 
 	
@@ -149,12 +161,14 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			PickUpParcelPerson ppp = createSimulatedPerson(queue, boarder, seed, p, listener, modesInSimulation, initialState);
 			createPrivateParcelDemand(ppp).forEach(schedulerHook::addParcel);
 		};
-		
-		this.privateDemandModel.printStatistics("private");
+				
 		
 		personLoader().households().flatMap(Household::persons).filter(personFilter).forEach(createAgent);
+		this.privateDemandModel.printStatistics("private");
+		
 		personLoader().clearInput();
 
+		initBusinessDemand();
 	}
 	
 
@@ -193,7 +207,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			createBusinessParcelProduction(b).forEach(schedulerHook::addParcel);
 		});
 		
-		this.businessDemandModel.printStatistics("produced");
+		this.businessProductionModel.printStatistics("produced");
 	}
 	
 

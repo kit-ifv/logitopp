@@ -14,8 +14,9 @@ public class BusinessParcelBuilder extends ParcelBuilder<Business> {
 	public IParcel doBuild() {
 		return new BusinessParcel(getAgent().location(),
 								  getAgent(),
+								  getConsumer().getValue(),
 								  getArrivalDate(),
-								  getDistributionCenter().getValue(),
+								  getProducer().getValue(),
 								  getSize().getValue(),
 								  getResults());
 	}

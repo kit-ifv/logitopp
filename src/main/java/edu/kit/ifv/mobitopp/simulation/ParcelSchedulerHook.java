@@ -33,7 +33,9 @@ public class ParcelSchedulerHook implements Hook {
 		if (this.parcels.containsKey(time)) {
 			this.parcels.get(time).add(parcel);
 		} else {
-			this.parcels.put(time, new ArrayList<>()).add(parcel);
+			ArrayList<ParcelBuilder<?>> list = new ArrayList<>();
+			list.add(parcel);
+			this.parcels.put(time, list);
 		}
 	}
 

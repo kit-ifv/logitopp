@@ -10,6 +10,7 @@ import java.util.Optional;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
@@ -25,7 +26,7 @@ public abstract class BaseParcel implements IParcel {
 	protected final int oId = OID_CNT++;
 
 	@Getter	@Setter	protected Time plannedArrivalDate;
-	@Getter	protected DistributionCenter distributionCenter;
+	@Getter	protected ParcelAgent producer;
 	@Getter	protected int deliveryAttempts = 0;
 	@Getter	protected Time deliveryTime = Time.future;
 	@Getter	protected ZoneAndLocation zoneAndLocation;
@@ -35,11 +36,11 @@ public abstract class BaseParcel implements IParcel {
 	protected final DeliveryResults results;
 	@Getter protected ParcelState state = ParcelState.UNDEFINED;
 
-	public BaseParcel(ZoneAndLocation location, Time plannedArrival, DistributionCenter distributionCenter,
+	public BaseParcel(ZoneAndLocation location, Time plannedArrival, ParcelAgent producer,
 			DeliveryResults results, ShipmentSize shipmentSize) {
 		this.results = results;
 		this.plannedArrivalDate = plannedArrival;
-		this.setDistributionCenter(distributionCenter);
+		this.setProducer(producer);
 		this.zoneAndLocation = location;
 		this.shipmentSize = shipmentSize;
 	}
@@ -93,13 +94,13 @@ public abstract class BaseParcel implements IParcel {
 	 * @param distributionCenter the new distribution center
 	 */
 	@Override
-	public void setDistributionCenter(DistributionCenter distributionCenter) {
-		if (this.distributionCenter != null) {
-			this.distributionCenter.removeParcelOrder(this);
+	public void setProducer(ParcelAgent producer) {
+		if (this.producer != null) {
+			this.producer.removeParcel(this);
 		}
 
-		this.distributionCenter = distributionCenter;
-		this.distributionCenter.addParcelOrder(this);
+		this.producer = producer;
+		this.producer.addParcel(this);
 	}
 
 	@Override
@@ -112,10 +113,10 @@ public abstract class BaseParcel implements IParcel {
 		
 		if (success) {
 			this.recipientType = recipient.get();
-			System.out.println(this.distributionCenter.getName() + " successfully delivered " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ")");
+			System.out.println(this.producer.toString() + " successfully delivered " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ")");
 			this.deliver(currentTime, deliveryGuy);
 		} else {
-			System.out.println(this.distributionCenter.getName() + " failed to deliver " + this.oId + "(attempt " + this.deliveryAttempts + ")");
+			System.out.println(this.producer.toString() + " failed to deliver " + this.oId + "(attempt " + this.deliveryAttempts + ")");
 			this.updateParcelDelivery(currentTime);
 		}
 

@@ -2,6 +2,7 @@ package edu.kit.ifv.mobitopp.simulation.parcels;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
@@ -20,8 +21,8 @@ public interface IParcel {
 	public Time getPlannedArrivalDate();
 	public void setPlannedArrivalDate(Time plannedArrivalDate);
 		
-	public DistributionCenter getDistributionCenter();
-	public void setDistributionCenter(DistributionCenter distributionCenter);
+	public ParcelAgent getProducer();
+	public void setProducer(ParcelAgent producer);
 
 	public ShipmentSize getShipmentSize();
 	

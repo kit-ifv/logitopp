@@ -7,6 +7,7 @@ import java.util.Optional;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
@@ -60,12 +61,12 @@ public class PrivateParcel extends BaseParcel {
 
 	@Override
 	protected Optional<RecipientType> canDeliver(Time currentTime) {
-		return this.distributionCenter.getPolicyProvider().forPrivate().canDeliver(this, currentTime);
+		return this.producer.getPolicyProvider().forPrivate().canDeliver(this, currentTime);
 	}
 
 	@Override
 	protected boolean updateParcelDelivery(Time currentTime) {
-		return this.distributionCenter.getPolicyProvider().forPrivate().updateParcelDelivery(this, currentTime);
+		return this.producer.getPolicyProvider().forPrivate().updateParcelDelivery(this, currentTime);
 	}
 
 	/**

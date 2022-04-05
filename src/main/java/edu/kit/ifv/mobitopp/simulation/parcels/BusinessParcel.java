@@ -5,9 +5,9 @@ import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK
 import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
+import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
-import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -17,13 +17,15 @@ public class BusinessParcel extends BaseParcel {
 	
 	@Getter
 	private final Business business;
+	@Getter private final ParcelAgent consumer;
 
-	public BusinessParcel(ZoneAndLocation location, Business business, Time plannedArrival, DistributionCenter distributionCenter,
-			ShipmentSize shipmentSize, DeliveryResults results) {
-		super(location, plannedArrival, distributionCenter, results, shipmentSize);
+	public BusinessParcel(ZoneAndLocation location, Business business, ParcelAgent consumer, Time plannedArrival,
+			ParcelAgent producer, ShipmentSize shipmentSize, DeliveryResults results) {
+		super(location, plannedArrival, producer, results, shipmentSize);
 		this.business = business;
 		this.results.logBusinessOrder(this);
 		this.results.logChange(this, null, Time.start, false);
+		this.consumer = consumer;
 	}
 
 	@Override
@@ -33,12 +35,12 @@ public class BusinessParcel extends BaseParcel {
 
 	@Override
 	protected Optional<RecipientType> canDeliver(Time currentTime) {
-		return distributionCenter.getPolicyProvider().forBusiness().canDeliver(this, currentTime);
+		return this.producer.getPolicyProvider().forBusiness().canDeliver(this, currentTime);
 	}
 
 	@Override
 	protected boolean updateParcelDelivery(Time currentTime) {
-		return distributionCenter.getPolicyProvider().forBusiness().updateParcelDelivery(this, currentTime);
+		return this.producer.getPolicyProvider().forBusiness().updateParcelDelivery(this, currentTime);
 	}
 
 	

@@ -84,7 +84,7 @@ public class PickUpParcelPerson extends SimulationPersonDecorator implements Nul
 	 */
 	public void receive(PrivateParcel parcel) {
 		this.received.add(parcel);
-		parcel.getDistributionCenter().getDelivered().add(parcel);
+		parcel.getProducer().addDelivered(parcel);
 	}
 	
 	/**

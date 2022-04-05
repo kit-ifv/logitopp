@@ -67,7 +67,7 @@ public class DeliveryAttemptsTest {
 		verify(delagate, times(1)).updateParcelDelivery(parcel1, Time.start);
 		verify(parcel1, times(0)).setDestinationType(any());
 //		verify(parcel1, times(0)).setDeliveryService(any());
-		verify(parcel1, times(0)).setDistributionCenter(any());
+		verify(parcel1, times(0)).setProducer(any());
 		verify(parcel1, times(0)).setPlannedArrivalDate(any());
 		assertEquals(res, false);
 		
@@ -75,7 +75,7 @@ public class DeliveryAttemptsTest {
 		verify(delagate, times(1)).updateParcelDelivery(parcel2, Time.start);
 		verify(parcel2, times(0)).setDestinationType(any());
 //		verify(parcel2, times(0)).setDeliveryService(any());
-		verify(parcel2, times(0)).setDistributionCenter(any());
+		verify(parcel2, times(0)).setProducer(any());
 		verify(parcel2, times(0)).setPlannedArrivalDate(any());
 		assertEquals(res, false);
 	}
@@ -86,7 +86,7 @@ public class DeliveryAttemptsTest {
 		verify(delagate, times(1)).updateParcelDelivery(parcel3, Time.start);
 		verify(parcel3, times(1)).setDestinationType(ParcelDestinationType.PACK_STATION);
 //		verify(parcel3, times(0)).setDeliveryService(any());
-		verify(parcel3, times(0)).setDistributionCenter(any());
+		verify(parcel3, times(0)).setProducer(any());
 		verify(parcel3, times(0)).setPlannedArrivalDate(any());
 		assertEquals(res, true);
 
