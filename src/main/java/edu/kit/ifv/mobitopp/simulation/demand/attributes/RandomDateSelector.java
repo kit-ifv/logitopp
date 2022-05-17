@@ -80,8 +80,8 @@ public class RandomDateSelector<A extends ParcelAgent, P extends ParcelBuilder<A
 	 * from the interval [from,until].
 	 * The selected date is cast to the models precision.
 	 *
-	 * @param parcel the {@link ParcelBuilders} for which an arrival date is selected
-	 * @param otherParcels the other {@link ParcelBuilders}s the recipient already ordered
+	 * @param parcel the {@link ParcelBuilder} for which an arrival date is selected
+	 * @param otherParcels the other {@link ParcelBuilder}s the recipient already ordered
 	 * @param numOfParcels the number of parcels the recipient will order
 	 * @param randomNumber a random number
 	 * @return the planned arrival date

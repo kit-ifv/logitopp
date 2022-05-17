@@ -12,7 +12,6 @@ import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -86,12 +85,12 @@ public abstract class BaseParcel implements IParcel {
 	}
 
 	/**
-	 * Sets the {@link DistributionCenter} from where the parcel will be delivered.
-	 * Adds the parcel to the given {@link DistributionCenter}'s parcels. If the
-	 * current distribution center is not null, remove the parcel from the current
-	 * distribution center.
+	 * Sets the {@link ParcelAgent producer} from where the parcel will be delivered.
+	 * Adds the parcel to the given {@link ParcelAgent producer}'s parcels. If the
+	 * current producer is not null, remove the parcel from the current
+	 * producer.
 	 *
-	 * @param distributionCenter the new distribution center
+	 * @param producer the new producer
 	 */
 	@Override
 	public void setProducer(ParcelAgent producer) {

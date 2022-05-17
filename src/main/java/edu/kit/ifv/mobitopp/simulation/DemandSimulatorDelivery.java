@@ -60,12 +60,13 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param personFactory              the person factory
 	 * @param privateDemandModel          the private order model
 	 * @param businessDemandModel         the business order model
+	 * @param businessProductionModel the business production model
 	 * @param results                    the delivery results
 	 * @param personFilter               the person filter do determine which
 	 *                                   persons should be simulated
-	 * @param businesses 
-	 * @param businessDemandFilte 
-	 * @param businessProductionFilte 
+	 * @param businessDemandFilter the business demand filter
+	 * @param businessProductionFilter the business production filter
+	 * @param businesses the businesses
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
@@ -101,6 +102,26 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		this.schedulerHook.register(this);
 	}
 
+	/**
+	 * Instantiates a new demand simulator delivery.
+	 *
+	 * @param destinationChoiceModel the destination choice model
+	 * @param modeChoiceModel the mode choice model
+	 * @param routeChoice the route choice
+	 * @param activityPeriodFixer the activity period fixer
+	 * @param activityDurationRandomizer the activity duration randomizer
+	 * @param tripFactory the trip factory
+	 * @param rescheduling the rescheduling
+	 * @param modesInSimulation the modes in simulation
+	 * @param initialState the initial state
+	 * @param context the context
+	 * @param personFactory the person factory
+	 * @param businessDemandModel the business demand model
+	 * @param businessProductionModel the business production model
+	 * @param results the results
+	 * @param personFilter the person filter
+	 * @param businesses the businesses
+	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
 			final ActivityPeriodFixer activityPeriodFixer,
@@ -120,6 +141,24 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 				PrivateParcelDemandModelBuilder.nullPrivateParcelModel(results), businessDemandModel, businessProductionModel, results, personFilter, b -> true, b-> true, businesses);
 	}
 
+	/**
+	 * Instantiates a new demand simulator delivery.
+	 *
+	 * @param destinationChoiceModel the destination choice model
+	 * @param modeChoiceModel the mode choice model
+	 * @param routeChoice the route choice
+	 * @param activityPeriodFixer the activity period fixer
+	 * @param activityDurationRandomizer the activity duration randomizer
+	 * @param tripFactory the trip factory
+	 * @param rescheduling the rescheduling
+	 * @param modesInSimulation the modes in simulation
+	 * @param initialState the initial state
+	 * @param context the context
+	 * @param personFactory the person factory
+	 * @param results the results
+	 * @param personFilter the person filter
+	 * @param businesses the businesses
+	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
 			final ActivityPeriodFixer activityPeriodFixer,
@@ -195,6 +234,10 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	}
 	
 	
+	/**
+	 * Initiates the business parcel demand.
+	 * Applies the business demand model and the business production model.
+	 */
 	protected void initBusinessDemand() {
 		this.businesses.stream().filter(businessDemandFilter).forEach(b -> {
 			createBusinessParcelDemand(b).forEach(schedulerHook::addParcel);

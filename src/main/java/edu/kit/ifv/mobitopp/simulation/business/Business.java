@@ -11,7 +11,6 @@ import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvide
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
 public class Business implements ParcelAgent {

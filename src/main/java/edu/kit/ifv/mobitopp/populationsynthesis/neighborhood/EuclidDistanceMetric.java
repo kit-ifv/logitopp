@@ -32,8 +32,8 @@ public class EuclidDistanceMetric implements DistanceMetric {
 	 * the commutative property, the symmetric method being
 	 * {@link EuclidDistanceMetric#distance(Point2D, Rectangle2D)}.
 	 *
-	 * @param a the rectangle a
-	 * @param b the point b
+	 * @param rect the rectangle
+	 * @param point the point
 	 * @return the euclidean distance
 	 */
 	@Override
@@ -60,8 +60,8 @@ public class EuclidDistanceMetric implements DistanceMetric {
 	 * operator has the commutative property, the symmetric method being
 	 * {@link EuclidDistanceMetric#distance(Rectangle2D, Point2D)}.
 	 *
-	 * @param a the point a
-	 * @param b the rectangle b
+	 * @param point the point
+	 * @param rect the rectangle
 	 * @return the euclidean distance
 	 */
 	@Override

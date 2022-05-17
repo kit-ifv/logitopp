@@ -55,11 +55,10 @@ public class DistributionCenter implements NullParcelProducer {
 	 * @param location       the location
 	 * @param numEmployees   the number of employees
 	 * @param share          the share of parcels they receive
-	 * @param tourStrategy   the tour assignment strategy
-	 * @param policyProvider the policy provider
+	 * @param attempts 		 the maximum number of delivery attempts
 	 */
 	public DistributionCenter(String name, String organization, Zone zone, Location location, int numEmployees,
-			double share, int attempts) {//, DeliveryTourAssignmentStrategy tourStrategy, ParcelPolicyProvider policyProvider) {
+			double share, int attempts) {
 		this.name = name;
 		this.organization = organization;
 
@@ -70,9 +69,6 @@ public class DistributionCenter implements NullParcelProducer {
 		this.relativeShare = share;
 		this.numEmployees = numEmployees;
 		this.employees = new ArrayList<DeliveryPerson>();
-		
-//		this.tourStrategy = tourStrategy;
-//		this.policyProvider = policyProvider;
 
 		this.currentParcels = new ArrayList<>();
 		this.delivered = new ArrayList<>();

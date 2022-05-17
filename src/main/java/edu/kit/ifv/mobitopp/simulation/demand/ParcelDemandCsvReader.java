@@ -9,8 +9,6 @@ import java.util.Map;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.InstantValueProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;

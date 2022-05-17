@@ -7,7 +7,6 @@ import java.util.Optional;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.Location;
-import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
@@ -41,8 +40,8 @@ public class PrivateParcel extends BaseParcel {
 	 * @param location           the location
 	 * @param plannedArrival     the planned arrival date
 	 * @param distributionCenter the distribution center
+	 * @param shipmentSize 		 the shipment size
 	 * @param results            the results to log state changes
-	 * @param deliveryService    the delivery service
 	 */
 	public PrivateParcel(PickUpParcelPerson person, ParcelDestinationType destination, ZoneAndLocation location,
 			Time plannedArrival, DistributionCenter distributionCenter, ShipmentSize shipmentSize, DeliveryResults results) {
