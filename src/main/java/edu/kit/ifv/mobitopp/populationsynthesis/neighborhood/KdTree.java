@@ -12,17 +12,34 @@ import java.util.function.Function;
 
 import lombok.Getter;
 
+/**
+ * The Class KdTree is a collection of {@link Node nodes} encapsulation entities of some type.
+ * The encapsulated entities have to mapped to a 2D coordinate.
+ *
+ * @param <O> the generic type of the encapsulated entities
+ */
 public class KdTree<O> {
 	
 	@Getter
 	private Node<O> root = null;
+	
 	@Getter
 	private List<Leaf<O>> leafs;
 	
+	/** The node capacity. */
 	private int nodeCapacity;
+	
+	/** The metric. */
 	private DistanceMetric metric;
 	
 	
+	/**
+	 * Instantiates a new kd tree built from the given list of {@link Leaf leaves}.
+	 *
+	 * @param nodes the leafs to be inserted in the tree
+	 * @param nodeCapacity the capacity of inner nodes
+	 * @param metric the metric to determine distance between leaves
+	 */
 	public KdTree(List<Leaf<O>> nodes, int nodeCapacity, DistanceMetric metric) {
 		nodes.forEach(n -> n.setMetric(metric));
 		this.leafs = new ArrayList<Leaf<O>>();
@@ -33,6 +50,13 @@ public class KdTree<O> {
 		
 	}
 	
+	/**
+	 * Instantiates a new kd tree for the given points.
+	 *
+	 * @param points the points to be inserted as {@link Leaf leaves}
+	 * @param nodeCapacity the capacity of inner nodes
+	 * @param metric the metric to determine distance between leaves
+	 */
 	public KdTree(Collection<Point2D> points, int nodeCapacity, DistanceMetric metric) {
 		this(points.stream()
 				   .map(p -> new Leaf<O>(p))
@@ -40,6 +64,15 @@ public class KdTree<O> {
 			nodeCapacity, metric);
 	}
 	
+	/**
+	 * Instantiates a new kd tree for the given entities.
+	 * The given coordinate mapping is applied to the entities to determine their location.
+	 *
+	 * @param objects the objects to be inserted as {@link Leaf leaves} in the tree
+	 * @param coordMap the coordinate mapping
+	 * @param nodeCapacity the capacity of inner nodes
+	 * @param metric the metric to determine distance between leaves
+	 */
 	public KdTree(Collection<O> objects, Function<O, Point2D> coordMap, int nodeCapacity, DistanceMetric metric) {
 		this(objects.stream()
 				   .map(o -> new Leaf<O>(o, coordMap))
@@ -49,11 +82,22 @@ public class KdTree<O> {
 	
 	
 	
+	/**
+	 * Checks if the kD tree is empty.
+	 *
+	 * @return true, if the kD tree is empty
+	 */
 	public boolean isEmpty() {
 		return this.root == null;
 	}
 	
 
+	/**
+	 * Builds the kD tree by recursively deviding the given list of {@link Leaf leaves} along the longest axis.
+	 *
+	 * @param leafs the leafs to be structured
+	 * @return the root node of the (sub) tree
+	 */
 	private Node<O> buildTree(List<Leaf<O>> leafs) {
 		
 		if (leafs.size() == 0) {
@@ -89,7 +133,7 @@ public class KdTree<O> {
 		double splitValue = valueMap.apply(median);
 		
 		
-		//TODO take n, drop n instead of  filter?
+		//take n, drop n instead of filter?
 		innerNode.addChild(
 				buildTree(leafs.stream().filter(node -> valueMap.apply(node) < splitValue).collect(toList()))
 		);
@@ -101,6 +145,9 @@ public class KdTree<O> {
 		return innerNode;
 	}
 	
+	/**
+	 * Prints the kD tree using the tree format of the root {@link Node}.
+	 */
 	public void print() {
 		System.out.println(this.root.treeFormat(""));
 	}

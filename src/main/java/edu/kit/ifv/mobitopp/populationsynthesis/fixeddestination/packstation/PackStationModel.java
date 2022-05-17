@@ -9,7 +9,7 @@ import edu.kit.ifv.mobitopp.populationsynthesis.PersonBuilder;
 public interface PackStationModel {
 
 	/**
-	 * Selects the Zone of a pack station for the given person.
+	 * Selects the {@link Zone} of a pack station for the given {@link PersonBuilder person}.
 	 *
 	 * @param p the person
 	 * @return the zone of a pack station
