@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public enum Sector {
+public enum Sector {//TODO: industrie, handel & gewerbe
 	
 	INDUSTRY(1) {
 		@Override

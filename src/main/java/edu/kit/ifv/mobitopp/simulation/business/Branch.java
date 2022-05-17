@@ -54,7 +54,6 @@ public enum Branch {
 	G(7) {
 		@Override
 		Sector getSector() {
-			// TODO Auto-generated method stub
 			return SERVICE;
 		}
 	},

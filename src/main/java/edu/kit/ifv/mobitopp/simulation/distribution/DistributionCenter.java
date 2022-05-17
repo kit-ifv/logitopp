@@ -22,6 +22,7 @@ import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.collections.CollectionsUtil;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The Class DistributionCenter represents a distribution center from where
@@ -34,6 +35,7 @@ public class DistributionCenter implements NullParcelProducer {
 	private Zone zone;
 	private Location location;
 	private int numEmployees;
+	private int attempts;
 	private Collection<DeliveryPerson> employees;
 	private double relativeShare;
 
@@ -41,8 +43,8 @@ public class DistributionCenter implements NullParcelProducer {
 	private Collection<IParcel> currentParcels;
 	private Collection<IParcel> delivered;
 
-	private DeliveryTourAssignmentStrategy tourStrategy;
-	private ParcelPolicyProvider policyProvider;
+	@Setter private DeliveryTourAssignmentStrategy tourStrategy;
+	@Setter private ParcelPolicyProvider policyProvider;
 
 	/**
 	 * Instantiates a new distribution center.
@@ -57,19 +59,20 @@ public class DistributionCenter implements NullParcelProducer {
 	 * @param policyProvider the policy provider
 	 */
 	public DistributionCenter(String name, String organization, Zone zone, Location location, int numEmployees,
-			double share, DeliveryTourAssignmentStrategy tourStrategy, ParcelPolicyProvider policyProvider) {
+			double share, int attempts) {//, DeliveryTourAssignmentStrategy tourStrategy, ParcelPolicyProvider policyProvider) {
 		this.name = name;
 		this.organization = organization;
 
 		this.zone = zone;
 		this.location = location;
-
+		
+		this.attempts = attempts;
 		this.relativeShare = share;
 		this.numEmployees = numEmployees;
 		this.employees = new ArrayList<DeliveryPerson>();
-
-		this.tourStrategy = tourStrategy;
-		this.policyProvider = policyProvider;
+		
+//		this.tourStrategy = tourStrategy;
+//		this.policyProvider = policyProvider;
 
 		this.currentParcels = new ArrayList<>();
 		this.delivered = new ArrayList<>();

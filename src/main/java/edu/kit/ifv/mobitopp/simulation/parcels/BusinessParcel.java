@@ -23,9 +23,9 @@ public class BusinessParcel extends BaseParcel {
 			ParcelAgent producer, ShipmentSize shipmentSize, DeliveryResults results) {
 		super(location, plannedArrival, producer, results, shipmentSize);
 		this.business = business;
+		this.consumer = consumer;
 		this.results.logBusinessOrder(this);
 		this.results.logChange(this, null, Time.start, false);
-		this.consumer = consumer;
 	}
 
 	@Override

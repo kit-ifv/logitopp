@@ -17,6 +17,7 @@ import edu.kit.ifv.mobitopp.time.Time;
  */
 public class DeliveryResults {
 
+	private static final String SEP = ";";
 	private final static Category resultCategoryStatePrivate = createResultCategoryStatePrivate();
 	private final static Category resultCategoryStateBusines = createResultCategoryStatePrivate();
 	private final static Category resultCategoryPrivateOrder = createResultCategoryPrivateOrder();
@@ -50,18 +51,18 @@ public class DeliveryResults {
 	 */
 	public void logChange(PrivateParcel parcel, DeliveryPerson deliveryGuy, Time currentTime, boolean isAttempt) {
 		String msg = "";
-		msg += currentTime.toString() + "; ";
-		msg += parcel.getOId() + "; ";
-		msg += parcel.getPerson().getOid() + "; ";
-		msg += parcel.getDestinationType().name() + "; ";
-		msg += parcel.getState().name() + "; ";
-		msg += isAttempt + "; ";
-		msg += ((deliveryGuy != null) ? deliveryGuy.getOid() : "NULL") + "; ";
-		msg += parcel.getProducer().toString() + "; ";
-		msg += parcel.getDeliveryAttempts() + "; ";
-		msg += String.valueOf(parcel.getDeliveryTime()) + ";";
-		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + "; ";
-		msg += ((deliveryGuy != null) ? deliveryGuy.currentActivity().zone().getId() : "NULL") + "; ";
+		msg += currentTime.toString() + SEP;
+		msg += parcel.getOId() + SEP;
+		msg += parcel.getPerson().getOid() + SEP;
+		msg += parcel.getDestinationType().name() + SEP;
+		msg += parcel.getState().name() + SEP;
+		msg += isAttempt + SEP;
+		msg += ((deliveryGuy != null) ? deliveryGuy.getOid() : "NULL") + SEP;
+		msg += parcel.getProducer().toString() + SEP;
+		msg += parcel.getDeliveryAttempts() + SEP;
+		msg += String.valueOf(parcel.getDeliveryTime()) + SEP;
+		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + SEP;
+		msg += ((deliveryGuy != null) ? deliveryGuy.currentActivity().zone().getId() : "NULL") + SEP;
 		msg += parcel.getZone().getId();
 
 		this.results.write(resultCategoryStatePrivate, msg);
@@ -82,18 +83,18 @@ public class DeliveryResults {
 	
 	public void logChange(BusinessParcel parcel, DeliveryPerson deliveryGuy, Time currentTime, boolean isAttempt) {
 		String msg = "";
-		msg += currentTime.toString() + "; ";
-		msg += parcel.getOId() + "; ";
-		msg += parcel.getZone().getId().getExternalId() + "; ";
-		msg += parcel.getLocation().forLogging() + "; ";
-		msg += parcel.getState().name() + "; ";
-		msg += isAttempt + "; ";
-		msg += ((deliveryGuy != null) ? deliveryGuy.getOid() : "NULL") + "; ";
-		msg += parcel.getProducer().toString() + "; ";
-		msg += parcel.getDeliveryAttempts() + "; ";
-		msg += String.valueOf(parcel.getDeliveryTime()) + ";";
-		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + "; ";
-		msg += ((deliveryGuy != null) ? deliveryGuy.currentActivity().zone().getId() : "NULL") + "; ";
+		msg += currentTime.toString() + SEP;
+		msg += parcel.getOId() + SEP;
+		msg += parcel.getZone().getId().getExternalId() + SEP; //TODO remove whitespaces
+		msg += parcel.getLocation().forLogging() + SEP;
+		msg += parcel.getState().name() + SEP;
+		msg += isAttempt + SEP;
+		msg += ((deliveryGuy != null) ? deliveryGuy.getOid() : "NULL") + SEP;
+		msg += parcel.getProducer().toString() + SEP;
+		msg += parcel.getDeliveryAttempts() + SEP;
+		msg += String.valueOf(parcel.getDeliveryTime()) + SEP;
+		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + SEP;
+		msg += ((deliveryGuy != null) ? deliveryGuy.currentActivity().zone().getId() : "NULL") + SEP;
 		msg += parcel.getZone().getId();
 
 		this.results.write(resultCategoryStateBusines, msg);
@@ -122,11 +123,11 @@ public class DeliveryResults {
 	private void logPrivateOrder(int pid, String recipient, String destination, String day, String distributioneCneter, Time currentTime) {
 		String msg = "";
 
-		msg += pid + "; ";
-		msg += recipient + "; ";
-		msg += destination + "; ";
-		msg += day + "; ";
-		msg += currentTime.toString() + ";";
+		msg += pid + SEP;
+		msg += recipient + SEP;
+		msg += destination + SEP;
+		msg += day + SEP;
+		msg += currentTime.toString() + SEP;
 		msg += distributioneCneter;
 
 		this.results.write(resultCategoryPrivateOrder, msg);
@@ -154,13 +155,13 @@ public class DeliveryResults {
 	private void logBusinessOrder(int pid, String zoneId, Location location, String day, String from, String to, Time currentTime) {
 		String msg = "";
 
-		msg += pid + "; ";
-		msg += zoneId + "; ";
-		msg += location.coordinate.getX() + "; ";
-		msg += location.coordinate.getY() + "; ";
-		msg += day + "; ";
-		msg += currentTime + ";";
-		msg += from + ";";
+		msg += pid + SEP;
+		msg += zoneId + SEP;
+		msg += location.coordinate.getX() + SEP;
+		msg += location.coordinate.getY() + SEP;
+		msg += day + SEP;
+		msg += currentTime + SEP;
+		msg += from + SEP;
 		msg += to;
 
 		this.results.write(resultCategoryBusinessOrder, msg);
@@ -189,9 +190,9 @@ public class DeliveryResults {
 	public void logEmployee(DeliveryPerson person, DistributionCenter distributionCenter) {
 		String msg = "";
 
-		msg += person.getId().getOid() + "; ";
-		msg += distributionCenter.getName() + "; ";
-		msg += distributionCenter.getOrganization() + "; ";
+		msg += person.getId().getOid() + SEP;
+		msg += distributionCenter.getName() + SEP;
+		msg += distributionCenter.getOrganization() + SEP;
 		msg += person.employment().name();
 
 		this.results.write(resultCategoryEmployee, msg);
@@ -224,11 +225,11 @@ public class DeliveryResults {
 			String after) {
 		String msg = "";
 
-		msg += person.getId().getOid() + "; ";
-		msg += currentTime.toString() + "; ";
-		msg += currentTime.weekDay().name() + "; ";
-		msg += reason + ";";
-		msg += before + ";";
+		msg += person.getId().getOid() + SEP;
+		msg += currentTime.toString() + SEP;
+		msg += currentTime.weekDay().name() + SEP;
+		msg += reason + SEP;
+		msg += before + SEP;
 		msg += after;
 
 		this.results.write(resultCategoryRescheduling, msg);
@@ -251,13 +252,13 @@ public class DeliveryResults {
 	public void logNeighborDelivery(int id, Zone zone, Time currentTime, boolean success, int numOfneighbors, int checkedNeighbors) {
 		String msg = "";
 		
-		msg += id + ";";
-		msg += zone.getId().getExternalId() + ";";
-		msg += currentTime.toString() + ";";
-		msg += currentTime.weekDay().name() + ";";
-		msg += success + ";";
-		msg += numOfneighbors + ";";
-		msg += checkedNeighbors + ";";
+		msg += id + SEP;
+		msg += zone.getId().getExternalId() + SEP;
+		msg += currentTime.toString() + SEP;
+		msg += currentTime.weekDay().name() + SEP;
+		msg += success + SEP;
+		msg += numOfneighbors + SEP;
+		msg += checkedNeighbors + SEP;
 		
 		results.write(resultCategoryNeighbordeliveries, msg);
 	}

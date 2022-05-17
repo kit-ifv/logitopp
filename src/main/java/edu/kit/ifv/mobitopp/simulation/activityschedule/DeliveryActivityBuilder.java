@@ -17,11 +17,11 @@ import lombok.Getter;
 @Getter
 public class DeliveryActivityBuilder {
 
-	private DeliveryPerson deliveryPerson;
-	private ActivityIfc work;
-	private Time plannedTime;
-	private int tripDuration;
-	private Collection<IParcel> parcels;
+	protected DeliveryPerson deliveryPerson;
+	protected ActivityIfc work;
+	protected Time plannedTime;
+	protected int tripDuration;
+	protected Collection<IParcel> parcels;
 
 	public DeliveryActivityBuilder() {
 		this.parcels = new ArrayList<>();
@@ -72,7 +72,7 @@ public class DeliveryActivityBuilder {
 				estimateDuration(deliveryPerson.getEfficiency()), tripDur, deliveryPerson);
 	}
 
-	private void verifyLocations() {
+	protected void verifyLocations() {
 		if (this.parcels.stream().map(IParcel::getLocation).distinct().count() > 1) {
 			throw new IllegalStateException(
 					"All parcels within a delivery activity should have the same delivery location.");
