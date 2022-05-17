@@ -11,6 +11,7 @@ import edu.kit.ifv.mobitopp.simulation.demand.attributes.InstantValueProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
+import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
@@ -69,6 +70,7 @@ public class ParcelDemandCsvReader implements ParcelDemandModel<PickUpParcelPers
 			
 			builder.setConsumer(new InstantValueProvider<>(recipient));
 			builder.setProducer(new InstantValueProvider<>(distributionCenter));
+			builder.setSize(new InstantValueProvider<>(ShipmentSize.SMALL));
 			
 			parcels.add(builder);
 		}
