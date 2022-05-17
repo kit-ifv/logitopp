@@ -103,6 +103,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 		}
 
 		if (currentTime.isAfter(lastPlan.plusHours(1))) {
+			lastPlan = currentTime.startOfDay().plusHours(currentTime.getHour());
 			planZoneTour(person.getDistributionCenter(), person, deliveries, currentTime);
 		}
 
@@ -131,6 +132,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 				break;
 			}
 
+			lastZone = delivery.getZone();
 		}
 
 		parcelTour.removeAll(assigned);
