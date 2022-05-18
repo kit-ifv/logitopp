@@ -62,7 +62,7 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		Zone lastZone = person.getDistributionCenter().getZone();
 		Time time = currentTime;
 
-		for (LinkDeliveryActivityBuilder delivery : route.getDeliveries()) {			
+		for (DeliveryActivityBuilder delivery : route.getDeliveries()) {			
 			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time);			
 			delivery.withTripDuration(round(tripDuration));
 			delivery.plannedAt(time.plusMinutes(round(tripDuration)));

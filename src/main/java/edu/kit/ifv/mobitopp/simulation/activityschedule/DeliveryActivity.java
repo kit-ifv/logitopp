@@ -17,38 +17,39 @@ import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
 /**
- * The Class DeliveryActivity represents the activity of delivering a set of parcels.
- * It decorates an existing activity.
+ * The Class DeliveryActivity represents the activity of delivering a set of
+ * parcels. It decorates an existing activity.
  */
 @Getter
 public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 
 	private ActivityAsLinkedListElement activity;
 	private final List<IParcel> parcels;
+	private final ZoneAndLocation stopLocation;
 	private final DeliveryPerson person;
 
 	/**
-	 * Instantiates a new delivery activity for the given parcels and delivery person based on the given
-	 * activity.
+	 * Instantiates a new delivery activity for the given parcels and delivery
+	 * person based on the given activity.
 	 *
-	 * @param activity the activity
-	 * @param parcels the parcels
-	 * @param person the delivery person
+	 * @param activity     the activity
+	 * @param parcels      the parcels
+	 * @param person       the delivery person
+	 * @param stopLocation
 	 */
-	private DeliveryActivity(ActivityAsLinkedListElement activity, Collection<IParcel> parcels,
-		DeliveryPerson person) {
+	private DeliveryActivity(ActivityAsLinkedListElement activity, Collection<IParcel> parcels, DeliveryPerson person,
+			ZoneAndLocation stopLocation) {
 		this.activity = activity;
 		this.parcels = new ArrayList<IParcel>(parcels);
+		this.stopLocation = stopLocation;
 		this.person = person;
-
-		if (!parcels.isEmpty()) {
-			setLocation(this.parcels.get(0).getZoneAndLocation());
-		}
-
+		
+		setLocation(stopLocation);
 	}
 
 	/**
-	 * Instantiates a new delivery activity for the given parcels and delivery person.
+	 * Instantiates a new delivery activity for the given parcels and delivery
+	 * person.
 	 *
 	 * @param oid                  the oid
 	 * @param activityNrOfWeek     the activity nr of week
@@ -58,16 +59,17 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	 * @param startFlexibility     the start flexibility
 	 * @param endFlexibility       the end flexibility
 	 * @param durationFlexibility  the duration flexibility
-	 * @param parcels the parcels
-	 * @param person the person
+	 * @param parcels              the parcels
+	 * @param person               the person
+	 * @param stopLocation        the stop locaction
 	 */
-	public DeliveryActivity(int oid, byte activityNrOfWeek, Time startDate, int duration,
-		int observedTripDuration, float startFlexibility, float endFlexibility,
-		float durationFlexibility, Collection<IParcel> parcels, DeliveryPerson person) {
+	public DeliveryActivity(int oid, byte activityNrOfWeek, Time startDate, int duration, int observedTripDuration,
+			float startFlexibility, float endFlexibility, float durationFlexibility, Collection<IParcel> parcels,
+			DeliveryPerson person, ZoneAndLocation stopLocation) {
 
-		this(new ActivityAsLinkedListElement(oid, activityNrOfWeek, ActivityType.DELIVER_PARCEL,
-			startDate, duration, observedTripDuration, startFlexibility, endFlexibility,
-			durationFlexibility), parcels, person);
+		this(new ActivityAsLinkedListElement(oid, activityNrOfWeek, ActivityType.DELIVER_PARCEL, startDate, duration,
+				observedTripDuration, startFlexibility, endFlexibility, durationFlexibility), parcels, person,
+				stopLocation);
 	}
 
 	/**
@@ -82,7 +84,7 @@ public class DeliveryActivity implements ActivityIfc, LinkedListElement {
 	/**
 	 * Abort delivery.
 	 *
-	 * @param person the person
+	 * @param person      the person
 	 * @param currentTime the current time
 	 */
 	public void abortDelivery(DeliveryPerson person, Time currentTime) {

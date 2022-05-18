@@ -17,10 +17,10 @@ import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvide
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
-import edu.kit.ifv.mobitopp.util.collections.CollectionsUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,6 +45,7 @@ public class DistributionCenter implements NullParcelProducer {
 
 	@Setter private DeliveryTourAssignmentStrategy tourStrategy;
 	@Setter private ParcelPolicyProvider policyProvider;
+	@Setter private DeliveryClusteringStrategy clusteringStrategy;
 
 	/**
 	 * Instantiates a new distribution center.
@@ -135,9 +136,11 @@ public class DistributionCenter implements NullParcelProducer {
 		List<DeliveryActivityBuilder> deliveries = new ArrayList<>();
 
 		List<IParcel> available = getAvailableParcels(currentTime);
-
-		CollectionsUtil.groupBy(available, IParcel::canBeDeliveredTogether)
-				.forEach(pcls -> deliveries.add(new DeliveryActivityBuilder().addParcels(pcls)));
+		
+		clusteringStrategy.cluster(available)
+						  .forEach(cluster -> deliveries.add(
+								  new DeliveryActivityBuilder(clusteringStrategy).addParcels(cluster)
+						));
 
 		return deliveries;
 	}

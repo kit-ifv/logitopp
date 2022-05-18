@@ -6,6 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
+import edu.kit.ifv.mobitopp.simulation.parcels.clustering.LinkDeliveryClustering;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
 import edu.kit.ifv.mobitopp.util.dataimport.Row;
 import lombok.Getter;
@@ -13,8 +15,9 @@ import lombok.Getter;
 public class Route {
 	
 	@Getter private int id;
-	private LinkedHashMap<Integer, LinkDeliveryActivityBuilder> deliveryTour;
+	private LinkedHashMap<Integer, DeliveryActivityBuilder> deliveryTour;
 	private LinkedHashMap<Integer, Integer> expectedParcels;
+	private DeliveryClusteringStrategy clusteringStrategy = new LinkDeliveryClustering();
 	
 	public Route(int id) {
 		this.deliveryTour = new LinkedHashMap<>();
@@ -22,7 +25,7 @@ public class Route {
 	}
 	
 	public void planStop(int link, int expectedParcels) {
-		this.deliveryTour.put(link, new LinkDeliveryActivityBuilder());
+		this.deliveryTour.put(link, new DeliveryActivityBuilder(clusteringStrategy));
 		this.expectedParcels.put(link, expectedParcels);
 	}
 	
@@ -56,7 +59,7 @@ public class Route {
 	}
 	
 	
-	public Collection<LinkDeliveryActivityBuilder> getDeliveries() {
+	public Collection<DeliveryActivityBuilder> getDeliveries() {
 		verify();
 		return this.deliveryTour.values();
 	}
