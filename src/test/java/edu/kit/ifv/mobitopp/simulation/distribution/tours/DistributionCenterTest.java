@@ -2,6 +2,7 @@ package edu.kit.ifv.mobitopp.simulation.distribution.tours;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -14,14 +15,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.BaseParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.clustering.LinkDeliveryClustering;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -38,13 +42,13 @@ public class DistributionCenterTest  {
 		rand = new Random(42);
 		
 		households = List.of(
-				household(0, 0),
-				household(1, 0),
-				household(2, 1),
-				household(3, 1),
-				household(4, 2),
-				household(5, 2),
-				household(6, 2)
+				household(0, 0,  1, 0.2),
+				household(1, 0, -1, 0.4),
+				household(2, 0,  1, 0.3),
+				household(3, 1,  2, 0.5),
+				household(4, 2,  3, 0.1),
+				household(5, 2, -3, 0.9),
+				household(6, 2,  4, 0.3)
 		);
 		
 		persons = List.of(
@@ -65,9 +69,14 @@ public class DistributionCenterTest  {
 			parcels.add(parcel());
 		}
 		
+		
+		
 		distributionCenter = mock(DistributionCenter.class);
 		when(distributionCenter.getAvailableParcels(Mockito.any())).thenReturn(parcels);
 		when(distributionCenter.getDeliveryActivities(Mockito.any())).thenCallRealMethod();
+		doCallRealMethod().when(distributionCenter).setClusteringStrategy(Mockito.any());
+		
+		distributionCenter.setClusteringStrategy(new LinkDeliveryClustering());
 	}
 	
 	
@@ -82,19 +91,22 @@ public class DistributionCenterTest  {
 		assertTrue(deliveries.stream().allMatch(d -> !d.getParcels().isEmpty()));
 		
 		for (DeliveryActivityBuilder d : deliveries) {
-			assertEquals(1, d.getParcels().stream().map(IParcel::getLocation).distinct().count());
+			assertEquals(1, d.getParcels().stream().map(IParcel::getLocation).map(Location::roadAccessEdgeId).map(Math::abs).distinct().count());
 			
-			if (d.getParcels().stream().anyMatch(p -> p instanceof PrivateParcel)) {
-				assertTrue(d.getParcels().stream().allMatch(p -> p instanceof PrivateParcel));
-				assertEquals(1, d.getParcels().stream().map(p -> ((PrivateParcel) p).getDestinationType()).distinct().count());
-				
-				if (d.getParcels().stream().anyMatch(p -> ((PrivateParcel) p).getDestinationType() == ParcelDestinationType.HOME )) {
-					assertEquals(1, d.getParcels().stream().map(p -> ((PrivateParcel) p).getPerson().household()).distinct().count());
-				}
-				
-			} else {
-				assertTrue(d.getParcels().stream().allMatch(p -> !(p instanceof PrivateParcel) ));
-			}
+			assertEquals( Math.abs(d.getLocation().roadAccessEdgeId()), Math.abs(d.getParcels().get(0).getLocation().roadAccessEdgeId()) );
+			System.out.println(d.getLocation());
+			
+//			if (d.getParcels().stream().anyMatch(p -> p instanceof PrivateParcel)) {
+//				assertTrue(d.getParcels().stream().allMatch(p -> p instanceof PrivateParcel));
+//				assertEquals(1, d.getParcels().stream().map(p -> ((PrivateParcel) p).getDestinationType()).distinct().count());
+//				
+//				if (d.getParcels().stream().anyMatch(p -> ((PrivateParcel) p).getDestinationType() == ParcelDestinationType.HOME )) {
+//					assertEquals(1, d.getParcels().stream().map(p -> ((PrivateParcel) p).getPerson().household()).distinct().count());
+//				}
+//				
+//			} else {
+//				assertTrue(d.getParcels().stream().allMatch(p -> !(p instanceof PrivateParcel) ));
+//			}
 		
 		}
 		
@@ -103,10 +115,10 @@ public class DistributionCenterTest  {
 	
 	
 	
-	private Household household(int id, int loc) {
+	private Household household(int id, int loc, int link, double pos) {
 		Household h = mock(Household.class);
 		when(h.getOid()).thenReturn(id);
-		when(h.homeLocation()).thenReturn(new Location(new Point(loc, 0), 0, 0));
+		when(h.homeLocation()).thenReturn(new Location(new Point(loc, 0), link, pos));
 		
 		return h;
 	}
@@ -120,26 +132,16 @@ public class DistributionCenterTest  {
 	}
 
 	private IParcel parcel() {		
-		IParcel parcel;
+		PrivateParcel p = mock(PrivateParcel.class);
+		when(p.getDestinationType()).thenReturn(ParcelDestinationType.HOME);
+		when(p.getPerson()).thenReturn(persons.get(rand.nextInt(persons.size())));
+
+		Location l = p.getPerson().household().homeLocation();
+		when(p.getLocation()).thenReturn(l);
+
+		Zone z = mock(Zone.class);
+		when(p.getZoneAndLocation()).thenReturn(new ZoneAndLocation(z, l));
 		
-		if(rand.nextBoolean()) {
-			PrivateParcel p = mock(PrivateParcel.class);
-			when(p.getDestinationType()).thenReturn(ParcelDestinationType.values()[rand.nextInt(3)]);
-			when(p.getPerson()).thenReturn(persons.get(rand.nextInt(persons.size())));
-			
-			if (p.getDestinationType() == ParcelDestinationType.HOME) {
-				Location l = p.getPerson().household().homeLocation();
-				when(p.getLocation()).thenReturn(l);
-			} else {
-				when(p.getLocation()).thenReturn(new Location(new Point(rand.nextInt(3), 0), 0, 0));
-			}
-			
-			parcel = p;
-		} else {
-			parcel = mock(BaseParcel.class);
-			when(parcel.getLocation()).thenReturn(new Location(new Point(rand.nextInt(3), 0), 0, 0));
-		}
-		
-		return parcel;
+		return p;
 	}
 }
