@@ -58,6 +58,7 @@ public class NeighborhoodDeliveryPolicy implements ParcelDeliveryPolicy<PrivateP
 			boolean anybodyHome = neighbors
 									.stream()
 									.flatMap(Household::persons)
+									.filter(p -> p.currentActivity() != null)
 									.anyMatch(p -> p.currentActivity().activityType().equals(ActivityType.HOME));
 			if (results != null) {
 				this.logNeighbors(parcel, currentTime, neighbors, anybodyHome);
