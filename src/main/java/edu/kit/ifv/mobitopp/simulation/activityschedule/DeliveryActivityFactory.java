@@ -31,7 +31,7 @@ public class DeliveryActivityFactory {
 	 * @param duration     the duration
 	 * @param tripDuration the trip duration
 	 * @param person       the delivery person
-	 * @param stopLocation 
+	 * @param stopLocation the stop zone and location 
 	 * @return the delivery activity
 	 */
 	public static DeliveryActivity createDeliveryActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate,
@@ -48,7 +48,6 @@ public class DeliveryActivityFactory {
 	 * unload duration.
 	 *
 	 * @param work         the work activity
-	 * @param efficiency   the efficiency profile
 	 * @param tripDuration the trip duration
 	 * @return the unload activity
 	 */

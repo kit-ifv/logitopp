@@ -58,12 +58,10 @@ public class DeliveryPerson implements SimulationPerson {
 	private final DistributionCenter distributionCenter;
 
 	/**
-	 * Instantiates a new {@link DeliveryPerson} with the given
-	 * {@link DeliveryEfficiencyProfile}.
+	 * Instantiates a new {@link DeliveryPerson} of the given {@link DistributionCenter}.
 	 *
 	 * @param person             the person
 	 * @param distributionCenter the distribution center
-	 * @param efficiency         the efficiency
 	 * @param seed               the seed
 	 */
 	public DeliveryPerson(SimulationPerson person, DistributionCenter distributionCenter, long seed) {
