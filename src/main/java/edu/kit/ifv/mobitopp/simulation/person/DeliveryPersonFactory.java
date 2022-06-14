@@ -28,16 +28,14 @@ public class DeliveryPersonFactory {
 
 	private Collection<DistributionCenter> distributionCenters;
 	private SimulationPersonFactory defaultFactory;
-	private DeliveryEfficiencyModel efficiencyModel;
 	private DeliveryEmploymentStrategy employmentStrategy;
 
 	public DeliveryPersonFactory(Collection<DistributionCenter> distributionCenters,
-		SimulationPersonFactory defaultFactory, DeliveryEfficiencyModel efficiencyModel,
+		SimulationPersonFactory defaultFactory,
 		DeliveryEmploymentStrategy employmentStrategy) {
 		
 		this.distributionCenters = distributionCenters;
 		this.defaultFactory = defaultFactory;
-		this.efficiencyModel = efficiencyModel;
 		this.employmentStrategy = employmentStrategy;
 	}
 
@@ -103,9 +101,7 @@ public class DeliveryPersonFactory {
 			.create(person, queue, customSimulationOptions, simulationDays, modesInSimulation,
 				tourFactory, tripFactory, initialState, boarder, seed, listener);
 
-		DeliveryEfficiencyProfile efficiency = this.efficiencyModel
-			.select(distributionCenter, person);
-		DeliveryPerson deliveryPerson = new DeliveryPerson(simPerson, distributionCenter, efficiency, seed);
+		DeliveryPerson deliveryPerson = new DeliveryPerson(simPerson, distributionCenter, seed);
 
 		ReschedulingStrategy customRescheduling = new DeliveryReschedulingStrategy(
 			distributionCenter, deliveryPerson, simulationOptions.rescheduling(), results);

@@ -55,8 +55,6 @@ public class DeliveryPerson implements SimulationPerson {
 	private final Collection<IParcel> currentTour;
 	private final Random random;
 	@Getter
-	private final DeliveryEfficiencyProfile efficiency;
-	@Getter
 	private final DistributionCenter distributionCenter;
 
 	/**
@@ -68,12 +66,10 @@ public class DeliveryPerson implements SimulationPerson {
 	 * @param efficiency         the efficiency
 	 * @param seed               the seed
 	 */
-	public DeliveryPerson(SimulationPerson person, DistributionCenter distributionCenter,
-			DeliveryEfficiencyProfile efficiency, long seed) {
+	public DeliveryPerson(SimulationPerson person, DistributionCenter distributionCenter, long seed) {
 		this.person = person;
 		this.currentTour = new ArrayList<IParcel>();
 		this.random = new Random(seed);
-		this.efficiency = efficiency;
 		this.distributionCenter = distributionCenter;
 	}
 

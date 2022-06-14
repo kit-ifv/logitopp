@@ -93,7 +93,7 @@ public class DeliveryResults {
 		String msg = "";
 		msg += currentTime.toString() + SEP;
 		msg += parcel.getOId() + SEP;
-		msg += parcel.getZone().getId().getExternalId() + SEP; //TODO remove whitespaces
+		msg += parcel.getZone().getId().getExternalId() + SEP;
 		msg += parcel.getLocation().forLogging() + SEP;
 		msg += parcel.getState().name() + SEP;
 		msg += isAttempt + SEP;

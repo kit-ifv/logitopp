@@ -1,8 +1,5 @@
 package edu.kit.ifv.mobitopp.simulation.activityschedule;
 
-import static java.lang.Math.max;
-import static java.lang.Math.round;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +9,6 @@ import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
@@ -43,9 +39,8 @@ public class DeliveryActivityBuilder {
 		return this;
 	}
 
-	public int estimateDuration(DeliveryEfficiencyProfile efficiency) {//TODO delivery duration model
-		return max(1,
-				round(efficiency.getDeliveryDurBase() + getParcels().size() * efficiency.getDeliveryDurPerParcel()));
+	public int estimateDuration() {
+		return (int) deliveryPerson.getDistributionCenter().getDurationModel().estimateDuration(deliveryPerson, parcels);
 	}
 
 	public DeliveryActivityBuilder deliveredBy(DeliveryPerson person) {
@@ -71,7 +66,7 @@ public class DeliveryActivityBuilder {
 	public DeliveryActivity build() {
 		int tripDur = (tripDuration > 0) ? tripDuration : 5;
 		return DeliveryActivityFactory.createDeliveryActivity(parcels, work, plannedTime,
-				estimateDuration(deliveryPerson.getEfficiency()), tripDur, deliveryPerson, getZoneAndLocation());
+				estimateDuration(), tripDur, deliveryPerson, getZoneAndLocation());
 	}
 	
 	public ZoneAndLocation getZoneAndLocation() {

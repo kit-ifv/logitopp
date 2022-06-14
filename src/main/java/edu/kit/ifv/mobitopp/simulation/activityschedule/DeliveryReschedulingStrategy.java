@@ -15,7 +15,6 @@ import edu.kit.ifv.mobitopp.simulation.ModifiableActivitySchedule;
 import edu.kit.ifv.mobitopp.simulation.ReschedulingStrategy;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.ActivityAsLinkedListElement;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -38,6 +37,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 	private DeliveryResults results;
 
 	private boolean firstRescheduling = true;
+	private int loadDuration = 15;
 
 	/**
 	 * Instantiates a new delivery rescheduling strategy for the given person and distribution center.
@@ -159,7 +159,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		
 		List<DeliveryActivityBuilder> deliveries = center.assignParcels(person, beginningActivity, currentTime, remainingTime);
 				
-		beginningActivity.changeDuration(getLoadDuration());
+		beginningActivity.changeDuration(loadDuration);
 		ActivityIfc currentActivity = beginningActivity;
 		
 		int parcelCnt = deliveries.stream().mapToInt(l -> l.getParcels().size()).sum();
@@ -185,7 +185,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		
 		
 		
-		ActivityIfc unload = DeliveryActivityFactory.createUnloadParcelsActivity(beginningActivity, getEfficiency(), 15);
+		ActivityIfc unload = DeliveryActivityFactory.createUnloadParcelsActivity(beginningActivity, 15);
 		unload.setLocation(this.center.getZoneAndLocation());
 		activitySchedule.insertActivityAfter(currentActivity, unload);
 		this.nextUnload = unload;
@@ -429,21 +429,4 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		return activity.activityType().equals(ActivityType.DELIVER_PARCEL);
 	}
 
-	/**
-	 * Gets the efficiency profile.
-	 *
-	 * @return the efficiency profile
-	 */
-	public DeliveryEfficiencyProfile getEfficiency() {
-		return this.person.getEfficiency();
-	}
-
-	/**
-	 * Gets the load duration.
-	 *
-	 * @return the load duration
-	 */
-	private int getLoadDuration() {
-		return getEfficiency().getLoadDuration();
-	}
 }

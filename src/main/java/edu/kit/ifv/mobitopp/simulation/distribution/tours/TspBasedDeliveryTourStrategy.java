@@ -78,7 +78,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 			delivery.withTripDuration(round(tripDuration));
 			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
 			
-			float deliveryDuration = delivery.estimateDuration(person.getEfficiency());
+			float deliveryDuration = delivery.estimateDuration();
 			time = time.plusMinutes(round(tripDuration + deliveryDuration));
 
 			float withReturn = travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time);

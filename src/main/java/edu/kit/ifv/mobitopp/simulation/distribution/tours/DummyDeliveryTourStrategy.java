@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -27,12 +26,11 @@ public class DummyDeliveryTourStrategy implements DeliveryTourAssignmentStrategy
 	public List<DeliveryActivityBuilder> assignParcels(Collection<DeliveryActivityBuilder> deliveries,
 			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime) {
 		
-		DeliveryEfficiencyProfile efficiency = person.getEfficiency();
 		List<DeliveryActivityBuilder> assigned = new ArrayList<>();
 		RelativeTime counter = RelativeTime.ofSeconds(remainingWorkTime.seconds());
 		
 		for (DeliveryActivityBuilder delivery : deliveries) {
-			counter = counter.minusMinutes(delivery.estimateDuration(efficiency) + 5);
+			counter = counter.minusMinutes(delivery.estimateDuration() + 5);
 			
 			if (!counter.isNegative()) {
 				assigned.add(delivery);

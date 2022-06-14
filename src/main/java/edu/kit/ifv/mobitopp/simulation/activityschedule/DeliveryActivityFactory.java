@@ -6,7 +6,6 @@ import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.ActivityAsLinkedListElement;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryEfficiencyProfile;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -19,6 +18,7 @@ public class DeliveryActivityFactory {
 	 * The activity counter. Counts negative for delivery related sub-activities.
 	 */
 	static int activityCounter = -1;// ?
+	private static int unloadDuration = 15;
 
 	/**
 	 * Creates a new DeliveryActivity for the given parcel with the given trip and
@@ -52,9 +52,8 @@ public class DeliveryActivityFactory {
 	 * @param tripDuration the trip duration
 	 * @return the unload activity
 	 */
-	public static ActivityIfc createUnloadParcelsActivity(ActivityIfc work, DeliveryEfficiencyProfile efficiency,
-			int tripDuration) {
-		return createUnloadParcelsActivity(work, tripDuration, efficiency.getUnloadDuration());
+	public static ActivityIfc createUnloadParcelsActivity(ActivityIfc work, int tripDuration) {
+		return createUnloadParcelsActivity(work, tripDuration, unloadDuration );
 	}
 
 	/**

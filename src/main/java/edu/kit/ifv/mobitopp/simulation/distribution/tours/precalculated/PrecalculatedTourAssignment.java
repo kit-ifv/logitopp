@@ -67,7 +67,7 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 			delivery.withTripDuration(round(tripDuration));
 			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
 			
-			float deliveryDuration = delivery.estimateDuration(person.getEfficiency());
+			float deliveryDuration = delivery.estimateDuration();
 			time = time.plusMinutes(round(tripDuration + deliveryDuration));
 			
 			assigned.add(delivery);

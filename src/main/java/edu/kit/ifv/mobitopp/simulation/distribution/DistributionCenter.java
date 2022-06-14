@@ -14,6 +14,7 @@ import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
@@ -46,6 +47,7 @@ public class DistributionCenter implements NullParcelProducer {
 	@Setter private DeliveryTourAssignmentStrategy tourStrategy;
 	@Setter private ParcelPolicyProvider policyProvider;
 	@Setter private DeliveryClusteringStrategy clusteringStrategy;
+	@Getter @Setter private DeliveryDurationModel durationModel;
 
 	/**
 	 * Instantiates a new distribution center.
@@ -211,4 +213,5 @@ public class DistributionCenter implements NullParcelProducer {
 	public String toString() {
 		return this.name;
 	}
+
 }
