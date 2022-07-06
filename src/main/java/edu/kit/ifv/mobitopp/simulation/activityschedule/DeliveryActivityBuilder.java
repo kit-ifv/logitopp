@@ -40,7 +40,7 @@ public class DeliveryActivityBuilder {
 	}
 
 	public int estimateDuration() {
-		return (int) deliveryPerson.getDistributionCenter().getDurationModel().estimateDuration(deliveryPerson, parcels);
+		return (int) 1.0 + 0.5 * parcels.size();
 	}
 
 	public DeliveryActivityBuilder deliveredBy(DeliveryPerson person) {
