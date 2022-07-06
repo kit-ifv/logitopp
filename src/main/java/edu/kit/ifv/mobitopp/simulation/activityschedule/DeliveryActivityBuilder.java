@@ -40,7 +40,7 @@ public class DeliveryActivityBuilder {
 	}
 
 	public int estimateDuration() {
-		return (int) 1.0 + 0.5 * parcels.size();
+		return (int) (1.0 + 0.5 * parcels.size());
 	}
 
 	public DeliveryActivityBuilder deliveredBy(DeliveryPerson person) {
