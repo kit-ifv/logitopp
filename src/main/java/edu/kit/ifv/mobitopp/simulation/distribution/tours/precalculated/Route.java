@@ -20,6 +20,7 @@ public class Route {
 	private DeliveryClusteringStrategy clusteringStrategy = new LinkDeliveryClustering();
 	
 	public Route(int id) {
+		this.id = id;
 		this.deliveryTour = new LinkedHashMap<>();
 		this.expectedParcels = new LinkedHashMap<>();
 	}
