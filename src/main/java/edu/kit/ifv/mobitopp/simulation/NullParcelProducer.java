@@ -2,7 +2,6 @@ package edu.kit.ifv.mobitopp.simulation;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 
 /**
  * The NullParcelProducer is a {@link ParcelAgent} with no parcel production.
@@ -91,7 +90,7 @@ public interface NullParcelProducer extends ParcelAgent {
 	 * @param parcel the parcel to be recorded as delivered
 	 */
 	@Override
-	default void addDelivered(PrivateParcel parcel) {
+	default void addDelivered(IParcel parcel) {
 		throw new UnsupportedOperationException(this.getClass().getSimpleName() + " is a NullParcelProducer and therefore does not hold parcels!");
 	}
 	

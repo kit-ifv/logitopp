@@ -10,7 +10,7 @@ import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
- * A factory for creating {@link DeliveryActivity DeliveryActivities}.
+ * A factory for creating {@link PersonDeliveryActivity DeliveryActivities}.
  */
 public class DeliveryActivityFactory {
 
@@ -21,7 +21,7 @@ public class DeliveryActivityFactory {
 	private static int unloadDuration = 15;
 
 	/**
-	 * Creates a new DeliveryActivity for the given parcel with the given trip and
+	 * Creates a new {@link PersonDeliveryActivity} for the given parcel with the given trip and
 	 * delivery duration. The activities flexibilities are determined by the given
 	 * work activity.
 	 *
@@ -34,10 +34,32 @@ public class DeliveryActivityFactory {
 	 * @param stopLocation the stop zone and location 
 	 * @return the delivery activity
 	 */
-	public static DeliveryActivity createDeliveryActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate,
+	public static PersonDeliveryActivity createDeliveryActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate,
 			int duration, int tripDuration, DeliveryPerson person, ZoneAndLocation stopLocation) {
 
-		return new DeliveryActivity(activityCounter--, work.getActivityNrOfWeek(), startDate, duration, tripDuration,
+		return new PersonDeliveryActivity(activityCounter--, work.getActivityNrOfWeek(), startDate, duration, tripDuration,
+				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person, stopLocation);
+
+	}
+	
+	/**
+	 * Creates a new {@link PersonPickupActivity} for the given parcel with the given trip and
+	 * delivery duration. The activities flexibilities are determined by the given
+	 * work activity.
+	 *
+	 * @param parcels      the parcels to be delivered
+	 * @param work         the work
+	 * @param startDate    the start date
+	 * @param duration     the duration
+	 * @param tripDuration the trip duration
+	 * @param person       the delivery person
+	 * @param stopLocation the stop zone and location 
+	 * @return the delivery activity
+	 */
+	public static PersonPickupActivity createPickupActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate,
+			int duration, int tripDuration, DeliveryPerson person, ZoneAndLocation stopLocation) {
+
+		return new PersonPickupActivity(activityCounter--, work.getActivityNrOfWeek(), startDate, duration, tripDuration,
 				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person, stopLocation);
 
 	}

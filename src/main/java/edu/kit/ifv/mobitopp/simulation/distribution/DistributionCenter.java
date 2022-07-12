@@ -12,12 +12,11 @@ import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;
 import edu.kit.ifv.mobitopp.simulation.Person;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
@@ -43,6 +42,7 @@ public class DistributionCenter implements NullParcelProducer {
 	@Getter(value = lombok.AccessLevel.NONE)
 	private Collection<IParcel> currentParcels;
 	private Collection<IParcel> delivered;
+	private Collection<IParcel> pickupRequests;
 
 	@Setter private DeliveryTourAssignmentStrategy tourStrategy;
 	@Setter private ParcelPolicyProvider policyProvider;
@@ -75,6 +75,7 @@ public class DistributionCenter implements NullParcelProducer {
 
 		this.currentParcels = new ArrayList<>();
 		this.delivered = new ArrayList<>();
+		this.pickupRequests = new ArrayList<>();
 	}
 
 	/**
@@ -86,12 +87,12 @@ public class DistributionCenter implements NullParcelProducer {
 	 * @param remainingWorkTime the remaining work time
 	 * @return the list of assigned deliveries
 	 */
-	public List<DeliveryActivityBuilder> assignParcels(DeliveryPerson person, ActivityIfc work, Time currentTime,
+	public List<ParcelActivityBuilder> assignParcels(DeliveryPerson person, ActivityIfc work, Time currentTime,
 			RelativeTime remainingWorkTime) {
-		List<DeliveryActivityBuilder> assigned = this.tourStrategy
+		List<ParcelActivityBuilder> assigned = this.tourStrategy
 				.assignParcels(this.getDeliveryActivities(currentTime), person, currentTime, remainingWorkTime);
 
-		loadParcels(person, assigned, currentTime);
+		removeParcels(person, assigned, currentTime);
 
 		return assigned;
 	}
@@ -103,10 +104,10 @@ public class DistributionCenter implements NullParcelProducer {
 	 * @param assigned    the assigned
 	 * @param currentTime the current time
 	 */
-	private void loadParcels(DeliveryPerson person, List<DeliveryActivityBuilder> assigned, Time currentTime) {
+	private void removeParcels(DeliveryPerson person, List<ParcelActivityBuilder> assigned, Time currentTime) {
 		assigned.forEach(d -> {
-			person.load(d.getParcels(), currentTime);
 			this.currentParcels.removeAll(d.getParcels());
+			this.pickupRequests.removeAll(d.getParcels());
 		});
 	}
 
@@ -134,15 +135,20 @@ public class DistributionCenter implements NullParcelProducer {
 				.collect(toList());
 	}
 
-	public List<DeliveryActivityBuilder> getDeliveryActivities(Time currentTime) {
-		List<DeliveryActivityBuilder> deliveries = new ArrayList<>();
+	public List<ParcelActivityBuilder> getDeliveryActivities(Time currentTime) {
+		List<ParcelActivityBuilder> deliveries = new ArrayList<>();
 
 		List<IParcel> available = getAvailableParcels(currentTime);
 		
 		clusteringStrategy.cluster(available)
 						  .forEach(cluster -> deliveries.add(
-								  new DeliveryActivityBuilder(clusteringStrategy).addParcels(cluster)
+								  new ParcelActivityBuilder(clusteringStrategy).addParcels(cluster).asDelivery().byDistributionCenter(this)
 						));
+		
+		clusteringStrategy.cluster(new ArrayList<>(pickupRequests))
+						  .forEach(cluster -> deliveries.add(
+								  new ParcelActivityBuilder(clusteringStrategy).addParcels(cluster).asPickup().byDistributionCenter(this)
+						   ));
 
 		return deliveries;
 	}
@@ -159,15 +165,18 @@ public class DistributionCenter implements NullParcelProducer {
 	}
 	
 	@Override
-	public void addDelivered(PrivateParcel parcel) {
+	public void addDelivered(IParcel parcel) {
 		this.delivered.add(parcel);
+	}
+	
+	public void requestPickup(IParcel parcel) {
+		this.pickupRequests.add(parcel);
 	}
 	
 	@Override
 	public ParcelPolicyProvider getPolicyProvider() {
 		return this.policyProvider;
 	}
-	
 
 	/**
 	 * Adds the employee.

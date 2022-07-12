@@ -35,16 +35,18 @@ public abstract class ParcelBuilder<P extends ParcelAgent> {
 	}
 	
 	public IParcel get() {
-		if (this.parcel == null) {
-			this.parcel = doBuild();
+		if (parcel == null) {
+			parcel = doBuild();
+			parcel.getProducer().addParcel(parcel);
 		}
-		 return this.parcel;
+		
+		return parcel;
 	}
 
-	public abstract IParcel doBuild();
+	protected abstract IParcel doBuild();
 	
 	public Time getArrivalDate() {
-		return this.arrivalDate.getValue();
+		return arrivalDate.getValue();
 	}
 	
 }

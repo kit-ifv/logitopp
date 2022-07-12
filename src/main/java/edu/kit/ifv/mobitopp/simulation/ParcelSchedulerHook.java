@@ -43,7 +43,7 @@ public class ParcelSchedulerHook implements Hook {
 	public void process(Time date) {
 		
 		if (this.parcels.containsKey(date)) {
-			this.parcels.get(date).forEach(ParcelBuilder::doBuild);
+			this.parcels.get(date).forEach(ParcelBuilder::get);
 			
 			if (!keepSchedule) {
 				this.parcels.remove(date);

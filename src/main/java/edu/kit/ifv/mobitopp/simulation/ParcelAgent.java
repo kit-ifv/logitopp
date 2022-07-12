@@ -2,7 +2,6 @@ package edu.kit.ifv.mobitopp.simulation;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 
 /**
  * The Interface ParcelAgent.
@@ -65,7 +64,7 @@ public interface ParcelAgent {
 	 *
 	 * @param parcel the parcel
 	 */
-	public void addDelivered(PrivateParcel parcel);
+	public void addDelivered(IParcel parcel);
 		
 
 }

@@ -8,6 +8,7 @@ import edu.kit.ifv.mobitopp.result.Results;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -19,7 +20,7 @@ public class DeliveryResults {
 
 	private static final String SEP = ";";
 	private final static Category resultCategoryStatePrivate = createResultCategoryStatePrivate();
-	private final static Category resultCategoryStateBusines = createResultCategoryStatePrivate();
+	private final static Category resultCategoryStateBusines = createResultCategoryStateBusiness();
 	private final static Category resultCategoryPrivateOrder = createResultCategoryPrivateOrder();
 	private final static Category resultCategoryBusinessOrder = createResultCategoryBusinessOrder();
 	private final static Category resultCategoryEmployee = createResultCategoryEmployee();
@@ -49,7 +50,7 @@ public class DeliveryResults {
 	 * @param currentTime the current time
 	 * @param isAttempt   the is attempt
 	 */
-	public void logChange(PrivateParcel parcel, DeliveryPerson deliveryGuy, Time currentTime, boolean isAttempt) {
+	public void logChange(PrivateParcel parcel, DeliveryAgent deliveryGuy, Time currentTime, boolean isAttempt) {
 		String msg = "";
 		msg += currentTime.toString() + SEP;
 		msg += parcel.getOId() + SEP;
@@ -62,7 +63,6 @@ public class DeliveryResults {
 		msg += parcel.getDeliveryAttempts() + SEP;
 		msg += String.valueOf(parcel.getDeliveryTime()) + SEP;
 		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + SEP;
-		msg += ((deliveryGuy != null) ? deliveryGuy.currentActivity().zone().getId() : "NULL") + SEP;
 		msg += parcel.getZone().getId();
 
 		this.results.write(resultCategoryStatePrivate, msg);
@@ -76,8 +76,8 @@ public class DeliveryResults {
 	public static Category createResultCategoryStatePrivate() {
 		return new Category("parcel-states",
 				Arrays.asList("Time", "ParcelID", "RecipientID", "DestinationType", "State", "IsDeliveryAttempt",
-						"DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "RecipientType",
-						"CurrentDeliveryGuyZone", "ParcelDestinationZone"));
+						"DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "RecipientType", 
+						"ParcelDestinationZone"));
 	}
 
 	
@@ -89,12 +89,12 @@ public class DeliveryResults {
 	 * @param currentTime the current time
 	 * @param isAttempt the is attempt
 	 */
-	public void logChange(BusinessParcel parcel, DeliveryPerson deliveryGuy, Time currentTime, boolean isAttempt) {
+	public void logChange(BusinessParcel parcel, DeliveryAgent deliveryGuy, Time currentTime, boolean isAttempt) {
 		String msg = "";
 		msg += currentTime.toString() + SEP;
 		msg += parcel.getOId() + SEP;
 		msg += parcel.getZone().getId().getExternalId() + SEP;
-		msg += parcel.getLocation().forLogging() + SEP;
+		msg += parcel.getLocation().coordinates() + SEP;
 		msg += parcel.getState().name() + SEP;
 		msg += isAttempt + SEP;
 		msg += ((deliveryGuy != null) ? deliveryGuy.getOid() : "NULL") + SEP;
@@ -102,7 +102,6 @@ public class DeliveryResults {
 		msg += parcel.getDeliveryAttempts() + SEP;
 		msg += String.valueOf(parcel.getDeliveryTime()) + SEP;
 		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + SEP;
-		msg += ((deliveryGuy != null) ? deliveryGuy.currentActivity().zone().getId() : "NULL") + SEP;
 		msg += parcel.getZone().getId();
 
 		this.results.write(resultCategoryStateBusines, msg);
@@ -117,8 +116,8 @@ public class DeliveryResults {
 	public static Category createResultCategoryStateBusiness() {
 		return new Category("business-parcel-states",
 				Arrays.asList("Time", "ParcelID", "ZoneId", "Location", "State", "IsDeliveryAttempt",
-						"DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "RecipientType",
-						"CurrentDeliveryGuyZone", "ParcelDestinationZone"));
+						"DeliveryGuyID", "Producer", "DeliveryAttempts", "DeliveryTime", "RecipientType", 
+						"ParcelDestinationZone"));
 	}
 	
 	

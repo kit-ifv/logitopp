@@ -157,7 +157,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		
 		RelativeTime remainingTime = _1800pm.differenceTo(currentTime);
 		
-		List<DeliveryActivityBuilder> deliveries = center.assignParcels(person, beginningActivity, currentTime, remainingTime);
+		List<ParcelActivityBuilder> deliveries = center.assignParcels(person, beginningActivity, currentTime, remainingTime);
 				
 		beginningActivity.changeDuration(loadDuration);
 		ActivityIfc currentActivity = beginningActivity;
@@ -174,10 +174,12 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 				currentActivity.changeDuration(newDuration);
 		};
 			
-		for (DeliveryActivityBuilder d : deliveries) {		
-			ActivityIfc delivery = d.deliveredBy(person)
+		for (ParcelActivityBuilder d : deliveries) {		
+			PersonParcelActivity delivery = d.deliveredBy(person)
 									.during(beginningActivity)
-									.build();
+									.buildPersonActivity();
+			
+			delivery.asParcelActivity().prepareAvtivity(currentTime);
 			
 			activitySchedule.insertActivityAfter(currentActivity, delivery);
 			currentActivity = delivery;
@@ -264,7 +266,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		for (ActivityIfc activity: nextActivities) {
 			if (isDelivery(activity)) {
 				
-				((DeliveryActivity) activity).abortDelivery(person, currentTime);
+				((DeliveryActivity) activity).abortActivity(currentTime);
 				activitySchedule.removeActivity(activity);
 				
 			}

@@ -16,7 +16,7 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
@@ -34,11 +34,11 @@ import edu.kit.ifv.mobitopp.time.Time;
  */
 public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrategy {
 
-	private List<DeliveryActivityBuilder> deliveryTour = new ArrayList<>();
+	private List<ParcelActivityBuilder> deliveryTour = new ArrayList<>();
 	private Time nextPlan = Time.start;
 
 	private static int MAX_CAPACITY = 160;
-	private static int MAX_HOURS = 8;
+//	private static int MAX_HOURS = 8;
 	private static boolean SKIP_SUNDAY = true;
 
 	/**
@@ -52,7 +52,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 	 * @return the collection of assigned deliveries
 	 */
 	@Override
-	public List<DeliveryActivityBuilder> assignParcels(Collection<DeliveryActivityBuilder> deliveries,
+	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
 			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime) {
 
 		if (SKIP_SUNDAY && currentTime.weekDay().equals(DayOfWeek.SUNDAY)
@@ -64,7 +64,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 			planGiantTour(person.getDistributionCenter(), deliveries, currentTime);
 		}
 
-		ArrayList<DeliveryActivityBuilder> assigned = new ArrayList<>();
+		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();
 
 		int capacity = MAX_CAPACITY;
 		Zone lastZone = person.getDistributionCenter().getZone();
@@ -72,7 +72,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		Time endOfWork = currentTime.plus(remainingWorkTime);
 
 		for (int i = 0; i < Math.min(capacity, deliveryTour.size()); i++) {
-			DeliveryActivityBuilder delivery = deliveryTour.get(i);
+			ParcelActivityBuilder delivery = deliveryTour.get(i);
 
 			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time);			
 			delivery.withTripDuration(round(tripDuration));
@@ -120,7 +120,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 	 * @param person             the {@link DeliveryPerson}
 	 * @param currentTime        the current {@link Time}
 	 */
-	private void planGiantTour(DistributionCenter distributionCenter, Collection<DeliveryActivityBuilder> deliveries,
+	private void planGiantTour(DistributionCenter distributionCenter, Collection<ParcelActivityBuilder> deliveries,
 			Time currentTime) {
 
 		SimpleWeightedGraph<Location, DefaultWeightedEdge> graph = new SimpleWeightedGraph<Location, DefaultWeightedEdge>(
@@ -132,7 +132,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		// Create complete graph: for each parcel add the location as vertex, also add
 		// edges to all existing vertices
 		// Use 2d distance as edge weight
-		for (DeliveryActivityBuilder d : deliveries) {
+		for (ParcelActivityBuilder d : deliveries) {
 			Location newLocation = d.getLocation();
 
 			if (graph.vertexSet().contains(newLocation)) {
@@ -154,8 +154,8 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		TwoApproxMetricTSP<Location, DefaultWeightedEdge> tspAlg = new TwoApproxMetricTSP<>();
 		GraphPath<Location, DefaultWeightedEdge> path = tspAlg.getTour(graph);
 
-		List<DeliveryActivityBuilder> prefix = new ArrayList<>();
-		List<DeliveryActivityBuilder> suffix = new ArrayList<>();
+		List<ParcelActivityBuilder> prefix = new ArrayList<>();
+		List<ParcelActivityBuilder> suffix = new ArrayList<>();
 		boolean foundStart = false;
 
 		for (Location l : path.getVertexList()) {

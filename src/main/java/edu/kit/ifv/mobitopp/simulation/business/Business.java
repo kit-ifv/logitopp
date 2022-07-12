@@ -7,9 +7,9 @@ import java.util.Random;
 
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
+import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import lombok.Getter;
 
 @Getter
@@ -94,11 +94,18 @@ public class Business implements ParcelAgent {
 
 	@Override
 	public void addParcel(IParcel parcel) {
-		this.currentParcels.add(parcel);		
+		//this.currentParcels.add(parcel);
+		
+		if (parcel.getConsumer() instanceof DistributionCenter) {//TODO fixx
+			DistributionCenter dc = (DistributionCenter) parcel.getConsumer();
+			
+			System.out.println("Business " + this.id + " requests " + dc.getName() + " to pick up parcel " + parcel.getOId());
+			dc.requestPickup(parcel);
+		}
 	}
 
 	@Override
-	public void addDelivered(PrivateParcel parcel) {
+	public void addDelivered(IParcel parcel) {
 		this.delivered.add(parcel);
 	}
 	

@@ -9,7 +9,7 @@ import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
+import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
@@ -29,18 +29,18 @@ public class BusinessParcel extends BaseParcel {
 	}
 
 	@Override
-	protected void logChange(Time currentTime, DeliveryPerson deliveryGuy, boolean isAttempt) {
+	protected void logChange(Time currentTime, DeliveryAgent deliveryGuy, boolean isAttempt) {
 		this.results.logChange(this, deliveryGuy, currentTime, isAttempt);
 	}
 
 	@Override
-	protected Optional<RecipientType> canDeliver(Time currentTime) {
-		return this.producer.getPolicyProvider().forBusiness().canDeliver(this, currentTime);
+	protected Optional<RecipientType> canDeliver(Time currentTime, DeliveryAgent agent) {
+		return agent.getPolicyProvider().forBusiness().canDeliver(this, currentTime);
 	}
 
 	@Override
-	protected boolean updateParcelDelivery(Time currentTime) {
-		return this.producer.getPolicyProvider().forBusiness().updateParcelDelivery(this, currentTime);
+	protected boolean updateParcelDelivery(Time currentTime, DeliveryAgent agent) {
+		return agent.getPolicyProvider().forBusiness().updateParcelDelivery(this, currentTime);
 	}
 
 	
@@ -68,5 +68,10 @@ public class BusinessParcel extends BaseParcel {
 			return false;
 		}
 
+	}
+
+	@Override
+	public void setConsumer(ParcelAgent producer) {
+		throw new UnsupportedOperationException("Setting the consumer is not supported for BusinessParcels.");
 	}
 }
