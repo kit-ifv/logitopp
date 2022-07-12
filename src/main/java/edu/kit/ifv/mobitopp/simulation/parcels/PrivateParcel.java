@@ -7,10 +7,11 @@ import java.util.Optional;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
+import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
@@ -54,18 +55,18 @@ public class PrivateParcel extends BaseParcel {
 	}
 
 	@Override
-	protected void logChange(Time currentTime, DeliveryPerson deliveryGuy, boolean isAttempt) {
+	protected void logChange(Time currentTime, DeliveryAgent deliveryGuy, boolean isAttempt) {
 		this.results.logChange(this, deliveryGuy, currentTime, isAttempt);
 	}
 
 	@Override
-	protected Optional<RecipientType> canDeliver(Time currentTime) {
-		return this.producer.getPolicyProvider().forPrivate().canDeliver(this, currentTime);
+	protected Optional<RecipientType> canDeliver(Time currentTime, DeliveryAgent agent) {
+		return agent.getPolicyProvider().forPrivate().canDeliver(this, currentTime);
 	}
 
 	@Override
-	protected boolean updateParcelDelivery(Time currentTime) {
-		return this.producer.getPolicyProvider().forPrivate().updateParcelDelivery(this, currentTime);
+	protected boolean updateParcelDelivery(Time currentTime, DeliveryAgent agent) {
+		return agent.getPolicyProvider().forPrivate().updateParcelDelivery(this, currentTime);
 	}
 
 	/**
@@ -105,9 +106,8 @@ public class PrivateParcel extends BaseParcel {
 	 * @param deliveryGuy the delivery guy
 	 */
 	@Override
-	protected void deliver(Time currentTime, DeliveryPerson deliveryGuy) {
+	protected void deliver(Time currentTime, DeliveryAgent deliveryGuy) {
 		this.deliveryTime = currentTime;
-		deliveryGuy.delivered(this);
 
 		this.state = ParcelState.DELIVERED;
 
@@ -186,6 +186,16 @@ public class PrivateParcel extends BaseParcel {
 			return false;
 		}
 
+	}
+
+	@Override
+	public ParcelAgent getConsumer() {
+		return person;
+	}
+
+	@Override
+	public void setConsumer(ParcelAgent producer) {
+		throw new UnsupportedOperationException("Changing the recipient of a PrivateParcel is not supportet.");
 	}
 
 }

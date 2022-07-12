@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -23,13 +23,13 @@ public class DummyDeliveryTourStrategy implements DeliveryTourAssignmentStrategy
 	 * @return the collection of assigned deliveries
 	 */
 	@Override
-	public List<DeliveryActivityBuilder> assignParcels(Collection<DeliveryActivityBuilder> deliveries,
+	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
 			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime) {
 		
-		List<DeliveryActivityBuilder> assigned = new ArrayList<>();
+		List<ParcelActivityBuilder> assigned = new ArrayList<>();
 		RelativeTime counter = RelativeTime.ofSeconds(remainingWorkTime.seconds());
 		
-		for (DeliveryActivityBuilder delivery : deliveries) {
+		for (ParcelActivityBuilder delivery : deliveries) {
 			counter = counter.minusMinutes(delivery.estimateDuration() + 5);
 			
 			if (!counter.isNegative()) {

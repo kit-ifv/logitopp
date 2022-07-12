@@ -13,7 +13,7 @@ import java.util.Map;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Mode;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
@@ -35,7 +35,7 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 	
 
 	@Override
-	public List<DeliveryActivityBuilder> assignParcels(Collection<DeliveryActivityBuilder> deliveries,
+	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
 			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime) {
 		
 		DayOfWeek day = currentTime.weekDay();
@@ -58,11 +58,11 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		Route route = Collections.max(routes, Comparator.comparingInt(Route::size));
 		this.routes.get(day).remove(route);
 
-		ArrayList<DeliveryActivityBuilder> assigned = new ArrayList<>();		
+		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();		
 		Zone lastZone = person.getDistributionCenter().getZone();
 		Time time = currentTime;
 
-		for (DeliveryActivityBuilder delivery : route.getDeliveries()) {			
+		for (ParcelActivityBuilder delivery : route.getDeliveries()) {			
 			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time);			
 			delivery.withTripDuration(round(tripDuration));
 			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
@@ -90,10 +90,10 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		return person.options().impedance().getTravelTime(origin.getId(), destination.getId(), mode, time);
 	}
 
-	private void fillRoutes(Collection<DeliveryActivityBuilder> deliveries, Collection<Route> routes) {
-		Collection<DeliveryActivityBuilder> remainingDeliveries = new ArrayList<>(deliveries);
+	private void fillRoutes(Collection<ParcelActivityBuilder> deliveries, Collection<Route> routes) {
+		Collection<ParcelActivityBuilder> remainingDeliveries = new ArrayList<>(deliveries);
 		for (Route route : routes) {
-			List<DeliveryActivityBuilder> stops = remainingDeliveries.stream().filter(route::contains).collect(toList());
+			List<ParcelActivityBuilder> stops = remainingDeliveries.stream().filter(route::contains).collect(toList());
 			stops.forEach(route::addParcels);
 			remainingDeliveries.removeAll(stops);
 		}

@@ -13,7 +13,7 @@ import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
+import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,9 +44,9 @@ public abstract class BaseParcel implements IParcel {
 		this.shipmentSize = shipmentSize;
 	}
 	
-	protected abstract void logChange(Time currentTime, DeliveryPerson deliveryGuy, boolean isAttempt);
-	protected abstract Optional<RecipientType> canDeliver(Time currentTime);
-	protected abstract boolean updateParcelDelivery(Time currentTime);
+	protected abstract void logChange(Time currentTime, DeliveryAgent deliveryGuy, boolean isAttempt);
+	protected abstract Optional<RecipientType> canDeliver(Time currentTime, DeliveryAgent agent);
+	protected abstract boolean updateParcelDelivery(Time currentTime, DeliveryAgent agent);
 	
 
 	public Zone getZone() {
@@ -66,7 +66,7 @@ public abstract class BaseParcel implements IParcel {
 	 * @param isAttempt   the is attempt
 	 * @return the parcel state
 	 */
-	private void updateState(Time currentTime, DeliveryPerson deliveryGuy, boolean isAttempt) {
+	private void updateState(Time currentTime, DeliveryAgent deliveryGuy, boolean isAttempt) {
 		this.state = this.state.nextState();
 		this.logChange(currentTime, deliveryGuy, isAttempt);
 	}
@@ -77,9 +77,8 @@ public abstract class BaseParcel implements IParcel {
 	 * @param currentTime the current time
 	 * @param deliveryGuy the delivery guy
 	 */
-	protected void deliver(Time currentTime, DeliveryPerson deliveryGuy) {
+	protected void deliver(Time currentTime, DeliveryAgent deliveryGuy) {
 		this.deliveryTime = currentTime;
-		deliveryGuy.delivered(this);
 
 		this.state = ParcelState.DELIVERED;
 	}
@@ -94,19 +93,14 @@ public abstract class BaseParcel implements IParcel {
 	 */
 	@Override
 	public void setProducer(ParcelAgent producer) {
-		if (this.producer != null) {
-			this.producer.removeParcel(this);
-		}
-
 		this.producer = producer;
-		this.producer.addParcel(this);
 	}
 
 	@Override
-	public boolean tryDelivery(Time currentTime, DeliveryPerson deliveryGuy) {
+	public boolean tryDelivery(Time currentTime, DeliveryAgent deliveryGuy) {
 		verifyState("tryDelivery", ONDELIVERY);
 		this.deliveryAttempts++;
-		Optional<RecipientType> recipient = this.canDeliver(currentTime);
+		Optional<RecipientType> recipient = this.canDeliver(currentTime, deliveryGuy);
 
 		boolean success = recipient.isPresent();
 		
@@ -116,7 +110,7 @@ public abstract class BaseParcel implements IParcel {
 			this.deliver(currentTime, deliveryGuy);
 		} else {
 			System.out.println(this.producer.toString() + " failed to deliver " + this.oId + "(attempt " + this.deliveryAttempts + ")");
-			this.updateParcelDelivery(currentTime);
+			this.updateParcelDelivery(currentTime, deliveryGuy);
 		}
 
 		this.updateState(currentTime, deliveryGuy, true);
@@ -131,21 +125,21 @@ public abstract class BaseParcel implements IParcel {
 	}
 
 	@Override
-	public void returning(Time currentTime, DeliveryPerson deliveryGuy) {
+	public void returning(Time currentTime, DeliveryAgent deliveryGuy) {
 		verifyState("returning", ONDELIVERY);
 		this.updateState(currentTime, deliveryGuy, false);
 		verifyState("returning result", RETURNING);
 	}
 
 	@Override
-	public void loaded(Time currentTime, DeliveryPerson deliveryGuy) {
+	public void loaded(Time currentTime, DeliveryAgent deliveryGuy) {
 		verifyState("loaded", ParcelState.UNDEFINED);
 		this.updateState(currentTime, deliveryGuy, false);
 		verifyState("loaded result", ONDELIVERY);
 	}
 
 	@Override
-	public void unloaded(Time currentTime, DeliveryPerson deliveryGuy) {
+	public void unloaded(Time currentTime, DeliveryAgent deliveryGuy) {
 		verifyState("unloaded", ONDELIVERY, RETURNING);
 		this.updateState(currentTime, deliveryGuy, false);
 		verifyState("unloaded result", ParcelState.UNDEFINED);
@@ -153,7 +147,7 @@ public abstract class BaseParcel implements IParcel {
 
 	protected void verifyState(String operation, ParcelState ... states ) {
 		if (!Arrays.asList(states).contains(this.state)) {
-			throw new IllegalStateException(operation + " expects the parcel state " + state.name()
+			throw new IllegalStateException(operation + " expects one of the parcel states: " + Arrays.toString(states)
 					+ " (but current state is " + this.state.name() + ")");
 		}
 	}

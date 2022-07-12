@@ -17,7 +17,7 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
@@ -37,7 +37,7 @@ import edu.kit.ifv.mobitopp.time.Time;
  */
 public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrategy {
 
-	private List<DeliveryActivityBuilder> parcelTour;
+	private List<ParcelActivityBuilder> parcelTour;
 	private Time lastPlan;
 
 	private final int meanCapacity;
@@ -95,7 +95,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 * @return the list of assigned parcels
 	 */
 	@Override
-	public List<DeliveryActivityBuilder> assignParcels(Collection<DeliveryActivityBuilder> deliveries,
+	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
 			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime) {
 
 		if (skipSunday && isSunday(currentTime) || startsAfter1800(currentTime)) {
@@ -107,7 +107,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			planZoneTour(person.getDistributionCenter(), person, deliveries, currentTime);
 		}
 
-		ArrayList<DeliveryActivityBuilder> assigned = new ArrayList<>();
+		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();
 
 		int capacity = selectCapacity(person);
 		Zone lastZone = person.getDistributionCenter().getZone();
@@ -115,7 +115,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 		Time endOfWork = currentTime.plus(remainingWorkTime);
 
 		for (int i = 0; i < Math.min(capacity, parcelTour.size()); i++) {
-			DeliveryActivityBuilder delivery = parcelTour.get(i);
+			ParcelActivityBuilder delivery = parcelTour.get(i);
 			
 			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time);			
 			delivery.withTripDuration(round(tripDuration));
@@ -196,7 +196,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 * @param currentTime the current {@link Time}
 	 */
 	private void planZoneTour(DistributionCenter dc, DeliveryPerson person,
-			Collection<DeliveryActivityBuilder> deliveries, Time currentTime) {
+			Collection<ParcelActivityBuilder> deliveries, Time currentTime) {
 
 		SimpleWeightedGraph<Zone, DefaultWeightedEdge> graph = new SimpleWeightedGraph<Zone, DefaultWeightedEdge>(
 				DefaultWeightedEdge.class);
@@ -206,7 +206,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 		// Create complete graph: for each parcel add the zone as vertex, also add edges
 		// to all existing vertices (in both directions)
 		// Use current travel time as edge weight
-		for (Zone newZone : deliveries.stream().map(DeliveryActivityBuilder::getZone).distinct().collect(toList())) {
+		for (Zone newZone : deliveries.stream().map(ParcelActivityBuilder::getZone).distinct().collect(toList())) {
 
 			if (graph.vertexSet().contains(newZone)) {
 				continue;
@@ -230,8 +230,8 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 		TwoApproxMetricTSP<Zone, DefaultWeightedEdge> tspAlg = new TwoApproxMetricTSP<>();
 		GraphPath<Zone, DefaultWeightedEdge> path = tspAlg.getTour(graph);
 
-		List<DeliveryActivityBuilder> prefix = new ArrayList<>();
-		List<DeliveryActivityBuilder> suffix = new ArrayList<>();
+		List<ParcelActivityBuilder> prefix = new ArrayList<>();
+		List<ParcelActivityBuilder> suffix = new ArrayList<>();
 		boolean foundStart = false;
 
 		for (Zone z : path.getVertexList()) {
@@ -239,16 +239,16 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 				foundStart = true;
 			}
 
-			List<DeliveryActivityBuilder> deliveriesInZone = deliveries.stream().filter(p -> p.getZone().equals(z))
+			List<ParcelActivityBuilder> deliveriesInZone = deliveries.stream().filter(p -> p.getZone().equals(z))
 					.collect(toList());
 
 			if (!foundStart) {
-				for (DeliveryActivityBuilder d : deliveriesInZone) {
+				for (ParcelActivityBuilder d : deliveriesInZone) {
 					suffix.add(d);
 				}
 
 			} else {
-				for (DeliveryActivityBuilder d : deliveriesInZone) {
+				for (ParcelActivityBuilder d : deliveriesInZone) {
 					prefix.add(d);
 				}
 			}

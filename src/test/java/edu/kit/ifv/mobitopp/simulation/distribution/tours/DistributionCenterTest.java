@@ -19,7 +19,7 @@ import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.BaseParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
@@ -82,15 +82,15 @@ public class DistributionCenterTest  {
 	
 	@Test
 	public void groupParcels() {
-		List<DeliveryActivityBuilder> deliveries = distributionCenter.getDeliveryActivities(Time.start);
+		List<ParcelActivityBuilder> deliveries = distributionCenter.getDeliveryActivities(Time.start);
 		verify(deliveries);
 		
 	}
 	
-	private void verify(List<DeliveryActivityBuilder> deliveries) {
+	private void verify(List<ParcelActivityBuilder> deliveries) {
 		assertTrue(deliveries.stream().allMatch(d -> !d.getParcels().isEmpty()));
 		
-		for (DeliveryActivityBuilder d : deliveries) {
+		for (ParcelActivityBuilder d : deliveries) {
 			assertEquals(1, d.getParcels().stream().map(IParcel::getLocation).map(Location::roadAccessEdgeId).map(Math::abs).distinct().count());
 			
 			assertEquals( Math.abs(d.getLocation().roadAccessEdgeId()), Math.abs(d.getParcels().get(0).getLocation().roadAccessEdgeId()) );

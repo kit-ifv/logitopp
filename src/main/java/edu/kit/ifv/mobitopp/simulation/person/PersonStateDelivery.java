@@ -3,7 +3,8 @@ package edu.kit.ifv.mobitopp.simulation.person;
 import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivity;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.PersonDeliveryActivity;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.PersonParcelActivity;
 import edu.kit.ifv.mobitopp.simulation.events.DemandSimulationEventIfc;
 import edu.kit.ifv.mobitopp.simulation.events.Event;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -62,7 +63,7 @@ public enum PersonStateDelivery implements PersonState {
 		public void doActionAtEnd(SimulationPerson person, Time currentTime) {
 				
 			if (person.currentActivity().activityType().equals(ActivityType.DELIVER_PARCEL)) {			
-				((DeliveryActivity) person.currentActivity()).tryDelivery(currentTime);
+				((PersonParcelActivity) person.currentActivity()).asParcelActivity().executeActivity(currentTime);
 			}
 			
 			

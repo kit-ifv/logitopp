@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import edu.kit.ifv.mobitopp.simulation.activityschedule.DeliveryActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.LinkDeliveryClustering;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
@@ -15,7 +15,7 @@ import lombok.Getter;
 public class Route {
 	
 	@Getter private int id;
-	private LinkedHashMap<Integer, DeliveryActivityBuilder> deliveryTour;
+	private LinkedHashMap<Integer, ParcelActivityBuilder> deliveryTour;
 	private LinkedHashMap<Integer, Integer> expectedParcels;
 	private DeliveryClusteringStrategy clusteringStrategy = new LinkDeliveryClustering();
 	
@@ -26,15 +26,15 @@ public class Route {
 	}
 	
 	public void planStop(int link, int expectedParcels) {
-		this.deliveryTour.put(link, new DeliveryActivityBuilder(clusteringStrategy));
+		this.deliveryTour.put(link, new ParcelActivityBuilder(clusteringStrategy));
 		this.expectedParcels.put(link, expectedParcels);
 	}
 	
-	public boolean contains(DeliveryActivityBuilder delivery) {
+	public boolean contains(ParcelActivityBuilder delivery) {
 		return this.deliveryTour.keySet().contains(Math.abs(delivery.getLocation().roadAccessEdgeId()));
 	}
 	
-	public void addParcels(DeliveryActivityBuilder delivery) {
+	public void addParcels(ParcelActivityBuilder delivery) {
 		if (contains(delivery)) {
 			int stop = Math.abs(delivery.getLocation().roadAccessEdgeId());
 			this.deliveryTour.put(stop, this.deliveryTour.get(stop).merge(delivery));
@@ -60,7 +60,7 @@ public class Route {
 	}
 	
 	
-	public Collection<DeliveryActivityBuilder> getDeliveries() {
+	public Collection<ParcelActivityBuilder> getDeliveries() {
 		verify();
 		return this.deliveryTour.values();
 	}

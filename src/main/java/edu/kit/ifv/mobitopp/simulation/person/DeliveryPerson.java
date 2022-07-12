@@ -1,11 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.person;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Stream;
 
 import edu.kit.ifv.mobitopp.data.Zone;
@@ -36,26 +33,19 @@ import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.events.DemandSimulationEventIfc;
 import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
 import edu.kit.ifv.mobitopp.simulation.modeChoice.ModeChoicePreferences;
-import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.publictransport.model.Vehicle;
 import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
 import edu.kit.ifv.mobitopp.simulation.tour.TourFactory;
 import edu.kit.ifv.mobitopp.time.Time;
-import lombok.Getter;
 
 /**
  * The Class DeliveryPerson decorates {@link SimulationPerson} by adding the
  * functionality of loading, delivering and unloading {@link PrivateParcel}s.
  */
-public class DeliveryPerson implements SimulationPerson {
+public class DeliveryPerson extends DeliveryAgent implements SimulationPerson   {
 
 	private final SimulationPerson person;
-	@Getter
-	private final Collection<IParcel> currentTour;
-	private final Random random;
-	@Getter
-	private final DistributionCenter distributionCenter;
 
 	/**
 	 * Instantiates a new {@link DeliveryPerson} of the given {@link DistributionCenter}.
@@ -65,53 +55,8 @@ public class DeliveryPerson implements SimulationPerson {
 	 * @param seed               the seed
 	 */
 	public DeliveryPerson(SimulationPerson person, DistributionCenter distributionCenter, long seed) {
+		super(distributionCenter, seed);
 		this.person = person;
-		this.currentTour = new ArrayList<IParcel>();
-		this.random = new Random(seed);
-		this.distributionCenter = distributionCenter;
-	}
-
-	/**
-	 * Loads the given parcels and updates their state (now on delivery).
-	 *
-	 * @param parcels     the parcels
-	 * @param currentTime the current time
-	 */
-	public void load(Collection<IParcel> parcels, Time currentTime) {
-		this.currentTour.addAll(parcels);
-		parcels.forEach(p -> p.loaded(currentTime, this));
-	}
-
-	/**
-	 * Unloads parcels from the current tour and updates their state (now
-	 * undefined).
-	 *
-	 * @param currentTime the current time
-	 * @return the unloaded parcels
-	 */
-	public Collection<IParcel> unload(Time currentTime) {
-		Collection<IParcel> parcels = new ArrayList<>(currentTour);
-		parcels.forEach(p -> p.unloaded(currentTime, this));
-		this.currentTour.clear();
-		return parcels;
-	}
-
-	/**
-	 * Removes the delivered parcel from the current tour.
-	 *
-	 * @param parcel the parcel
-	 */
-	public void delivered(IParcel parcel) {
-		this.currentTour.remove(parcel);
-	}
-
-	/**
-	 * Gets the next random number.
-	 *
-	 * @return the next random number
-	 */
-	public double getNextRandom() {
-		return this.random.nextDouble();
 	}
 
 	@Override
