@@ -10,50 +10,67 @@ import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.time.DayOfWeek;
+import edu.kit.ifv.mobitopp.time.Time;
+import edu.kit.ifv.mobitopp.util.collections.Pair;
 import lombok.Getter;
 
 @Getter
 public class Business implements ParcelAgent {
 
-	private final int id;
+	private static final Pair<Time, Time> empty = new Pair<>(Time.future, Time.start);
+	private final long id;
 	private final String name;
+	
 	private final Branch branch;
+	private final Sector sector;
+	private final BuildingType buildingType;
+	
 	private final int employees;
 	private final double area;
+	private final Map<DayOfWeek, Pair<Time, Time>> openingHours;
 	private final ZoneAndLocation location;
-	private final Map<AreaFunction, Double> functionShares;
-	private final Random random;
 	private final Fleet fleet;
 	
 	private final ParcelPolicyProvider policyProvider;
+	private final Random random;
 
+	
 	private int plannedProductionQuantitiy;
 	private int coveredProductionQuantitiy;
 	private final Collection<IParcel> currentParcels;
 	private final Collection<IParcel> delivered;
 	
 
-	public Business(int id, String name, ZoneAndLocation location, Branch branch,
-			int employees, double area, Map<AreaFunction, Double> functionShares,
-			Fleet fleet, Random random, ParcelPolicyProvider policyProvider) {
+	public Business(long id, String name, Branch branch, Sector sector, BuildingType buildingType, int employees,
+			double area, Map<DayOfWeek, Pair<Time, Time>> openingHours, ZoneAndLocation location, Fleet fleet,
+			ParcelPolicyProvider policyProvider, Random random) {
 		this.id = id;
 		this.name = name;
+
 		this.branch = branch;
+		this.sector = sector;
+		this.buildingType = buildingType;
 		this.employees = employees;
+
 		this.area = area;
+		this.openingHours = openingHours;
 		this.location = location;
-		this.functionShares = functionShares;
-		this.random = random;
 		this.fleet = fleet;
+
 		this.policyProvider = policyProvider;
+		this.random = random;
+
 		this.currentParcels = new ArrayList<>();
 		this.delivered = new ArrayList<>();
 	}
 
 
-	
-	
-	
+	public boolean isOpen(Time currentTime) {
+		Pair<Time, Time> interval = this.openingHours.getOrDefault(currentTime.weekDay(), empty);
+		return interval.getFirst().isBeforeOrEqualTo(currentTime) && currentTime.isBeforeOrEqualTo(interval.getSecond());
+	}
+
 	@Override
 	public void setPlannedProductionQuantity(int quantity) {
 		this.plannedProductionQuantitiy = quantity;

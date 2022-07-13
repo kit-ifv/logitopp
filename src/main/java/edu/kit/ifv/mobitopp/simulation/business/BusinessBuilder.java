@@ -6,29 +6,35 @@ import java.util.Random;
 
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
+import edu.kit.ifv.mobitopp.time.DayOfWeek;
+import edu.kit.ifv.mobitopp.time.Time;
+import edu.kit.ifv.mobitopp.util.collections.Pair;
 
 public class BusinessBuilder {
-
-//	private static int ID_CNT;
 	
-	private int id;
+	private long id;
 	private String name;
+	
 	private Branch branch;
+	private Sector sector;
+	private BuildingType buildingType;
+	
 	private int employees;
 	private double area;
-	private Map<AreaFunction,Double> functionShares;
-	private Random random;
+	private Map<DayOfWeek, Pair<Time, Time>> openingHours;
 	private ZoneAndLocation location;
 	private Fleet fleet;
+	
 	private ParcelPolicyProvider policyProvider;
+	private Random random;
+	
 	
 	public BusinessBuilder(long seed) {
-		this.functionShares = new HashMap<>();
+		this.openingHours = new HashMap<>();
 		this.random = new Random(seed);
-//		this.id = ID_CNT++;
 	}
 	
-	public BusinessBuilder id(int id) {
+	public BusinessBuilder id(long id) {
 		this.id = id;
 		return this;
 	}
@@ -43,6 +49,16 @@ public class BusinessBuilder {
 		return this;
 	}
 	
+	public BusinessBuilder with(Sector sector) {
+		this.sector = sector;
+		return this;
+	}
+	
+	public BusinessBuilder with(BuildingType buildingType) {
+		this.buildingType = buildingType;
+		return this;
+	}
+	
 	public BusinessBuilder with(int employees) {
 		this.employees = employees;
 		return this;
@@ -53,8 +69,13 @@ public class BusinessBuilder {
 		return this;
 	}
 	
-	public BusinessBuilder with(double share, AreaFunction function) {
-		this.functionShares.put(function, share);
+	public BusinessBuilder openBetween(DayOfWeek day, Pair<Time, Time> interval) {
+		this.openingHours.put(day, interval);
+		return this;
+	}
+	
+	public BusinessBuilder at(ZoneAndLocation location) {
+		this.location = location;
 		return this;
 	}
 	
@@ -67,20 +88,14 @@ public class BusinessBuilder {
 		this.policyProvider = policyProvider;
 		return this;
 	}
-		
-	public BusinessBuilder at(ZoneAndLocation location) {
-		this.location = location;
-		return this;
-	}
-	
-	
+
 	private void validate() {
 
 	}
 	
 	public Business build() {
 		validate();
-		return new Business(id, name, location, branch, employees, area, functionShares, fleet, random, policyProvider);
+		return new Business(id, name, branch, sector, buildingType, employees, area, openingHours, location, fleet, policyProvider, random);
 	}
 	
 
