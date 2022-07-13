@@ -70,11 +70,13 @@ public class DistributionCenterTest  {
 		}
 		
 		
+		distributionCenter = new DistributionCenter("test", "org", mock(Zone.class), mock(Location.class), 100, 0.8, 3);
+		parcels.forEach(distributionCenter::addParcel);
 		
-		distributionCenter = mock(DistributionCenter.class);
-		when(distributionCenter.getAvailableParcels(Mockito.any())).thenReturn(parcels);
-		when(distributionCenter.getDeliveryActivities(Mockito.any())).thenCallRealMethod();
-		doCallRealMethod().when(distributionCenter).setClusteringStrategy(Mockito.any());
+//		distributionCenter = mock(DistributionCenter.class);
+//		when(distributionCenter.getAvailableParcels(Mockito.any())).thenReturn(parcels);
+//		when(distributionCenter.getDeliveryActivities(Mockito.any())).thenCallRealMethod();
+//		doCallRealMethod().when(distributionCenter).setClusteringStrategy(Mockito.any());
 		
 		distributionCenter.setClusteringStrategy(new LinkDeliveryClustering());
 	}
@@ -82,7 +84,7 @@ public class DistributionCenterTest  {
 	
 	@Test
 	public void groupParcels() {
-		List<ParcelActivityBuilder> deliveries = distributionCenter.getDeliveryActivities(Time.start);
+		List<ParcelActivityBuilder> deliveries = distributionCenter.getDeliveryActivities(Time.future);
 		verify(deliveries);
 		
 	}
@@ -135,6 +137,7 @@ public class DistributionCenterTest  {
 		PrivateParcel p = mock(PrivateParcel.class);
 		when(p.getDestinationType()).thenReturn(ParcelDestinationType.HOME);
 		when(p.getPerson()).thenReturn(persons.get(rand.nextInt(persons.size())));
+		when(p.getPlannedArrivalDate()).thenReturn(Time.future);
 
 		Location l = p.getPerson().household().homeLocation();
 		when(p.getLocation()).thenReturn(l);
