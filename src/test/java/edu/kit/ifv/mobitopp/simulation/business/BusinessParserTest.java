@@ -27,8 +27,6 @@ public class BusinessParserTest {
 		BusinessParser parser = new BusinessParser(repo);
 		Collection<BusinessBuilder> businesses = parser.parse(file, 42);
 		
-//		businesses.forEach(b -> System.out.println(b.build()));
-		
 		assertEquals(100, businesses.size());
 	}
 
