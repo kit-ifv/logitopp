@@ -26,26 +26,47 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public enum Sector {//TODO: industrie, handel & gewerbe
-	
-	INDUSTRY(1) {
+public enum Sector {
+
+	OTHER(0) {
 		@Override
-		Collection<Branch> getContainedTrades() {
-			return List.of(A, B, C, D, E, F);
+		Collection<Branch> getContainedBranches() {
+			return List.of();
 		}
 	},
 	
-	SERVICE(2) {
+	TRADE(1) {
 		@Override
-		Collection<Branch> getContainedTrades() {
-			return List.of(G, H, I, J, K, L, M, N, Q, S);
+		Collection<Branch> getContainedBranches() {
+			return List.of(C, G);
 		}
 	},
 	
-	OTHER(3) {
+	HOSPITALITY(2) {
 		@Override
-		Collection<Branch> getContainedTrades() {
-			return List.of(O, P, R, T, U);
+		Collection<Branch> getContainedBranches() {
+			return List.of(I, R);
+		}
+	},
+	
+	SERVICE(3) {
+		@Override
+		Collection<Branch> getContainedBranches() {
+			return List.of(J, K, L, M, N, P, S);
+		}
+	},
+	
+	INDUSTRY(4) {
+		@Override
+		Collection<Branch> getContainedBranches() {
+			return List.of(A, C, D, E, F, H);
+		}
+	},
+	
+	ADMINISTRATION(5) {
+		@Override
+		Collection<Branch> getContainedBranches() {
+			return List.of(O, P, Q, S);
 		}
 	};
 	
@@ -63,7 +84,7 @@ public enum Sector {//TODO: industrie, handel & gewerbe
 		return this.name();
 	}
 	
-	abstract Collection<Branch> getContainedTrades();
+	abstract Collection<Branch> getContainedBranches();
 	
 	public static Sector fromInt(int number) {
 		return Arrays.stream(Sector.values())
