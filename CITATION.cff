@@ -1,9 +1,15 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-- family-names: "KÃ¼bler"
+- family-names: "Kübler"
   given-names: "Jelle"
   orcid: "https://orcid.org/0000-0001-8095-1815"
+- family-names: "Barthelmes"
+  given-names: "Lukas"
+  orcid: "https://orcid.org/0000-0003-1122-853X"
+- family-names: "Görgülü"
+  given-names: "Mehmet Emre"
+  orcid: "https://orcid.org/0000-0001-5845-5073"
 - family-names: "Reiffer"
   given-names: "Anna"
   orcid: "https://orcid.org/0000-0003-1764-0154"
