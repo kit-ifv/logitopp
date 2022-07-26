@@ -80,8 +80,7 @@ public class ParcelDemandCsvReader implements ParcelDemandModel<PickUpParcelPers
 
 	@Override
 	public void printStatistics(String label) {
-		// TODO Auto-generated method stub
-		
+		//TODO
 	}
 
 }
