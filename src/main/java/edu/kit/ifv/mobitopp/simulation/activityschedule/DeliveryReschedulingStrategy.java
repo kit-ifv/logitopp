@@ -266,7 +266,7 @@ public class DeliveryReschedulingStrategy implements ReschedulingStrategy {
 		for (ActivityIfc activity: nextActivities) {
 			if (isDelivery(activity)) {
 				
-				((DeliveryActivity) activity).abortActivity(currentTime);
+				((ParcelActivity) activity).abortActivity(currentTime);
 				activitySchedule.removeActivity(activity);
 				
 			}
