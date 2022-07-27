@@ -21,6 +21,7 @@ import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.simulation.person.PublicTransportBehaviour;
 import edu.kit.ifv.mobitopp.simulation.person.TripFactory;
 import edu.kit.ifv.mobitopp.simulation.tour.TourBasedModeChoiceModel;
+import lombok.Setter;
 
 /**
  * The Class DemandSimulatorDelivery extends the DemandSimulatorPassenger by
@@ -42,6 +43,9 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	
 	private final ParcelSchedulerHook schedulerHook;
 	private final DeliveryResults deliveryResults;
+	
+	@Setter
+	private boolean onlyDemand = false;
 	
 
 	/**
@@ -208,6 +212,12 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		personLoader().clearInput();
 
 		initBusinessDemand();
+		
+		if (onlyDemand) {
+			this.schedulerHook.flushAllParcels();
+			System.out.println("Generated Demand Only");
+			System.exit(0);
+		}
 	}
 	
 

@@ -52,5 +52,11 @@ public class ParcelSchedulerHook implements Hook {
 		}
 	}
 	
+	public void flushAllParcels() {
+		for (Time time : this.parcels.keySet()) {
+			process(time);
+		}
+	}
+	
 
 }
