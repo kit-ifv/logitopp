@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.data.ZoneRepository;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
@@ -41,7 +42,9 @@ public class BusinessParser {
 		double x = row.valueAsDouble("loc_x");
 		double y = row.valueAsDouble("loc_y");
 		String zoneId = row.get("zone");
-		ZoneAndLocation location = new ZoneAndLocation(zoneRepo.getByExternalId(zoneId), new Location(new Point2D.Double(x, y), 0, 0));
+		Zone zone = zoneRepo.getByExternalId(zoneId);
+		
+		ZoneAndLocation location = new ZoneAndLocation(zone, new Location(new Point2D.Double(x, y), 0, 0));
 		
 		BusinessBuilder builder = new BusinessBuilder(seed)
 				.id(id)
