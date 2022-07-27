@@ -23,7 +23,6 @@ public class Business implements ParcelAgent {
 	private final String name;
 	
 	private final Branch branch;
-	private final Sector sector;
 	private final BuildingType buildingType;
 	
 	private final int employees;
@@ -42,14 +41,13 @@ public class Business implements ParcelAgent {
 	private final Collection<IParcel> delivered;
 	
 
-	public Business(long id, String name, Branch branch, Sector sector, BuildingType buildingType, int employees,
+	public Business(long id, String name, Branch branch, BuildingType buildingType, int employees,
 			double area, Map<DayOfWeek, Pair<Time, Time>> openingHours, ZoneAndLocation location, Fleet fleet,
 			ParcelPolicyProvider policyProvider, Random random) {
 		this.id = id;
 		this.name = name;
 
 		this.branch = branch;
-		this.sector = sector;
 		this.buildingType = buildingType;
 		this.employees = employees;
 
@@ -135,5 +133,11 @@ public class Business implements ParcelAgent {
 	@Override
 	public String toString() {
 		return this.name;
+	}
+
+
+	@Override
+	public ZoneAndLocation getZoneAndLocation() {
+		return this.location();
 	}
 }

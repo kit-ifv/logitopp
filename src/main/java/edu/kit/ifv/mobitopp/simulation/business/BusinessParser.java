@@ -33,7 +33,6 @@ public class BusinessParser {
 		String name = row.get("name");
 		
 		Branch branch = Branch.fromInt(row.valueAsInteger("branch"));
-		Sector sector = Sector.fromInt(row.valueAsInteger("sector"));
 		BuildingType building = BuildingType.fromInt(row.valueAsInteger("building"));
 		
 		int employees = row.valueAsInteger("employees");
@@ -48,7 +47,6 @@ public class BusinessParser {
 				.id(id)
 				.called(name)
 				.with(branch)
-				.with(sector)
 				.with(building)
 				.with(employees)
 				.with(area)

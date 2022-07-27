@@ -31,14 +31,14 @@ public enum Sector {
 	OTHER(0) {
 		@Override
 		Collection<Branch> getContainedBranches() {
-			return List.of();
+			return List.of(B, T, U);
 		}
 	},
 	
 	TRADE(1) {
 		@Override
 		Collection<Branch> getContainedBranches() {
-			return List.of(C, G);
+			return List.of(G);
 		}
 	},
 	
@@ -52,7 +52,7 @@ public enum Sector {
 	SERVICE(3) {
 		@Override
 		Collection<Branch> getContainedBranches() {
-			return List.of(J, K, L, M, N, P, S);
+			return List.of(J, K, L, M, N, Q, S);
 		}
 	},
 	
@@ -66,7 +66,7 @@ public enum Sector {
 	ADMINISTRATION(5) {
 		@Override
 		Collection<Branch> getContainedBranches() {
-			return List.of(O, P, Q, S);
+			return List.of(O, P);
 		}
 	};
 	

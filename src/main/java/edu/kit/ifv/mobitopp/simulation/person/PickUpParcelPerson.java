@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;
 import edu.kit.ifv.mobitopp.simulation.SimulationOptionsCustomization;
+import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.PickUpParcelReschedulingStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
@@ -116,6 +117,13 @@ public class PickUpParcelPerson extends SimulationPersonDecorator implements Nul
 	 */
 	public double getNextRandom() {
 		return this.random.nextDouble();
+	}
+
+
+
+	@Override
+	public ZoneAndLocation getZoneAndLocation() {
+		return new ZoneAndLocation(person.homeZone(), person.household().homeLocation());
 	}
 
 

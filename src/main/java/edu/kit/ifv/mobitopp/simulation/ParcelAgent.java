@@ -66,5 +66,6 @@ public interface ParcelAgent {
 	 */
 	public void addDelivered(IParcel parcel);
 		
+	public ZoneAndLocation getZoneAndLocation();
 
 }

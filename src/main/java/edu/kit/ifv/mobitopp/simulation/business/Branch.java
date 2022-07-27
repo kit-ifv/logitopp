@@ -26,8 +26,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	OTHER(0) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(Sector.OTHER);
+		Sector getSector() {
+			return Sector.OTHER;
 		}
 
 		@Override
@@ -38,8 +38,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	A(1) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(INDUSTRY);
+		Sector getSector() {
+			return INDUSTRY;
 		}
 
 		@Override
@@ -50,8 +50,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	B(2) {//
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(Sector.OTHER);
+		Sector getSector() {
+			return Sector.OTHER;
 		}
 
 		@Override
@@ -63,8 +63,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	C(3) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(TRADE, INDUSTRY);
+		Sector getSector() {
+			return INDUSTRY;
 		}
 
 		@Override
@@ -75,8 +75,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	D(4) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(INDUSTRY);
+		Sector getSector() {
+			return INDUSTRY;
 		}
 
 		@Override
@@ -87,8 +87,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	E(5) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(INDUSTRY);
+		Sector getSector() {
+			return INDUSTRY;
 		}
 
 		@Override
@@ -99,8 +99,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	F(6) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(INDUSTRY);
+		Sector getSector() {
+			return INDUSTRY;
 		}
 
 		@Override
@@ -112,8 +112,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	G(7) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(TRADE);
+		Sector getSector() {
+			return TRADE;
 		}
 
 		@Override
@@ -124,8 +124,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	H(8) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(INDUSTRY);
+		Sector getSector() {
+			return INDUSTRY;
 		}
 
 		@Override
@@ -136,8 +136,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	I(9) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(HOSPITALITY);
+		Sector getSector() {
+			return HOSPITALITY;
 		}
 
 		@Override
@@ -148,8 +148,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	J(10) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(SERVICE);
+		Sector getSector() {
+			return SERVICE;
 		}
 
 		@Override
@@ -161,8 +161,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	K(11) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(SERVICE);
+		Sector getSector() {
+			return SERVICE;
 		}
 
 		@Override
@@ -173,8 +173,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	L(12) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(SERVICE);
+		Sector getSector() {
+			return SERVICE;
 		}
 
 		@Override
@@ -185,8 +185,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	M(13) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(SERVICE);
+		Sector getSector() {
+			return SERVICE;
 		}
 
 		@Override
@@ -197,8 +197,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	N(14) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(SERVICE);
+		Sector getSector() {
+			return SERVICE;
 		}
 
 		@Override
@@ -209,8 +209,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	O(15) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(ADMINISTRATION);
+		Sector getSector() {
+			return ADMINISTRATION;
 		}
 
 		@Override
@@ -221,8 +221,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	P(16) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(SERVICE, ADMINISTRATION);
+		Sector getSector() {
+			return ADMINISTRATION;
 		}
 
 		@Override
@@ -233,8 +233,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	Q(17) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(ADMINISTRATION);
+		Sector getSector() {
+			return ADMINISTRATION;
 		}
 
 		@Override
@@ -245,8 +245,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	R(18) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(HOSPITALITY);
+		Sector getSector() {
+			return HOSPITALITY;
 		}
 
 		@Override
@@ -257,8 +257,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	S(19) {
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(SERVICE, ADMINISTRATION);
+		Sector getSector() {
+			return SERVICE;
 		}
 
 		@Override
@@ -269,8 +269,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	T(20) {//
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(Sector.OTHER);
+		Sector getSector() {
+			return Sector.OTHER;
 		}
 
 		@Override
@@ -281,8 +281,8 @@ public enum Branch {//According to NACE Rev. 2
 	
 	U(21) {//
 		@Override
-		Collection<Sector> getSectors() {
-			return List.of(Sector.OTHER);
+		Sector getSector() {
+			return Sector.OTHER;
 		}
 
 		@Override
@@ -305,7 +305,7 @@ public enum Branch {//According to NACE Rev. 2
 		return this.name();
 	}
 	
-	abstract Collection<Sector> getSectors();
+	abstract Sector getSector();
 	abstract Collection<BuildingType> getBuildingTypes();
 	
 	public static Branch fromInt(int number) {

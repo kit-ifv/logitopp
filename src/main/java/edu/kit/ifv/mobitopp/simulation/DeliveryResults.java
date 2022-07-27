@@ -8,6 +8,7 @@ import edu.kit.ifv.mobitopp.result.Results;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -39,9 +40,6 @@ public class DeliveryResults {
 		this.results = results;
 	}
 
-	
-	
-	
 	/**
 	 * Log a parcels new state.
 	 *
@@ -76,18 +74,17 @@ public class DeliveryResults {
 	public static Category createResultCategoryStatePrivate() {
 		return new Category("parcel-states",
 				Arrays.asList("Time", "ParcelID", "RecipientID", "DestinationType", "State", "IsDeliveryAttempt",
-						"DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "RecipientType", 
+						"DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "RecipientType",
 						"ParcelDestinationZone"));
 	}
 
-	
 	/**
 	 * Log change of parcel state.
 	 *
-	 * @param parcel the parcel
+	 * @param parcel      the parcel
 	 * @param deliveryGuy the delivery guy
 	 * @param currentTime the current time
-	 * @param isAttempt the is attempt
+	 * @param isAttempt   the is attempt
 	 */
 	public void logChange(BusinessParcel parcel, DeliveryAgent deliveryGuy, Time currentTime, boolean isAttempt) {
 		String msg = "";
@@ -107,7 +104,6 @@ public class DeliveryResults {
 		this.results.write(resultCategoryStateBusines, msg);
 	}
 
-	
 	/**
 	 * Creates the result category state business.
 	 *
@@ -115,42 +111,51 @@ public class DeliveryResults {
 	 */
 	public static Category createResultCategoryStateBusiness() {
 		return new Category("business-parcel-states",
-				Arrays.asList("Time", "ParcelID", "ZoneId", "Location", "State", "IsDeliveryAttempt",
-						"DeliveryGuyID", "Producer", "DeliveryAttempts", "DeliveryTime", "RecipientType", 
-						"ParcelDestinationZone"));
+				Arrays.asList("Time", "ParcelID", "ZoneId", "Location", "State", "IsDeliveryAttempt", "DeliveryGuyID",
+						"Producer", "DeliveryAttempts", "DeliveryTime", "RecipientType", "ParcelDestinationZone"));
 	}
-	
-	
-	
+
 	/**
 	 * Logs the order of the given parcel.
 	 *
 	 * @param parcel the ordered parcel
 	 */
 	public void logPrivateOrder(PrivateParcel parcel) {
-		this.logPrivateOrder(parcel.getOId(), parcel.getPerson().getOid() + "", parcel.getDestinationType().name(),
-				parcel.getPlannedArrivalDate().getDay() + "", parcel.getProducer().toString(), parcel.getPlannedArrivalDate());
+		this.logPrivateOrder(parcel.getOId(), parcel.getPerson().getOid() + "", parcel.getShipmentSize(), parcel.getDestinationType().name(),
+				parcel.getPlannedArrivalDate().getDay() + "", parcel.getProducer().toString(),
+				parcel.getPlannedArrivalDate(), parcel.getZoneAndLocation(), parcel.getProducer().getZoneAndLocation());
 	}
 
 	/**
 	 * Log private parcel order.
 	 *
-	 * @param pid the pid
-	 * @param recipient the recipient
-	 * @param destination the destination
-	 * @param day the day
+	 * @param pid                the pid
+	 * @param recipient          the recipient
+	 * @param shipmentSize		 the shipment size
+	 * @param destination        the destination
+	 * @param day                the day
 	 * @param distributionCenter the distribution center
-	 * @param currentTime the current time
+	 * @param currentTime        the current time
 	 */
-	private void logPrivateOrder(int pid, String recipient, String destination, String day, String distributionCenter, Time currentTime) {
+	private void logPrivateOrder(int pid, String recipient, ShipmentSize shipmentSize, String destination, String day, String distributionCenter,
+			Time currentTime, ZoneAndLocation recipientLoc, ZoneAndLocation dcLoc) {
 		String msg = "";
 
 		msg += pid + SEP;
+		msg += shipmentSize + SEP;
 		msg += recipient + SEP;
 		msg += destination + SEP;
+		msg += recipientLoc.zone().getId().getExternalId() + SEP;
+		msg += recipientLoc.location().coordinatesP().getX() + SEP;
+		msg += recipientLoc.location().coordinatesP().getY() + SEP;
 		msg += day + SEP;
 		msg += currentTime.toString() + SEP;
-		msg += distributionCenter;
+		msg += distributionCenter + SEP;
+		msg += distributionCenter + SEP;
+		msg += dcLoc.zone().getId().getExternalId() + SEP;
+		msg += dcLoc.location().coordinatesP().getX() + SEP;
+		msg += dcLoc.location().coordinatesP().getY();
+		
 
 		this.results.write(resultCategoryPrivateOrder, msg);
 	}
@@ -161,64 +166,67 @@ public class DeliveryResults {
 	 * @return the category
 	 */
 	public static Category createResultCategoryPrivateOrder() {
-		return new Category("parcel-orders-private", Arrays.asList("ParcelID", "RecipientID", "DestinationType", "ArrivalDay", "ArrivalTime",
-				"DistributionCenter", "DeliveryService"));
+		return new Category("parcel-orders-private", Arrays.asList("ParcelID", "Size", "RecipientID", "DestinationType", "DestinationZone", "DestinationX", "DestinationY",
+				"ArrivalDay", "ArrivalTime", "DistributionCenter", "DeliveryService", "DcZone", "DcX", "DcY"));
 	}
-	
-	
-	
-	
-	
+
 	/**
 	 * Log business parcel order.
 	 *
 	 * @param parcel the parcel
 	 */
 	public void logBusinessOrder(BusinessParcel parcel) {
-		this.logBusinessOrder(parcel.getOId(), parcel.getZone().getId().getExternalId(), parcel.getLocation(),
-				parcel.getPlannedArrivalDate().getDay() + "", parcel.getProducer().toString(), parcel.getConsumer().toString(), parcel.getPlannedArrivalDate());
+		ZoneAndLocation producerLoc = parcel.getProducer().getZoneAndLocation();
+		ZoneAndLocation consumerLoc = parcel.getConsumer().getZoneAndLocation();
+		this.logBusinessOrder(parcel.getOId(), parcel.getShipmentSize(), parcel.getProducer().toString(),
+				parcel.getConsumer().toString(), producerLoc.zone().getId().getExternalId(), producerLoc.location(),
+				consumerLoc.zone().getId().getExternalId(), consumerLoc.location(),
+				parcel.getPlannedArrivalDate().getDay() + "",  parcel.getPlannedArrivalDate());
 	}
 
 	/**
 	 * Log business parcel order.
 	 *
-	 * @param pid the parcel id
-	 * @param zoneId the zone id
-	 * @param location the location
-	 * @param day the day
-	 * @param from the producer
-	 * @param to the consumer
+	 * @param pid         the parcel id
+	 * @param zoneId      the zone id
+	 * @param location    the location
+	 * @param day         the day
+	 * @param from        the producer
+	 * @param to          the consumer
 	 * @param currentTime the current time
 	 */
-	private void logBusinessOrder(int pid, String zoneId, Location location, String day, String from, String to, Time currentTime) {
+	private void logBusinessOrder(int pid, ShipmentSize size, String from, String to, String zoneIdFrom, Location locationFrom, String zoneIdTo,
+			Location locationTo, String day,  Time currentTime) {
 		String msg = "";
 
 		msg += pid + SEP;
-		msg += zoneId + SEP;
-		msg += location.coordinate.getX() + SEP;
-		msg += location.coordinate.getY() + SEP;
-		msg += day + SEP;
-		msg += currentTime + SEP;
+		msg += size.name() + SEP;
 		msg += from + SEP;
-		msg += to;
+		msg += to + SEP;
+		msg += zoneIdFrom + SEP;
+		msg += locationFrom.coordinate.getX() + SEP;
+		msg += locationFrom.coordinate.getY() + SEP;
+		msg += zoneIdTo + SEP;
+		msg += locationTo.coordinate.getX() + SEP;
+		msg += locationTo.coordinate.getY() + SEP;
+		msg += day + SEP;
+		msg += currentTime;
+		
 
 		this.results.write(resultCategoryBusinessOrder, msg);
 	}
-	
+
 	/**
 	 * Creates the result category order for private parcel-orders results.
 	 *
 	 * @return the category
 	 */
 	public static Category createResultCategoryBusinessOrder() {
-		return new Category("parcel-orders-business", Arrays.asList("ParcelID", "ZoneId", "LocationX", "LocationY", "ArrivalDay", "ArrivalTime",
-				"From", "To"));
+		return new Category("parcel-orders-business",
+				Arrays.asList("ParcelID", "Size", "From", "To", "FromZoneId", "FromLocationX", "FromLocationY",
+						"ToZoneId", "ToLocationX", "ToLocationY", "ArrivalDay", "ArrivalTime"));
 	}
 
-	
-	
-	
-	
 	/**
 	 * Logs the given employee of the given distribution center.
 	 *
@@ -246,10 +254,6 @@ public class DeliveryResults {
 				Arrays.asList("PeronID", "DistributionCenter", "Organization", "EmploymentType"));
 	}
 
-	
-	
-	
-	
 	/**
 	 * Logs a delivery rescheduling event.
 	 *
@@ -282,24 +286,21 @@ public class DeliveryResults {
 		return new Category("delivery-rescheduling",
 				Arrays.asList("PeronID", "Time", "Day", "Reason", "Before", "After"));
 	}
-	
-	
-	
-	
-	
+
 	/**
 	 * Log neighbor parcel delivery.
 	 *
-	 * @param id the id
-	 * @param zone the zone
-	 * @param currentTime the current time
-	 * @param success the success state
-	 * @param numOfNeighbors the number of neighbors
+	 * @param id               the id
+	 * @param zone             the zone
+	 * @param currentTime      the current time
+	 * @param success          the success state
+	 * @param numOfNeighbors   the number of neighbors
 	 * @param checkedNeighbors the number of checked neighbors
 	 */
-	public void logNeighborDelivery(int id, Zone zone, Time currentTime, boolean success, int numOfNeighbors, int checkedNeighbors) {
+	public void logNeighborDelivery(int id, Zone zone, Time currentTime, boolean success, int numOfNeighbors,
+			int checkedNeighbors) {
 		String msg = "";
-		
+
 		msg += id + SEP;
 		msg += zone.getId().getExternalId() + SEP;
 		msg += currentTime.toString() + SEP;
@@ -307,17 +308,18 @@ public class DeliveryResults {
 		msg += success + SEP;
 		msg += numOfNeighbors + SEP;
 		msg += checkedNeighbors + SEP;
-		
+
 		results.write(resultCategoryNeighbordeliveries, msg);
 	}
-	
+
 	/**
 	 * Creates the result category neighbor deliveries.
 	 *
 	 * @return the category
 	 */
 	private static Category createResultCategoryNeighborDeliveries() {
-		return new Category("neighbor-deliveries", Arrays.asList("Delivery", "Zone", "Time", "Day", "Success", "NumberOfNeighbors", "CheckedNeighbors"));
+		return new Category("neighbor-deliveries",
+				Arrays.asList("Delivery", "Zone", "Time", "Day", "Success", "NumberOfNeighbors", "CheckedNeighbors"));
 	}
 
 }

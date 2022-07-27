@@ -16,7 +16,6 @@ public class BusinessBuilder {
 	private String name;
 	
 	private Branch branch;
-	private Sector sector;
 	private BuildingType buildingType;
 	
 	private int employees;
@@ -46,11 +45,6 @@ public class BusinessBuilder {
 	
 	public BusinessBuilder with(Branch branch) {
 		this.branch = branch;
-		return this;
-	}
-	
-	public BusinessBuilder with(Sector sector) {
-		this.sector = sector;
 		return this;
 	}
 	
@@ -95,7 +89,7 @@ public class BusinessBuilder {
 	
 	public Business build() {
 		validate();
-		return new Business(id, name, branch, sector, buildingType, employees, area, openingHours, location, fleet, policyProvider, random);
+		return new Business(id, name, branch, buildingType, employees, area, openingHours, location, fleet, policyProvider, random);
 	}
 	
 
