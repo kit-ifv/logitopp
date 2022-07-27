@@ -65,6 +65,12 @@ public class BusinessParser {
 		
 	private Optional<Pair<Time,Time>> parseOpeningHours(DayOfWeek day, Row row) {
 		String column = "open:"+day.name();
+		
+		if (!row.containsAttribute(column)) {
+			return Optional.empty();
+		}
+		
+		
 		String range = row.get(column);
 		
 		if (!range.strip().isEmpty()) {
