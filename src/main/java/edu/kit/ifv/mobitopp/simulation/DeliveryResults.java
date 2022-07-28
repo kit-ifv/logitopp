@@ -189,7 +189,7 @@ public class DeliveryResults {
 		this.logBusinessOrder(parcel.getOId(), parcel.getShipmentSize(), parcel.getProducer().toString(),
 				parcel.getConsumer().toString(), producerLoc.zone().getId().getExternalId(), producerLoc.location(),
 				consumerLoc.zone().getId().getExternalId(), consumerLoc.location(),
-				parcel.getPlannedArrivalDate().getDay() + "",  parcel.getPlannedArrivalDate());
+				parcel.getPlannedArrivalDate().getDay() + "",  parcel.getPlannedArrivalDate(), category);
 	}
 
 	/**
@@ -202,9 +202,10 @@ public class DeliveryResults {
 	 * @param from        the producer
 	 * @param to          the consumer
 	 * @param currentTime the current time
+	 * @param category 	  the result category
 	 */
 	private void logBusinessOrder(int pid, ShipmentSize size, String from, String to, String zoneIdFrom, Location locationFrom, String zoneIdTo,
-			Location locationTo, String day,  Time currentTime) {
+			Location locationTo, String day,  Time currentTime, Category category) {
 		String msg = "";
 
 		msg += pid + SEP;
@@ -221,7 +222,7 @@ public class DeliveryResults {
 		msg += currentTime;
 		
 
-		this.results.write(resultCategoryBusinessOrder, msg);
+		this.results.write(category, msg);
 	}
 
 	/**
