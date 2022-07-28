@@ -24,6 +24,7 @@ public class DeliveryResults {
 	private final static Category resultCategoryStateBusines = createResultCategoryStateBusiness();
 	private final static Category resultCategoryPrivateOrder = createResultCategoryPrivateOrder();
 	private final static Category resultCategoryBusinessOrder = createResultCategoryBusinessOrder();
+	private final static Category resultCategoryBusinessProduction = createResultCategoryBusinessProduction();
 	private final static Category resultCategoryEmployee = createResultCategoryEmployee();
 	private final static Category resultCategoryRescheduling = createResultCategoryRescheduling();
 	private final static Category resultCategoryNeighbordeliveries = createResultCategoryNeighborDeliveries();
@@ -178,6 +179,13 @@ public class DeliveryResults {
 	public void logBusinessOrder(BusinessParcel parcel) {
 		ZoneAndLocation producerLoc = parcel.getProducer().getZoneAndLocation();
 		ZoneAndLocation consumerLoc = parcel.getConsumer().getZoneAndLocation();
+		
+		Category category = resultCategoryBusinessProduction;
+		
+		if (parcel.getConsumer().equals(parcel.getBusiness())) {
+			category = resultCategoryBusinessOrder;
+		}
+		
 		this.logBusinessOrder(parcel.getOId(), parcel.getShipmentSize(), parcel.getProducer().toString(),
 				parcel.getConsumer().toString(), producerLoc.zone().getId().getExternalId(), producerLoc.location(),
 				consumerLoc.zone().getId().getExternalId(), consumerLoc.location(),
@@ -217,12 +225,23 @@ public class DeliveryResults {
 	}
 
 	/**
-	 * Creates the result category order for private parcel-orders results.
+	 * Creates the result category order for business parcel-orders results.
 	 *
 	 * @return the category
 	 */
 	public static Category createResultCategoryBusinessOrder() {
 		return new Category("parcel-orders-business",
+				Arrays.asList("ParcelID", "Size", "From", "To", "FromZoneId", "FromLocationX", "FromLocationY",
+						"ToZoneId", "ToLocationX", "ToLocationY", "ArrivalDay", "ArrivalTime"));
+	}
+	
+	/**
+	 * Creates the result category order for business parcel-production results.
+	 *
+	 * @return the category
+	 */
+	public static Category createResultCategoryBusinessProduction() {
+		return new Category("parcel-production-business",
 				Arrays.asList("ParcelID", "Size", "From", "To", "FromZoneId", "FromLocationX", "FromLocationY",
 						"ToZoneId", "ToLocationX", "ToLocationY", "ArrivalDay", "ArrivalTime"));
 	}
