@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -52,10 +53,16 @@ public class ParcelSchedulerHook implements Hook {
 		}
 	}
 	
-	public void flushAllParcels() {
+	public Collection<IParcel> flushAllParcels() {
+		Collection<IParcel> parcels = new ArrayList<>();
+		
 		for (Time time : this.parcels.keySet()) {
-			this.parcels.get(time).forEach(ParcelBuilder::get);
+			this.parcels.get(time).forEach(p -> {
+				parcels.add(p.get());
+			});
 		}
+		
+		return parcels;
 	}
 	
 

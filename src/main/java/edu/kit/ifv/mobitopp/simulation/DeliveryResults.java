@@ -12,6 +12,7 @@ import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
+import lombok.Getter;
 
 /**
  * The Class DeliveryResults provides methods for logging results concerned with
@@ -29,6 +30,7 @@ public class DeliveryResults {
 	private final static Category resultCategoryRescheduling = createResultCategoryRescheduling();
 	private final static Category resultCategoryNeighbordeliveries = createResultCategoryNeighborDeliveries();
 
+	@Getter
 	private Results results;
 
 	/**
