@@ -87,15 +87,35 @@ public class GeoDistanceMetric implements DistanceMetric {
 	 */
 	@Override
 	public float distance(Point2D a, Point2D b) {
-		double deltaLat = toRadians(b.getY() - a.getY());
-		double deltaLon = toRadians(b.getX() - a.getX());
-
-		double t = pow(sin(deltaLat / 2), 2)
-				+ cos(toRadians(a.getY())) * cos(toRadians(b.getY())) * pow(sin(deltaLon / 2), 2);
-
-		double c = 2 * atan2(sqrt(t), sqrt(1 - t));
-
-		return (float) (c * R);
+		double lat1 = a.getY();
+		double lat2 = b.getY();
+		double lon1 = a.getX();
+		double lon2 = b.getX();
+		
+		// distance between latitudes and longitudes
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+ 
+        // convert to radians
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+ 
+        // apply formulae
+        double term = Math.pow(Math.sin(dLat / 2), 2) +
+                   	  Math.pow(Math.sin(dLon / 2), 2) *
+                      Math.cos(lat1) *
+                      Math.cos(lat2);
+        double c = 2 * Math.asin(Math.sqrt(term));
+        return (float) (R * c);
+//		double deltaLat = toRadians(b.getY() - a.getY());
+//		double deltaLon = toRadians(b.getX() - a.getX());
+//
+//		double t = pow(sin(deltaLat / 2), 2)
+//				+ cos(toRadians(a.getY())) * cos(toRadians(b.getY())) * pow(sin(deltaLon / 2), 2);
+//
+//		double c = 2 * atan2(sqrt(t), sqrt(1 - t));
+//
+//		return (float) (c * R);
 	}
 
 }
