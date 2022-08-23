@@ -40,7 +40,7 @@ public class PrivateParcelDemandModelBuilder extends ParcelDemandModelBuilder<Pi
 		}
 		nextIsLatent = false;
 		
-		this.parcelOrderModel.add(step, propertySetter);
+		this.parcelOrderModel.add(nextStep, propertySetter);
 		
 		return this;
 	}

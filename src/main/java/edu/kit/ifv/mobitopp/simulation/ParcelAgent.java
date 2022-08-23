@@ -7,37 +7,9 @@ import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
  * The Interface ParcelAgent.
  */
 public interface ParcelAgent {
-	
-	/**
-	 * Sets the planned production quantity.
-	 *
-	 * @param quantity the new planned production quantity
-	 */
-	public void setPlannedProductionQuantity(int quantity);
-	
-	/**
-	 * Gets the planned production quantity.
-	 *
-	 * @return the planned production quantity
-	 */
-	public int getPlannedProductionQuantity();
-	
-	/**
-	 * Adds the actual production quantity.
-	 *
-	 * @param quantity the quantity
-	 */
-	public void addActualProductionQuantity(int quantity);
-	
-	/**
-	 * Gets the remaining production quantity.
-	 *
-	 * @return the remaining production quantity
-	 */
-	public int getRemainingProductionQuantity();
 
-	
-	
+	public DemandQuantity getDemandQuantity();
+
 	/**
 	 * Removes the parcel.
 	 *

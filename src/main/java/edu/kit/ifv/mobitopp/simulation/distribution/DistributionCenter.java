@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.kit.ifv.mobitopp.data.Zone;
+import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;
 import edu.kit.ifv.mobitopp.simulation.Person;
@@ -48,6 +49,8 @@ public class DistributionCenter implements NullParcelProducer {
 	@Setter private ParcelPolicyProvider policyProvider;
 	@Setter private DeliveryClusteringStrategy clusteringStrategy;
 	@Getter @Setter private DeliveryDurationModel durationModel;
+	
+	private final DemandQuantity demandQuantity;
 
 	/**
 	 * Instantiates a new distribution center.
@@ -76,6 +79,8 @@ public class DistributionCenter implements NullParcelProducer {
 		this.currentParcels = new ArrayList<>();
 		this.delivered = new ArrayList<>();
 		this.pickupRequests = new ArrayList<>();
+		
+		this.demandQuantity = new DemandQuantity();
 	}
 
 	/**

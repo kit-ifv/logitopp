@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
 
+import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
@@ -33,16 +34,17 @@ public class Business implements ParcelAgent {
 	
 	private final ParcelPolicyProvider policyProvider;
 	private final Random random;
-
 	
-	private int plannedProductionQuantitiy;
-	private int coveredProductionQuantitiy;
+	private final Collection<DistributionCenter> deliveryPartners;
+	private final Collection<DistributionCenter> shippingPartners;
+
 	private final Collection<IParcel> currentParcels;
 	private final Collection<IParcel> delivered;
 	
-
-	public Business(long id, String name, Branch branch, BuildingType buildingType, int employees,
-			double area, Map<DayOfWeek, Pair<Time, Time>> openingHours, ZoneAndLocation location, Fleet fleet,
+	private final DemandQuantity demandQuantity;
+	
+	public Business(long id, String name, Branch branch, BuildingType buildingType, int employees, double area,
+			Map<DayOfWeek, Pair<Time, Time>> openingHours, ZoneAndLocation location, Fleet fleet,
 			ParcelPolicyProvider policyProvider, Random random) {
 		this.id = id;
 		this.name = name;
@@ -58,9 +60,13 @@ public class Business implements ParcelAgent {
 
 		this.policyProvider = policyProvider;
 		this.random = random;
+		this.deliveryPartners = new ArrayList<>();
+		this.shippingPartners = new ArrayList<>();
 
 		this.currentParcels = new ArrayList<>();
 		this.delivered = new ArrayList<>();
+		
+		this.demandQuantity = new DemandQuantity();
 	}
 
 
@@ -68,26 +74,13 @@ public class Business implements ParcelAgent {
 		Pair<Time, Time> interval = this.openingHours.getOrDefault(currentTime.weekDay(), empty);
 		return interval.getFirst().isBeforeOrEqualTo(currentTime) && currentTime.isBeforeOrEqualTo(interval.getSecond());
 	}
-
-	@Override
-	public void setPlannedProductionQuantity(int quantity) {
-		this.plannedProductionQuantitiy = quantity;
+	
+	public void addDeliveryPartner(DistributionCenter distributionCenter) {
+		this.deliveryPartners.add(distributionCenter);
 	}
-
-	@Override
-	public int getRemainingProductionQuantity() {
-
-		return this.plannedProductionQuantitiy - this.coveredProductionQuantitiy;
-	}
-
-	@Override
-	public void addActualProductionQuantity(int quantity) {
-		this.coveredProductionQuantitiy += quantity;
-	}
-
-	@Override
-	public int getPlannedProductionQuantity() {
-		return this.plannedProductionQuantitiy;
+	
+	public void addShippingPartner(DistributionCenter distributionCenter) {
+		this.shippingPartners.add(distributionCenter);
 	}
 
 	public ZoneAndLocation location() {
@@ -140,4 +133,5 @@ public class Business implements ParcelAgent {
 	public ZoneAndLocation getZoneAndLocation() {
 		return this.location();
 	}
+
 }

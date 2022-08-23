@@ -3,7 +3,6 @@ package edu.kit.ifv.mobitopp.simulation.person;
 import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.PersonDeliveryActivity;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.PersonParcelActivity;
 import edu.kit.ifv.mobitopp.simulation.events.DemandSimulationEventIfc;
 import edu.kit.ifv.mobitopp.simulation.events.Event;

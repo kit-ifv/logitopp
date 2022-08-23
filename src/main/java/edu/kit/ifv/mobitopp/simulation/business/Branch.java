@@ -1,26 +1,23 @@
 package edu.kit.ifv.mobitopp.simulation.business;
 
+import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.HOSPITAL;
+import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.HOTEL;
+import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.INDUSTRIAL;
+import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.LEISURE;
+import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.OFFICE;
+import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.RESTAURANT;
+import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.SCHOOL_UNIVERSITY;
+import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.STORE;
+import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.WAREHOUSE;
+import static edu.kit.ifv.mobitopp.simulation.business.Sector.ADMINISTRATION;
+import static edu.kit.ifv.mobitopp.simulation.business.Sector.HOSPITALITY;
 import static edu.kit.ifv.mobitopp.simulation.business.Sector.INDUSTRY;
-import static edu.kit.ifv.mobitopp.simulation.business.Sector.OTHER;
 import static edu.kit.ifv.mobitopp.simulation.business.Sector.SERVICE;
 import static edu.kit.ifv.mobitopp.simulation.business.Sector.TRADE;
-import static edu.kit.ifv.mobitopp.simulation.business.Sector.HOSPITALITY;
-import static edu.kit.ifv.mobitopp.simulation.business.Sector.ADMINISTRATION;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.OTHER;
-import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.STORE;
-import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.LEISURE;
-import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.RESTAURANT;
-import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.HOTEL;
-import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.OFFICE;
-import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.INDUSTRIAL;
-import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.HOSPITAL;
-import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.WAREHOUSE;
-import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.SCHOOL_UNIVERSITY;
 
 public enum Branch {//According to NACE Rev. 2
 	

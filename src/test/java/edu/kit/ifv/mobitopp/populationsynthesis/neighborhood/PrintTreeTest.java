@@ -1,7 +1,6 @@
 package edu.kit.ifv.mobitopp.populationsynthesis.neighborhood;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.awt.geom.Point2D;
 import java.io.ByteArrayOutputStream;

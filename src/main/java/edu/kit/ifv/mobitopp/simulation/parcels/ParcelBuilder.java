@@ -30,7 +30,7 @@ public abstract class ParcelBuilder<P extends ParcelAgent> {
 
 	public final void notifyProducer() {
 		if (getProducer().isDetermined()) {
-			getProducer().getValue().addActualProductionQuantity(1);
+//			getProducer().getValue().addActualProductionQuantity(1); TODO
 		}
 	}
 	

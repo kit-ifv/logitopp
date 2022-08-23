@@ -1,12 +1,6 @@
 package edu.kit.ifv.mobitopp.populationsynthesis.neighborhood;
 
-import static java.lang.Math.atan2;
-import static java.lang.Math.cos;
 import static java.lang.Math.max;
-import static java.lang.Math.pow;
-import static java.lang.Math.sin;
-import static java.lang.Math.sqrt;
-import static java.lang.Math.toRadians;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;

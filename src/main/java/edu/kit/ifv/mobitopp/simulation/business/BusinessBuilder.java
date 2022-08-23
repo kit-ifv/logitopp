@@ -25,8 +25,7 @@ public class BusinessBuilder {
 	private Fleet fleet;
 	
 	private ParcelPolicyProvider policyProvider;
-	private Random random;
-	
+	private Random random;	
 	
 	public BusinessBuilder(long seed) {
 		this.openingHours = new HashMap<>();
@@ -82,7 +81,7 @@ public class BusinessBuilder {
 		this.policyProvider = policyProvider;
 		return this;
 	}
-
+	
 	private void validate() {
 
 	}

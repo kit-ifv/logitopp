@@ -6,7 +6,7 @@ public class ParcelProductionQuantityModel<P extends ParcelAgent> implements Par
 		
 	@Override
 	public int select(P producer, double randomNumber) {
-		return producer.getRemainingProductionQuantity();
+		return producer.getDemandQuantity().getProduction();
 	}
 
 }
