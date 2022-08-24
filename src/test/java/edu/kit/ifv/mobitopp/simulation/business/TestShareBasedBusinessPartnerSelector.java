@@ -62,7 +62,7 @@ public class TestShareBasedBusinessPartnerSelector {
 	public void select() {
 		NumberOfPartnersModel numberModel = new DistributionBasedNumberOfPartnersModel(b -> new BoxPlotDistribution(1, 1, 2, 2, 3));
 		
-		ShareBasedBusinessPartnerSelector selector = new ShareBasedBusinessPartnerSelector(numberModel, distributionCenters, shareProvider, demandProvider, capacityProvider, mock(DeliveryResults.class), "Test");
+		BusinessPartnerSelector selector = new ShareBasedBusinessPartnerSelector(numberModel, distributionCenters, shareProvider, demandProvider, capacityProvider, mock(DeliveryResults.class), "Test");
 		
 		for (int i = 0; i < 1000; i++) {
 			selector.select(business);

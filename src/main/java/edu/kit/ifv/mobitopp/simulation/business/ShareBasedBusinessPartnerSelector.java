@@ -11,7 +11,7 @@ import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
 
-public class ShareBasedBusinessPartnerSelector {
+public class ShareBasedBusinessPartnerSelector implements BusinessPartnerSelector {
 
 	private final NumberOfPartnersModel numberModel;
 	
@@ -44,6 +44,7 @@ public class ShareBasedBusinessPartnerSelector {
 		this.tag = tag;
 	}
 
+	@Override
 	public Collection<DistributionCenter> select(Business business) {
 		int num = numberModel.select(business, business.getNextRandom());
 		int amount = demandProvider.apply(business);
@@ -101,6 +102,7 @@ public class ShareBasedBusinessPartnerSelector {
 		return res;
 	}
 	
+	@Override
 	public void printStatistics() {
 		System.out.println("Partner Selector (" + count + " bsnss):");
 		System.out.println("  Aggregate(" + total +"): " + aggregate);
@@ -110,6 +112,7 @@ public class ShareBasedBusinessPartnerSelector {
 		
 	}
 
+	@Override
 	public LinkedHashMap<DistributionCenter, Double> computeCurrentWeights() {
 		LinkedHashMap<DistributionCenter, Double> weights = new LinkedHashMap<>(aggregate);
 		aggregate.keySet().forEach(d -> weights.computeIfPresent(d, (dc, prev) -> prev/total));

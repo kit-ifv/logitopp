@@ -35,7 +35,7 @@ public enum Sector {
 		}
 	},
 	
-	TRADE(1) {
+	RETAIL(1) {
 		@Override
 		Collection<Branch> getContainedBranches() {
 			return List.of(G);

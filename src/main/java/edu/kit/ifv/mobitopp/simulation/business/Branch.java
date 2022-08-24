@@ -13,7 +13,7 @@ import static edu.kit.ifv.mobitopp.simulation.business.Sector.ADMINISTRATION;
 import static edu.kit.ifv.mobitopp.simulation.business.Sector.HOSPITALITY;
 import static edu.kit.ifv.mobitopp.simulation.business.Sector.INDUSTRY;
 import static edu.kit.ifv.mobitopp.simulation.business.Sector.SERVICE;
-import static edu.kit.ifv.mobitopp.simulation.business.Sector.TRADE;
+import static edu.kit.ifv.mobitopp.simulation.business.Sector.RETAIL;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -109,7 +109,7 @@ public enum Branch {// According to NACE Rev. 2
 	G(7) {
 		@Override
 		public Sector getSector() {
-			return TRADE;
+			return RETAIL;
 		}
 
 		@Override
