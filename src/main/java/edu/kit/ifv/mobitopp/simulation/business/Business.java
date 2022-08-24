@@ -134,5 +134,9 @@ public class Business implements ParcelAgent {
 	public ZoneAndLocation getZoneAndLocation() {
 		return this.location();
 	}
+	
+	public Sector getSector() {
+		return this.branch.getSector();
+	}
 
 }

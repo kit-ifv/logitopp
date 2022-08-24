@@ -14,6 +14,7 @@ import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.util.random.BoxPlotDistribution;
 
@@ -61,18 +62,19 @@ public class TestShareBasedBusinessPartnerSelector {
 	public void select() {
 		NumberOfPartnersModel numberModel = new DistributionBasedNumberOfPartnersModel(b -> new BoxPlotDistribution(1, 1, 2, 2, 3));
 		
-		ShareBasedBusinessPartnerSelector selector = new ShareBasedBusinessPartnerSelector(numberModel, distributionCenters, shareProvider, demandProvider, capacityProvider);
+		ShareBasedBusinessPartnerSelector selector = new ShareBasedBusinessPartnerSelector(numberModel, distributionCenters, shareProvider, demandProvider, capacityProvider, mock(DeliveryResults.class), "Test");
 		
 		for (int i = 0; i < 1000; i++) {
 			selector.select(business);
 		}
 		
+		selector.printStatistics();
+		
 		LinkedHashMap<DistributionCenter, Double> weights = selector.computeCurrentWeights();
 		for (DistributionCenter dc : distributionCenters) {
 			assertEquals(dc.getRelativeShare(), weights.get(dc), 0.001);
 		}
-		
-		selector.printStatistics();
+				
 	}
 	
 	

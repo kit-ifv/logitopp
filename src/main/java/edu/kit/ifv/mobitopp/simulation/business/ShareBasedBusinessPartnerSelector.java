@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
+import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
 
@@ -20,10 +21,14 @@ public class ShareBasedBusinessPartnerSelector {
 	private final Function<Business, Integer> demandProvider;
 	private final Function<DistributionCenter, Double> shareProvider;
 	private final Function<DistributionCenter, Double> capacityProvider;
+	
+	private final DeliveryResults results;
+
+	private final String tag;
 
 	public ShareBasedBusinessPartnerSelector(NumberOfPartnersModel numberModel,
 			Collection<DistributionCenter> distributionCenters, Function<DistributionCenter, Double> shareProvider,
-			Function<Business, Integer> demandProvider, Function<DistributionCenter, Double> capacityProvider) {
+			Function<Business, Integer> demandProvider, Function<DistributionCenter, Double> capacityProvider, DeliveryResults results, String tag) {
 		
 		this.numberModel = numberModel;
 		
@@ -35,6 +40,8 @@ public class ShareBasedBusinessPartnerSelector {
 		this.demandProvider = demandProvider;
 		this.shareProvider = shareProvider;
 		this.capacityProvider = capacityProvider;
+		this.results = results;
+		this.tag = tag;
 	}
 
 	public Collection<DistributionCenter> select(Business business) {
@@ -43,7 +50,7 @@ public class ShareBasedBusinessPartnerSelector {
 		
 		Map<DistributionCenter, Double> weights = computeWeights();
 		Collection<DistributionCenter> drawn = draw(num, weights, business::getNextRandom);
-		updateAggregate(amount, drawn);
+		updateAggregate(business, amount, drawn);
 	
 		return drawn;
 	}
@@ -65,12 +72,14 @@ public class ShareBasedBusinessPartnerSelector {
 		return weights;
 	}
 	
-	private void updateAggregate(double amount, Collection<DistributionCenter> options) {
+	private void updateAggregate(Business business, int amount, Collection<DistributionCenter> options) {
 		double totalCap = options.stream().mapToDouble(d -> capacityProvider.apply(d)).sum();
 		
 		options.forEach(dc -> {
 			double inc = capacityProvider.apply(dc) / totalCap;
 			aggregate.put(dc, aggregate.get(dc) + inc*amount);
+			
+			results.logBusinessPartner(business, dc, tag, amount, inc, inc*amount, options.size());
 		});
 		
 		total += amount;

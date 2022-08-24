@@ -5,6 +5,7 @@ import java.util.Arrays;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.result.Category;
 import edu.kit.ifv.mobitopp.result.Results;
+import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
@@ -29,6 +30,8 @@ public class DeliveryResults {
 	private final static Category resultCategoryEmployee = createResultCategoryEmployee();
 	private final static Category resultCategoryRescheduling = createResultCategoryRescheduling();
 	private final static Category resultCategoryNeighbordeliveries = createResultCategoryNeighborDeliveries();
+	
+	private final static Category resultCategoryPartners = createRestutCategoryPartners();
 
 	@Getter
 	private Results results;
@@ -329,7 +332,7 @@ public class DeliveryResults {
 		msg += currentTime.weekDay().name() + SEP;
 		msg += success + SEP;
 		msg += numOfNeighbors + SEP;
-		msg += checkedNeighbors + SEP;
+		msg += checkedNeighbors;
 
 		results.write(resultCategoryNeighbordeliveries, msg);
 	}
@@ -342,6 +345,27 @@ public class DeliveryResults {
 	private static Category createResultCategoryNeighborDeliveries() {
 		return new Category("neighbor-deliveries",
 				Arrays.asList("Delivery", "Zone", "Time", "Day", "Success", "NumberOfNeighbors", "CheckedNeighbors"));
+	}
+
+	
+	public void logBusinessPartner(Business business, DistributionCenter dc, String tag,  int demand, double relativeCapacity, double estimatedDemand, int numOfPartners) {
+		String msg = "";
+		
+		msg += business.getId() + SEP;
+		msg += business.getSector().asInt() + SEP;
+		msg += dc.getName() + SEP;
+		msg += tag + SEP;
+		msg += demand + SEP;
+		msg += relativeCapacity + SEP;
+		msg += estimatedDemand + SEP;
+		msg += numOfPartners;
+		
+		results.write(resultCategoryPartners, msg);
+	}
+	
+	private static Category createRestutCategoryPartners() {
+		return new Category("business_partners",
+				Arrays.asList("Business", "Sector", "DictributionCenter", "Tag", "BusinessDemand", "CapacityFactor", "EstimatedDemand", "NumOfPartners"));
 	}
 
 }

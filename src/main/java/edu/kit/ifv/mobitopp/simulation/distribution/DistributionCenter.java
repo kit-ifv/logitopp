@@ -30,7 +30,7 @@ import lombok.Setter;
  * delivery persons start to deliver parcels.
  */
 @Getter
-public class DistributionCenter implements NullParcelProducer {
+public class DistributionCenter implements NullParcelProducer {//TODO add id
 	private String organization;
 	private String name;
 	private Zone zone;

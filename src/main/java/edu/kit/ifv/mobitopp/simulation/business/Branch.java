@@ -19,298 +19,295 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public enum Branch {//According to NACE Rev. 2
-	
+public enum Branch {// According to NACE Rev. 2
+
 	OTHER(0) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return Sector.OTHER;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(BuildingType.OTHER);
 		}
 	},
-	
+
 	A(1) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return INDUSTRY;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(INDUSTRIAL);
 		}
 	},
-	
+
 	B(2) {//
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return Sector.OTHER;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 
 			return List.of(BuildingType.OTHER);
 		}
 	},
-	
+
 	C(3) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return INDUSTRY;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(STORE, INDUSTRIAL);
 		}
 	},
-	
+
 	D(4) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return INDUSTRY;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(INDUSTRIAL);
 		}
 	},
-	
+
 	E(5) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return INDUSTRY;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(INDUSTRIAL);
 		}
 	},
-	
+
 	F(6) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return INDUSTRY;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(INDUSTRIAL);
 		}
 	},
-	
-	
+
 	G(7) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return TRADE;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(STORE);
 		}
 	},
-	
+
 	H(8) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return INDUSTRY;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(INDUSTRIAL, WAREHOUSE);
 		}
 	},
-	
+
 	I(9) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return HOSPITALITY;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(RESTAURANT, HOTEL);
 		}
 	},
-	
+
 	J(10) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return SERVICE;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 
 			return List.of(BuildingType.OTHER);
 		}
 	},
-	
+
 	K(11) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return SERVICE;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(OFFICE);
 		}
 	},
-	
+
 	L(12) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return SERVICE;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(OFFICE);
 		}
 	},
-	
+
 	M(13) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return SERVICE;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(OFFICE);
 		}
 	},
-	
+
 	N(14) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return SERVICE;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(OFFICE);
 		}
 	},
-	
+
 	O(15) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return ADMINISTRATION;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(OFFICE);
 		}
 	},
-	
+
 	P(16) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return ADMINISTRATION;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(SCHOOL_UNIVERSITY);
 		}
 	},
-	
+
 	Q(17) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return SERVICE;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(STORE, OFFICE, HOSPITAL);
 		}
 	},
-	
+
 	R(18) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return HOSPITALITY;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(LEISURE);
 		}
 	},
-	
+
 	S(19) {
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return SERVICE;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(LEISURE, OFFICE);
 		}
 	},
-	
+
 	T(20) {//
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return Sector.OTHER;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(BuildingType.OTHER);
 		}
 	},
-	
+
 	U(21) {//
 		@Override
-		Sector getSector() {
+		public Sector getSector() {
 			return Sector.OTHER;
 		}
 
 		@Override
-		Collection<BuildingType> getBuildingTypes() {
+		public Collection<BuildingType> getBuildingTypes() {
 			return List.of(BuildingType.OTHER);
 		}
-	};	
-	
+	};
+
 	private final int number;
-	
+
 	private Branch(int number) {
 		this.number = number;
 	}
-	
+
 	public int asInt() {
 		return this.number;
 	}
-	
+
 	public String asString() {
 		return this.name();
 	}
-	
-	abstract Sector getSector();
-	abstract Collection<BuildingType> getBuildingTypes();
-	
+
+	public abstract Sector getSector();
+
+	public abstract Collection<BuildingType> getBuildingTypes();
+
 	public static Branch fromInt(int number) {
-		return Arrays.stream(Branch.values())
-					 .filter(p -> p.asInt() == number)
-					 .findFirst()
-					 .orElseGet(() -> {
-						 throw new IllegalArgumentException("Cannot parse " + number + " as trade!");
-					 });
+		return Arrays.stream(Branch.values()).filter(p -> p.asInt() == number).findFirst().orElseGet(() -> {
+			throw new IllegalArgumentException("Cannot parse " + number + " as trade!");
+		});
 	}
 }
