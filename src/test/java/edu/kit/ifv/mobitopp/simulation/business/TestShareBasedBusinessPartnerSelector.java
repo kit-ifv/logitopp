@@ -33,21 +33,21 @@ public class TestShareBasedBusinessPartnerSelector {
 	public void setUp() {
 		DistributionCenter d1 = mock(DistributionCenter.class);
 		when(d1.toString()).thenReturn("A");
-		when(d1.getRelativeShare()).thenReturn(0.5);
+		when(d1.getShareDelivery()).thenReturn(0.5);
 		when(d1.getNumEmployees()).thenReturn(15);
 		
 		DistributionCenter d2 = mock(DistributionCenter.class);
 		when(d2.toString()).thenReturn("B");
-		when(d2.getRelativeShare()).thenReturn(0.3);
+		when(d2.getShareDelivery()).thenReturn(0.3);
 		when(d2.getNumEmployees()).thenReturn(10);
 		
 		DistributionCenter d3 = mock(DistributionCenter.class);
 		when(d3.toString()).thenReturn("C");
-		when(d3.getRelativeShare()).thenReturn(0.2);
+		when(d3.getShareDelivery()).thenReturn(0.2);
 		when(d3.getNumEmployees()).thenReturn(12);
 		
 		distributionCenters = new ArrayList<>(List.of(d1, d2, d3));
-		shareProvider = d -> d.getRelativeShare();
+		shareProvider = d -> d.getShareDelivery();
 		capacityProvider = d -> (double) d.getNumEmployees();
 		
 		Random rand = new Random(42);
@@ -72,7 +72,7 @@ public class TestShareBasedBusinessPartnerSelector {
 		
 		LinkedHashMap<DistributionCenter, Double> weights = selector.computeCurrentWeights();
 		for (DistributionCenter dc : distributionCenters) {
-			assertEquals(dc.getRelativeShare(), weights.get(dc), 0.001);
+			assertEquals(dc.getShareDelivery(), weights.get(dc), 0.001);
 		}
 				
 	}

@@ -30,7 +30,7 @@ import lombok.Setter;
  * delivery persons start to deliver parcels.
  */
 @Getter
-public class DistributionCenter implements NullParcelProducer {//TODO add id
+public class DistributionCenter implements NullParcelProducer {// TODO add id
 	private String organization;
 	private String name;
 	private Zone zone;
@@ -38,48 +38,57 @@ public class DistributionCenter implements NullParcelProducer {//TODO add id
 	private int numEmployees;
 	private int attempts;
 	private Collection<DeliveryPerson> employees;
-	private double relativeShare;
+
+	private double shareDelivery;
+	private double shareShipping;
 
 	@Getter(value = lombok.AccessLevel.NONE)
 	private Collection<IParcel> currentParcels;
 	private Collection<IParcel> delivered;
 	private Collection<IParcel> pickupRequests;
 
-	@Setter private DeliveryTourAssignmentStrategy tourStrategy;
-	@Setter private ParcelPolicyProvider policyProvider;
-	@Setter private DeliveryClusteringStrategy clusteringStrategy;
-	@Getter @Setter private DeliveryDurationModel durationModel;
-	
+	@Setter
+	private DeliveryTourAssignmentStrategy tourStrategy;
+	@Setter
+	private ParcelPolicyProvider policyProvider;
+	@Setter
+	private DeliveryClusteringStrategy clusteringStrategy;
+	@Getter
+	@Setter
+	private DeliveryDurationModel durationModel;
+
 	private final DemandQuantity demandQuantity;
 
 	/**
 	 * Instantiates a new distribution center.
 	 *
-	 * @param name           the distribution centers name
-	 * @param organization   the organizations name
-	 * @param zone           the zone
-	 * @param location       the location
-	 * @param numEmployees   the number of employees
-	 * @param share          the share of parcels they receive
-	 * @param attempts 		 the maximum number of delivery attempts
+	 * @param name          the distribution centers name
+	 * @param organization  the organizations name
+	 * @param zone          the zone
+	 * @param location      the location
+	 * @param numEmployees  the number of employees
+	 * @param shareDelivery the share delivery
+	 * @param shareShipping the market share in shipping
+	 * @param attempts      the maximum number of delivery attempts
 	 */
 	public DistributionCenter(String name, String organization, Zone zone, Location location, int numEmployees,
-			double share, int attempts) {
+			double shareDelivery, double shareShipping, int attempts) {
 		this.name = name;
 		this.organization = organization;
 
 		this.zone = zone;
 		this.location = location;
-		
+
 		this.attempts = attempts;
-		this.relativeShare = share;
+		this.shareDelivery = shareDelivery;
+		this.shareShipping = shareShipping;
 		this.numEmployees = numEmployees;
 		this.employees = new ArrayList<DeliveryPerson>();
 
 		this.currentParcels = new ArrayList<>();
 		this.delivered = new ArrayList<>();
 		this.pickupRequests = new ArrayList<>();
-		
+
 		this.demandQuantity = new DemandQuantity();
 	}
 
@@ -94,8 +103,8 @@ public class DistributionCenter implements NullParcelProducer {//TODO add id
 	 */
 	public List<ParcelActivityBuilder> assignParcels(DeliveryPerson person, ActivityIfc work, Time currentTime,
 			RelativeTime remainingWorkTime) {
-		List<ParcelActivityBuilder> assigned = this.tourStrategy
-				.assignParcels(this.getDeliveryActivities(currentTime), person, currentTime, remainingWorkTime);
+		List<ParcelActivityBuilder> assigned = this.tourStrategy.assignParcels(this.getDeliveryActivities(currentTime),
+				person, currentTime, remainingWorkTime);
 
 		removeParcels(person, assigned, currentTime);
 
@@ -144,16 +153,14 @@ public class DistributionCenter implements NullParcelProducer {//TODO add id
 		List<ParcelActivityBuilder> deliveries = new ArrayList<>();
 
 		List<IParcel> available = getAvailableParcels(currentTime);
-		
+
 		clusteringStrategy.cluster(available)
-						  .forEach(cluster -> deliveries.add(
-								  new ParcelActivityBuilder(clusteringStrategy).addParcels(cluster).asDelivery().byDistributionCenter(this)
-						));
-		
+				.forEach(cluster -> deliveries.add(new ParcelActivityBuilder(clusteringStrategy).addParcels(cluster)
+						.asDelivery().byDistributionCenter(this)));
+
 		clusteringStrategy.cluster(new ArrayList<>(pickupRequests))
-						  .forEach(cluster -> deliveries.add(
-								  new ParcelActivityBuilder(clusteringStrategy).addParcels(cluster).asPickup().byDistributionCenter(this)
-						   ));
+				.forEach(cluster -> deliveries.add(new ParcelActivityBuilder(clusteringStrategy).addParcels(cluster)
+						.asPickup().byDistributionCenter(this)));
 
 		return deliveries;
 	}
@@ -163,21 +170,20 @@ public class DistributionCenter implements NullParcelProducer {//TODO add id
 		this.currentParcels.add(parcel);
 	}
 
-
 	@Override
 	public void removeParcel(IParcel parcel) {
 		this.currentParcels.remove(parcel);
 	}
-	
+
 	@Override
 	public void addDelivered(IParcel parcel) {
 		this.delivered.add(parcel);
 	}
-	
+
 	public void requestPickup(IParcel parcel) {
 		this.pickupRequests.add(parcel);
 	}
-	
+
 	@Override
 	public ParcelPolicyProvider getPolicyProvider() {
 		return this.policyProvider;
@@ -222,7 +228,6 @@ public class DistributionCenter implements NullParcelProducer {//TODO add id
 		return new ZoneAndLocation(this.zone, this.location);
 	}
 
-	
 	@Override
 	public String toString() {
 		return this.name;

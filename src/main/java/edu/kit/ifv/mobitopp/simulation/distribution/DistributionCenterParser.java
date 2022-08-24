@@ -32,7 +32,8 @@ public class DistributionCenterParser {
 		String organisation = row.get("organisation");
 		
 		int employees = row.valueAsInteger("employees");
-		double share = row.valueAsDouble("share");		
+		double shareDelivery = row.valueAsDouble("share_delivery");	
+		double shareShipping = row.valueAsDouble("share_shipping");	
 		int attempts = row.valueAsInteger("attempts");
 		
 		double x = row.valueAsDouble("loc_x");
@@ -42,7 +43,7 @@ public class DistributionCenterParser {
 		String zoneId = row.get("zone");		
 		Zone zone = zoneRepo.getByExternalId(zoneId);
 		
-		return new DistributionCenter(name, organisation, zone, location, scaleEmployees(employees), share, attempts);
+		return new DistributionCenter(name, organisation, zone, location, scaleEmployees(employees), shareDelivery, shareShipping, attempts);
 	}
 	
 	protected int scaleEmployees(int numOfEmployees) {

@@ -67,7 +67,7 @@ public class DistributionCenterTest  {
 		}
 		
 		
-		distributionCenter = new DistributionCenter("test", "org", mock(Zone.class), mock(Location.class), 100, 0.8, 3);
+		distributionCenter = new DistributionCenter("test", "org", mock(Zone.class), mock(Location.class), 100, 0.8, 0.5, 3);
 		parcels.forEach(distributionCenter::addParcel);
 		
 //		distributionCenter = mock(DistributionCenter.class);

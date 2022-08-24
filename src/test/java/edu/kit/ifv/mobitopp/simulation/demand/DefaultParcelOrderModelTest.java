@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
+import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.NormalDistributedNumberOfParcelsSelector;
@@ -77,16 +78,22 @@ public class DefaultParcelOrderModelTest {
 		when(outsideHousehold.homeLocation()).thenReturn(new Location(new Point2D.Double(100,100), 0, 0));
 		
 		workInsidePerson = mock(PickUpParcelPerson.class);
+		DemandQuantity quantityP1 = new DemandQuantity();
+		when(workInsidePerson.getDemandQuantity()).thenReturn(quantityP1);
 		when(workInsidePerson.household()).thenReturn(insideHousehold);
 		when(workInsidePerson.fixedZoneFor(ActivityType.WORK)).thenReturn(surveyZone);
 		when(workInsidePerson.hasFixedZoneFor(ActivityType.WORK)).thenReturn(true);
 		
 		workOutsidePerson = mock(PickUpParcelPerson.class);
+		DemandQuantity quantityP2 = new DemandQuantity();
+		when(workOutsidePerson.getDemandQuantity()).thenReturn(quantityP2);
 		when(workOutsidePerson.household()).thenReturn(outsideHousehold);
 		when(workOutsidePerson.fixedZoneFor(ActivityType.WORK)).thenReturn(nonSurveyZone);
 		when(workOutsidePerson.hasFixedZoneFor(ActivityType.WORK)).thenReturn(true);
 		
 		noWorkPerson = mock(PickUpParcelPerson.class);
+		DemandQuantity quantityP3 = new DemandQuantity();
+		when(noWorkPerson.getDemandQuantity()).thenReturn(quantityP3);
 		when(noWorkPerson.fixedDestinationFor(ActivityType.PICK_UP_PARCEL)).thenReturn(new Location(new Point2D.Float(1,1), 0, 0));
 		when(noWorkPerson.household()).thenReturn(insideHousehold);
 		when(noWorkPerson.hasFixedZoneFor(ActivityType.PICK_UP_PARCEL)).thenReturn(true);
@@ -96,9 +103,15 @@ public class DefaultParcelOrderModelTest {
 		
 		//Distribution Centers
 		centerA = mock(DistributionCenter.class);
-		when(centerA.getRelativeShare()).thenReturn(0.5);
+		when(centerA.getShareDelivery()).thenReturn(0.5);
+		DemandQuantity quantityA = new DemandQuantity();
+		when(centerA.getDemandQuantity()).thenReturn(quantityA);
+		
 		centerB = mock(DistributionCenter.class);
-		when(centerB.getRelativeShare()).thenReturn(0.5);
+		when(centerB.getShareDelivery()).thenReturn(0.5);
+		DemandQuantity quantityB = new DemandQuantity();
+		when(centerB.getDemandQuantity()).thenReturn(quantityB);
+		
 		sharesCenterA = Map.of(centerA, 1.0, centerB, 0.0);
 //		sharesCenterB = Map.of(centerA, 0.0, centerB, 1.0);
 		centers = List.of(centerA, centerB);
@@ -196,6 +209,7 @@ public class DefaultParcelOrderModelTest {
 																			.customSharesDistributionCenterSelection(sharesCenterA)
 																			.useDistributionCenterAsProducer()
 																			.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+																			.useAgentAsConsumer()
 																			.build();
 				
 		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
@@ -229,6 +243,7 @@ public class DefaultParcelOrderModelTest {
 				.customSharesDistributionCenterSelection(sharesCenterA)
 				.useDistributionCenterAsProducer()
 				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.useAgentAsConsumer()
 				.build();
 
 		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
@@ -264,6 +279,7 @@ public class DefaultParcelOrderModelTest {
 				   .customSharesDistributionCenterSelection(sharesCenterA)
 				   .useDistributionCenterAsProducer()
 				   .randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				   .useAgentAsConsumer()
 				   .build();
 		
 		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
@@ -297,6 +313,7 @@ public class DefaultParcelOrderModelTest {
 				.customSharesDistributionCenterSelection(sharesCenterA)
 				.useDistributionCenterAsProducer()
 				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.useAgentAsConsumer()
 				.build();
 
 		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
@@ -317,6 +334,7 @@ public class DefaultParcelOrderModelTest {
 				.customSharesDistributionCenterSelection(sharesCenterA)
 				.useDistributionCenterAsProducer()
 				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.useAgentAsConsumer()
 				.build();
 
 		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
@@ -357,6 +375,7 @@ public class DefaultParcelOrderModelTest {
 				.customSharesDistributionCenterSelection(sharesCenterA)
 				.useDistributionCenterAsProducer()
 				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.useAgentAsConsumer()
 				.build();
 
 		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);
@@ -390,6 +409,7 @@ public class DefaultParcelOrderModelTest {
 				.customSharesDistributionCenterSelection(sharesCenterA)
 				.useDistributionCenterAsProducer()
 				.randomArrivalMinuteSelection(Time.start.plusDays(1), Time.start.plusDays(4))
+				.useAgentAsConsumer()
 				.build();
 
 		List<Collection<PrivateParcelBuilder>> orders = generateNParcels(model, workOutsidePerson, 10);

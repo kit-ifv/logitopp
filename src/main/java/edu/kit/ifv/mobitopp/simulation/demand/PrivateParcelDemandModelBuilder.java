@@ -81,7 +81,7 @@ public class PrivateParcelDemandModelBuilder extends ParcelDemandModelBuilder<Pi
 		builder.useNormalDistributionNumberSelector(0.65, 0.5, 1, 10);
 		
 		return builder.equalParcelDestinationSelection(workZoneFilter)
-					  .shareBasedDistributionCenterSelection(distributionCenters)
+					  .deliveryShareBasedDistributionCenterSelection(distributionCenters)
 					  .useDistributionCenterAsProducer()
 					  .useAgentAsConsumer()
 					//.equalServiceProviderSelection(List.of("Dummy Delivery Service"))

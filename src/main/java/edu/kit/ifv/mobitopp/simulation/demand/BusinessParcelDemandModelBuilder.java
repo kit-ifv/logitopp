@@ -33,7 +33,7 @@ public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<B
 		return forBusinessParcels(results)
 					.useRandomNumberSelector(0, 3, 0.01)
 					.filterRecipients(o -> zoneFilter.test(o.location().zone()) )
-					.shareBasedDistributionCenterSelection(distributionCenters)
+					.deliveryShareBasedDistributionCenterSelection(distributionCenters)
 					//.equalServiceProviderSelection(List.of("Dummy Delivery Service"))
 					.randomArrivalDaySelectionExcludeSunday()
 					.build();

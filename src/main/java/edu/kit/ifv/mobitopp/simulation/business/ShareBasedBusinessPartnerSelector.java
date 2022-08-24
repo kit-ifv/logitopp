@@ -116,4 +116,18 @@ public class ShareBasedBusinessPartnerSelector {
 		return weights;
 	}
 
+	public static ShareBasedBusinessPartnerSelector forShipping(NumberOfPartnersModel numberModel,
+			Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
+		
+		return new ShareBasedBusinessPartnerSelector(numberModel, distributionCenters, d -> d.getShareDelivery(),
+				b -> b.getDemandQuantity().getProduction(), d -> (double) d.getNumEmployees(), results, "shipping");
+	}
+	
+	public static ShareBasedBusinessPartnerSelector forDelivery(NumberOfPartnersModel numberModel,
+			Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
+		
+		return new ShareBasedBusinessPartnerSelector(numberModel, distributionCenters, d -> d.getShareDelivery(), //TODO separate relative share for prod and cons
+				b -> b.getDemandQuantity().getConsumption(), d -> (double) d.getNumEmployees(), results, "delivery");
+	}
+	
 }
