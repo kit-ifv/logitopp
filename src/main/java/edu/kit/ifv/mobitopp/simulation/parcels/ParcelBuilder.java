@@ -1,6 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
+import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
@@ -28,9 +29,15 @@ public abstract class ParcelBuilder<P extends ParcelAgent> {
 		this.results = results;
 	}
 
-	public final void notifyProducer() {
+	public final void notifyAgents() {
 		if (getProducer().isDetermined()) {
-//			getProducer().getValue().addActualProductionQuantity(1); TODO
+			DemandQuantity producerQuantity = getProducer().getValue().getDemandQuantity();
+			producerQuantity.addProduction(1);
+		}
+		
+		if (getConsumer().isDetermined()) {
+			DemandQuantity consumerQuantity = getConsumer().getValue().getDemandQuantity();
+			consumerQuantity.addConsumption(1);
 		}
 	}
 	

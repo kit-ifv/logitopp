@@ -12,6 +12,10 @@ public class DemandQuantity {
 	public void setConsumption(int consumption) {
 		this.consumption = consumption;
 	}
+	
+	public void addConsumption(int increment) {
+		this.consumption += increment;
+	}
 
 	public int getProduction() {
 		return production;
@@ -19,6 +23,10 @@ public class DemandQuantity {
 
 	public void setProduction(int production) {
 		this.production = production;
+	}
+	
+	public void addProduction(int increment) {
+		this.production += increment;
 	}
 	
 }
