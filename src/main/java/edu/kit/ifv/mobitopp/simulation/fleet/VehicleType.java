@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.business;
+package edu.kit.ifv.mobitopp.simulation.fleet;
 
 import java.util.Arrays;
 

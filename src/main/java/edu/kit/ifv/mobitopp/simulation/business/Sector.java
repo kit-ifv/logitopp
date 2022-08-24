@@ -31,7 +31,7 @@ public enum Sector {
 	OTHER(0) {
 		@Override
 		Collection<Branch> getContainedBranches() {
-			return List.of(B, T, U);
+			return List.of(Branch.OTHER, B, T, U);
 		}
 	},
 	

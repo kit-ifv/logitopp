@@ -6,6 +6,7 @@ import java.util.Random;
 
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
+import edu.kit.ifv.mobitopp.simulation.fleet.Fleet;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.collections.Pair;

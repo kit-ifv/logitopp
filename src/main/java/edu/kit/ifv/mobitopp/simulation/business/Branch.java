@@ -127,7 +127,7 @@ public enum Branch {//According to NACE Rev. 2
 
 		@Override
 		Collection<BuildingType> getBuildingTypes() {
-			return List.of(WAREHOUSE);
+			return List.of(INDUSTRIAL, WAREHOUSE);
 		}
 	},
 	
@@ -231,7 +231,7 @@ public enum Branch {//According to NACE Rev. 2
 	Q(17) {
 		@Override
 		Sector getSector() {
-			return ADMINISTRATION;
+			return SERVICE;
 		}
 
 		@Override

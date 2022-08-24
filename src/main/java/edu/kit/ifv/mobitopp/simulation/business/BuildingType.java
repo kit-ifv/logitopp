@@ -31,7 +31,7 @@ public enum BuildingType {
 	OTHER(0) {
 		@Override
 		Collection<Branch> getBranches() {
-			return List.of(B, J, T, U);
+			return List.of(Branch.OTHER, B, J, T, U);
 		}
 	},
 	
@@ -66,7 +66,7 @@ public enum BuildingType {
 	OFFICE(5) {
 		@Override
 		Collection<Branch> getBranches() {
-			return List.of(K, L, M, N, O, P, Q, S);
+			return List.of(K, L, M, N, O, Q, S);
 		}
 	},
 	
