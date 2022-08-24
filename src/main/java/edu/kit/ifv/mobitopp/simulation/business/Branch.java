@@ -242,7 +242,7 @@ public enum Branch {// According to NACE Rev. 2
 	R(18) {
 		@Override
 		public Sector getSector() {
-			return HOSPITALITY;
+			return Sector.LEISURE;
 		}
 
 		@Override

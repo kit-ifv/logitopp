@@ -45,7 +45,7 @@ public enum Sector {
 	HOSPITALITY(2) {
 		@Override
 		Collection<Branch> getContainedBranches() {
-			return List.of(I, R);
+			return List.of(I);
 		}
 	},
 	
@@ -67,6 +67,13 @@ public enum Sector {
 		@Override
 		Collection<Branch> getContainedBranches() {
 			return List.of(O, P);
+		}
+	},
+	
+	LEISURE(6) {
+		@Override
+		Collection<Branch> getContainedBranches() {
+			return List.of(R);
 		}
 	};
 	
