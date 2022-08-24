@@ -10,23 +10,25 @@ import java.util.function.Function;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
 
-public class ShareBasedBusniessPartnerSelector {
+public class ShareBasedBusinessPartnerSelector {
 
 	private final NumberOfPartnersModel numberModel;
 	
 	private final Map<DistributionCenter, Double> aggregate;
 	private double total;
+	private int count;
 	private final Function<Business, Integer> demandProvider;
 	private final Function<DistributionCenter, Double> shareProvider;
 	private final Function<DistributionCenter, Double> capacityProvider;
 
-	public ShareBasedBusniessPartnerSelector(NumberOfPartnersModel numberModel,
+	public ShareBasedBusinessPartnerSelector(NumberOfPartnersModel numberModel,
 			Collection<DistributionCenter> distributionCenters, Function<DistributionCenter, Double> shareProvider,
 			Function<Business, Integer> demandProvider, Function<DistributionCenter, Double> capacityProvider) {
 		
 		this.numberModel = numberModel;
 		
 		this.total = 0.0;
+		this.count = 0;
 		this.aggregate = new LinkedHashMap<>();
 		distributionCenters.forEach(d -> this.aggregate.put(d, 0.0));
 		
@@ -72,6 +74,7 @@ public class ShareBasedBusniessPartnerSelector {
 		});
 		
 		total += amount;
+		count += 1;
 	}
 	
 	private Collection<DistributionCenter> draw(int n, Map<DistributionCenter, Double> weights, DoubleSupplier random) {
@@ -87,7 +90,21 @@ public class ShareBasedBusniessPartnerSelector {
 		}	
 		
 		return res;
+	}
+	
+	public void printStatistics() {
+		System.out.println("Partner Selector (" + count + " bsnss):");
+		System.out.println("  Aggregate(" + total +"): " + aggregate);
 		
+		LinkedHashMap<DistributionCenter, Double> weights = computeCurrentWeights();
+		System.out.println("  Weights: " + weights);
+		
+	}
+
+	public LinkedHashMap<DistributionCenter, Double> computeCurrentWeights() {
+		LinkedHashMap<DistributionCenter, Double> weights = new LinkedHashMap<>(aggregate);
+		aggregate.keySet().forEach(d -> weights.computeIfPresent(d, (dc, prev) -> prev/total));
+		return weights;
 	}
 
 }
