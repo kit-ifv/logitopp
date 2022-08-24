@@ -19,25 +19,28 @@ public class BoxPlotDistribution {
 	public double draw(double random) {
 		double a;
 		double b;
-		
+		double scale = random;
 		if (random >= 0.75) {
 			a = quartHigh;
 			b = max;
+			scale -= 0.75;
 			
 		} else if (random >= 0.5) {
 			a = median;
 			b = quartHigh;
+			scale -= 0.5;
 
 		} else if (random >= 0.25) {
 			a = quartLow;
 			b = median;
+			scale -= 0.25;
 			
 		} else {
 			a = min;
 			b= quartLow;
 		}
 		
-		double scale = (random - a) / 0.25;
+		scale /= 0.25;
 		
 		return interpolate(a, b, scale);
 	}
