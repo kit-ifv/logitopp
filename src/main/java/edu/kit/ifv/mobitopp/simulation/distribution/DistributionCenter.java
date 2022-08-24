@@ -31,21 +31,22 @@ import lombok.Setter;
  */
 @Getter
 public class DistributionCenter implements NullParcelProducer {// TODO add id
-	private String organization;
-	private String name;
-	private Zone zone;
-	private Location location;
+	private final int id;
+	private final String organization;
+	private final String name;
+	private final Zone zone;
+	private final Location location;
 	private int numEmployees;
 	private int attempts;
-	private Collection<DeliveryPerson> employees;
+	private final Collection<DeliveryPerson> employees;
 
 	private double shareDelivery;
 	private double shareShipping;
 
 	@Getter(value = lombok.AccessLevel.NONE)
-	private Collection<IParcel> currentParcels;
-	private Collection<IParcel> delivered;
-	private Collection<IParcel> pickupRequests;
+	private final Collection<IParcel> currentParcels;
+	private final Collection<IParcel> delivered;
+	private final Collection<IParcel> pickupRequests;
 
 	@Setter
 	private DeliveryTourAssignmentStrategy tourStrategy;
@@ -58,10 +59,12 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 	private DeliveryDurationModel durationModel;
 
 	private final DemandQuantity demandQuantity;
+	
 
 	/**
 	 * Instantiates a new distribution center.
 	 *
+	 * @param id            the id
 	 * @param name          the distribution centers name
 	 * @param organization  the organizations name
 	 * @param zone          the zone
@@ -71,8 +74,9 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 	 * @param shareShipping the market share in shipping
 	 * @param attempts      the maximum number of delivery attempts
 	 */
-	public DistributionCenter(String name, String organization, Zone zone, Location location, int numEmployees,
+	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numEmployees,
 			double shareDelivery, double shareShipping, int attempts) {
+		this.id = id;
 		this.name = name;
 		this.organization = organization;
 
