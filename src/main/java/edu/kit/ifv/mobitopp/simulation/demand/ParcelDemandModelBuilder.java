@@ -260,7 +260,7 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 		return this.selectShareBased(Arrays.asList(ShipmentSize.values()), ParcelBuilder::setSize);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> customShareBasedShipmentSizeSelection(Map<ShipmentSize, Double> shares) {
+	public ParcelDemandModelBuilder<A,P> shareBasedShipmentSizeSelection(Map<ShipmentSize, Double> shares) {
 		return this.selectShareBased(shares, ParcelBuilder::setSize);
 	}
 	

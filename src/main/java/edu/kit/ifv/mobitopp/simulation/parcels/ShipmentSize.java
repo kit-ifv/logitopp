@@ -5,6 +5,7 @@ public enum ShipmentSize {
 	SMALL,
 	MEDIUM,
 	LARGE,
+	EXTRA_LARGE,
 	PALLET,
 	CONTAINER;
 	
