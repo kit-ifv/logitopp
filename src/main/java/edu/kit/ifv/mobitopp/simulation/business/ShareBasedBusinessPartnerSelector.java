@@ -91,7 +91,7 @@ public class ShareBasedBusinessPartnerSelector implements BusinessPartnerSelecto
 		Map<DistributionCenter, Double> map = new LinkedHashMap<>(weights);
 		Collection<DistributionCenter> res = new ArrayList<>();
 		
-		for (int i = 0; i < n; i++) {
+		while (res.size() < n && !map.isEmpty()) {
 			DiscreteRandomVariable<DistributionCenter> var = new DiscreteRandomVariable<>(map);
 			DistributionCenter dc = var.realization(random.getAsDouble());
 			
@@ -104,11 +104,12 @@ public class ShareBasedBusinessPartnerSelector implements BusinessPartnerSelecto
 	
 	@Override
 	public void printStatistics() {
-		System.out.println("Partner Selector (" + count + " bsnss):");
+		System.out.println("Partner Selector (" + tag + "; " + count + " bsnss):");
 		System.out.println("  Aggregate(" + total +"): " + aggregate);
 		
 		LinkedHashMap<DistributionCenter, Double> weights = computeCurrentWeights();
 		System.out.println("  Weights: " + weights);
+		System.out.println();
 		
 	}
 

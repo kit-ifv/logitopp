@@ -7,10 +7,10 @@ import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 
 public interface BusinessPartnerSelector {
 
-	Collection<DistributionCenter> select(Business business);
+	public Collection<DistributionCenter> select(Business business);
 
-	void printStatistics();
+	public void printStatistics();
 
-	LinkedHashMap<DistributionCenter, Double> computeCurrentWeights();
+	public LinkedHashMap<DistributionCenter, Double> computeCurrentWeights();
 
 }
