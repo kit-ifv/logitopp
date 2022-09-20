@@ -17,8 +17,12 @@ import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
 import edu.kit.ifv.mobitopp.util.dataimport.Row;
 
-public class ParcelDemandCsvReader implements ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> {
+public class PrivateParcelDemandCsvReader implements ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> {
 	
+	private static final String SIZE = "Size";
+	private static final String DISTRIBUTION_CENTER = "DistributionCenter";
+	private static final String DESTINATION_TYPE = "DestinationType";
+	private static final String ARRIVAL_DAY = "ArrivalDay";
 	private final DeliveryResults results;
 	private final CsvFile file;
 	private final Map<Integer, Collection<Row>> rowsPerPerson;
@@ -27,7 +31,7 @@ public class ParcelDemandCsvReader implements ParcelDemandModel<PickUpParcelPers
 	private static final String PERSON_ID = "RecipientID";
 	
 
-	public ParcelDemandCsvReader(CsvFile file, Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
+	public PrivateParcelDemandCsvReader(CsvFile file, Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
 		this.results = results;
 		this.file = file;
 		this.rowsPerPerson = new LinkedHashMap<>();
@@ -58,19 +62,22 @@ public class ParcelDemandCsvReader implements ParcelDemandModel<PickUpParcelPers
 		for (Row row : this.rowsPerPerson.getOrDefault(recipient.getOid(), List.of())) {			
 			PrivateParcelBuilder builder = new PrivateParcelBuilder(recipient, results);
 			
-			InstantValueProvider<Time> arrivalDate = new InstantValueProvider<>(Time.start.plusDays(row.valueAsInteger("ArrivalDay")));
-			builder.setArrivalDate(arrivalDate);
+			Time day = Time.start.plusDays(row.valueAsInteger(ARRIVAL_DAY));
+			builder.setArrivalDate(new InstantValueProvider<>(day));
 			
-			InstantValueProvider<ParcelDestinationType> destinationType = new InstantValueProvider<>(ParcelDestinationType.valueOf(row.get("DestinationType")));
-			builder.setDestinationType(destinationType);
+			ParcelDestinationType destination = ParcelDestinationType.valueOf(row.get(DESTINATION_TYPE));
+			builder.setDestinationType(new InstantValueProvider<>(destination));
 			
-			DistributionCenter distributionCenter = this.distributionCenters.get(row.get("DistributionCenter").trim());
+			DistributionCenter distributionCenter = this.distributionCenters.get(row.get(DISTRIBUTION_CENTER).trim());
 			builder.setDistributionCenter(new InstantValueProvider<DistributionCenter>(distributionCenter));
+			
+			ShipmentSize size = ShipmentSize.valueOf(row.get(SIZE));
+			builder.setSize(new InstantValueProvider<>(size));
 			
 			
 			builder.setConsumer(new InstantValueProvider<>(recipient));
 			builder.setProducer(new InstantValueProvider<>(distributionCenter));
-			builder.setSize(new InstantValueProvider<>(ShipmentSize.SMALL));
+			
 			
 			parcels.add(builder);
 		}
@@ -80,7 +87,7 @@ public class ParcelDemandCsvReader implements ParcelDemandModel<PickUpParcelPers
 
 	@Override
 	public void printStatistics(String label) {
-		//TODO
+		System.out.println(file.getLength() + " parcels for " + rowsPerPerson.size() + " private persons were loaded from csv");
 	}
 
 }
