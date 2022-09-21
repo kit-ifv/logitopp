@@ -13,12 +13,14 @@ import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
+import edu.kit.ifv.mobitopp.time.SimpleTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
 import edu.kit.ifv.mobitopp.util.dataimport.Row;
 
 public class PrivateParcelDemandCsvReader implements ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> {
 	
+	private static final String ARRIVAL_TIME = "ArrivalTime";
 	private static final String SIZE = "Size";
 	private static final String DISTRIBUTION_CENTER = "DistributionCenter";
 	private static final String DESTINATION_TYPE = "DestinationType";
@@ -63,7 +65,12 @@ public class PrivateParcelDemandCsvReader implements ParcelDemandModel<PickUpPar
 			PrivateParcelBuilder builder = new PrivateParcelBuilder(recipient, results);
 			
 			Time day = Time.start.plusDays(row.valueAsInteger(ARRIVAL_DAY));
-			builder.setArrivalDate(new InstantValueProvider<>(day));
+			String[] parts = row.get(ARRIVAL_TIME).split(" ")[2].split(":");
+			day = day.plusHours(Integer.parseInt(parts[0]));
+			day = day.plusMinutes(Integer.parseInt(parts[1]));
+			day = day.plusSeconds(Integer.parseInt(parts[2]));
+			
+			builder.setArrivalDate(new InstantValueProvider<>(day));			
 			
 			ParcelDestinationType destination = ParcelDestinationType.valueOf(row.get(DESTINATION_TYPE));
 			builder.setDestinationType(new InstantValueProvider<>(destination));

@@ -18,6 +18,7 @@ import edu.kit.ifv.mobitopp.util.dataimport.Row;
 
 public class BusinessParcelDemandCsvReader implements ParcelDemandModel<Business, BusinessParcelBuilder> {
 	
+	private static final String ARRIVAL_TIME = "ArrivalTime";
 	private static final String SIZE = "Size";
 	private static final String DISTRIBUTION_CENTER = "DistributionCenter";
 	private static final String ARRIVAL_DAY = "ArrivalDay";
@@ -61,6 +62,11 @@ public class BusinessParcelDemandCsvReader implements ParcelDemandModel<Business
 			BusinessParcelBuilder builder = new BusinessParcelBuilder(recipient, results);
 			
 			Time day = Time.start.plusDays(row.valueAsInteger(ARRIVAL_DAY));
+			String[] parts = row.get(ARRIVAL_TIME).split(" ")[2].split(":");
+			day = day.plusHours(Integer.parseInt(parts[0]));
+			day = day.plusMinutes(Integer.parseInt(parts[1]));
+			day = day.plusSeconds(Integer.parseInt(parts[2]));
+			
 			builder.setArrivalDate(new InstantValueProvider<>(day));
 			
 			DistributionCenter distributionCenter = this.distributionCenters.get(row.get(DISTRIBUTION_CENTER).trim());
