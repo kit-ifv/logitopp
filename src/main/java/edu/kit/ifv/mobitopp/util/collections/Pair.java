@@ -1,5 +1,8 @@
 package edu.kit.ifv.mobitopp.util.collections;
 
+import lombok.ToString;
+
+@ToString
 public class Pair<F,S> {
 
 	private F first;

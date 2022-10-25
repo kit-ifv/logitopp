@@ -102,4 +102,10 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		}
 	}
 
+
+	@Override
+	public Mode getMode() {
+		return mode;
+	}
+
 }

@@ -3,6 +3,7 @@ package edu.kit.ifv.mobitopp.simulation.activityschedule;
 import java.util.Collection;
 
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
+import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.ActivityAsLinkedListElement;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
@@ -58,9 +59,11 @@ public class DeliveryActivityFactory {
 	 */
 	public static PersonPickupActivity createPickupActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate,
 			int duration, int tripDuration, DeliveryPerson person, ZoneAndLocation stopLocation) {
+		
+		Mode mode = person.getDistributionCenter().getTourStrategy().getMode();
 
 		return new PersonPickupActivity(activityCounter--, work.getActivityNrOfWeek(), startDate, duration, tripDuration,
-				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person, stopLocation);
+				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person, stopLocation, mode); //TODO also for pickup
 
 	}
 

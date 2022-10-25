@@ -15,6 +15,7 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
@@ -178,6 +179,11 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		this.deliveryTour = this.deliveryTour.stream().distinct().collect(Collectors.toList());
 
 		this.nextPlan = nextPlan.plusDays(1);
+	}
+
+	@Override
+	public Mode getMode() {
+		return StandardMode.TRUCK;
 	}
 
 }

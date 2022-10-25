@@ -21,12 +21,13 @@ public class PersonPickupActivity extends PickupActivity implements PersonParcel
 	private ActivityAsLinkedListElement activity;
 	
 	public PersonPickupActivity(ActivityAsLinkedListElement activity, ZoneAndLocation stopLocation, Collection<IParcel> parcels, DeliveryAgent agent,
-			Time plannedTime) {
+			Time plannedTime, Mode mode) {
 		super(stopLocation, parcels, agent, plannedTime);
 		this.activity = activity;
 
 		setLocation(stopLocation);
 		setStartDate(plannedTime);
+		setMode(mode);
 	}
 	
 	/**
@@ -47,11 +48,11 @@ public class PersonPickupActivity extends PickupActivity implements PersonParcel
 	 */
 	public PersonPickupActivity(int oid, byte activityNrOfWeek, Time startDate, int duration, int observedTripDuration,
 			float startFlexibility, float endFlexibility, float durationFlexibility, Collection<IParcel> parcels,
-			DeliveryPerson person, ZoneAndLocation stopLocation) {
+			DeliveryPerson person, ZoneAndLocation stopLocation, Mode mode) {
 
 		this(new ActivityAsLinkedListElement(oid, activityNrOfWeek, ActivityType.DELIVER_PARCEL, startDate, duration,
 				observedTripDuration, startFlexibility, endFlexibility, durationFlexibility), stopLocation, parcels, person,
-				 startDate);
+				 startDate, mode);
 	}
 
 	/**

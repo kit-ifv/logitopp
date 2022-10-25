@@ -262,4 +262,9 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 
 	}
 
+	@Override
+	public Mode getMode() {
+		return mode;
+	}
+
 }

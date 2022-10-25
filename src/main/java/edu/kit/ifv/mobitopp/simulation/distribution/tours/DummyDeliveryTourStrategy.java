@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import edu.kit.ifv.mobitopp.simulation.Mode;
+import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
@@ -41,6 +43,11 @@ public class DummyDeliveryTourStrategy implements DeliveryTourAssignmentStrategy
 		
 		return assigned;
 		
+	}
+
+	@Override
+	public Mode getMode() {
+		return StandardMode.TRUCK;
 	}
 
 	
