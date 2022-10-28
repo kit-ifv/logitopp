@@ -35,12 +35,13 @@ public class PersonDeliveryActivity extends DeliveryActivity implements PersonPa
 	 * @param plannedTime 
 	 */
 	private PersonDeliveryActivity(ActivityAsLinkedListElement activity, Collection<IParcel> parcels, DeliveryPerson person,
-			ZoneAndLocation stopLocation, Time plannedTime) {
+			ZoneAndLocation stopLocation, Time plannedTime, Mode mode) {
 		super(stopLocation, new ArrayList<>(parcels), person, plannedTime);
 		this.activity = activity;
 		
 		setLocation(stopLocation);
 		setStartDate(plannedTime);
+		setMode(mode);
 	}
 
 	/**
@@ -61,11 +62,11 @@ public class PersonDeliveryActivity extends DeliveryActivity implements PersonPa
 	 */
 	public PersonDeliveryActivity(int oid, byte activityNrOfWeek, Time startDate, int duration, int observedTripDuration,
 			float startFlexibility, float endFlexibility, float durationFlexibility, Collection<IParcel> parcels,
-			DeliveryPerson person, ZoneAndLocation stopLocation) {
+			DeliveryPerson person, ZoneAndLocation stopLocation, Mode mode) {
 
 		this(new ActivityAsLinkedListElement(oid, activityNrOfWeek, ActivityType.DELIVER_PARCEL, startDate, duration,
 				observedTripDuration, startFlexibility, endFlexibility, durationFlexibility), parcels, person,
-				stopLocation, startDate);
+				stopLocation, startDate, mode);
 	}
 
 	/**

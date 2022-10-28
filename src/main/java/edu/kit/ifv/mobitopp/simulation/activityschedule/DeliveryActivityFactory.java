@@ -38,8 +38,10 @@ public class DeliveryActivityFactory {
 	public static PersonDeliveryActivity createDeliveryActivity(Collection<IParcel> parcels, ActivityIfc work, Time startDate,
 			int duration, int tripDuration, DeliveryPerson person, ZoneAndLocation stopLocation) {
 
+		Mode mode = person.getDistributionCenter().getTourStrategy().getMode();
+		
 		return new PersonDeliveryActivity(activityCounter--, work.getActivityNrOfWeek(), startDate, duration, tripDuration,
-				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person, stopLocation);
+				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person, stopLocation, mode);
 
 	}
 	
@@ -63,7 +65,7 @@ public class DeliveryActivityFactory {
 		Mode mode = person.getDistributionCenter().getTourStrategy().getMode();
 
 		return new PersonPickupActivity(activityCounter--, work.getActivityNrOfWeek(), startDate, duration, tripDuration,
-				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person, stopLocation, mode); //TODO also for pickup
+				work.startFlexibility(), work.endFlexibility(), work.durationFlexibility(), parcels, person, stopLocation, mode);
 
 	}
 
