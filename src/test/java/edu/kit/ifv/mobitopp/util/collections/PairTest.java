@@ -92,4 +92,11 @@ public class PairTest {
 		assertFalse(pair.equals(new Pair<>("hola", "mundo")));
 	}
 	
+	@Test
+	public void convertToString() {
+		Pair<String,String> pair = new Pair<>("hello", "world");
+
+		assertEquals("Pair(first=hello, second=world)", pair.toString());
+	}
+	
 }

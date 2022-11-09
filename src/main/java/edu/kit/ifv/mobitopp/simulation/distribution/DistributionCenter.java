@@ -176,8 +176,9 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 
 	@Override
 	public void removeParcel(IParcel parcel) {
-		this.currentParcels.remove(parcel);
+		this.currentParcels.remove(parcel);//should not be called
 	}
+	
 
 	@Override
 	public void addDelivered(IParcel parcel) {
@@ -235,6 +236,14 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 	@Override
 	public String toString() {
 		return this.name;
+	}
+	
+	public int currentDeliveryDemand() {
+		return currentParcels.size();
+	}
+	
+	public int currentShippingDemand() {
+		return pickupRequests.size();
 	}
 
 }

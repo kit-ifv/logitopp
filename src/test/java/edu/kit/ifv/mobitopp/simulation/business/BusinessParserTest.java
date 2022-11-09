@@ -29,5 +29,20 @@ public class BusinessParserTest {
 		
 		assertEquals(100, businesses.size());
 	}
+	
+	@Test
+	public void parserWithMissingTime() {
+		
+		CsvFile file = CsvFile.createFrom("src/test/resources/businesses_without_time.csv");
+		
+		Zone zone = mock(Zone.class);
+		ZoneRepository repo = mock(ZoneRepository.class);
+		when(repo.getByExternalId(any())).thenReturn(zone);
+		
+		BusinessParser parser = new BusinessParser(repo);
+		Collection<BusinessBuilder> businesses = parser.parse(file, 42);
+		
+		assertEquals(100, businesses.size());
+	}
 
 }
