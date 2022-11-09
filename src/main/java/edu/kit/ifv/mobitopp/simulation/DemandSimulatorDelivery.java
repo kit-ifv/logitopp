@@ -3,6 +3,7 @@ package edu.kit.ifv.mobitopp.simulation;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityPeriodFixer;
@@ -13,6 +14,7 @@ import edu.kit.ifv.mobitopp.simulation.demand.BusinessParcelDemandModelBuilder;
 import edu.kit.ifv.mobitopp.simulation.demand.ParcelDemandModel;
 import edu.kit.ifv.mobitopp.simulation.demand.PrivateParcelDemandModelBuilder;
 import edu.kit.ifv.mobitopp.simulation.destinationChoice.DestinationChoiceModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
@@ -260,8 +262,9 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		this.businessProductionModel.printStatistics("produced");
 		
 		
-		this.businesses.stream().filter(businessDemandFilter).filter(b -> b.getDemandQuantity().getConsumption() > 0).forEach(deliverySelector::select);
-		this.businesses.stream().filter(businessProductionFilter).filter(b -> b.getDemandQuantity().getProduction() > 0).forEach(shippingSelector::select);
+		
+		this.businesses.stream().filter(businessDemandFilter).filter(b -> b.getDemandQuantity().getConsumption() > 0).forEach(b -> deliverySelector.select(b).forEach(b::addDeliveryPartner) );// deliverySelector::select);
+		this.businesses.stream().filter(businessProductionFilter).filter(b -> b.getDemandQuantity().getProduction() > 0).forEach(b -> shippingSelector.select(b).forEach(b::addShippingPartner));
 		
 		deliverySelector.printStatistics();
 		shippingSelector.printStatistics();
