@@ -4,40 +4,50 @@ import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvide
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 
 /**
- * The Interface ParcelAgent.
+ * The Interface ParcelAgent provides methods for interacting with entities that may produce and/or receive parcels.
  */
 public interface ParcelAgent {
 
+	/**
+	 * Gets the agent's demand quantity.
+	 *
+	 * @return the demand quantity
+	 */
 	public DemandQuantity getDemandQuantity();
 
 	/**
-	 * Removes the parcel.
+	 * Removes the given parcel from the agent's production set.
 	 *
 	 * @param parcel the parcel
 	 */
 	public void removeParcel(IParcel parcel);
 
 	/**
-	 * Adds the parcel.
+	 * Adds the given parcel from the agent's production set.
 	 *
 	 * @param parcel the parcel
 	 */
 	public void addParcel(IParcel parcel);
 
 	/**
-	 * Gets the policy provider.
+	 * Gets the agent's policy provider.
 	 *
 	 * @return the policy provider
 	 */
 	public ParcelPolicyProvider getPolicyProvider();
 
 	/**
-	 * Adds the delivered.
+	 * Adds the given parcel as delivered.
 	 *
-	 * @param parcel the parcel
+	 * @param parcel the delivered parcel
 	 */
 	public void addDelivered(IParcel parcel);
 		
+	/**
+	 * Gets the zone and location of the agent.
+	 *
+	 * @return the zone and location
+	 */
 	public ZoneAndLocation getZoneAndLocation();
 
 }

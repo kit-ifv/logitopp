@@ -30,8 +30,8 @@ public class DeliveryResults {
 	private final static Category resultCategoryEmployee = createResultCategoryEmployee();
 	private final static Category resultCategoryRescheduling = createResultCategoryRescheduling();
 	private final static Category resultCategoryNeighbordeliveries = createResultCategoryNeighborDeliveries();
-	
-	private final static Category resultCategoryPartners = createRestutCategoryPartners();
+
+	private final static Category resultCategoryPartners = createResultCategoryPartners();
 
 	@Getter
 	private Results results;
@@ -47,12 +47,12 @@ public class DeliveryResults {
 	}
 
 	/**
-	 * Log a parcels new state.
+	 * Log change of private parcel state.
 	 *
 	 * @param parcel      the parcel
 	 * @param deliveryGuy the delivery guy
 	 * @param currentTime the current time
-	 * @param isAttempt   the is attempt
+	 * @param isAttempt   whether the state change was a delivery attempt
 	 */
 	public void logChange(PrivateParcel parcel, DeliveryAgent deliveryGuy, Time currentTime, boolean isAttempt) {
 		String msg = "";
@@ -75,7 +75,8 @@ public class DeliveryResults {
 	/**
 	 * Creates the result category for parcel-states results.
 	 *
-	 * @return the category
+	 * @return the result category defining the header for private parcel state
+	 *         changes
 	 */
 	public static Category createResultCategoryStatePrivate() {
 		return new Category("parcel-states",
@@ -85,12 +86,12 @@ public class DeliveryResults {
 	}
 
 	/**
-	 * Log change of parcel state.
+	 * Log change of business parcel state.
 	 *
 	 * @param parcel      the parcel
 	 * @param deliveryGuy the delivery guy
 	 * @param currentTime the current time
-	 * @param isAttempt   the is attempt
+	 * @param isAttempt   whether the state change was a delivery attempt
 	 */
 	public void logChange(BusinessParcel parcel, DeliveryAgent deliveryGuy, Time currentTime, boolean isAttempt) {
 		String msg = "";
@@ -102,6 +103,7 @@ public class DeliveryResults {
 		msg += isAttempt + SEP;
 		msg += ((deliveryGuy != null) ? deliveryGuy.getOid() : "NULL") + SEP;
 		msg += parcel.getProducer().toString() + SEP;
+		msg += parcel.getConsumer().toString() + SEP;
 		msg += parcel.getDeliveryAttempts() + SEP;
 		msg += String.valueOf(parcel.getDeliveryTime()) + SEP;
 		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + SEP;
@@ -113,23 +115,26 @@ public class DeliveryResults {
 	/**
 	 * Creates the result category state business.
 	 *
-	 * @return the category
+	 * @return the result category which defines the header for business parcel
+	 *         state changes
 	 */
 	public static Category createResultCategoryStateBusiness() {
 		return new Category("business-parcel-states",
 				Arrays.asList("Time", "ParcelID", "ZoneId", "Location", "State", "IsDeliveryAttempt", "DeliveryGuyID",
-						"Producer", "DeliveryAttempts", "DeliveryTime", "RecipientType", "ParcelDestinationZone"));
+						"Producer", "Consumer", "DeliveryAttempts", "DeliveryTime", "RecipientType",
+						"ParcelDestinationZone"));
 	}
 
 	/**
-	 * Logs the order of the given parcel.
+	 * Logs the order of the given private parcel.
 	 *
 	 * @param parcel the ordered parcel
 	 */
 	public void logPrivateOrder(PrivateParcel parcel) {
-		this.logPrivateOrder(parcel.getOId(), parcel.getPerson().getOid() + "", parcel.getShipmentSize(), parcel.getDestinationType().name(),
-				parcel.getPlannedArrivalDate().getDay() + "", parcel.getProducer().toString(),
-				parcel.getPlannedArrivalDate(), parcel.getZoneAndLocation(), parcel.getProducer().getZoneAndLocation());
+		this.logPrivateOrder(parcel.getOId(), parcel.getPerson().getOid() + "", parcel.getShipmentSize(),
+				parcel.getDestinationType().name(), parcel.getPlannedArrivalDate().getDay() + "",
+				parcel.getProducer().toString(), parcel.getPlannedArrivalDate(), parcel.getZoneAndLocation(),
+				parcel.getProducer().getZoneAndLocation());
 	}
 
 	/**
@@ -137,14 +142,14 @@ public class DeliveryResults {
 	 *
 	 * @param pid                the pid
 	 * @param recipient          the recipient
-	 * @param shipmentSize		 the shipment size
+	 * @param shipmentSize       the shipment size
 	 * @param destination        the destination
 	 * @param day                the day
 	 * @param distributionCenter the distribution center
 	 * @param currentTime        the current time
 	 */
-	private void logPrivateOrder(int pid, String recipient, ShipmentSize shipmentSize, String destination, String day, String distributionCenter,
-			Time currentTime, ZoneAndLocation recipientLoc, ZoneAndLocation dcLoc) {
+	private void logPrivateOrder(int pid, String recipient, ShipmentSize shipmentSize, String destination, String day,
+			String distributionCenter, Time currentTime, ZoneAndLocation recipientLoc, ZoneAndLocation dcLoc) {
 		String msg = "";
 
 		msg += pid + SEP;
@@ -157,11 +162,9 @@ public class DeliveryResults {
 		msg += day + SEP;
 		msg += currentTime.toString() + SEP;
 		msg += distributionCenter + SEP;
-		msg += distributionCenter + SEP;
 		msg += dcLoc.zone().getId().getExternalId() + SEP;
 		msg += dcLoc.location().coordinatesP().getX() + SEP;
 		msg += dcLoc.location().coordinatesP().getY();
-		
 
 		this.results.write(resultCategoryPrivateOrder, msg);
 	}
@@ -172,8 +175,9 @@ public class DeliveryResults {
 	 * @return the category
 	 */
 	public static Category createResultCategoryPrivateOrder() {
-		return new Category("parcel-orders-private", Arrays.asList("ParcelID", "Size", "RecipientID", "DestinationType", "DestinationZone", "DestinationX", "DestinationY",
-				"ArrivalDay", "ArrivalTime", "DistributionCenter", "DeliveryService", "DcZone", "DcX", "DcY"));
+		return new Category("parcel-orders-private",
+				Arrays.asList("ParcelID", "Size", "RecipientID", "DestinationType", "DestinationZone", "DestinationX",
+						"DestinationY", "ArrivalDay", "ArrivalTime", "DistributionCenter", "DcZone", "DcX", "DcY"));
 	}
 
 	/**
@@ -184,17 +188,17 @@ public class DeliveryResults {
 	public void logBusinessOrder(BusinessParcel parcel) {
 		ZoneAndLocation producerLoc = parcel.getProducer().getZoneAndLocation();
 		ZoneAndLocation consumerLoc = parcel.getConsumer().getZoneAndLocation();
-		
+
 		Category category = resultCategoryBusinessProduction;
-		
+
 		if (parcel.getConsumer().equals(parcel.getBusiness())) {
 			category = resultCategoryBusinessOrder;
 		}
-		
+
 		this.logBusinessOrder(parcel.getOId(), parcel.getShipmentSize(), parcel.getProducer().toString(),
 				parcel.getConsumer().toString(), producerLoc.zone().getId().getExternalId(), producerLoc.location(),
 				consumerLoc.zone().getId().getExternalId(), consumerLoc.location(),
-				parcel.getPlannedArrivalDate().getDay() + "",  parcel.getPlannedArrivalDate(), category);
+				parcel.getPlannedArrivalDate().getDay() + "", parcel.getPlannedArrivalDate(), category);
 	}
 
 	/**
@@ -207,10 +211,11 @@ public class DeliveryResults {
 	 * @param from        the producer
 	 * @param to          the consumer
 	 * @param currentTime the current time
-	 * @param category 	  the result category
+	 * @param category    the result category
 	 */
-	private void logBusinessOrder(int pid, ShipmentSize size, String from, String to, String zoneIdFrom, Location locationFrom, String zoneIdTo,
-			Location locationTo, String day,  Time currentTime, Category category) {
+	private void logBusinessOrder(int pid, ShipmentSize size, String from, String to, String zoneIdFrom,
+			Location locationFrom, String zoneIdTo, Location locationTo, String day, Time currentTime,
+			Category category) {
 		String msg = "";
 
 		msg += pid + SEP;
@@ -225,7 +230,6 @@ public class DeliveryResults {
 		msg += locationTo.coordinate.getY() + SEP;
 		msg += day + SEP;
 		msg += currentTime;
-		
 
 		this.results.write(category, msg);
 	}
@@ -240,7 +244,7 @@ public class DeliveryResults {
 				Arrays.asList("ParcelID", "Size", "From", "To", "FromZoneId", "FromLocationX", "FromLocationY",
 						"ToZoneId", "ToLocationX", "ToLocationY", "ArrivalDay", "ArrivalTime"));
 	}
-	
+
 	/**
 	 * Creates the result category order for business parcel-production results.
 	 *
@@ -347,10 +351,22 @@ public class DeliveryResults {
 				Arrays.asList("Delivery", "Zone", "Time", "Day", "Success", "NumberOfNeighbors", "CheckedNeighbors"));
 	}
 
-	
-	public void logBusinessPartner(Business business, DistributionCenter dc, String tag,  int demand, double relativeCapacity, double estimatedDemand, int numOfPartners) {
+	/**
+	 * Log potential business partner.
+	 *
+	 * @param business         the business
+	 * @param dc               the distribution center
+	 * @param tag              the tag to identify the context of the partnership
+	 * @param demand           the parcel demand of the given business
+	 * @param relativeCapacity the relative capacity of the given business
+	 * @param estimatedDemand  the estimated demand of the given business
+	 * @param numOfPartners    the number of selected partners for the given
+	 *                         business
+	 */
+	public void logBusinessPartner(Business business, DistributionCenter dc, String tag, int demand,
+			double relativeCapacity, double estimatedDemand, int numOfPartners) {
 		String msg = "";
-		
+
 		msg += business.getId() + SEP;
 		msg += business.getSector().asInt() + SEP;
 		msg += dc.getName() + SEP;
@@ -360,13 +376,18 @@ public class DeliveryResults {
 		msg += relativeCapacity + SEP;
 		msg += estimatedDemand + SEP;
 		msg += numOfPartners;
-		
+
 		results.write(resultCategoryPartners, msg);
 	}
-	
-	private static Category createRestutCategoryPartners() {
-		return new Category("business_partners",
-				Arrays.asList("Business", "Sector", "DictributionCenter", "DcId", "Tag", "BusinessDemand", "CapacityFactor", "EstimatedDemand", "NumOfPartners"));
+
+	/**
+	 * Creates the result category partners.
+	 *
+	 * @return the result category which defines the header for partners of businesses
+	 */
+	private static Category createResultCategoryPartners() {
+		return new Category("business_partners", Arrays.asList("Business", "Sector", "DictributionCenter", "DcId",
+				"Tag", "BusinessDemand", "CapacityFactor", "EstimatedDemand", "NumOfPartners"));
 	}
 
 }
