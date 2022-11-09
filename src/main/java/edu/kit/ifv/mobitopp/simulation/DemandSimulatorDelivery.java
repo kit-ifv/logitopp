@@ -47,7 +47,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	private final DeliveryResults deliveryResults;
 
 	@Setter
-	private boolean onlyDemand = false;
+	private boolean skipSimulation = false;
 
 	/**
 	 * Instantiates a new demand simulator delivery.
@@ -213,7 +213,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 
 		initBusinessDemand();
 		
-		if (onlyDemand) {
+		if (skipSimulation) {
 			this.schedulerHook.flushAllParcels();
 			System.out.println("Generated Demand Only");
 			System.exit(0);

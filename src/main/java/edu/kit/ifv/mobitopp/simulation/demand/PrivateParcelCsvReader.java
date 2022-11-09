@@ -13,12 +13,11 @@ import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
-import edu.kit.ifv.mobitopp.time.SimpleTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
 import edu.kit.ifv.mobitopp.util.dataimport.Row;
 
-public class PrivateParcelDemandCsvReader implements ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> {
+public class PrivateParcelCsvReader implements ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> {
 	
 	private static final String ARRIVAL_TIME = "ArrivalTime";
 	private static final String SIZE = "Size";
@@ -33,7 +32,7 @@ public class PrivateParcelDemandCsvReader implements ParcelDemandModel<PickUpPar
 	private static final String PERSON_ID = "RecipientID";
 	
 
-	public PrivateParcelDemandCsvReader(CsvFile file, Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
+	public PrivateParcelCsvReader(CsvFile file, Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
 		this.results = results;
 		this.file = file;
 		this.rowsPerPerson = new LinkedHashMap<>();

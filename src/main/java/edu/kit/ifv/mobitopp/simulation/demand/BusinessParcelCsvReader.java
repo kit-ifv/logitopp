@@ -16,7 +16,7 @@ import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
 import edu.kit.ifv.mobitopp.util.dataimport.Row;
 
-public class BusinessParcelDemandCsvReader implements ParcelDemandModel<Business, BusinessParcelBuilder> {
+public class BusinessParcelCsvReader implements ParcelDemandModel<Business, BusinessParcelBuilder> {
 	
 	private static final String ARRIVAL_TIME = "ArrivalTime";
 	private static final String SIZE = "Size";
@@ -29,11 +29,14 @@ public class BusinessParcelDemandCsvReader implements ParcelDemandModel<Business
 	
 	private static final String BUSINESS_ID = "To";
 	
+	private boolean forProduction;
 
-	public BusinessParcelDemandCsvReader(CsvFile file, Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
+	public BusinessParcelCsvReader(CsvFile file, Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
 		this.results = results;
 		this.file = file;
+		this.forProduction = false;
 		this.rowsPerBusiness = new LinkedHashMap<>();
+		
 		fillMap();
 		
 		this.distributionCenters = new LinkedHashMap<>();
@@ -75,10 +78,15 @@ public class BusinessParcelDemandCsvReader implements ParcelDemandModel<Business
 			ShipmentSize size = ShipmentSize.valueOf(row.get(SIZE));
 			builder.setSize(new InstantValueProvider<>(size));
 			
-			builder.setConsumer(new InstantValueProvider<>(recipient));
-			builder.setProducer(new InstantValueProvider<>(distributionCenter));
-			
-			
+			if (forProduction) {
+				builder.setConsumer(new InstantValueProvider<>(distributionCenter));
+				builder.setProducer(new InstantValueProvider<>(recipient));
+				
+			} else {
+				builder.setConsumer(new InstantValueProvider<>(recipient));
+				builder.setProducer(new InstantValueProvider<>(distributionCenter));
+			}
+
 			parcels.add(builder);
 		}
 		
@@ -88,6 +96,16 @@ public class BusinessParcelDemandCsvReader implements ParcelDemandModel<Business
 	@Override
 	public void printStatistics(String label) {
 		System.out.println(file.getLength() + " parcels for " + rowsPerBusiness.size() + " businesses were loaded from csv");
+	}
+
+	public BusinessParcelCsvReader forProduction() {
+		this.forProduction = true;
+		return this;
+	}
+	
+	public BusinessParcelCsvReader forConsumption() {
+		this.forProduction = false;
+		return this;
 	}
 
 }
