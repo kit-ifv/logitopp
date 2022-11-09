@@ -354,6 +354,7 @@ public class DeliveryResults {
 		msg += business.getId() + SEP;
 		msg += business.getSector().asInt() + SEP;
 		msg += dc.getName() + SEP;
+		msg += dc.getId() + SEP;
 		msg += tag + SEP;
 		msg += demand + SEP;
 		msg += relativeCapacity + SEP;
@@ -365,7 +366,7 @@ public class DeliveryResults {
 	
 	private static Category createRestutCategoryPartners() {
 		return new Category("business_partners",
-				Arrays.asList("Business", "Sector", "DictributionCenter", "Tag", "BusinessDemand", "CapacityFactor", "EstimatedDemand", "NumOfPartners"));
+				Arrays.asList("Business", "Sector", "DictributionCenter", "DcId", "Tag", "BusinessDemand", "CapacityFactor", "EstimatedDemand", "NumOfPartners"));
 	}
 
 }
