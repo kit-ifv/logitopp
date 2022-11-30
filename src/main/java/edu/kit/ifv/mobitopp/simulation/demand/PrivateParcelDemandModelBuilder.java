@@ -7,91 +7,177 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
+import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.LatentModelStepWarpper;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedParcelDestinationSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 
-public class PrivateParcelDemandModelBuilder extends ParcelDemandModelBuilder<PickUpParcelPerson, PrivateParcelBuilder> {
-	
-	
+/**
+ * The Class PrivateParcelDemandModelBuilder is a
+ * {@link ParcelDemandModelBuilder} for {@link PrivateParcel}s and
+ * {@link PickUpParcelPerson private} {@link ParcelAgent}s.
+ */
+public class PrivateParcelDemandModelBuilder
+		extends ParcelDemandModelBuilder<PickUpParcelPerson, PrivateParcelBuilder> {
+
+	/**
+	 * Creates a new {@link PrivateParcelDemandModelBuilder builder} for private
+	 * person parcels using the persons' random number generator and a
+	 * {@link PrivateParcelBuilder} as factory.
+	 *
+	 * @param results the results
+	 * @return the private parcel demand model builder
+	 */
 	public static PrivateParcelDemandModelBuilder forPrivateParcels(DeliveryResults results) {
 		PrivateParcelDemandModelBuilder builder = new PrivateParcelDemandModelBuilder();
-		
+
 		builder.useRandom(p -> p::getNextRandom);
 		builder.useParcelFactory(a -> new PrivateParcelBuilder(a, results));
-		
+
 		return builder;
 	}
-	
-	public <T> PrivateParcelDemandModelBuilder addPrivateStep(ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, T> step, BiConsumer<PrivateParcelBuilder, ValueProvider<T>> propertySetter) {
+
+	/**
+	 * Adds the private {@link ParcelDemandModelStep demand model step}.
+	 *
+	 * @param <T>            the generic type of the property
+	 * @param step           the model step
+	 * @param propertySetter the property setter
+	 * @return the private parcel demand model builder
+	 */
+	public <T> PrivateParcelDemandModelBuilder addPrivateStep(
+			ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, T> step,
+			BiConsumer<PrivateParcelBuilder, ValueProvider<T>> propertySetter) {
 		verifyAndInitialize();
-		
+
 		ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, T> nextStep;
 		if (nextIsLatent) {
 			nextStep = new LatentModelStepWarpper<>(step);
-			
+
 		} else {
 			nextStep = step;
 		}
 		nextIsLatent = false;
-		
+
 		this.parcelOrderModel.add(nextStep, propertySetter);
-		
+
 		return this;
 	}
-	
-	
-	
-	public PrivateParcelDemandModelBuilder customParcelDestinationSelection(ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, ParcelDestinationType> step) {
+
+	/**
+	 * Add a custom {@link ParcelDestinationType parcel destination} selection model
+	 * step.
+	 *
+	 * @param step the parcel destination model step
+	 * @return the private parcel demand model builder
+	 */
+	public PrivateParcelDemandModelBuilder customParcelDestinationSelection(
+			ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, ParcelDestinationType> step) {
 		return this.addPrivateStep(step, PrivateParcelBuilder::setDestinationType);
 	}
-	
+
+	/**
+	 * Add the equal {@link ParcelDestinationType parcel destination} selection
+	 * model step with the given work-zone filter and equal shares of all
+	 * {@link ParcelDestinationType destination types}.
+	 *
+	 * @param workZoneFilter the work zone filter, outside which WORK is not a valid
+	 *                       option
+	 * @return the private parcel demand model builder
+	 */
 	public PrivateParcelDemandModelBuilder equalParcelDestinationSelection(Predicate<Zone> workZoneFilter) {
 		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector(workZoneFilter));
 	}
-	
+
+	/**
+	 * Add the equal {@link ParcelDestinationType parcel destination} selection
+	 * model step using equal shares of all {@link ParcelDestinationType destination
+	 * types}.
+	 *
+	 * @return the private parcel demand model builder
+	 */
 	public PrivateParcelDemandModelBuilder equalParcelDestinationSelection() {
 		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector());
 	}
 
-	public PrivateParcelDemandModelBuilder shareBasedParcelDestinationSelection(Map<ParcelDestinationType, Double> shares) {
+	/**
+	 * Add the share based {@link ParcelDestinationType parcel destination}
+	 * selection model step using the given shares.
+	 *
+	 * @param shares the shares of the {@link ParcelDestinationType destination
+	 *               types}
+	 * @return the private parcel demand model builder
+	 */
+	public PrivateParcelDemandModelBuilder shareBasedParcelDestinationSelection(
+			Map<ParcelDestinationType, Double> shares) {
 		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector(shares));
 	}
-	
-	public PrivateParcelDemandModelBuilder shareBasedParcelDestinationSelection(Map<ParcelDestinationType, Double> shares, Predicate<Zone> workZoneFilter) {
+
+	/**
+	 * Add the share based {@link ParcelDestinationType parcel destination}
+	 * selection model step using the given shares and the given work-zone filter.
+	 *
+	 * @param shares         the shares of the {@link ParcelDestinationType destination
+	 *               types}
+	 * @param workZoneFilter the work zone filter, outside which WORK is not a valid
+	 *                       option
+	 * @return the private parcel demand model builder
+	 */
+	public PrivateParcelDemandModelBuilder shareBasedParcelDestinationSelection(
+			Map<ParcelDestinationType, Double> shares, Predicate<Zone> workZoneFilter) {
 		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector(shares, workZoneFilter));
 	}
-	
-	
-	
-	
-	
-	public static ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> defaultPrivateParcelModel(Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
+
+	/**
+	 * Builds the default private parcel model using a trivial zone filter
+	 * (true).
+	 *
+	 * @param distributionCenters the distribution centers
+	 * @param results             the results
+	 * @return the parcel demand model
+	 */
+	public static ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> defaultPrivateParcelModel(
+			Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
 		return defaultPrivateParcelModel(distributionCenters, z -> true, results);
 	}
-	
-	public static ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> defaultPrivateParcelModel(Collection<DistributionCenter> distributionCenters, Predicate<Zone> workZoneFilter, DeliveryResults results) {
+
+	/**
+	 * Builds the default private parcel model.
+	 *
+	 * @param distributionCenters the distribution centers
+	 * @param workZoneFilter      the work zone filter, outside which WORK-delivery is not a valid
+	 *                       option
+	 * @param results             the results
+	 * @return the parcel demand model
+	 */
+	public static ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> defaultPrivateParcelModel(
+			Collection<DistributionCenter> distributionCenters, Predicate<Zone> workZoneFilter,
+			DeliveryResults results) {
 		PrivateParcelDemandModelBuilder builder = forPrivateParcels(results);
-		
+
 		builder.useNormalDistributionNumberSelector(0.65, 0.5, 1, 10);
-		
+
 		return builder.equalParcelDestinationSelection(workZoneFilter)
-					  .deliveryShareBasedDistributionCenterSelection(distributionCenters)
-					  .useDistributionCenterAsProducer()
-					  .useAgentAsConsumer()
-					//.equalServiceProviderSelection(List.of("Dummy Delivery Service"))
-					  .randomArrivalDaySelectionExcludeSunday()
-					  .build();
+				.privateShareBasedDistributionCenterSelection(distributionCenters).useDistributionCenterAsProducer()
+				.useAgentAsConsumer()
+				// .equalServiceProviderSelection(List.of("Dummy Delivery Service"))
+				.randomArrivalDaySelectionExcludeSunday().build();
 	}
-	
-	public static ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> nullPrivateParcelModel(DeliveryResults results) {
-		return forPrivateParcels(results)
-					.useNullNumberSelector()
-					.build();
+
+	/**
+	 * Builds the null private parcel model which generates no parcel demand.
+	 *
+	 * @param results the results
+	 * @return the parcel demand model
+	 */
+	public static ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> nullPrivateParcelModel(
+			DeliveryResults results) {
+		return forPrivateParcels(results).useNullNumberSelector().build();
 	}
 }

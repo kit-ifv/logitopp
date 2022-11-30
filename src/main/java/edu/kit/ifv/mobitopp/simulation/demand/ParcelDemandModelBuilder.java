@@ -166,13 +166,13 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 		return this.selectShareBased(distributionCenters, ParcelBuilder::setDistributionCenter);
 	}
 
-	public ParcelDemandModelBuilder<A,P> deliveryShareBasedDistributionCenterSelection(Collection<DistributionCenter> distributionCenters) {
-		Map<DistributionCenter, Double> shares = distributionCenters.stream().collect(toMap(Function.identity(), DistributionCenter::getShareDelivery));
+	public ParcelDemandModelBuilder<A,P> privateShareBasedDistributionCenterSelection(Collection<DistributionCenter> distributionCenters) {
+		Map<DistributionCenter, Double> shares = distributionCenters.stream().collect(toMap(Function.identity(), DistributionCenter::getSharePrivate));
 		return this.selectShareBased(shares, ParcelBuilder::setDistributionCenter);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> shippingShareBasedDistributionCenterSelection(Collection<DistributionCenter> distributionCenters) {
-		Map<DistributionCenter, Double> shares = distributionCenters.stream().collect(toMap(Function.identity(), DistributionCenter::getShareShipping));
+	public ParcelDemandModelBuilder<A,P> businessShareBasedDistributionCenterSelection(Collection<DistributionCenter> distributionCenters) {
+		Map<DistributionCenter, Double> shares = distributionCenters.stream().collect(toMap(Function.identity(), DistributionCenter::getShareBusiness));
 		return this.selectShareBased(shares, ParcelBuilder::setDistributionCenter);
 	}
 	

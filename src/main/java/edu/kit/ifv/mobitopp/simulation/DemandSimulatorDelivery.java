@@ -3,7 +3,6 @@ package edu.kit.ifv.mobitopp.simulation;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityPeriodFixer;
@@ -14,7 +13,6 @@ import edu.kit.ifv.mobitopp.simulation.demand.BusinessParcelDemandModelBuilder;
 import edu.kit.ifv.mobitopp.simulation.demand.ParcelDemandModel;
 import edu.kit.ifv.mobitopp.simulation.demand.PrivateParcelDemandModelBuilder;
 import edu.kit.ifv.mobitopp.simulation.destinationChoice.DestinationChoiceModel;
-import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.events.EventQueue;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
@@ -38,8 +36,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	private final Collection<Business> businesses;
 	private final Predicate<Business> businessDemandFilter;
 	private final Predicate<Business> businessProductionFilter;
-	private final BusinessPartnerSelector deliverySelector;
-	private final BusinessPartnerSelector shippingSelector;
+	private final BusinessPartnerSelector partnerSelector;
 
 	private final ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> privateDemandModel;
 	private final ParcelDemandModel<Business, BusinessParcelBuilder> businessDemandModel;
@@ -74,6 +71,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param businessDemandFilter       the business demand filter
 	 * @param businessProductionFilter   the business production filter
 	 * @param businesses                 the businesses
+	 * @param partnerSelector            the cep-partner selector for businesses
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
@@ -88,8 +86,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			final ParcelDemandModel<Business, BusinessParcelBuilder> businessProductionModel,
 			final DeliveryResults results, final Predicate<Person> personFilter,
 			final Predicate<Business> businessDemandFilter, final Predicate<Business> businessProductionFilter,
-			final Collection<Business> businesses, final BusinessPartnerSelector deliverySelector,
-			final BusinessPartnerSelector shippingSelector) {
+			final Collection<Business> businesses, final BusinessPartnerSelector partnerSelector) {
 
 		super(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
 				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory.getDefaultFactory());
@@ -104,8 +101,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		this.deliveryResults = results;
 		this.schedulerHook = new ParcelSchedulerHook(false);
 		this.businesses = businesses;
-		this.deliverySelector = deliverySelector;
-		this.shippingSelector = shippingSelector;
+		this.partnerSelector = partnerSelector;
 
 		this.schedulerHook.register(this);
 	}
@@ -129,6 +125,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param results                    the results
 	 * @param personFilter               the person filter
 	 * @param businesses                 the businesses
+	 * @param partnerSelector            the cep-partner selector for businesses
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
@@ -141,13 +138,12 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			final ParcelDemandModel<Business, BusinessParcelBuilder> businessDemandModel,
 			final ParcelDemandModel<Business, BusinessParcelBuilder> businessProductionModel,
 			final DeliveryResults results, final Predicate<Person> personFilter, final Collection<Business> businesses,
-			final BusinessPartnerSelector deliverySelector, final BusinessPartnerSelector shippingSelector) {
+			final BusinessPartnerSelector partnerSelector) {
 
 		this(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
 				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory,
 				PrivateParcelDemandModelBuilder.nullPrivateParcelModel(results), businessDemandModel,
-				businessProductionModel, results, personFilter, b -> true, b -> true, businesses, deliverySelector,
-				shippingSelector);
+				businessProductionModel, results, personFilter, b -> true, b -> true, businesses, partnerSelector);
 	}
 
 	/**
@@ -167,6 +163,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param results                    the results
 	 * @param personFilter               the person filter
 	 * @param businesses                 the businesses
+	 * @param partnerSelector            the cep-partner selector for businesses
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
@@ -177,15 +174,14 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 
 			final DeliveryPersonFactory personFactory, final DeliveryResults results,
 			final Predicate<Person> personFilter, Collection<Business> businesses,
-			final BusinessPartnerSelector deliverySelector,
-			final BusinessPartnerSelector shippingSelector) {
+			final BusinessPartnerSelector partnerSelector) {
 
 		this(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
 				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory,
 				PrivateParcelDemandModelBuilder.nullPrivateParcelModel(results),
 				BusinessParcelDemandModelBuilder.nullBusinessParcelOrderModel(results),
 				BusinessParcelDemandModelBuilder.nullBusinessParcelOrderModel(results), results, personFilter,
-				b -> true, b -> true, businesses, deliverySelector, shippingSelector);
+				b -> true, b -> true, businesses, partnerSelector);
 	}
 
 	/**
@@ -204,7 +200,8 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			PersonListener listener, Set<Mode> modesInSimulation, PersonState initialState) {
 
 		Consumer<Person> createAgent = p -> {
-			PickUpParcelPerson ppp = createSimulatedPerson(queue, boarder, seed, p, listener, modesInSimulation, initialState);
+			PickUpParcelPerson ppp = createSimulatedPerson(queue, boarder, seed, p, listener, modesInSimulation,
+					initialState);
 			createPrivateParcelDemand(ppp).forEach(schedulerHook::addParcel);
 		};
 
@@ -214,7 +211,7 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		personLoader().clearInput();
 
 		initBusinessDemand();
-		
+
 		if (skipSimulation) {
 			this.schedulerHook.flushAllParcels();
 			System.out.println("Generated Demand Only");
@@ -260,14 +257,11 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		});
 
 		this.businessProductionModel.printStatistics("produced");
-		
-		
-		
-		this.businesses.stream().filter(businessDemandFilter).filter(b -> b.getDemandQuantity().getConsumption() > 0).forEach(b -> deliverySelector.select(b).forEach(b::addDeliveryPartner) );// deliverySelector::select);
-		this.businesses.stream().filter(businessProductionFilter).filter(b -> b.getDemandQuantity().getProduction() > 0).forEach(b -> shippingSelector.select(b).forEach(b::addShippingPartner));
-		
-		deliverySelector.printStatistics();
-		shippingSelector.printStatistics();
+
+		this.businesses.stream().filter(businessDemandFilter).filter(b -> b.getDemandQuantity().getConsumption() > 0)
+				.forEach(b -> partnerSelector.select(b).forEach(b::addDeliveryPartner));
+
+		partnerSelector.printStatistics();
 	}
 
 	/**

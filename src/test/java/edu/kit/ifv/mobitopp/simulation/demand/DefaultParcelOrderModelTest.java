@@ -103,12 +103,12 @@ public class DefaultParcelOrderModelTest {
 		
 		//Distribution Centers
 		centerA = mock(DistributionCenter.class);
-		when(centerA.getShareDelivery()).thenReturn(0.5);
+		when(centerA.getSharePrivate()).thenReturn(0.5);
 		DemandQuantity quantityA = new DemandQuantity();
 		when(centerA.getDemandQuantity()).thenReturn(quantityA);
 		
 		centerB = mock(DistributionCenter.class);
-		when(centerB.getShareDelivery()).thenReturn(0.5);
+		when(centerB.getSharePrivate()).thenReturn(0.5);
 		DemandQuantity quantityB = new DemandQuantity();
 		when(centerB.getDemandQuantity()).thenReturn(quantityB);
 		

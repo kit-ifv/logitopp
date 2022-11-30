@@ -40,8 +40,8 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 	private int attempts;
 	private final Collection<DeliveryPerson> employees;
 
-	private double shareDelivery;
-	private double shareShipping;
+	private double sharePrivate;
+	private double shareBusiness;
 
 	@Getter(value = lombok.AccessLevel.NONE)
 	private final Collection<IParcel> currentParcels;
@@ -59,7 +59,6 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 	private DeliveryDurationModel durationModel;
 
 	private final DemandQuantity demandQuantity;
-	
 
 	/**
 	 * Instantiates a new distribution center.
@@ -70,12 +69,12 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 	 * @param zone          the zone
 	 * @param location      the location
 	 * @param numEmployees  the number of employees
-	 * @param shareDelivery the share delivery
-	 * @param shareShipping the market share in shipping
+	 * @param sharePrivate  the market share for private recipients
+	 * @param shareBusiness the market share for business recipients
 	 * @param attempts      the maximum number of delivery attempts
 	 */
 	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numEmployees,
-			double shareDelivery, double shareShipping, int attempts) {
+			double sharePrivate, double shareBusiness, int attempts) {
 		this.id = id;
 		this.name = name;
 		this.organization = organization;
@@ -84,8 +83,8 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 		this.location = location;
 
 		this.attempts = attempts;
-		this.shareDelivery = shareDelivery;
-		this.shareShipping = shareShipping;
+		this.sharePrivate = sharePrivate;
+		this.shareBusiness = shareBusiness;
 		this.numEmployees = numEmployees;
 		this.employees = new ArrayList<DeliveryPerson>();
 
@@ -176,9 +175,8 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 
 	@Override
 	public void removeParcel(IParcel parcel) {
-		this.currentParcels.remove(parcel);//should not be called
+		this.currentParcels.remove(parcel);// should not be called
 	}
-	
 
 	@Override
 	public void addDelivered(IParcel parcel) {
@@ -237,11 +235,11 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 	public String toString() {
 		return this.name;
 	}
-	
+
 	public int currentDeliveryDemand() {
 		return currentParcels.size();
 	}
-	
+
 	public int currentShippingDemand() {
 		return pickupRequests.size();
 	}
