@@ -260,6 +260,9 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 
 		this.businesses.stream().filter(businessDemandFilter).filter(b -> b.getDemandQuantity().getConsumption() > 0)
 				.forEach(b -> partnerSelector.select(b).forEach(b::addDeliveryPartner));
+		
+		this.businesses.stream().filter(businessProductionFilter).filter(b -> b.getDemandQuantity().getProduction() > 0)
+				.forEach(b -> partnerSelector.select(b).forEach(b::addShippingPartner));
 
 		partnerSelector.printStatistics();
 	}
