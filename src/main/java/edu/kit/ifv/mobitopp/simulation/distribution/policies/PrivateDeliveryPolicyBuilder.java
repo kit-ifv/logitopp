@@ -4,40 +4,40 @@ import edu.kit.ifv.mobitopp.populationsynthesis.neighborhood.NeighborhoodRelatio
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 
-public class DeliveryPolicyBuilder {
+public class PrivateDeliveryPolicyBuilder {
 
 	private ParcelDeliveryPolicy<PrivateParcel> policy;
 	
-	public DeliveryPolicyBuilder() {
+	public PrivateDeliveryPolicyBuilder() {
 		this.policy = new BaseDeliveryPolicy();
 	}
 	
-	public DeliveryPolicyBuilder basedOn(ParcelDeliveryPolicy<PrivateParcel> policy) {
+	public PrivateDeliveryPolicyBuilder basedOn(ParcelDeliveryPolicy<PrivateParcel> policy) {
 		this.policy = policy;
 		return this;
 	}
 	
-	public DeliveryPolicyBuilder checkOtherHouseholdMembers() {
+	public PrivateDeliveryPolicyBuilder checkOtherHouseholdMembers() {
 		this.policy = new HouseholdDeliveryPolicy(policy);
 		return this;
 	}
 		
-	public DeliveryPolicyBuilder checkNeighbors(NeighborhoodRelationship neighborhood, DeliveryResults results) {
+	public PrivateDeliveryPolicyBuilder checkNeighbors(NeighborhoodRelationship neighborhood, DeliveryResults results) {
 		this.policy = new NeighborhoodDeliveryPolicy(policy, neighborhood, results);
 		return this;
 	}
 	
-	public DeliveryPolicyBuilder checkNeighbors(NeighborhoodRelationship neighborhood) {
+	public PrivateDeliveryPolicyBuilder checkNeighbors(NeighborhoodRelationship neighborhood) {
 		this.policy = new NeighborhoodDeliveryPolicy(policy, neighborhood);
 		return this;
 	}
 	
-	public DeliveryPolicyBuilder abortAfter(int attempts) {
+	public PrivateDeliveryPolicyBuilder abortAfter(int attempts) {
 		this.policy = new DeliveryAttemptsPolicy(policy, attempts);
 		return this;
 	}
 
-	public DeliveryPolicyBuilder wrapWith(DeliveryPolicyDecorator<PrivateParcel> decorator) {
+	public PrivateDeliveryPolicyBuilder wrapWith(DeliveryPolicyDecorator<PrivateParcel> decorator) {
 		this.policy = decorator.of(this.policy);
 		return this;
 	}
