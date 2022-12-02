@@ -19,6 +19,7 @@ import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
@@ -67,7 +68,7 @@ public class DistributionCenterTest  {
 		}
 		
 		
-		distributionCenter = new DistributionCenter(42, "test", "org", mock(Zone.class), mock(Location.class), 100, 0.8, 0.5, 3);
+		distributionCenter = new DistributionCenter(42, "test", "org", mock(Zone.class), mock(Location.class), 100, 0.8, 0.5, 3, VehicleType.TRUCK);
 		parcels.forEach(distributionCenter::addParcel);
 		
 //		distributionCenter = mock(DistributionCenter.class);

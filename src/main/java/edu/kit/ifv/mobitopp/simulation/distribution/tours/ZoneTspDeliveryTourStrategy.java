@@ -19,6 +19,7 @@ import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
@@ -40,49 +41,28 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	private List<ParcelActivityBuilder> parcelTour;
 	private Time lastPlan;
 
-	private final int meanCapacity;
-	private final double capacityStdDev;
-	private final int minCapacity;
-	private final int maxCapacity;
 	private final boolean skipSunday;
-	private final Mode mode;
 
 	/**
 	 * Instantiates a new {@link ZoneTspDeliveryTourStrategy} with the given
 	 * oprtions.
 	 *
-	 * @param meanCapacity   the mean capacity
-	 * @param capacityStdDev the capacity standard deviation
-	 * @param minCapacity    the minimum capacity
-	 * @param maxCapacity    the maximum capacity
 	 * @param skipSunday     whether sunday should be skipped
-	 * @param mode           the delivery mode
 	 */
-	public ZoneTspDeliveryTourStrategy(int meanCapacity, double capacityStdDev, int minCapacity, int maxCapacity,
-			boolean skipSunday, Mode mode) {
+	public ZoneTspDeliveryTourStrategy(boolean skipSunday) {
 
-		this.meanCapacity = meanCapacity;
-		this.capacityStdDev = capacityStdDev;
-		this.minCapacity = minCapacity;
-		this.maxCapacity = maxCapacity;
 		this.skipSunday = skipSunday;
-		this.mode = mode;
 
 		this.lastPlan = Time.start;
 		this.parcelTour = new ArrayList<>();
 	}
 
 	/**
-	 * Instantiates a default {@link ZoneTspDeliveryTourStrategy} with: <br>
-	 * a mean capacity of 160 <br>
-	 * a capacity standard deviation of 16 <br>
-	 * a minimum capacity of 100 <br>
-	 * a maximum capacity of 200 <br>
-	 * no deliveries on sunday <br>
-	 * and the mode truck.
+	 * Instantiates a default {@link ZoneTspDeliveryTourStrategy} with no deliveries
+	 * on sunday and the mode truck.
 	 */
 	public ZoneTspDeliveryTourStrategy() {
-		this(160, 16, 100, 200, true, StandardMode.TRUCK);
+		this(true);
 	}
 
 	/**
@@ -96,7 +76,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 */
 	@Override
 	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
-			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime) {
+			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
 
 		if (skipSunday && isSunday(currentTime) || startsAfter1800(currentTime)) {
 			return Arrays.asList();
@@ -104,28 +84,29 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 
 		if (currentTime.isAfter(lastPlan.plusHours(1))) {
 			lastPlan = currentTime.startOfDay().plusHours(currentTime.getHour());
-			planZoneTour(person.getDistributionCenter(), person, deliveries, currentTime);
+			planZoneTour(person.getDistributionCenter(), person, deliveries, currentTime, vehicle.getMode());
 		}
 
 		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();
 
-		int capacity = selectCapacity(person);
+		int capacity = vehicle.getCapacity();
 		Zone lastZone = person.getDistributionCenter().getZone();
 		Time time = currentTime;
 		Time endOfWork = currentTime.plus(remainingWorkTime);
 
 		for (int i = 0; i < Math.min(capacity, parcelTour.size()); i++) {
 			ParcelActivityBuilder delivery = parcelTour.get(i);
-			
-			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time);			
+
+			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time, vehicle.getMode());
 			delivery.withTripDuration(round(tripDuration));
 			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
-			
+
 			float deliveryDuration = delivery.estimateDuration();
 			time = time.plusMinutes(round(tripDuration + deliveryDuration));
 
-			float withReturn = travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time);
-			
+			float withReturn = travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time,
+					vehicle.getMode());
+
 			if (time.plusMinutes(round(withReturn)).isBeforeOrEqualTo(endOfWork)) {
 				assigned.add(delivery);
 			} else {
@@ -170,21 +151,8 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 * @param time        the time
 	 * @return the float
 	 */
-	private float travelTime(DeliveryPerson person, Zone origin, Zone destination, Time time) {
+	private float travelTime(DeliveryPerson person, Zone origin, Zone destination, Time time, Mode mode) {
 		return person.options().impedance().getTravelTime(origin.getId(), destination.getId(), mode, time);
-	}
-
-	/**
-	 * Selects a capacity from a normal distribution.
-	 *
-	 * @param person the person
-	 * @return the capacity
-	 */
-	private int selectCapacity(DeliveryPerson person) {
-		double stdGauss = new Random((long) (person.getNextRandom() * Long.MAX_VALUE)).nextGaussian();
-		double scaledGauss = capacityStdDev * stdGauss + meanCapacity;
-
-		return Math.min(Math.max(minCapacity, (int) round(scaledGauss)), maxCapacity);
 	}
 
 	/**
@@ -196,7 +164,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 * @param currentTime the current {@link Time}
 	 */
 	private void planZoneTour(DistributionCenter dc, DeliveryPerson person,
-			Collection<ParcelActivityBuilder> deliveries, Time currentTime) {
+			Collection<ParcelActivityBuilder> deliveries, Time currentTime, Mode mode) {
 
 		SimpleWeightedGraph<Zone, DefaultWeightedEdge> graph = new SimpleWeightedGraph<Zone, DefaultWeightedEdge>(
 				DefaultWeightedEdge.class);
@@ -217,8 +185,8 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			for (Zone z : graph.vertexSet()) {
 				if (z != newZone) {
 					DefaultWeightedEdge edgeTo = graph.addEdge(newZone, z);
-					double weight = travelTime(person, newZone, z, currentTime)
-							+ travelTime(person, z, newZone, currentTime);
+					double weight = travelTime(person, newZone, z, currentTime, mode)
+							+ travelTime(person, z, newZone, currentTime, mode);
 					weight /= 2.0;
 					graph.setEdgeWeight(edgeTo, weight);
 				}
@@ -260,11 +228,6 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 		this.parcelTour.addAll(suffix);
 		this.parcelTour = this.parcelTour.stream().distinct().collect(toList());
 
-	}
-
-	@Override
-	public Mode getMode() {
-		return mode;
 	}
 
 }

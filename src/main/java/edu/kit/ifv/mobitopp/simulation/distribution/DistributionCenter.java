@@ -17,6 +17,7 @@ import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
+import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
@@ -30,7 +31,7 @@ import lombok.Setter;
  * delivery persons start to deliver parcels.
  */
 @Getter
-public class DistributionCenter implements NullParcelProducer {// TODO add id
+public class DistributionCenter implements NullParcelProducer {
 	private final int id;
 	private final String organization;
 	private final String name;
@@ -39,7 +40,8 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 	private int numEmployees;
 	private int attempts;
 	private final Collection<DeliveryPerson> employees;
-
+	private final VehicleType vehicleType;
+	
 	private double sharePrivate;
 	private double shareBusiness;
 
@@ -74,7 +76,7 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 	 * @param attempts      the maximum number of delivery attempts
 	 */
 	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numEmployees,
-			double sharePrivate, double shareBusiness, int attempts) {
+			double sharePrivate, double shareBusiness, int attempts, VehicleType vehicleType) {
 		this.id = id;
 		this.name = name;
 		this.organization = organization;
@@ -87,6 +89,7 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 		this.shareBusiness = shareBusiness;
 		this.numEmployees = numEmployees;
 		this.employees = new ArrayList<DeliveryPerson>();
+		this.vehicleType = vehicleType;
 
 		this.currentParcels = new ArrayList<>();
 		this.delivered = new ArrayList<>();
@@ -107,7 +110,7 @@ public class DistributionCenter implements NullParcelProducer {// TODO add id
 	public List<ParcelActivityBuilder> assignParcels(DeliveryPerson person, ActivityIfc work, Time currentTime,
 			RelativeTime remainingWorkTime) {
 		List<ParcelActivityBuilder> assigned = this.tourStrategy.assignParcels(this.getDeliveryActivities(currentTime),
-				person, currentTime, remainingWorkTime);
+				person, currentTime, remainingWorkTime, vehicleType);
 
 		removeParcels(person, assigned, currentTime);
 

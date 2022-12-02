@@ -15,6 +15,7 @@ import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
+import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
@@ -25,18 +26,16 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 	
 	private final Map<DayOfWeek, Collection<Route>> routes;
 	private DayOfWeek lastUpdate = null;
-	private final Mode mode;
 	
-	public PrecalculatedTourAssignment(Map<DayOfWeek, CsvFile> routeFiles, String algorithm, Mode mode, String name) {
+	public PrecalculatedTourAssignment(Map<DayOfWeek, CsvFile> routeFiles, String algorithm, String name) {
 		this.routes = new HashMap<>();
 		routeFiles.forEach((day,file) -> this.routes.put(day, Route.parseRoutes(file, algorithm, name+"_"+day)));
-		this.mode = mode;
 	}
 	
 
 	@Override
 	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
-			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime) {
+			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
 		
 		DayOfWeek day = currentTime.weekDay();
 		
@@ -63,7 +62,7 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		Time time = currentTime;
 
 		for (ParcelActivityBuilder delivery : route.getDeliveries()) {			
-			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time);			
+			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time, vehicle.getMode());			
 			delivery.withTripDuration(round(tripDuration));
 			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
 			
@@ -86,7 +85,7 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		return currentTime.weekDay().equals(DayOfWeek.SUNDAY);
 	}
 	
-	private float travelTime(DeliveryPerson person, Zone origin, Zone destination, Time time) {
+	private float travelTime(DeliveryPerson person, Zone origin, Zone destination, Time time, Mode mode) {
 		return person.options().impedance().getTravelTime(origin.getId(), destination.getId(), mode, time);
 	}
 
@@ -100,12 +99,6 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		if (!remainingDeliveries.isEmpty()) {
 			System.out.println("Could not assign all parcels to routes: " + remainingDeliveries.size() + " remaining!");
 		}
-	}
-
-
-	@Override
-	public Mode getMode() {
-		return mode;
 	}
 
 }

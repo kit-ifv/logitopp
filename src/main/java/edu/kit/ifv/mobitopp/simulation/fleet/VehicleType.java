@@ -2,17 +2,65 @@ package edu.kit.ifv.mobitopp.simulation.fleet;
 
 import java.util.Arrays;
 
+import edu.kit.ifv.mobitopp.simulation.Mode;
+import edu.kit.ifv.mobitopp.simulation.StandardMode;
+
 public enum VehicleType {
 	
-	CAR(1),
-	TRUCK(2),
-	OTHER(3);
+	OTHER(0) {
+		@Override
+		public	Mode getMode() {
+			return StandardMode.CAR;
+		}
+
+		@Override
+		public int getCapacity() {
+			return 0;
+		}
+	},
+	BIKE(1) {
+		@Override
+		public	Mode getMode() {
+			return StandardMode.BIKE;
+		}
+
+		@Override
+		public int getCapacity() {
+			return 50;
+		}
+	},
+	TRUCK(2) {
+		@Override
+		public	Mode getMode() {
+			return StandardMode.TRUCK;
+		}
+
+		@Override
+		public int getCapacity() {
+			return 160;
+		}
+	},
+	TRAM(3) {
+		@Override
+		public	Mode getMode() {
+			return StandardMode.UNKNOWN;//TODO check if exception ok
+		}
+
+		@Override
+		public int getCapacity() {
+			return 4;
+		}
+	};
 	
 	private final int number;
 	
 	private VehicleType(int number) {
 		this.number = number;
 	}
+	
+	public abstract Mode getMode();
+	
+	public abstract int getCapacity();
 	
 
 	public int asInt() {

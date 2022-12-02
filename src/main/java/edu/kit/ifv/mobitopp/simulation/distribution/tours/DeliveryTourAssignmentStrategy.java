@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -23,8 +24,6 @@ public interface DeliveryTourAssignmentStrategy {
 	 * @param remainingWorkTime the remaining work time
 	 * @return the collection of parcels to be delivered by the delivery person (subset of the given distribution centers parcels)
 	 */
-	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries, DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime);
-	
-	public Mode getMode();
+	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries, DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle);
 	
 }

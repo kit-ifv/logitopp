@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.data.ZoneRepository;
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
 import edu.kit.ifv.mobitopp.util.dataimport.Row;
 
@@ -67,9 +68,12 @@ public class DistributionCenterParser {
 
 		String zoneId = row.get("zone");
 		Zone zone = zoneRepo.getByExternalId(zoneId);
+		
+		int vehicleType = row.valueAsInteger("vehicle_type");
+		VehicleType type = VehicleType.fromInt(vehicleType);
 
 		return new DistributionCenter(id, name, organisation, zone, location, scaleEmployees(employees), sharePrivate,
-				shareBusiness, attempts);
+				shareBusiness, attempts, type);
 	}
 
 	/**
