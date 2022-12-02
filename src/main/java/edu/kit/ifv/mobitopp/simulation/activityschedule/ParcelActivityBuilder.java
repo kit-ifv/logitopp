@@ -124,6 +124,14 @@ public class ParcelActivityBuilder {
 		return this.getZoneAndLocation().location();
 	}
 
+	public int size() {
+		return this.parcels.size();
+	}
+	
+	public int volume() {
+		return this.parcels.stream().mapToInt(p -> p.getShipmentSize().getVolume(p)).sum();
+	}
+	
 	public ParcelActivityBuilder merge(ParcelActivityBuilder other) {
 		ParcelActivityBuilder newBuilder = new ParcelActivityBuilder(this.clusteringStrategy);
 		newBuilder.addParcels(this.getParcels());

@@ -14,7 +14,7 @@ public enum VehicleType {
 		}
 
 		@Override
-		public int getCapacity() {
+		public int getVolume() {
 			return 0;
 		}
 	},
@@ -25,8 +25,8 @@ public enum VehicleType {
 		}
 
 		@Override
-		public int getCapacity() {
-			return 50;
+		public int getVolume() {
+			return 120*80*940;
 		}
 	},
 	TRUCK(2) {
@@ -36,8 +36,8 @@ public enum VehicleType {
 		}
 
 		@Override
-		public int getCapacity() {
-			return 160;
+		public int getVolume() {
+			return 12*100*100*100;
 		}
 	},
 	TRAM(3) {
@@ -47,8 +47,8 @@ public enum VehicleType {
 		}
 
 		@Override
-		public int getCapacity() {
-			return 4;
+		public int getVolume() {
+			return 0;
 		}
 	};
 	
@@ -60,7 +60,7 @@ public enum VehicleType {
 	
 	public abstract Mode getMode();
 	
-	public abstract int getCapacity();
+	public abstract int getVolume();
 	
 
 	public int asInt() {

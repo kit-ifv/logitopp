@@ -66,7 +66,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 
 		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();
 
-		int capacity = vehicle.getCapacity();
+		int capacity = vehicle.getVolume();
 		Zone lastZone = person.getDistributionCenter().getZone();
 		Time time = currentTime;
 		Time endOfWork = currentTime.plus(remainingWorkTime);

@@ -89,12 +89,13 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 
 		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();
 
-		int capacity = vehicle.getCapacity();
+		int capacity = vehicle.getVolume();
+		int volume = 0;
 		Zone lastZone = person.getDistributionCenter().getZone();
 		Time time = currentTime;
 		Time endOfWork = currentTime.plus(remainingWorkTime);
 
-		for (int i = 0; i < Math.min(capacity, parcelTour.size()); i++) {
+		for (int i = 0; i < parcelTour.size() && volume <= capacity; i++) {
 			ParcelActivityBuilder delivery = parcelTour.get(i);
 
 			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time, vehicle.getMode());
@@ -104,22 +105,39 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			float deliveryDuration = delivery.estimateDuration();
 			time = time.plusMinutes(round(tripDuration + deliveryDuration));
 
-			float withReturn = travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time,
+			float withReturnDur = travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time,
 					vehicle.getMode());
-
-			if (time.plusMinutes(round(withReturn)).isBeforeOrEqualTo(endOfWork)) {
+			
+			int deliveryVolume = getVolume(delivery);
+			volume += deliveryVolume;
+			
+			if (withinWorkhours(time, endOfWork, withReturnDur) && volume <= capacity) {
 				assigned.add(delivery);
+
 			} else {
 				break;
 			}
 
 			lastZone = delivery.getZone();
 		}
+		
+		System.out.println("Tour size:" + assigned.size());
+		System.out.println("Num pcls:" + assigned.stream().mapToInt(d -> d.getParcels().size()).sum());
+		System.out.println("Volume: " + assigned.stream().mapToInt(d -> d.volume()).sum());
+		System.out.println("Time:" + time.differenceTo(currentTime));
 
 		parcelTour.removeAll(assigned);
 
 		return assigned;
 
+	}
+
+	private boolean withinWorkhours(Time time, Time endOfWork, float withReturn) {
+		return time.plusMinutes(round(withReturn)).isBeforeOrEqualTo(endOfWork);
+	}
+	
+	private int getVolume(ParcelActivityBuilder delivery) {
+		return delivery.getParcels().stream().mapToInt(p -> p.getShipmentSize().getVolume(p)).sum();
 	}
 
 	/**
