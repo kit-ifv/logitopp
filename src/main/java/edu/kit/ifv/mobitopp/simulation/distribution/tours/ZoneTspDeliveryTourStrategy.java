@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.tour.TwoApproxMetricTSP;
@@ -15,12 +14,12 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 import edu.kit.ifv.mobitopp.data.Zone;
+import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Mode;
-import edu.kit.ifv.mobitopp.simulation.StandardMode;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryAgent;
 import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -42,41 +41,44 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	private Time lastPlan;
 
 	private final boolean skipSunday;
+	private final ImpedanceIfc impedance;
 
 	/**
 	 * Instantiates a new {@link ZoneTspDeliveryTourStrategy} with the given
 	 * oprtions.
 	 *
-	 * @param skipSunday     whether sunday should be skipped
+	 * @param skipSunday whether sunday should be skipped
+	 * @param impedance  the impedance
 	 */
-	public ZoneTspDeliveryTourStrategy(boolean skipSunday) {
+	public ZoneTspDeliveryTourStrategy(boolean skipSunday, ImpedanceIfc impedance) {
 
 		this.skipSunday = skipSunday;
 
 		this.lastPlan = Time.start;
 		this.parcelTour = new ArrayList<>();
+		this.impedance = impedance;
 	}
 
 	/**
 	 * Instantiates a default {@link ZoneTspDeliveryTourStrategy} with no deliveries
 	 * on sunday and the mode truck.
 	 */
-	public ZoneTspDeliveryTourStrategy() {
-		this(true);
+	public ZoneTspDeliveryTourStrategy(ImpedanceIfc impedance) {
+		this(true, impedance);
 	}
 
 	/**
 	 * Assign parcels to the given delivery person.
 	 *
 	 * @param deliveries        the deliveries
-	 * @param person            the person
+	 * @param agent             the person
 	 * @param currentTime       the current time
 	 * @param remainingWorkTime the remaining work time
 	 * @return the list of assigned parcels
 	 */
 	@Override
-	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
-			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
+	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries, DeliveryAgent agent,
+			Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
 
 		if (skipSunday && isSunday(currentTime) || startsAfter1800(currentTime)) {
 			return Arrays.asList();
@@ -84,33 +86,33 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 
 		if (currentTime.isAfter(lastPlan.plusHours(1))) {
 			lastPlan = currentTime.startOfDay().plusHours(currentTime.getHour());
-			planZoneTour(person.getDistributionCenter(), person, deliveries, currentTime, vehicle.getMode());
+			planZoneTour(agent.getDistributionCenter(), deliveries, currentTime, vehicle.getMode());
 		}
 
 		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();
 
 		int capacity = vehicle.getVolume();
 		int volume = 0;
-		Zone lastZone = person.getDistributionCenter().getZone();
+		Zone lastZone = agent.getDistributionCenter().getZone();
 		Time time = currentTime;
 		Time endOfWork = currentTime.plus(remainingWorkTime);
 
 		for (int i = 0; i < parcelTour.size() && volume <= capacity; i++) {
 			ParcelActivityBuilder delivery = parcelTour.get(i);
 
-			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time, vehicle.getMode());
+			float tripDuration = travelTime(lastZone, delivery.getZone(), time, vehicle.getMode());
 			delivery.withTripDuration(round(tripDuration));
 			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
 
 			float deliveryDuration = delivery.estimateDuration();
 			time = time.plusMinutes(round(tripDuration + deliveryDuration));
 
-			float withReturnDur = travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time,
+			float withReturnDur = travelTime(delivery.getZone(), agent.getDistributionCenter().getZone(), time,
 					vehicle.getMode());
-			
+
 			int deliveryVolume = getVolume(delivery);
 			volume += deliveryVolume;
-			
+
 			if (withinWorkhours(time, endOfWork, withReturnDur) && volume <= capacity) {
 				assigned.add(delivery);
 
@@ -120,7 +122,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 
 			lastZone = delivery.getZone();
 		}
-		
+
 		System.out.println("Tour size:" + assigned.size());
 		System.out.println("Num pcls:" + assigned.stream().mapToInt(d -> d.getParcels().size()).sum());
 		System.out.println("Volume: " + assigned.stream().mapToInt(d -> d.volume()).sum());
@@ -135,7 +137,7 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	private boolean withinWorkhours(Time time, Time endOfWork, float withReturn) {
 		return time.plusMinutes(round(withReturn)).isBeforeOrEqualTo(endOfWork);
 	}
-	
+
 	private int getVolume(ParcelActivityBuilder delivery) {
 		return delivery.getParcels().stream().mapToInt(p -> p.getShipmentSize().getVolume(p)).sum();
 	}
@@ -169,20 +171,20 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 	 * @param time        the time
 	 * @return the float
 	 */
-	private float travelTime(DeliveryPerson person, Zone origin, Zone destination, Time time, Mode mode) {
-		return person.options().impedance().getTravelTime(origin.getId(), destination.getId(), mode, time);
+	private float travelTime(Zone origin, Zone destination, Time time, Mode mode) {
+		return impedance.getTravelTime(origin.getId(), destination.getId(), mode, time);
 	}
 
 	/**
 	 * Plan giant tour through all delivery zones using a TSP 2 approximation.
 	 *
 	 * @param dc          the {@link DistributionCenter}
-	 * @param person
+	 * @param agent
 	 * @param deliveries  the {@link DeliveryPerson}
 	 * @param currentTime the current {@link Time}
 	 */
-	private void planZoneTour(DistributionCenter dc, DeliveryPerson person,
-			Collection<ParcelActivityBuilder> deliveries, Time currentTime, Mode mode) {
+	private void planZoneTour(DistributionCenter dc, Collection<ParcelActivityBuilder> deliveries, Time currentTime,
+			Mode mode) {
 
 		SimpleWeightedGraph<Zone, DefaultWeightedEdge> graph = new SimpleWeightedGraph<Zone, DefaultWeightedEdge>(
 				DefaultWeightedEdge.class);
@@ -203,8 +205,8 @@ public class ZoneTspDeliveryTourStrategy implements DeliveryTourAssignmentStrate
 			for (Zone z : graph.vertexSet()) {
 				if (z != newZone) {
 					DefaultWeightedEdge edgeTo = graph.addEdge(newZone, z);
-					double weight = travelTime(person, newZone, z, currentTime, mode)
-							+ travelTime(person, z, newZone, currentTime, mode);
+					double weight = travelTime(newZone, z, currentTime, mode)
+							+ travelTime(z, newZone, currentTime, mode);
 					weight /= 2.0;
 					graph.setEdgeWeight(edgeTo, weight);
 				}

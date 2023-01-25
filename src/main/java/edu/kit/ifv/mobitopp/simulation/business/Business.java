@@ -10,7 +10,6 @@ import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
-import edu.kit.ifv.mobitopp.simulation.fleet.Fleet;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -31,7 +30,6 @@ public class Business implements ParcelAgent {
 	private final double area;
 	private final Map<DayOfWeek, Pair<Time, Time>> openingHours;
 	private final ZoneAndLocation location;
-	private final Fleet fleet;
 	
 	private final ParcelPolicyProvider policyProvider;
 	private final Random random;
@@ -45,7 +43,7 @@ public class Business implements ParcelAgent {
 	private final DemandQuantity demandQuantity;
 	
 	public Business(long id, String name, Branch branch, BuildingType buildingType, int employees, double area,
-			Map<DayOfWeek, Pair<Time, Time>> openingHours, ZoneAndLocation location, Fleet fleet,
+			Map<DayOfWeek, Pair<Time, Time>> openingHours, ZoneAndLocation location,
 			ParcelPolicyProvider policyProvider, Random random) {
 		this.id = id;
 		this.name = name;
@@ -57,7 +55,6 @@ public class Business implements ParcelAgent {
 		this.area = area;
 		this.openingHours = openingHours;
 		this.location = location;
-		this.fleet = fleet;
 
 		this.policyProvider = policyProvider;
 		this.random = random;

@@ -12,11 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 import edu.kit.ifv.mobitopp.data.Zone;
+import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Mode;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryAgent;
 import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -26,16 +27,18 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 	
 	private final Map<DayOfWeek, Collection<Route>> routes;
 	private DayOfWeek lastUpdate = null;
+	private final ImpedanceIfc impedance;
 	
-	public PrecalculatedTourAssignment(Map<DayOfWeek, CsvFile> routeFiles, String algorithm, String name) {
+	public PrecalculatedTourAssignment(Map<DayOfWeek, CsvFile> routeFiles, String algorithm, String name, ImpedanceIfc impedance) {
 		this.routes = new HashMap<>();
 		routeFiles.forEach((day,file) -> this.routes.put(day, Route.parseRoutes(file, algorithm, name+"_"+day)));
+		this.impedance = impedance;
 	}
 	
 
 	@Override
 	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
-			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
+			DeliveryAgent agent, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
 		
 		DayOfWeek day = currentTime.weekDay();
 		
@@ -58,11 +61,11 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		this.routes.get(day).remove(route);
 
 		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();		
-		Zone lastZone = person.getDistributionCenter().getZone();
+		Zone lastZone = agent.getDistributionCenter().getZone();
 		Time time = currentTime;
 
 		for (ParcelActivityBuilder delivery : route.getDeliveries()) {			
-			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time, vehicle.getMode());			
+			float tripDuration = travelTime(lastZone, delivery.getZone(), time, vehicle.getMode());			
 			delivery.withTripDuration(round(tripDuration));
 			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
 			
@@ -85,8 +88,8 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		return currentTime.weekDay().equals(DayOfWeek.SUNDAY);
 	}
 	
-	private float travelTime(DeliveryPerson person, Zone origin, Zone destination, Time time, Mode mode) {
-		return person.options().impedance().getTravelTime(origin.getId(), destination.getId(), mode, time);
+	private float travelTime(Zone origin, Zone destination, Time time, Mode mode) {
+		return impedance.getTravelTime(origin.getId(), destination.getId(), mode, time);
 	}
 
 	private void fillRoutes(Collection<ParcelActivityBuilder> deliveries, Collection<Route> routes) {

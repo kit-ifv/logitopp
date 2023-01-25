@@ -7,11 +7,10 @@ import edu.kit.ifv.mobitopp.result.Category;
 import edu.kit.ifv.mobitopp.result.Results;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
@@ -27,8 +26,6 @@ public class DeliveryResults {
 	private final static Category resultCategoryPrivateOrder = createResultCategoryPrivateOrder();
 	private final static Category resultCategoryBusinessOrder = createResultCategoryBusinessOrder();
 	private final static Category resultCategoryBusinessProduction = createResultCategoryBusinessProduction();
-	private final static Category resultCategoryEmployee = createResultCategoryEmployee();
-	private final static Category resultCategoryRescheduling = createResultCategoryRescheduling();
 	private final static Category resultCategoryNeighbordeliveries = createResultCategoryNeighborDeliveries();
 
 	private final static Category resultCategoryPartners = createResultCategoryPartners();
@@ -54,7 +51,7 @@ public class DeliveryResults {
 	 * @param currentTime the current time
 	 * @param isAttempt   whether the state change was a delivery attempt
 	 */
-	public void logChange(PrivateParcel parcel, DeliveryAgent deliveryGuy, Time currentTime, boolean isAttempt) {
+	public void logChange(PrivateParcel parcel, DeliveryVehicle deliveryVehicle, Time currentTime, boolean isAttempt) {
 		String msg = "";
 		msg += currentTime.toString() + SEP;
 		msg += parcel.getOId() + SEP;
@@ -62,7 +59,7 @@ public class DeliveryResults {
 		msg += parcel.getDestinationType().name() + SEP;
 		msg += parcel.getState().name() + SEP;
 		msg += isAttempt + SEP;
-		msg += ((deliveryGuy != null) ? deliveryGuy.getOid() : "NULL") + SEP;
+		msg += ((deliveryVehicle != null) ? deliveryVehicle.getId() : "NULL") + SEP;
 		msg += parcel.getProducer().toString() + SEP;
 		msg += parcel.getDeliveryAttempts() + SEP;
 		msg += String.valueOf(parcel.getDeliveryTime()) + SEP;
@@ -93,7 +90,7 @@ public class DeliveryResults {
 	 * @param currentTime the current time
 	 * @param isAttempt   whether the state change was a delivery attempt
 	 */
-	public void logChange(BusinessParcel parcel, DeliveryAgent deliveryGuy, Time currentTime, boolean isAttempt) {
+	public void logChange(BusinessParcel parcel, DeliveryVehicle deliveryVehicle, Time currentTime, boolean isAttempt) {
 		String msg = "";
 		msg += currentTime.toString() + SEP;
 		msg += parcel.getOId() + SEP;
@@ -101,7 +98,7 @@ public class DeliveryResults {
 		msg += parcel.getLocation().coordinates() + SEP;
 		msg += parcel.getState().name() + SEP;
 		msg += isAttempt + SEP;
-		msg += ((deliveryGuy != null) ? deliveryGuy.getOid() : "NULL") + SEP;
+		msg += ((deliveryVehicle != null) ? deliveryVehicle.getId() : "NULL") + SEP;
 		msg += parcel.getProducer().toString() + SEP;
 		msg += parcel.getConsumer().toString() + SEP;
 		msg += parcel.getDeliveryAttempts() + SEP;
@@ -254,66 +251,6 @@ public class DeliveryResults {
 		return new Category("parcel-production-business",
 				Arrays.asList("ParcelID", "Size", "From", "To", "FromZoneId", "FromLocationX", "FromLocationY",
 						"ToZoneId", "ToLocationX", "ToLocationY", "ArrivalDay", "ArrivalTime"));
-	}
-
-	/**
-	 * Logs the given employee of the given distribution center.
-	 *
-	 * @param person             the employee
-	 * @param distributionCenter the distribution center
-	 */
-	public void logEmployee(DeliveryPerson person, DistributionCenter distributionCenter) {
-		String msg = "";
-
-		msg += person.getId().getOid() + SEP;
-		msg += distributionCenter.getName() + SEP;
-		msg += distributionCenter.getOrganization() + SEP;
-		msg += person.employment().name();
-
-		this.results.write(resultCategoryEmployee, msg);
-	}
-
-	/**
-	 * Creates the result category employee for delivery-employees results.
-	 *
-	 * @return the category
-	 */
-	public static Category createResultCategoryEmployee() {
-		return new Category("delivery-employees",
-				Arrays.asList("PeronID", "DistributionCenter", "Organization", "EmploymentType"));
-	}
-
-	/**
-	 * Logs a delivery rescheduling event.
-	 *
-	 * @param person      the delivery person
-	 * @param currentTime the current time
-	 * @param reason      the reason
-	 * @param before      the before
-	 * @param after       the after
-	 */
-	public void logDeliveryReschedulingEvent(DeliveryPerson person, Time currentTime, String reason, String before,
-			String after) {
-		String msg = "";
-
-		msg += person.getId().getOid() + SEP;
-		msg += currentTime.toString() + SEP;
-		msg += currentTime.weekDay().name() + SEP;
-		msg += reason + SEP;
-		msg += before + SEP;
-		msg += after;
-
-		this.results.write(resultCategoryRescheduling, msg);
-	}
-
-	/**
-	 * Creates the result category rescheduling for delivery-rescheduling results.
-	 *
-	 * @return the category
-	 */
-	public static Category createResultCategoryRescheduling() {
-		return new Category("delivery-rescheduling",
-				Arrays.asList("PeronID", "Time", "Day", "Reason", "Before", "After"));
 	}
 
 	/**

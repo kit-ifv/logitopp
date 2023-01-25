@@ -6,7 +6,6 @@ import java.util.Random;
 
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
-import edu.kit.ifv.mobitopp.simulation.fleet.Fleet;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.collections.Pair;
@@ -23,7 +22,6 @@ public class BusinessBuilder {
 	private double area;
 	private Map<DayOfWeek, Pair<Time, Time>> openingHours;
 	private ZoneAndLocation location;
-	private Fleet fleet;
 	
 	private ParcelPolicyProvider policyProvider;
 	private Random random;	
@@ -72,12 +70,7 @@ public class BusinessBuilder {
 		this.location = location;
 		return this;
 	}
-	
-	public BusinessBuilder with(Fleet fleet) {
-		this.fleet = fleet;
-		return this;
-	}
-	
+		
 	public BusinessBuilder with(ParcelPolicyProvider policyProvider) {
 		this.policyProvider = policyProvider;
 		return this;
@@ -89,7 +82,7 @@ public class BusinessBuilder {
 	
 	public Business build() {
 		validate();
-		return new Business(id, name, branch, buildingType, employees, area, openingHours, location, fleet, policyProvider, random);
+		return new Business(id, name, branch, buildingType, employees, area, openingHours, location, policyProvider, random);
 	}
 	
 

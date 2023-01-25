@@ -3,6 +3,7 @@ package edu.kit.ifv.mobitopp.simulation.activityschedule;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.ModifiableActivitySchedule;
 import edu.kit.ifv.mobitopp.simulation.ReschedulingStrategy;
+import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.ActivityAsLinkedListElement;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -13,6 +14,11 @@ import edu.kit.ifv.mobitopp.time.Time;
  */
 public class PickUpParcelReschedulingStrategy implements ReschedulingStrategy  {
 
+	/**
+	 * The activity counter. Counts negative for delivery related sub-activities.
+	 */
+	static int activityCounter = -1;
+	
 	private PickUpParcelPerson person;
 	private ReschedulingStrategy defaultRescheduling;
 	private boolean isPickupPlanned = false;
@@ -62,7 +68,7 @@ public class PickUpParcelReschedulingStrategy implements ReschedulingStrategy  {
 			if (nextHome != null && activitySchedule.hasPrevActivity(nextHome)) {
 				
 				ActivityIfc prev = activitySchedule.prevActivity(nextHome);
-				ActivityIfc pickUpActivity = DeliveryActivityFactory.createPickUpParcelsActivity(prev, 15, 3);//TODO trip/pick up duration
+				ActivityIfc pickUpActivity = createPickUpParcelsActivity(prev, 15, 3);//TODO trip/pick up duration
 				activitySchedule.insertActivityAfter(prev, pickUpActivity);
 				
 				this.isPickupPlanned = true;
@@ -75,6 +81,23 @@ public class PickUpParcelReschedulingStrategy implements ReschedulingStrategy  {
 				
 		this.defaultRescheduling.adjustSchedule(activitySchedule, beginningActivity, plannedStartTime, currentTime);
 		
+	}
+	
+	/**
+	 * Creates a new pick up parcel Activity with the given trip and pick up
+	 * duration.
+	 *
+	 * @param current        the current activity
+	 * @param tripDuration   the trip duration
+	 * @param pickUpDuration the pick up duration
+	 * @return the pick up parcel activity
+	 */
+	public static ActivityIfc createPickUpParcelsActivity(ActivityIfc current, int tripDuration, int pickUpDuration) {
+		ActivityIfc activity = new ActivityAsLinkedListElement(activityCounter--, current.getActivityNrOfWeek(),
+				ActivityType.PICK_UP_PARCEL, current.startDate().plusMinutes(current.duration()), tripDuration,
+				pickUpDuration, current.startFlexibility(), current.endFlexibility(), current.durationFlexibility());
+
+		return activity;
 	}
 	
 }

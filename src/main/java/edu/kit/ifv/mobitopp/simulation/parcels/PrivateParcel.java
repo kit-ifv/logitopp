@@ -1,7 +1,5 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
-
 import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.data.Zone;
@@ -11,7 +9,7 @@ import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
@@ -55,18 +53,18 @@ public class PrivateParcel extends BaseParcel {
 	}
 
 	@Override
-	protected void logChange(Time currentTime, DeliveryAgent deliveryGuy, boolean isAttempt) {
-		this.results.logChange(this, deliveryGuy, currentTime, isAttempt);
+	protected void logChange(Time currentTime, DeliveryVehicle deliveryVehicle, boolean isAttempt) {
+		this.results.logChange(this, deliveryVehicle, currentTime, isAttempt);
 	}
 
 	@Override
-	protected Optional<RecipientType> canDeliver(Time currentTime, DeliveryAgent agent) {
-		return agent.getPolicyProvider().forPrivate().canDeliver(this, currentTime);
+	protected Optional<RecipientType> canDeliver(Time currentTime, DeliveryVehicle deliveryVehicle) {
+		return deliveryVehicle.getOwner().getPolicyProvider().forPrivate().canDeliver(this, currentTime);
 	}
 
 	@Override
-	protected boolean updateParcelDelivery(Time currentTime, DeliveryAgent agent) {
-		return agent.getPolicyProvider().forPrivate().updateParcelDelivery(this, currentTime);
+	protected boolean updateParcelDelivery(Time currentTime, DeliveryVehicle deliveryVehicle) {
+		return deliveryVehicle.getOwner().getPolicyProvider().forPrivate().updateParcelDelivery(this, currentTime);
 	}
 
 	/**
@@ -99,18 +97,9 @@ public class PrivateParcel extends BaseParcel {
 		return new ZoneAndLocation(getZone(), getLocation());
 	}
 
-	/**
-	 * Deliver.
-	 *
-	 * @param currentTime the current time
-	 * @param deliveryGuy the delivery guy
-	 */
+
 	@Override
-	protected void deliver(Time currentTime, DeliveryAgent deliveryGuy) {
-		this.deliveryTime = currentTime;
-
-		this.state = ParcelState.DELIVERED;
-
+	protected void onDeliverySuccess() {
 		if (this.destinationType.equals(ParcelDestinationType.PACK_STATION)) {
 			this.person.notifyParcelInPackStation(this);
 		} else {
@@ -146,47 +135,47 @@ public class PrivateParcel extends BaseParcel {
 				+ this.getPlannedArrivalDate().toString();
 	}
 
-	@Override
-	public boolean couldBeDeliveredWith(IParcel other) {
-
-		if (super.couldBeDeliveredWith(other)) {
-			
-			if (other instanceof PrivateParcel) {
-				PrivateParcel that = (PrivateParcel) other;
-				
-				if (that.getDestinationType().equals(this.getDestinationType())) {
-					
-					switch (this.getDestinationType()) {
-						case HOME: 
-							return this.getPerson().household().getOid() == that.getPerson().household().getOid();
-							
-						case PACK_STATION:
-							return true;
-						case WORK:
-							return true;
-							
-						default:
-							return false;
-					
-					}
-					
-				} else {
-					return false;
-				}
-				
-				
-			} else if (other instanceof BusinessParcel) {
-				return this.getDestinationType().equals(WORK);				
-				
-			} else {
-				return false;
-			}
-			
-		} else {
-			return false;
-		}
-
-	}
+//	@Override
+//	public boolean couldBeDeliveredWith(IParcel other) {
+//
+//		if (super.couldBeDeliveredWith(other)) {
+//			
+//			if (other instanceof PrivateParcel) {
+//				PrivateParcel that = (PrivateParcel) other;
+//				
+//				if (that.getDestinationType().equals(this.getDestinationType())) {
+//					
+//					switch (this.getDestinationType()) {
+//						case HOME: 
+//							return this.getPerson().household().getOid() == that.getPerson().household().getOid();
+//							
+//						case PACK_STATION:
+//							return true;
+//						case WORK:
+//							return true;
+//							
+//						default:
+//							return false;
+//					
+//					}
+//					
+//				} else {
+//					return false;
+//				}
+//				
+//				
+//			} else if (other instanceof BusinessParcel) {
+//				return this.getDestinationType().equals(WORK);				
+//				
+//			} else {
+//				return false;
+//			}
+//			
+//		} else {
+//			return false;
+//		}
+//
+//	}
 
 	@Override
 	public ParcelAgent getConsumer() {

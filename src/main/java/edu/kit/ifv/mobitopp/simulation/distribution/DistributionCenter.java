@@ -1,27 +1,26 @@
 package edu.kit.ifv.mobitopp.simulation.distribution;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
+import edu.kit.ifv.mobitopp.simulation.Hook;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;
-import edu.kit.ifv.mobitopp.simulation.Person;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityIfc;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
-import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,37 +29,34 @@ import lombok.Setter;
  * The Class DistributionCenter represents a distribution center from where
  * delivery persons start to deliver parcels.
  */
-@Getter
-public class DistributionCenter implements NullParcelProducer {
-	private final int id;
-	private final String organization;
-	private final String name;
-	private final Zone zone;
-	private final Location location;
-	private int numEmployees;
-	private int attempts;
-	private final Collection<DeliveryPerson> employees;
+public class DistributionCenter implements NullParcelProducer, Hook {
+	@Getter private final int id;
+	@Getter private final String organization;
+	@Getter private final String name;
+	@Getter private final Zone zone;
+	@Getter private final Location location;
+	@Getter private int numEmployees;
+	@Getter private int attempts;
+	@Getter private double sharePrivate;
+	@Getter private double shareBusiness;
+	@Getter private final DemandQuantity demandQuantity;
+	
+	private final Collection<DeliveryVehicle> vehicles;
+	private final Map<DeliveryVehicle, Time> returnTimes;
 	private final VehicleType vehicleType;
 	
-	private double sharePrivate;
-	private double shareBusiness;
-
-	@Getter(value = lombok.AccessLevel.NONE)
 	private final Collection<IParcel> currentParcels;
-	private final Collection<IParcel> delivered;
+	private final Collection<IParcel> collectedPickups;
 	private final Collection<IParcel> pickupRequests;
+	private final Collection<PlannedDeliveryTour> plannedTours;
 
-	@Setter
-	private DeliveryTourAssignmentStrategy tourStrategy;
-	@Setter
-	private ParcelPolicyProvider policyProvider;
-	@Setter
-	private DeliveryClusteringStrategy clusteringStrategy;
-	@Getter
-	@Setter
-	private DeliveryDurationModel durationModel;
-
-	private final DemandQuantity demandQuantity;
+			@Setter	private DeliveryTourAssignmentStrategy tourStrategy;
+			@Setter	private ParcelPolicyProvider policyProvider;
+			@Setter	private DeliveryClusteringStrategy clusteringStrategy;
+	@Getter	@Setter private DeliveryDurationModel durationModel;
+	@Getter			private final ParcelArrivalScheduler scheduler;
+	
+	
 
 	/**
 	 * Instantiates a new distribution center.
@@ -88,85 +84,108 @@ public class DistributionCenter implements NullParcelProducer {
 		this.sharePrivate = sharePrivate;
 		this.shareBusiness = shareBusiness;
 		this.numEmployees = numEmployees;
-		this.employees = new ArrayList<DeliveryPerson>();
+		
+		this.vehicles = new ArrayList<>();
+		
+		this.returnTimes = new LinkedHashMap<>();
 		this.vehicleType = vehicleType;
 
 		this.currentParcels = new ArrayList<>();
-		this.delivered = new ArrayList<>();
+		this.collectedPickups = new ArrayList<>();
 		this.pickupRequests = new ArrayList<>();
+		this.plannedTours = new ArrayList<>();
+		
+		this.scheduler = new ParcelArrivalScheduler(this);
 
 		this.demandQuantity = new DemandQuantity();
 	}
-
-	/**
-	 * Assign parcels to the given delivery person.
-	 *
-	 * @param person            the delivery person
-	 * @param work              the work
-	 * @param currentTime       the current time
-	 * @param remainingWorkTime the remaining work time
-	 * @return the list of assigned deliveries
-	 */
-	public List<ParcelActivityBuilder> assignParcels(DeliveryPerson person, ActivityIfc work, Time currentTime,
-			RelativeTime remainingWorkTime) {
-		List<ParcelActivityBuilder> assigned = this.tourStrategy.assignParcels(this.getDeliveryActivities(currentTime),
-				person, currentTime, remainingWorkTime, vehicleType);
-
-		removeParcels(person, assigned, currentTime);
-
-		return assigned;
+	
+	
+	
+	@Override
+	public void process(Time date) {
+		// TODO check if it is time to (re)?plan delivery tours
+		// TODO group deliveries and pickups to parcelActivities
+		// TODO plan tours for parcel activities
+		// TODO store planned tours
+		
+		// TODO check if vehicle can and should be dispatched -> dummy dispatch strategy time window, tour available and vehicle available
+		// TODO dispatch tour
+		// TODO check again
 	}
+	
+	
 
-	/**
-	 * The given delivery person loads the given parcels.
-	 *
-	 * @param person      the person
-	 * @param assigned    the assigned
-	 * @param currentTime the current time
-	 */
-	private void removeParcels(DeliveryPerson person, List<ParcelActivityBuilder> assigned, Time currentTime) {
-		assigned.forEach(d -> {
-			this.currentParcels.removeAll(d.getParcels());
-			this.pickupRequests.removeAll(d.getParcels());
-		});
-	}
+//	/**
+//	 * Assign parcels to the given delivery person.
+//	 *
+//	 * @param agent            the delivery person
+//	 * @param work              the work
+//	 * @param currentTime       the current time
+//	 * @param remainingWorkTime the remaining work time
+//	 * @return the list of assigned deliveries
+//	 */
+//	public List<ParcelActivityBuilder> assignParcels(DeliveryAgent agent, ActivityIfc work, Time currentTime,
+//			RelativeTime remainingWorkTime) {
+//		List<ParcelActivityBuilder> assigned = this.tourStrategy.assignParcels(this.getDeliveryActivities(currentTime),
+//				agent, currentTime, remainingWorkTime, vehicleType);
+//
+//		removeParcels(agent, assigned, currentTime);
+//
+//		return assigned;
+//	}
+//
+//	/**
+//	 * The given delivery person loads the given parcels.
+//	 *
+//	 * @param person      the person
+//	 * @param assigned    the assigned
+//	 * @param currentTime the current time
+//	 */
+//	private void removeParcels(DeliveryAgent person, List<ParcelActivityBuilder> assigned, Time currentTime) {
+//		assigned.forEach(d -> {
+//			this.currentParcels.removeAll(d.getParcels());
+//			this.pickupRequests.removeAll(d.getParcels());
+//		});
+//	}
+//
+//	/**
+//	 * Unload parcels of the given delivery person.
+//	 *
+//	 * @param person      the person
+//	 * @param currentTime the current time
+//	 */
+//	public void unloadParcels(DeliveryAgent person, Time currentTime) {
+//		Collection<IParcel> returning = person.unload(currentTime);
+//		currentParcels.addAll(returning);
+//	}
+//
+//	/**
+//	 * Gets the currently available parcels. This includes all parcels that have
+//	 * arrived prior to the given time and have not been picked up by a delivery
+//	 * person.
+//	 *
+//	 * @param currentTime the current time
+//	 * @return the available parcels
+//	 */
+//	public List<IParcel> getAvailableParcels(Time currentTime) {
+//		return this.currentParcels.stream().filter(p -> p.getPlannedArrivalDate().isBeforeOrEqualTo(currentTime))
+//				.collect(toList());
+//	}
 
-	/**
-	 * Unload parcels of the given delivery person.
-	 *
-	 * @param person      the person
-	 * @param currentTime the current time
-	 */
-	public void unloadParcels(DeliveryPerson person, Time currentTime) {
-		Collection<IParcel> returning = person.unload(currentTime);
-		currentParcels.addAll(returning);
-	}
-
-	/**
-	 * Gets the currently available parcels. This includes all parcels that have
-	 * arrived prior to the given time and have not been picked up by a delivery
-	 * person.
-	 *
-	 * @param currentTime the current time
-	 * @return the available parcels
-	 */
-	public List<IParcel> getAvailableParcels(Time currentTime) {
-		return this.currentParcels.stream().filter(p -> p.getPlannedArrivalDate().isBeforeOrEqualTo(currentTime))
-				.collect(toList());
-	}
-
-	public List<ParcelActivityBuilder> getDeliveryActivities(Time currentTime) {
+	private List<ParcelActivityBuilder> getDeliveryActivities(Time currentTime) { //TODO move to clustering??
 		List<ParcelActivityBuilder> deliveries = new ArrayList<>();
 
-		List<IParcel> available = getAvailableParcels(currentTime);
+		List<IParcel> available = new ArrayList<>(currentParcels);
+		available.addAll(pickupRequests);
 
 		clusteringStrategy.cluster(available)
-				.forEach(cluster -> deliveries.add(new ParcelActivityBuilder(clusteringStrategy).addParcels(cluster)
-						.asDelivery().byDistributionCenter(this)));
-
-		clusteringStrategy.cluster(new ArrayList<>(pickupRequests))
-				.forEach(cluster -> deliveries.add(new ParcelActivityBuilder(clusteringStrategy).addParcels(cluster)
-						.asPickup().byDistributionCenter(this)));
+						  .forEach(cluster -> {
+							  ParcelActivityBuilder activity = new ParcelActivityBuilder(clusteringStrategy).byDistributionCenter(this);
+							  cluster.stream().filter(currentParcels::contains).forEach(activity::addParcel);
+							  cluster.stream().filter(pickupRequests::contains).forEach(activity::addPickUp);
+							  deliveries.add(activity);							  
+						  });
 
 		return deliveries;
 	}
@@ -178,12 +197,16 @@ public class DistributionCenter implements NullParcelProducer {
 
 	@Override
 	public void removeParcel(IParcel parcel) {
-		this.currentParcels.remove(parcel);// should not be called
+		this.currentParcels.remove(parcel);
 	}
 
+	public void removePickupRequest(IParcel parcel) {
+		this.pickupRequests.remove(parcel);
+	}
+	
 	@Override
 	public void addDelivered(IParcel parcel) {
-		this.delivered.add(parcel);
+		this.collectedPickups.add(parcel);
 	}
 
 	public void requestPickup(IParcel parcel) {
@@ -193,36 +216,6 @@ public class DistributionCenter implements NullParcelProducer {
 	@Override
 	public ParcelPolicyProvider getPolicyProvider() {
 		return this.policyProvider;
-	}
-
-	/**
-	 * Adds the employee.
-	 *
-	 * @param p the p
-	 * @return true, if successful
-	 */
-	public boolean addEmployee(DeliveryPerson p) {
-		return this.employees.add(p);
-	}
-
-	/**
-	 * Checks whether this distribution center has enough employees.
-	 *
-	 * @return true, if successful
-	 */
-	public boolean hasEnoughEmployees() {
-		return this.employees.size() >= this.numEmployees;
-	}
-
-	/**
-	 * Checks if the given delivery person is an employee of this distribution
-	 * center.
-	 *
-	 * @param p the p
-	 * @return true, if is employee
-	 */
-	public boolean isEmployee(Person p) {
-		return employees.contains(p);
 	}
 
 	/**
@@ -246,5 +239,28 @@ public class DistributionCenter implements NullParcelProducer {
 	public int currentShippingDemand() {
 		return pickupRequests.size();
 	}
+
+
+
+	public void bookVehicleUntil(DeliveryVehicle vehicle, Time returnTime) {
+		if (this.returnTimes.containsKey(vehicle)) {
+			throw new IllegalArgumentException("Vehicle is already booked:" + vehicle + " until " + returnTimes.get(vehicle));
+		}
+		
+		this.returnTimes.put(vehicle, returnTime);
+		this.vehicles.remove(vehicle);		
+	}
+	
+	public void returnVehicle(DeliveryVehicle vehicle) {
+		if (!this.returnTimes.containsKey(vehicle)) {
+			throw new IllegalArgumentException("The given vehicle is not booked and cannot be returned: " + vehicle);
+		}
+		
+		this.returnTimes.remove(vehicle);
+		this.vehicles.add(vehicle);
+	}
+
+	
+
 
 }

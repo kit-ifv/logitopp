@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.LinkDeliveryClustering;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;

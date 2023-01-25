@@ -7,9 +7,7 @@ import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;
-import edu.kit.ifv.mobitopp.simulation.SimulationOptionsCustomization;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.PickUpParcelReschedulingStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import lombok.Getter;
@@ -34,10 +32,9 @@ public class PickUpParcelPerson extends SimulationPersonDecorator implements Nul
 	 * decorating the given {@link SimulationPerson}.
 	 * 
 	 * @param person the person
-	 * @param options the options
 	 * @param seed the seed
 	 */
-	public PickUpParcelPerson(SimulationPerson person, SimulationOptionsCustomization options, long seed) {	
+	public PickUpParcelPerson(SimulationPerson person, long seed) {	
 		super(person);
 		
 		this.person = person;
@@ -47,11 +44,7 @@ public class PickUpParcelPerson extends SimulationPersonDecorator implements Nul
 		this.inPackstation = new ArrayList<IParcel>();
 		
 		this.random = new Random(getOid() + seed);
-		this.demandQuantity = new DemandQuantity();
-		
-		PickUpParcelReschedulingStrategy pickUpReschedulingStrategy = new PickUpParcelReschedulingStrategy(this, options.rescheduling());
-		options.customize(pickUpReschedulingStrategy);
-		
+		this.demandQuantity = new DemandQuantity();		
 	}
 	
 	

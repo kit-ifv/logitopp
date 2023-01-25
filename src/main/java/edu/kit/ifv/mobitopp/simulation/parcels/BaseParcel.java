@@ -3,9 +3,12 @@ package edu.kit.ifv.mobitopp.simulation.parcels;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelState.DELIVERED;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelState.ONDELIVERY;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelState.RETURNING;
+import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelState.UNDEFINED;
 
 import java.util.Arrays;
 import java.util.Optional;
+
+import org.mozilla.javascript.Undefined;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
@@ -13,7 +16,7 @@ import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,9 +47,9 @@ public abstract class BaseParcel implements IParcel {
 		this.shipmentSize = shipmentSize;
 	}
 	
-	protected abstract void logChange(Time currentTime, DeliveryAgent deliveryGuy, boolean isAttempt);
-	protected abstract Optional<RecipientType> canDeliver(Time currentTime, DeliveryAgent agent);
-	protected abstract boolean updateParcelDelivery(Time currentTime, DeliveryAgent agent);
+	protected abstract void logChange(Time currentTime, DeliveryVehicle deliveryVehicle, boolean isAttempt);
+	protected abstract Optional<RecipientType> canDeliver(Time currentTime, DeliveryVehicle deliveryVehicle);
+	protected abstract boolean updateParcelDelivery(Time currentTime, DeliveryVehicle deliveryVehicle);
 	
 
 	public Zone getZone() {
@@ -62,22 +65,22 @@ public abstract class BaseParcel implements IParcel {
 	 * attempts is increased. Logs the state change at the given {@link Time}.
 	 *
 	 * @param currentTime the current time
-	 * @param deliveryGuy the delivery guy
+	 * @param deliveryVehicle the delivery vehicle
 	 * @param isAttempt   the is attempt
 	 * @return the parcel state
 	 */
-	private void updateState(Time currentTime, DeliveryAgent deliveryGuy, boolean isAttempt) {
+	private void updateState(Time currentTime, DeliveryVehicle deliveryVehicle, boolean isAttempt) {
 		this.state = this.state.nextState();
-		this.logChange(currentTime, deliveryGuy, isAttempt);
+		this.logChange(currentTime, deliveryVehicle, isAttempt);
 	}
 
 	/**
 	 * Deliver.
 	 *
 	 * @param currentTime the current time
-	 * @param deliveryGuy the delivery guy
+	 * @param deliveryVehicle the delivery vehicle
 	 */
-	protected void deliver(Time currentTime, DeliveryAgent deliveryGuy) {
+	protected void setDelivered(Time currentTime, DeliveryVehicle deliveryVehicle) {
 		this.deliveryTime = currentTime;
 
 		this.state = ParcelState.DELIVERED;
@@ -97,23 +100,27 @@ public abstract class BaseParcel implements IParcel {
 	}
 
 	@Override
-	public boolean tryDelivery(Time currentTime, DeliveryAgent deliveryGuy) {
+	public boolean tryDelivery(Time currentTime, DeliveryVehicle deliveryVehicle) {
 		verifyState("tryDelivery", ONDELIVERY);
 		this.deliveryAttempts++;
-		Optional<RecipientType> recipient = this.canDeliver(currentTime, deliveryGuy);
+		Optional<RecipientType> recipient = this.canDeliver(currentTime, deliveryVehicle);
 
 		boolean success = recipient.isPresent();
 		
 		if (success) {
 			this.recipientType = recipient.get();
 			System.out.println(this.producer.toString() + " successfully delivered " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ")");
-			this.deliver(currentTime, deliveryGuy);
+			
+			setDelivered(currentTime, deliveryVehicle);
+			onDeliverySuccess();
+			
 		} else {
 			System.out.println(this.producer.toString() + " failed to deliver " + this.oId + "(attempt " + this.deliveryAttempts + ")");
-			this.updateParcelDelivery(currentTime, deliveryGuy);
+			
+			onDeliveryFailure(currentTime, deliveryVehicle);
 		}
 
-		this.updateState(currentTime, deliveryGuy, true);
+		this.updateState(currentTime, deliveryVehicle, true);
 
 		if (success) {
 			verifyState("tryDelivery result", DELIVERED);
@@ -123,26 +130,74 @@ public abstract class BaseParcel implements IParcel {
 
 		return success;
 	}
-
+	
 	@Override
-	public void returning(Time currentTime, DeliveryAgent deliveryGuy) {
+	public boolean tryPickup(Time currentTime, DeliveryVehicle vehicle) {
+		
+		//TODO introduce canPickUp in policy
+		Optional<RecipientType> recipient = this.canDeliver(currentTime, vehicle);
+
+		boolean success = recipient.isPresent();
+		if (success) {
+			this.recipientType = recipient.get();
+			System.out.println(vehicle.toString() + " successfully picked up " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ") at " + producer.toString());
+			
+			setOnDelivery(currentTime, vehicle);
+			onPickUpSuccess(currentTime, vehicle);
+			
+		} else {
+			System.out.println(vehicle.toString() + " failed to pick up " + this.oId + "(attempt " + this.deliveryAttempts + ") at " + producer.toString());
+			onPickUpFailure(vehicle);
+		}
+		
+		if (success) {
+			verifyState("tryPickup result", ONDELIVERY);
+		} else {
+			verifyState("tryPickup result", UNDEFINED);
+		}
+		
+		return success;
+	}
+	
+	
+	
+	protected void onDeliverySuccess() {
+		this.getConsumer().addDelivered(this); //TODO override in wrapping parcel shipment
+	}
+	
+	protected void onDeliveryFailure(Time currentTime, DeliveryVehicle vehicle) {
+		updateParcelDelivery(currentTime, vehicle);
+		vehicle.addReturningParcel(this);
+	}
+	
+	protected void onPickUpSuccess(Time currentTime, DeliveryVehicle vehicle) {
+		vehicle.addPickedUpParcel(this);
+		this.getProducer().removeParcel(this);
+	}
+	
+	protected void onPickUpFailure(DeliveryVehicle vehicle) {
+		vehicle.getOwner().requestPickup(this);
+	}
+
+	
+	
+
+	protected void setReturning(Time currentTime, DeliveryVehicle deliveryVehicle) {
 		verifyState("returning", ONDELIVERY);
-		this.updateState(currentTime, deliveryGuy, false);
+		this.updateState(currentTime, deliveryVehicle, false);
 		verifyState("returning result", RETURNING);
 	}
 
-	@Override
-	public void loaded(Time currentTime, DeliveryAgent deliveryGuy) {
-		verifyState("loaded", ParcelState.UNDEFINED);
-		this.updateState(currentTime, deliveryGuy, false);
+	protected void setOnDelivery(Time currentTime, DeliveryVehicle deliveryVehicle) {
+		verifyState("loaded", UNDEFINED);
+		this.updateState(currentTime, deliveryVehicle, false);		
 		verifyState("loaded result", ONDELIVERY);
 	}
 
-	@Override
-	public void unloaded(Time currentTime, DeliveryAgent deliveryGuy) {
+	protected void setUndefined(Time currentTime, DeliveryVehicle deliveryVehicle) {
 		verifyState("unloaded", ONDELIVERY, RETURNING);
-		this.updateState(currentTime, deliveryGuy, false);
-		verifyState("unloaded result", ParcelState.UNDEFINED);
+		this.updateState(currentTime, deliveryVehicle, false);
+		verifyState("unloaded result", UNDEFINED);
 	}
 
 	protected void verifyState(String operation, ParcelState ... states ) {
@@ -164,26 +219,26 @@ public abstract class BaseParcel implements IParcel {
 	}
 	
 
-	@Override
-	public boolean canBeDeliveredTogether(IParcel other) {
-		if (other == null) {
-			return this.couldBeDeliveredWith(other);
-		} else {
-			return this.couldBeDeliveredWith(other) && other.couldBeDeliveredWith(this);
-		}
-	}
-	
-	@Override
-	public boolean couldBeDeliveredWith(IParcel other) {
-		if (other == this) {
-			return true;
-		}
-
-		if (other == null) {
-			return false;
-		}
-
-		return other.getLocation().equals(this.getLocation());
-	}
+//	@Override
+//	public boolean canBeDeliveredTogether(IParcel other) {
+//		if (other == null) {
+//			return this.couldBeDeliveredWith(other);
+//		} else {
+//			return this.couldBeDeliveredWith(other) && other.couldBeDeliveredWith(this);
+//		}
+//	}
+//	
+//	@Override
+//	public boolean couldBeDeliveredWith(IParcel other) {
+//		if (other == this) {
+//			return true;
+//		}
+//
+//		if (other == null) {
+//			return false;
+//		}
+//
+//		return other.getLocation().equals(this.getLocation());
+//	}
 	
 }

@@ -14,13 +14,13 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 import edu.kit.ifv.mobitopp.data.Zone;
+import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.Mode;
-import edu.kit.ifv.mobitopp.simulation.StandardMode;
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryAgent;
 import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -38,22 +38,27 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 
 	private List<ParcelActivityBuilder> deliveryTour = new ArrayList<>();
 	private Time nextPlan = Time.start;
+	private final ImpedanceIfc impedance;
 
 	private static boolean SKIP_SUNDAY = true;
+	
+	public TspBasedDeliveryTourStrategy(ImpedanceIfc impedance) {
+		this.impedance = impedance;
+	}
 
 	/**
 	 * Assign parcels to the given delivery person based on the duration of the
 	 * working activity and the time required per parcel.
 	 *
 	 * @param deliveries        the deliveries
-	 * @param person            the person
+	 * @param agent             the delivery agent
 	 * @param currentTime       the current time
 	 * @param remainingWorkTime the remaining work time
 	 * @return the collection of assigned deliveries
 	 */
 	@Override
-	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
-			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
+	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries, DeliveryAgent agent,
+			Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
 
 		if (SKIP_SUNDAY && currentTime.weekDay().equals(DayOfWeek.SUNDAY)
 				|| currentTime.isAfter(currentTime.startOfDay().plusHours(18))) {
@@ -61,27 +66,28 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		}
 
 		if (currentTime.isAfter(nextPlan)) {
-			planGiantTour(person.getDistributionCenter(), deliveries, currentTime);
+			planGiantTour(agent.getDistributionCenter(), deliveries, currentTime);
 		}
 
 		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();
 
 		int capacity = vehicle.getVolume();
-		Zone lastZone = person.getDistributionCenter().getZone();
+		Zone lastZone = agent.getDistributionCenter().getZone();
 		Time time = currentTime;
 		Time endOfWork = currentTime.plus(remainingWorkTime);
 
 		for (int i = 0; i < Math.min(capacity, deliveryTour.size()); i++) {
 			ParcelActivityBuilder delivery = deliveryTour.get(i);
 
-			float tripDuration = travelTime(person, lastZone, delivery.getZone(), time, vehicle.getMode());			
+			float tripDuration = travelTime(lastZone, delivery.getZone(), time, vehicle.getMode());
 			delivery.withTripDuration(round(tripDuration));
 			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
-			
+
 			float deliveryDuration = delivery.estimateDuration();
 			time = time.plusMinutes(round(tripDuration + deliveryDuration));
 
-			float withReturn = travelTime(person, delivery.getZone(), person.getDistributionCenter().getZone(), time, vehicle.getMode());
+			float withReturn = travelTime(delivery.getZone(), agent.getDistributionCenter().getZone(), time,
+					vehicle.getMode());
 			if (time.plusMinutes(round(withReturn)).isBeforeOrEqualTo(endOfWork)) {
 				assigned.add(delivery);
 			} else {
@@ -105,8 +111,8 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 	 * @param time        the time
 	 * @return the float
 	 */
-	private float travelTime(DeliveryPerson person, Zone origin, Zone destination, Time time, Mode mode) {
-		return person.options().impedance().getTravelTime(origin.getId(), destination.getId(), mode, time);
+	private float travelTime(Zone origin, Zone destination, Time time, Mode mode) {
+		return impedance.getTravelTime(origin.getId(), destination.getId(), mode, time);
 	}
 
 	/**

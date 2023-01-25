@@ -57,7 +57,7 @@ public class GenericParcelDemandModel<A extends ParcelAgent, P extends ParcelBui
 				step.apply(parcel, parcels, quantity, randomNumbers.getAsDouble());
 			}
 			
-			parcel.notifyAgents();//TODO notify consumer
+			parcel.notifyAgents();
 			parcels.add(parcel);
 		}
 

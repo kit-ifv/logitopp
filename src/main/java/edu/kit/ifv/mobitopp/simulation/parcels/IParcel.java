@@ -5,7 +5,7 @@ import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public interface IParcel {
@@ -31,13 +31,15 @@ public interface IParcel {
 	public Zone getZone();
 	public ZoneAndLocation getZoneAndLocation();
 	
-	public boolean couldBeDeliveredWith(IParcel other);
-	public boolean canBeDeliveredTogether(IParcel other);
+//	public boolean couldBeDeliveredWith(IParcel other);
+//	public boolean canBeDeliveredTogether(IParcel other);
 	
-	public boolean tryDelivery(Time currentTime, DeliveryAgent deliveryGuy);	
-	public void returning(Time currentTime, DeliveryAgent deliveryGuy);
-	public void loaded(Time currentTime, DeliveryAgent deliveryGuy);
-	public void unloaded(Time currentTime, DeliveryAgent deliveryGuy);
+	public boolean tryDelivery(Time currentTime, DeliveryVehicle vehicle);
+	public boolean tryPickup(Time currentTime, DeliveryVehicle vehicle);
+	
+//	public void returning(Time currentTime, DeliveryVehicle deliveryVehicle);
+//	public void loaded(Time currentTime, DeliveryVehicle deliveryVehicle);
+//	public void unloaded(Time currentTime, DeliveryVehicle deliveryVehicle);
 	
 	public RecipientType getRecipientType();
 	

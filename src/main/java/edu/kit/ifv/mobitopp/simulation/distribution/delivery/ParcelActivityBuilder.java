@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.activityschedule;
+package edu.kit.ifv.mobitopp.simulation.distribution.delivery;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,27 +8,27 @@ import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryAgent;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
 @Getter
 public class ParcelActivityBuilder {
 	protected DistributionCenter distributionCenter;
-	protected DeliveryAgent deliveryAgent;
-	protected ActivityIfc work;
-	protected Time plannedTime;
-	protected int tripDuration;
-	protected List<IParcel> parcels;
-	protected boolean isPickup;
+	protected DeliveryVehicle deliveryVehicle;
+	protected Time plannedArrivalTime;
+	
+	protected final List<IParcel> parcels;
+	protected final List<IParcel> pickUps;
+
+	
 	protected DeliveryClusteringStrategy clusteringStrategy;
 
 	public ParcelActivityBuilder(DeliveryClusteringStrategy clusteringStrategy) {
 		this.parcels = new ArrayList<>();
-		this.tripDuration = -1;
+		this.pickUps = new ArrayList<>();
 		this.clusteringStrategy = clusteringStrategy;
 	}
 
@@ -41,38 +41,23 @@ public class ParcelActivityBuilder {
 		this.parcels.addAll(parcels);
 		return this;
 	}
+	
+	public ParcelActivityBuilder addPickUp(IParcel pickUp) {
+		this.pickUps.add(pickUp);
+		return this;
+	}
+
+	public ParcelActivityBuilder addPickUps(Collection<IParcel> pickUps) {
+		this.pickUps.addAll(pickUps);
+		return this;
+	}
 
 	public int estimateDuration() {
-		return (int) distributionCenter.getDurationModel().estimateDuration(deliveryAgent, parcels);
-	}
-
-	public ParcelActivityBuilder deliveredBy(DeliveryPerson person) {
-		this.deliveryAgent = person;
-		return this;
-	}
-
-	public ParcelActivityBuilder during(ActivityIfc work) {
-		this.work = work;
-		return this;
+		return (int) distributionCenter.getDurationModel().estimateDuration(deliveryVehicle, parcels);
 	}
 
 	public ParcelActivityBuilder plannedAt(Time time) {
-		this.plannedTime = time;
-		return this;
-	}
-	
-	public ParcelActivityBuilder withTripDuration(int tripDuration) {
-		this.tripDuration = tripDuration;
-		return this;
-	}
-	
-	public ParcelActivityBuilder asPickup() {
-		this.isPickup = true;
-		return this;
-	}
-	
-	public ParcelActivityBuilder asDelivery() {
-		this.isPickup = false;
+		this.plannedArrivalTime = time;
 		return this;
 	}
 	
@@ -81,30 +66,8 @@ public class ParcelActivityBuilder {
 		return this;
 	}
 	
-	
-	
-	public PersonParcelActivity buildPersonActivity() {
-		int tripDur = (tripDuration > 0) ? tripDuration : 5;
-		DeliveryPerson deliveryPerson = (DeliveryPerson) deliveryAgent;
-		
-		if (isPickup) {
-			return DeliveryActivityFactory.createPickupActivity(parcels, work, plannedTime,
-					estimateDuration(), tripDur, deliveryPerson, getZoneAndLocation());
-			
-		} else {
-			return DeliveryActivityFactory.createDeliveryActivity(parcels, work, plannedTime,
-				estimateDuration(), tripDur, deliveryPerson, getZoneAndLocation());
-		}
-	}
-	
 	public ParcelActivity buildWorkerActivity() {
-		
-		if (isPickup) {
-			return new PickupActivity(getZoneAndLocation(), parcels, deliveryAgent, plannedTime);
-		} else {
-			return new DeliveryActivity(getZoneAndLocation(), parcels, deliveryAgent, plannedTime);
-		}
-		
+		return new ParcelActivity(getZoneAndLocation(), parcels, pickUps, deliveryVehicle, plannedArrivalTime);		
 	}
 	
 	

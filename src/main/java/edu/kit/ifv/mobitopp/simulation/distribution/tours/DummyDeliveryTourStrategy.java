@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import edu.kit.ifv.mobitopp.simulation.activityschedule.ParcelActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryAgent;
 import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
-import edu.kit.ifv.mobitopp.simulation.person.DeliveryPerson;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -25,7 +25,7 @@ public class DummyDeliveryTourStrategy implements DeliveryTourAssignmentStrategy
 	 */
 	@Override
 	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
-			DeliveryPerson person, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
+			DeliveryAgent person, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
 		
 		List<ParcelActivityBuilder> assigned = new ArrayList<>();
 		RelativeTime counter = RelativeTime.ofSeconds(remainingWorkTime.seconds());
