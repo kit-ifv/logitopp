@@ -16,7 +16,6 @@ import lombok.Getter;
 
 @Getter
 public class ParcelActivityBuilder {
-	protected DistributionCenter distributionCenter;
 	protected DeliveryVehicle deliveryVehicle;
 	protected Time plannedArrivalTime;
 	
@@ -53,7 +52,7 @@ public class ParcelActivityBuilder {
 	}
 
 	public int estimateDuration() {
-		return (int) distributionCenter.getDurationModel().estimateDuration(deliveryVehicle, parcels);
+		return (int) this.deliveryVehicle.getOwner().getDurationModel().estimateDuration(deliveryVehicle, parcels);
 	}
 
 	public ParcelActivityBuilder plannedAt(Time time) {
@@ -61,8 +60,8 @@ public class ParcelActivityBuilder {
 		return this;
 	}
 	
-	public ParcelActivityBuilder byDistributionCenter(DistributionCenter distributionCenter) {
-		this.distributionCenter = distributionCenter;
+	public ParcelActivityBuilder by(DeliveryVehicle vehicle) {
+		this.deliveryVehicle = vehicle;
 		return this;
 	}
 	

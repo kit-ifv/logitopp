@@ -19,15 +19,17 @@ public class PlannedDeliveryTour {
 	private final List<ParcelActivityBuilder> stops;
 	private final VehicleType vehicleType;
 	@Getter private final RelativeTime plannedDuration;
+	@Getter private final Time plannedAt;
 	
-	public PlannedDeliveryTour(VehicleType vehicleType, RelativeTime plannedDuration) {
+	public PlannedDeliveryTour(VehicleType vehicleType, RelativeTime plannedDuration, Time plannedAt) {
 		this.stops = new ArrayList<>();
 		this.vehicleType = vehicleType;
 		this.plannedDuration = plannedDuration;
+		this.plannedAt = plannedAt;
 	}
 	
-	public PlannedDeliveryTour(VehicleType vehicleType, List<ParcelActivityBuilder> plannedStops, RelativeTime plannedDuration) {
-		this(vehicleType, plannedDuration);
+	public PlannedDeliveryTour(VehicleType vehicleType, List<ParcelActivityBuilder> plannedStops, RelativeTime plannedDuration, Time plannedAt) {
+		this(vehicleType, plannedDuration, plannedAt);
 		addStops(plannedStops);
 	}
 	
@@ -53,7 +55,7 @@ public class PlannedDeliveryTour {
 			float tripDuration = impedance.getTravelTime(position.getId(), destination.getId(), vehicle.getType().getMode(), time);
 			time = time.plusMinutes(Math.round(tripDuration));
 			
-			stop.plannedAt(time);
+			stop.by(vehicle).plannedAt(time);
 			time = time.plusMinutes(stop.estimateDuration());
 			
 			actualStops.add(stop.buildWorkerActivity());

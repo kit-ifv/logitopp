@@ -4,8 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryAgent;
-import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -15,14 +14,14 @@ import edu.kit.ifv.mobitopp.time.Time;
 public interface DeliveryTourAssignmentStrategy {
 
 	/**
-	 * Compute parcels at the given distribution center to be delivered by the given delivery person.
+	 * Compute delivery tours for the given delivery/pickup activities.
 	 *
-	 * @param deliveries the deliveries
-	 * @param agent the delivery person
+	 * @param deliveries the delivery/pickup activities
+	 * @param vehicle the delivery vehicle
 	 * @param currentTime the current time
-	 * @param remainingWorkTime the remaining work time
+	 * @param maxTourDuration the maximum tour duration
 	 * @return the collection of parcels to be delivered by the delivery person (subset of the given distribution centers parcels)
 	 */
-	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries, DeliveryAgent agent, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle);
+	public List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> deliveries, DeliveryVehicle vehicle, Time currentTime, RelativeTime maxTourDuration);
 	
 }

@@ -181,7 +181,7 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 
 		clusteringStrategy.cluster(available)
 						  .forEach(cluster -> {
-							  ParcelActivityBuilder activity = new ParcelActivityBuilder(clusteringStrategy).byDistributionCenter(this);
+							  ParcelActivityBuilder activity = new ParcelActivityBuilder(clusteringStrategy);
 							  cluster.stream().filter(currentParcels::contains).forEach(activity::addParcel);
 							  cluster.stream().filter(pickupRequests::contains).forEach(activity::addPickUp);
 							  deliveries.add(activity);							  

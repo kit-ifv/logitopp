@@ -3,7 +3,6 @@ package edu.kit.ifv.mobitopp.simulation.distribution.tours;
 import static java.lang.Math.round;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,9 +18,7 @@ import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryAgent;
-import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
-import edu.kit.ifv.mobitopp.time.DayOfWeek;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -36,70 +33,10 @@ import edu.kit.ifv.mobitopp.time.Time;
  */
 public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrategy {
 
-	private List<ParcelActivityBuilder> deliveryTour = new ArrayList<>();
-	private Time nextPlan = Time.start;
 	private final ImpedanceIfc impedance;
-
-	private static boolean SKIP_SUNDAY = true;
 	
 	public TspBasedDeliveryTourStrategy(ImpedanceIfc impedance) {
 		this.impedance = impedance;
-	}
-
-	/**
-	 * Assign parcels to the given delivery person based on the duration of the
-	 * working activity and the time required per parcel.
-	 *
-	 * @param deliveries        the deliveries
-	 * @param agent             the delivery agent
-	 * @param currentTime       the current time
-	 * @param remainingWorkTime the remaining work time
-	 * @return the collection of assigned deliveries
-	 */
-	@Override
-	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries, DeliveryAgent agent,
-			Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
-
-		if (SKIP_SUNDAY && currentTime.weekDay().equals(DayOfWeek.SUNDAY)
-				|| currentTime.isAfter(currentTime.startOfDay().plusHours(18))) {
-			return Arrays.asList();
-		}
-
-		if (currentTime.isAfter(nextPlan)) {
-			planGiantTour(agent.getDistributionCenter(), deliveries, currentTime);
-		}
-
-		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();
-
-		int capacity = vehicle.getVolume();
-		Zone lastZone = agent.getDistributionCenter().getZone();
-		Time time = currentTime;
-		Time endOfWork = currentTime.plus(remainingWorkTime);
-
-		for (int i = 0; i < Math.min(capacity, deliveryTour.size()); i++) {
-			ParcelActivityBuilder delivery = deliveryTour.get(i);
-
-			float tripDuration = travelTime(lastZone, delivery.getZone(), time, vehicle.getMode());
-			delivery.withTripDuration(round(tripDuration));
-			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
-
-			float deliveryDuration = delivery.estimateDuration();
-			time = time.plusMinutes(round(tripDuration + deliveryDuration));
-
-			float withReturn = travelTime(delivery.getZone(), agent.getDistributionCenter().getZone(), time,
-					vehicle.getMode());
-			if (time.plusMinutes(round(withReturn)).isBeforeOrEqualTo(endOfWork)) {
-				assigned.add(delivery);
-			} else {
-				break;
-			}
-
-		}
-
-		deliveryTour.removeAll(assigned);
-
-		return assigned;
-
 	}
 
 	/**
@@ -111,8 +48,55 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 	 * @param time        the time
 	 * @return the float
 	 */
-	private float travelTime(Zone origin, Zone destination, Time time, Mode mode) {
+	protected float travelTime(Zone origin, Zone destination, Time time, Mode mode) {
 		return impedance.getTravelTime(origin.getId(), destination.getId(), mode, time);
+	}
+
+	@Override
+	public List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> deliveries, DeliveryVehicle vehicle,
+			Time currentTime, RelativeTime maxTourDuration) {
+		
+		Mode mode = vehicle.getType().getMode();
+		int capacity = vehicle.getCapacity();
+		
+		List<PlannedDeliveryTour> plannedTours = new ArrayList<>();
+		List<ParcelActivityBuilder> giantTour = planGiantTour(vehicle.getOwner(), deliveries, currentTime, mode);
+		
+		while (!giantTour.isEmpty()) {
+			List<ParcelActivityBuilder> assigned = new ArrayList<>();
+			Zone lastZone = vehicle.getOwner().getZone();
+			Time time = currentTime;
+			Time endOfTour = currentTime.plus(maxTourDuration);
+		
+			for (int i = 0; i < Math.min(capacity, giantTour.size()); i++) { //TODO check capacity computation/restriction
+				ParcelActivityBuilder delivery = giantTour.get(i);
+		
+				float tripDuration = travelTime(lastZone, delivery.getZone(), time, mode);		
+				float deliveryDuration = delivery.estimateDuration();
+				float returnTime = travelTime(delivery.getZone(), vehicle.getOwner().getZone(), time, mode);
+				
+				if (time.plusMinutes(round(tripDuration + deliveryDuration + returnTime)).isBeforeOrEqualTo(endOfTour)) {
+					
+					time = time.plusMinutes(round(tripDuration));
+					assigned.add(delivery.plannedAt(time).by(vehicle));
+					time = time.plusMinutes(round(deliveryDuration));
+					lastZone = delivery.getZone();
+					
+				} else {
+					time = time.plusMinutes(round(returnTime));
+					break;
+				}
+		
+			}
+
+			plannedTours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, time.differenceTo(currentTime), currentTime));
+			giantTour.removeAll(assigned);
+		}
+		
+	
+		
+		
+		return plannedTours;
 	}
 
 	/**
@@ -126,8 +110,10 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 	 * @param person             the {@link DeliveryPerson}
 	 * @param currentTime        the current {@link Time}
 	 */
-	private void planGiantTour(DistributionCenter distributionCenter, Collection<ParcelActivityBuilder> deliveries,
-			Time currentTime) {
+	protected List<ParcelActivityBuilder> planGiantTour(DistributionCenter distributionCenter, Collection<ParcelActivityBuilder> deliveries,
+			Time currentTime, Mode mode) {
+		
+		List<ParcelActivityBuilder> giantTour = new ArrayList<>();
 
 		SimpleWeightedGraph<Location, DefaultWeightedEdge> graph = new SimpleWeightedGraph<Location, DefaultWeightedEdge>(
 				DefaultWeightedEdge.class);
@@ -178,12 +164,12 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 
 		}
 
-		this.deliveryTour.clear();
-		this.deliveryTour.addAll(prefix);
-		this.deliveryTour.addAll(suffix);
-		this.deliveryTour = this.deliveryTour.stream().distinct().collect(Collectors.toList());
+		giantTour.clear();
+		giantTour.addAll(prefix);
+		giantTour.addAll(suffix);
+		giantTour = giantTour.stream().distinct().collect(Collectors.toList());
 
-		this.nextPlan = nextPlan.plusDays(1);
+		return giantTour;
 	}
 
 }

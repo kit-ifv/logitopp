@@ -16,8 +16,8 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryAgent;
-import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
+import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -29,6 +29,7 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 	private DayOfWeek lastUpdate = null;
 	private final ImpedanceIfc impedance;
 	
+	@Deprecated //TODO rewrite
 	public PrecalculatedTourAssignment(Map<DayOfWeek, CsvFile> routeFiles, String algorithm, String name, ImpedanceIfc impedance) {
 		this.routes = new HashMap<>();
 		routeFiles.forEach((day,file) -> this.routes.put(day, Route.parseRoutes(file, algorithm, name+"_"+day)));
@@ -37,8 +38,8 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 	
 
 	@Override
-	public List<ParcelActivityBuilder> assignParcels(Collection<ParcelActivityBuilder> deliveries,
-			DeliveryAgent agent, Time currentTime, RelativeTime remainingWorkTime, VehicleType vehicle) {
+	public List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> deliveries,
+			DeliveryVehicle vehicle, Time currentTime, RelativeTime remainingWorkTime) {
 		
 		DayOfWeek day = currentTime.weekDay();
 		
@@ -61,12 +62,12 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		this.routes.get(day).remove(route);
 
 		ArrayList<ParcelActivityBuilder> assigned = new ArrayList<>();		
-		Zone lastZone = agent.getDistributionCenter().getZone();
+		Zone lastZone = vehicle.getOwner().getZone();
 		Time time = currentTime;
 
 		for (ParcelActivityBuilder delivery : route.getDeliveries()) {			
-			float tripDuration = travelTime(lastZone, delivery.getZone(), time, vehicle.getMode());			
-			delivery.withTripDuration(round(tripDuration));
+			float tripDuration = travelTime(lastZone, delivery.getZone(), time, vehicle.getType().getMode());			
+			
 			delivery.plannedAt(time.plusMinutes(round(tripDuration)));
 			
 			float deliveryDuration = delivery.estimateDuration();
@@ -77,7 +78,7 @@ public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrate
 		}
 		
 		
-		return assigned;
+		return null;
 	}
 
 	private boolean startsAfter1800(Time currentTime) {
