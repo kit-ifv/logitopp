@@ -16,16 +16,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
+import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.util.random.BoxPlotDistribution;
 
 public class TestShareBasedBusinessPartnerSelector {
 	
 	private static final int MAX_DEMAND = 10;
 	
-	private Collection<DistributionCenter> distributionCenters;
-	private Function<DistributionCenter, Double> capacityProvider;
+	private Collection<CEPServiceProvider> serviceProviders;
+	private Function<CEPServiceProvider, Double> capacityProvider;
 	private Function<Business, Integer> demandProvider;
+	
+	private Map<CEPServiceProvider, Double> sharesProduction;
+	private Map<CEPServiceProvider, Double> sharesConsumption;
+	private MarketShareProvider shareProvider;
 
 	private Business business;
 
@@ -33,38 +38,45 @@ public class TestShareBasedBusinessPartnerSelector {
 
 	@BeforeEach
 	public void setUp() throws NoSuchFieldException, SecurityException {
-		DistributionCenter d1 = mock(DistributionCenter.class);
+		this.sharesConsumption = new LinkedHashMap<>();
+		this.sharesProduction = new LinkedHashMap<>();
+		
+		CEPServiceProvider d1 = mock(CEPServiceProvider.class);
 		when(d1.toString()).thenReturn("A");
-		when(d1.getShareBusiness()).thenReturn(0.5);
-		when(d1.getSharePrivate()).thenReturn(0.2);
-		when(d1.getNumEmployees()).thenReturn(15);
+		sharesConsumption.put(d1, 0.5);
+		sharesProduction.put(d1, 0.2);
+		when(d1.getNumVehicles()).thenReturn(15);
 		
-		DistributionCenter d2 = mock(DistributionCenter.class);
+		CEPServiceProvider d2 = mock(CEPServiceProvider.class);
 		when(d2.toString()).thenReturn("B");
-		when(d2.getShareBusiness()).thenReturn(0.3);
-		when(d2.getSharePrivate()).thenReturn(0.5);
-		when(d2.getNumEmployees()).thenReturn(10);
+		sharesConsumption.put(d2, 0.3);
+		sharesProduction.put(d2, 0.5);
+		when(d2.getNumVehicles()).thenReturn(10);
 		
-		DistributionCenter d3 = mock(DistributionCenter.class);
+		CEPServiceProvider d3 = mock(CEPServiceProvider.class);
 		when(d3.toString()).thenReturn("C");
-		when(d3.getShareBusiness()).thenReturn(0.2);
-		when(d3.getSharePrivate()).thenReturn(0.3);
-		when(d3.getNumEmployees()).thenReturn(12);
+		sharesConsumption.put(d3, 0.2);
+		sharesProduction.put(d3, 0.3);
+		when(d3.getNumVehicles()).thenReturn(12);
 		
-		distributionCenters = new ArrayList<>(List.of(d1, d2, d3));
-		capacityProvider = d -> (double) d.getNumEmployees();
+		serviceProviders = new ArrayList<>(List.of(d1, d2, d3));
+		capacityProvider = d -> (double) d.getNumVehicles();
 		
 		this.rand = new Random(42);
 		demandProvider = b -> demand(rand);
 
 		business = new Business(1L, "", Branch.A, BuildingType.HOSPITAL, 12, 42.0, Map.of(), null, null, rand);
+		
+		shareProvider = mock(MarketShareProvider.class);
+		when(shareProvider.getBusinessConsumptionShare()).thenReturn(sharesConsumption);
+		when(shareProvider.getBusinessProductionShare()).thenReturn(sharesProduction);
 	}
 	
 	@Test
 	public void select() {
 		NumberOfPartnersModel numberModel = new DistributionBasedNumberOfPartnersModel(b -> new BoxPlotDistribution(1, 1, 2, 2, 3));
 		
-		BusinessPartnerSelector selector = new ShareBasedBusinessPartnerSelector(numberModel, distributionCenters, demandProvider, capacityProvider, mock(DeliveryResults.class), "Test");
+		BusinessPartnerSelector selector = new ShareBasedBusinessPartnerSelector(numberModel, serviceProviders, sharesProduction::get, demandProvider, capacityProvider, mock(DeliveryResults.class), "Test");
 	
 		for (int i = 0; i < 1000; i++) {
 			setRandomDemand();
@@ -73,9 +85,9 @@ public class TestShareBasedBusinessPartnerSelector {
 		
 		selector.printStatistics();
 		
-		LinkedHashMap<DistributionCenter, Double> weights = selector.computeCurrentWeights();
-		for (DistributionCenter dc : distributionCenters) {
-			assertEquals(dc.getShareBusiness(), weights.get(dc), 0.01);
+		LinkedHashMap<CEPServiceProvider, Double> weights = selector.computeCurrentWeights();
+		for (CEPServiceProvider cepsp : serviceProviders) {
+			assertEquals(sharesProduction.get(cepsp), weights.get(cepsp), 0.01);
 		}
 				
 	}
@@ -84,10 +96,10 @@ public class TestShareBasedBusinessPartnerSelector {
 	public void selectMoreThanAvailable() {
 		NumberOfPartnersModel numberModel = (b,r) -> 4;
 		
-		BusinessPartnerSelector selector = new ShareBasedBusinessPartnerSelector(numberModel, distributionCenters, demandProvider, capacityProvider, mock(DeliveryResults.class), "Test");
+		BusinessPartnerSelector selector = new ShareBasedBusinessPartnerSelector(numberModel, serviceProviders, sharesProduction::get, demandProvider, capacityProvider, mock(DeliveryResults.class), "Test");
 		
 		setRandomDemand();
-		Collection<DistributionCenter> res = selector.select(business);
+		Collection<CEPServiceProvider> res = selector.select(business);
 
 		assertEquals(3, res.size());
 		
@@ -98,7 +110,7 @@ public class TestShareBasedBusinessPartnerSelector {
 	public void selectForShipping() {
 		NumberOfPartnersModel numberModel = new DistributionBasedNumberOfPartnersModel(b -> new BoxPlotDistribution(1, 1, 2, 2, 3));
 		
-		BusinessPartnerSelector selector =  ShareBasedBusinessPartnerSelector.createFor(numberModel, distributionCenters,  mock(DeliveryResults.class));
+		BusinessPartnerSelector selector =  ShareBasedBusinessPartnerSelector.createForProduction(numberModel, serviceProviders, shareProvider, mock(DeliveryResults.class));
 
 		for (int i = 0; i < 10000; i++) {
 			setRandomDemand();
@@ -107,9 +119,9 @@ public class TestShareBasedBusinessPartnerSelector {
 		
 		selector.printStatistics();
 		
-		LinkedHashMap<DistributionCenter, Double> weights = selector.computeCurrentWeights();
-		for (DistributionCenter dc : distributionCenters) {
-			assertEquals(dc.getShareBusiness(), weights.get(dc), 0.01);
+		LinkedHashMap<CEPServiceProvider, Double> weights = selector.computeCurrentWeights();
+		for (CEPServiceProvider cepsp : serviceProviders) {
+			assertEquals(sharesProduction.get(cepsp), weights.get(cepsp), 0.01);
 		}
 				
 	}
@@ -118,7 +130,7 @@ public class TestShareBasedBusinessPartnerSelector {
 	public void selectForDelivery() {
 		NumberOfPartnersModel numberModel = new DistributionBasedNumberOfPartnersModel(b -> new BoxPlotDistribution(1, 1, 2, 2, 3));
 		
-		BusinessPartnerSelector selector =  ShareBasedBusinessPartnerSelector.createFor(numberModel, distributionCenters,  mock(DeliveryResults.class));
+		BusinessPartnerSelector selector =  ShareBasedBusinessPartnerSelector.createForConsumption(numberModel, serviceProviders, shareProvider, mock(DeliveryResults.class));
 
 		for (int i = 0; i < 1000; i++) {
 			setRandomDemand();
@@ -127,9 +139,9 @@ public class TestShareBasedBusinessPartnerSelector {
 		
 		selector.printStatistics();
 		
-		LinkedHashMap<DistributionCenter, Double> weights = selector.computeCurrentWeights();
-		for (DistributionCenter dc : distributionCenters) {
-			assertEquals(dc.getShareBusiness(), weights.get(dc), 0.01);
+		LinkedHashMap<CEPServiceProvider, Double> weights = selector.computeCurrentWeights();
+		for (CEPServiceProvider cepsp : serviceProviders) {
+			assertEquals(sharesConsumption.get(cepsp), weights.get(cepsp), 0.01);
 		}
 				
 	}

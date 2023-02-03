@@ -1,16 +1,21 @@
 package edu.kit.ifv.mobitopp.simulation;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.InstantValueProvider;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.LatentValueProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.time.Time;
+import edu.kit.ifv.mobitopp.util.collections.CollectionsUtil;
 
 /**
  * The Class ParcelSchedulerHook stores pending {@link ParcelBuilder parcels} in a virtual vault and
@@ -89,13 +94,34 @@ public class ParcelSchedulerHook implements Hook {
 	public void process(Time date) {
 
 		if (this.parcels.containsKey(date)) {
-			this.parcels.get(date).forEach(ParcelBuilder::get);
+			Collection<ParcelBuilder<?>> dueParcels = this.parcels.get(date);
+			List<IParcel> arrivingPcls = dueParcels.stream().map(ParcelBuilder::get).collect(toList());
 
 			if (!keepSchedule) {
 				this.parcels.remove(date);
 			}
+			
+			logStatistics(date, arrivingPcls);
 
 		}
+	}
+
+	/**
+	 * Log statistics of arriving parcels.
+	 *
+	 * @param date the date
+	 * @param arrivingPcls the arriving pcls
+	 */
+	private void logStatistics(Time date, List<IParcel> arrivingPcls) {
+		Collection<List<IParcel>> categoryGroups = 
+				CollectionsUtil.groupBy(arrivingPcls, (p1, p2) -> p1.getProducer().carrierTag().equals(p2.getProducer().carrierTag()));
+		
+		System.out.println(date.toString() +  ": Schedule " + arrivingPcls.size() + " new parcels.");
+		for (List<IParcel> group : categoryGroups) {
+			String tag = group.get(0).getProducer().carrierTag();
+			System.out.println(tag + ": " + group.size());
+		}
+		System.out.println();
 	}
 
 	/**

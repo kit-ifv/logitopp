@@ -26,7 +26,7 @@ public class Route {
 	}
 	
 	public void planStop(int link, int expectedParcels) {
-		this.deliveryTour.put(link, new ParcelActivityBuilder(clusteringStrategy));
+//		this.deliveryTour.put(link, new ParcelActivityBuilder(clusteringStrategy));
 		this.expectedParcels.put(link, expectedParcels);
 	}
 	
@@ -37,13 +37,13 @@ public class Route {
 	public void addParcels(ParcelActivityBuilder delivery) {
 		if (contains(delivery)) {
 			int stop = Math.abs(delivery.getLocation().roadAccessEdgeId());
-			this.deliveryTour.put(stop, this.deliveryTour.get(stop).merge(delivery));
+//			this.deliveryTour.put(stop, this.deliveryTour.get(stop).merge(delivery));
 		}
 	}
 	
 	private void verify() {
 		for (int stop : deliveryTour.keySet()) {
-			int parcels = this.deliveryTour.get(stop).getParcels().size();
+			int parcels = this.deliveryTour.get(stop).getAllParcels().size();
 			int expected = this.expectedParcels.get(stop);
 			if (parcels != expected) {
 				System.out.println("Tour " + id + " stop " + stop + " contains " + parcels + " parcels "+ " but " + expected + " were expected.");
@@ -56,7 +56,7 @@ public class Route {
 	}
 	
 	public int size() {
-		return this.deliveryTour.values().stream().mapToInt(d -> d.getParcels().size()).sum();
+		return this.deliveryTour.values().stream().mapToInt(d -> d.getAllParcels().size()).sum();
 	}
 	
 	

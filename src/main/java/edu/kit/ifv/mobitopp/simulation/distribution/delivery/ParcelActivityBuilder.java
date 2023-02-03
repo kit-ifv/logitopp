@@ -7,10 +7,8 @@ import java.util.List;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
@@ -19,40 +17,23 @@ public class ParcelActivityBuilder {
 	protected DeliveryVehicle deliveryVehicle;
 	protected Time plannedArrivalTime;
 	
-	protected final List<IParcel> parcels;
+	protected final List<IParcel> allParcels;
+	protected final List<IParcel> deliveries;
 	protected final List<IParcel> pickUps;
+	protected final ZoneAndLocation stopLocation;
 
-	
-	protected DeliveryClusteringStrategy clusteringStrategy;
-
-	public ParcelActivityBuilder(DeliveryClusteringStrategy clusteringStrategy) {
-		this.parcels = new ArrayList<>();
+	public ParcelActivityBuilder(Collection<IParcel> parcels, ZoneAndLocation stopLocation) {
+		this.allParcels = new ArrayList<>(parcels);
+		this.deliveries = new ArrayList<>();
 		this.pickUps = new ArrayList<>();
-		this.clusteringStrategy = clusteringStrategy;
-	}
+		this.stopLocation = stopLocation;
 
-	public ParcelActivityBuilder addParcel(IParcel parcel) {
-		this.parcels.add(parcel);
-		return this;
-	}
-
-	public ParcelActivityBuilder addParcels(Collection<IParcel> parcels) {
-		this.parcels.addAll(parcels);
-		return this;
+		parcels.stream().filter(IParcel::isPickUp).forEach(pickUps::add);
+		parcels.stream().filter(p -> !p.isPickUp()).forEach(deliveries::add);
 	}
 	
-	public ParcelActivityBuilder addPickUp(IParcel pickUp) {
-		this.pickUps.add(pickUp);
-		return this;
-	}
-
-	public ParcelActivityBuilder addPickUps(Collection<IParcel> pickUps) {
-		this.pickUps.addAll(pickUps);
-		return this;
-	}
-
 	public int estimateDuration() {
-		return (int) this.deliveryVehicle.getOwner().getDurationModel().estimateDuration(deliveryVehicle, parcels);
+		return (int) this.deliveryVehicle.getOwner().getDurationModel().estimateDuration(deliveryVehicle, getAllParcels()); //TODO distinguish pickups and deliveries in duration model?
 	}
 
 	public ParcelActivityBuilder plannedAt(Time time) {
@@ -66,41 +47,24 @@ public class ParcelActivityBuilder {
 	}
 	
 	public ParcelActivity buildWorkerActivity() {
-		return new ParcelActivity(getZoneAndLocation(), parcels, pickUps, deliveryVehicle, plannedArrivalTime);		
-	}
-	
-	
-	
-	
-	
-	public ZoneAndLocation getZoneAndLocation() {
-		return clusteringStrategy.getStopLocation(this.parcels);
-	}
-	
+		return new ParcelActivity(stopLocation, deliveries, pickUps, deliveryVehicle, plannedArrivalTime);		
+	}	
+		
 
 	public Zone getZone() {
-		return this.getZoneAndLocation().zone();
+		return this.getStopLocation().zone();
 	}
 
 	public Location getLocation() {
-		return this.getZoneAndLocation().location();
+		return this.getStopLocation().location();
 	}
 
 	public int size() {
-		return this.parcels.size();
+		return this.getAllParcels().size();
 	}
 	
 	public int volume() {
-		return this.parcels.stream().mapToInt(p -> p.getShipmentSize().getVolume(p)).sum();
+		return getAllParcels().stream().mapToInt(p -> p.getShipmentSize().getVolume(p)).sum();
 	}
-	
-	public ParcelActivityBuilder merge(ParcelActivityBuilder other) {
-		ParcelActivityBuilder newBuilder = new ParcelActivityBuilder(this.clusteringStrategy);
-		newBuilder.addParcels(this.getParcels());
-		newBuilder.addParcels(other.getParcels());
-		
-		return newBuilder;
-	}
-
 	
 }

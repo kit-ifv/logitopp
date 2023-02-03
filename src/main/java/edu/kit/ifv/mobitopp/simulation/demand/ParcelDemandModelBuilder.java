@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.CopyProviderModelStep;
+import edu.kit.ifv.mobitopp.simulation.demand.attributes.DistributionCenterSelectorByFleetSize;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.LatentModelStepWarpper;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector;
@@ -24,7 +25,9 @@ import edu.kit.ifv.mobitopp.simulation.demand.quantity.NormalDistributedNumberOf
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.NullNumerOfParcelsSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.ParcelQuantityModel;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.RandomNumberOfParcelsSelector;
+import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -158,27 +161,84 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 	
 	
 	
+	public ParcelDemandModelBuilder<A,P> customCepspSelection(ParcelDemandModelStep<A, P, CEPServiceProvider> step) {
+		return this.addStep(step, ParcelBuilder::setServiceProvider);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> equalDistributionCepspSelection(Collection<CEPServiceProvider> serviceProviders) {
+		return this.selectShareBased(serviceProviders, ParcelBuilder::setServiceProvider);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> shareBasedCepspSelection(Map<CEPServiceProvider, Double> shares) {
+		return this.selectShareBased(shares, ParcelBuilder::setServiceProvider);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> privateConsumptionShareBasedCepspSelection(MarketShareProvider shareProvider) {
+		return this.shareBasedCepspSelection(shareProvider.getPrivateConsumptionShare());
+	}
+	
+	public ParcelDemandModelBuilder<A,P> privateProductionShareBasedCepspSelection(MarketShareProvider shareProvider) {
+		return this.shareBasedCepspSelection(shareProvider.getPrivateProductionShare());
+	}
+	
+	public ParcelDemandModelBuilder<A,P> privateOverallShareBasedCepspSelection(MarketShareProvider shareProvider) {
+		return this.shareBasedCepspSelection(shareProvider.getPrivateShare());
+	}
+	
+	public ParcelDemandModelBuilder<A,P> businessConsumptionShareBasedCepspSelection(MarketShareProvider shareProvider) {
+		return this.shareBasedCepspSelection(shareProvider.getBusinessConsumptionShare());
+	}
+	
+	public ParcelDemandModelBuilder<A,P> businessProductionShareBasedCepspSelection(MarketShareProvider shareProvider) {
+		return this.shareBasedCepspSelection(shareProvider.getBusinessProductionShare());
+	}
+	
+	public ParcelDemandModelBuilder<A,P> businessOverallShareBasedCepspSelection(MarketShareProvider shareProvider) {
+		return this.shareBasedCepspSelection(shareProvider.getBusinessShare());
+	}
+	
+	public ParcelDemandModelBuilder<A,P> overallConsumptionShareBasedCepspSelection(MarketShareProvider shareProvider) {
+		return this.shareBasedCepspSelection(shareProvider.getConsumptionShare());
+	}
+	
+	public ParcelDemandModelBuilder<A,P> overallProductionShareBasedCepspSelection(MarketShareProvider shareProvider) {
+		return this.shareBasedCepspSelection(shareProvider.getProductionShare());
+	}
+	
+	public ParcelDemandModelBuilder<A,P> totalMarketShareBasedCepspSelection(MarketShareProvider shareProvider) {
+		return this.shareBasedCepspSelection(shareProvider.getTotalShare());
+	}
+	
+	
+	
+	
+	
 	public ParcelDemandModelBuilder<A,P> customDistributionCenterSelection(ParcelDemandModelStep<A, P, DistributionCenter> step) {
 		return this.addStep(step, ParcelBuilder::setDistributionCenter);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> equalDistributionCenterSelection(Collection<DistributionCenter> distributionCenters) {
-		return this.selectShareBased(distributionCenters, ParcelBuilder::setDistributionCenter);
-	}
-
-	public ParcelDemandModelBuilder<A,P> privateShareBasedDistributionCenterSelection(Collection<DistributionCenter> distributionCenters) {
-		Map<DistributionCenter, Double> shares = distributionCenters.stream().collect(toMap(Function.identity(), DistributionCenter::getSharePrivate));
-		return this.selectShareBased(shares, ParcelBuilder::setDistributionCenter);
+	public ParcelDemandModelBuilder<A,P> distributionCenterSelectionInCepspByFleetsize() {
+		return this.addStep(new DistributionCenterSelectorByFleetSize<>(), ParcelBuilder::setDistributionCenter);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> businessShareBasedDistributionCenterSelection(Collection<DistributionCenter> distributionCenters) {
-		Map<DistributionCenter, Double> shares = distributionCenters.stream().collect(toMap(Function.identity(), DistributionCenter::getShareBusiness));
-		return this.selectShareBased(shares, ParcelBuilder::setDistributionCenter);
-	}
 	
-	public ParcelDemandModelBuilder<A,P> customSharesDistributionCenterSelection(Map<DistributionCenter, Double> shares) {
-		return this.selectShareBased(shares, ParcelBuilder::setDistributionCenter);
-	}
+//	public ParcelDemandModelBuilder<A,P> equalDistributionCenterSelection(Collection<DistributionCenter> distributionCenters) {
+//		return this.selectShareBased(distributionCenters, ParcelBuilder::setDistributionCenter);
+//	}
+//
+//	public ParcelDemandModelBuilder<A,P> privateShareBasedDistributionCenterSelection(Collection<DistributionCenter> distributionCenters) {
+//		Map<DistributionCenter, Double> shares = distributionCenters.stream().collect(toMap(Function.identity(), DistributionCenter::getSharePrivate));
+//		return this.selectShareBased(shares, ParcelBuilder::setDistributionCenter);
+//	}
+//	
+//	public ParcelDemandModelBuilder<A,P> businessShareBasedDistributionCenterSelection(Collection<DistributionCenter> distributionCenters) {
+//		Map<DistributionCenter, Double> shares = distributionCenters.stream().collect(toMap(Function.identity(), DistributionCenter::getShareBusiness));
+//		return this.selectShareBased(shares, ParcelBuilder::setDistributionCenter);
+//	}
+//	
+//	public ParcelDemandModelBuilder<A,P> customSharesDistributionCenterSelection(Map<DistributionCenter, Double> shares) {
+//		return this.selectShareBased(shares, ParcelBuilder::setDistributionCenter);
+//	}
 	
 	
 	
@@ -281,6 +341,22 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 //		return this.customServiceProviderSelection((parcel, otherParcels, numOfParcels, rand) -> parcel.getDistributionCenter().getServiceProvider());
 //	}
 
+	
+	public ParcelDemandModelBuilder<A,P> customPickupOrDeliverySelection(ParcelDemandModelStep<A, P, Boolean> step) {
+		return this.addStep(step, ParcelBuilder::setIsPickUp);
+	}
+	
+	public ParcelDemandModelBuilder<A, P> allAsPickup() {
+		return this.addStep((p, op, n, r) -> true, ParcelBuilder::setIsPickUp);
+	}
+	
+	public ParcelDemandModelBuilder<A, P> allAsDelivery() {
+		return this.addStep((p, op, n, r) -> false, ParcelBuilder::setIsPickUp);
+	}
+	
+	
+	
+	
 	public ParcelDemandModel<A, P> build() {
 		verifyAndInitialize();
 		

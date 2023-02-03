@@ -11,7 +11,7 @@ import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 public class LinkDeliveryClustering implements DeliveryClusteringStrategy {
 
 	@Override
-	public boolean cabBeGrouped(IParcel a, IParcel b) {
+	public boolean canBeGrouped(IParcel a, IParcel b) {
 		return areOnSameLink(a,b);
 	}
 	 

@@ -124,5 +124,10 @@ public class PickUpParcelPerson extends SimulationPersonDecorator implements Nul
 		return new ZoneAndLocation(person.homeZone(), person.household().homeLocation());
 	}
 
+	
+	@Override
+	public String carrierTag() {
+		return "PrivatePerson";
+	}
 
 }

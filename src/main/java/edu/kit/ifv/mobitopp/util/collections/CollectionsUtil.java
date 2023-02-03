@@ -43,4 +43,25 @@ public final class CollectionsUtil {
 		return list;
 	}
 	
+	public static <T> List<List<T>> partition(List<T> list, int maxSize) {
+		if (list.size() <= maxSize) {
+			return List.of(list);
+		}
+		
+		int numParts = (int) Math.ceil(list.size() / (1.0*maxSize));
+		
+		List<List<T>> partitions = new ArrayList<>(numParts);
+		for (int i=0; i < numParts; i++) {
+			partitions.add(new ArrayList<>(maxSize));
+		}
+		
+		int i = 0;
+		for (T t : list) {
+			partitions.get(i % numParts).add(t);
+			i++;
+		}
+		
+		return partitions;
+	};
+	
 }

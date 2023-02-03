@@ -8,8 +8,6 @@ import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelState.UNDEFINED;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.mozilla.javascript.Undefined;
-
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.Location;
@@ -34,17 +32,19 @@ public abstract class BaseParcel implements IParcel {
 	@Getter	protected ZoneAndLocation zoneAndLocation;
 	@Getter protected RecipientType recipientType;
 	@Getter protected ShipmentSize shipmentSize;
+	@Getter protected boolean isPickUp;
 
 	protected final DeliveryResults results;
 	@Getter protected ParcelState state = ParcelState.UNDEFINED;
 
 	public BaseParcel(ZoneAndLocation location, Time plannedArrival, ParcelAgent producer,
-			DeliveryResults results, ShipmentSize shipmentSize) {
+			DeliveryResults results, ShipmentSize shipmentSize, boolean isPickUp) {
 		this.results = results;
 		this.plannedArrivalDate = plannedArrival;
 		this.setProducer(producer);
 		this.zoneAndLocation = location;
 		this.shipmentSize = shipmentSize;
+		this.isPickUp = isPickUp;
 	}
 	
 	protected abstract void logChange(Time currentTime, DeliveryVehicle deliveryVehicle, boolean isAttempt);
@@ -157,6 +157,16 @@ public abstract class BaseParcel implements IParcel {
 		}
 		
 		return success;
+	}
+	
+	@Override
+	public void load(Time time, DeliveryVehicle vehicle) {
+		setOnDelivery(time, vehicle);
+	}
+	
+	@Override
+	public void unload(Time time, DeliveryVehicle vehicle) {
+		setUndefined(time, vehicle);
 	}
 	
 	

@@ -37,6 +37,7 @@ public class DeliveryVehicle {
 	}
 	
 	public void unloadReturningParcel(Time currentTime) {
+		this.returningParcels.forEach(p -> p.unload(currentTime, this));
 		this.returningParcels.forEach(owner::addParcel);
 		this.pickedUpParcels.forEach(p -> p.tryDelivery(currentTime, this)); //TODO unpack if container, add precalculated bike route etc. (maybe call deliver here??)
 		

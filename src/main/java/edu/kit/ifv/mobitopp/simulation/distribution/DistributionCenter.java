@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.Hook;
+import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
@@ -21,6 +23,7 @@ import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
+import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,11 +38,10 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	@Getter private final String name;
 	@Getter private final Zone zone;
 	@Getter private final Location location;
-	@Getter private int numEmployees;
+	@Getter private int numVehicles;
 	@Getter private int attempts;
-	@Getter private double sharePrivate;
-	@Getter private double shareBusiness;
 	@Getter private final DemandQuantity demandQuantity;
+	
 	
 	private final Collection<DeliveryVehicle> vehicles;
 	private final Map<DeliveryVehicle, Time> returnTimes;
@@ -49,7 +51,8 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	private final Collection<IParcel> collectedPickups;
 	private final Collection<IParcel> pickupRequests;
 	private final Collection<PlannedDeliveryTour> plannedTours;
-
+	private final ImpedanceIfc impedance;
+	
 			@Setter	private DeliveryTourAssignmentStrategy tourStrategy;
 			@Setter	private ParcelPolicyProvider policyProvider;
 			@Setter	private DeliveryClusteringStrategy clusteringStrategy;
@@ -66,52 +69,114 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	 * @param organization  the organizations name
 	 * @param zone          the zone
 	 * @param location      the location
-	 * @param numEmployees  the number of employees
-	 * @param sharePrivate  the market share for private recipients
-	 * @param shareBusiness the market share for business recipients
+	 * @param numVehicles   the number of vehicles
 	 * @param attempts      the maximum number of delivery attempts
 	 */
-	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numEmployees,
-			double sharePrivate, double shareBusiness, int attempts, VehicleType vehicleType) {
+	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numVehicles,
+			int attempts, VehicleType vehicleType, ImpedanceIfc impedance) {
 		this.id = id;
 		this.name = name;
 		this.organization = organization;
-
 		this.zone = zone;
 		this.location = location;
 
 		this.attempts = attempts;
-		this.sharePrivate = sharePrivate;
-		this.shareBusiness = shareBusiness;
-		this.numEmployees = numEmployees;
+		this.numVehicles = numVehicles;
 		
-		this.vehicles = new ArrayList<>();
+		this.demandQuantity = new DemandQuantity();
 		
 		this.returnTimes = new LinkedHashMap<>();
 		this.vehicleType = vehicleType;
+		this.vehicles = new ArrayList<>();
 
 		this.currentParcels = new ArrayList<>();
 		this.collectedPickups = new ArrayList<>();
 		this.pickupRequests = new ArrayList<>();
 		this.plannedTours = new ArrayList<>();
+		this.impedance = impedance;
 		
 		this.scheduler = new ParcelArrivalScheduler(this);
 
-		this.demandQuantity = new DemandQuantity();
+		initVehicles();
+		
+	}
+	
+	private void initVehicles() {
+		
+		for (int i = 0; i < numVehicles; i++) {
+			vehicles.add(new DeliveryVehicle(vehicleType, 150, this)); //TODO determine capacity in vehicle type
+		}
+		
 	}
 	
 	
 	
 	@Override
-	public void process(Time date) {
+	public void process(Time currentTime) { //TODO register dc and its scheduler as hook (maybe dc calls its own scheduler instead of main hook)
+
+		scheduler.process(currentTime);
+		
+		planTours(currentTime);
+		dispatchAvailableTours(currentTime);
+		
+	}
+	
+	private void planTours(Time currentTime) {
+		
+		if (currentTime.equals(currentTime.startOfDay().plusHours(6))) { //TODO add replanning for non-hubs
+			
+			ArrayList<DeliveryVehicle> vehs = new ArrayList<>(this.vehicles);
+			vehs.addAll(returnTimes.keySet());
+			
+			List<ParcelActivityBuilder> activities = getDeliveryActivities();
+			
+			if (!activities.isEmpty()) {
+				this.plannedTours.addAll(
+					this.tourStrategy.planTours(activities, vehs.iterator().next(), currentTime, RelativeTime.ofHours(8))
+				);
+			}
+			
+
+		}
+		
+		// TODO Auto-generated method stub
 		// TODO check if it is time to (re)?plan delivery tours
 		// TODO group deliveries and pickups to parcelActivities
 		// TODO plan tours for parcel activities
 		// TODO store planned tours
+	}
+
+
+
+	private void dispatchAvailableTours(Time currentTime) {
 		
-		// TODO check if vehicle can and should be dispatched -> dummy dispatch strategy time window, tour available and vehicle available
-		// TODO dispatch tour
-		// TODO check again
+		if (canDispatch(currentTime)) {
+			
+			Optional<PlannedDeliveryTour> tour = plannedTours.stream().filter(t-> endsBeforeEndOfDeliveryTime(currentTime, t)).findFirst();
+			
+			
+			if (tour.isPresent()) {
+				DeliveryVehicle vehicle = vehicles.iterator().next();
+				tour.get().dispatchTour(currentTime, vehicle, impedance);
+				
+				plannedTours.remove(tour.get());
+				
+				dispatchAvailableTours(currentTime);
+			}						
+		}
+	}
+
+
+
+	
+	private boolean canDispatch(Time time) { //TODO extract dispatch times strategy
+		int hour=time.getHour();
+		
+		return !plannedTours.isEmpty() && !vehicles.isEmpty() && 8 <= hour && hour <= 18 && plannedTours.stream().anyMatch(t -> endsBeforeEndOfDeliveryTime(time, t));
+	}
+
+	private boolean endsBeforeEndOfDeliveryTime(Time time, PlannedDeliveryTour t) {
+		return time.plus(t.getPlannedDuration()).getHour() <= 21;
 	}
 	
 	
@@ -173,19 +238,26 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 //				.collect(toList());
 //	}
 
-	private List<ParcelActivityBuilder> getDeliveryActivities(Time currentTime) { //TODO move to clustering??
+
+
+
+
+	private List<ParcelActivityBuilder> getDeliveryActivities() { //TODO move to clustering??
 		List<ParcelActivityBuilder> deliveries = new ArrayList<>();
 
 		List<IParcel> available = new ArrayList<>(currentParcels);
 		available.addAll(pickupRequests);
+		
+		if (available.isEmpty()) {
+			return deliveries;
+		}
 
-		clusteringStrategy.cluster(available)
-						  .forEach(cluster -> {
-							  ParcelActivityBuilder activity = new ParcelActivityBuilder(clusteringStrategy);
-							  cluster.stream().filter(currentParcels::contains).forEach(activity::addParcel);
-							  cluster.stream().filter(pickupRequests::contains).forEach(activity::addPickUp);
-							  deliveries.add(activity);							  
-						  });
+		System.out.println(name + " processes " + available.size() + " parcels.");
+		clusteringStrategy.cluster(available, 150) //TODO replace by vehicle type capacity
+						  .stream()
+						  .map(cluster -> new ParcelActivityBuilder(cluster.getParcels(), cluster.getZoneAndLocation()))
+						  .forEach(deliveries::add);
+		System.out.println(name + " processes " + deliveries.size() + " stops.");
 
 		return deliveries;
 	}
@@ -260,7 +332,10 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		this.vehicles.add(vehicle);
 	}
 
-	
+	@Override
+	public String carrierTag() {
+		return this.name;
+	}
 
 
 }

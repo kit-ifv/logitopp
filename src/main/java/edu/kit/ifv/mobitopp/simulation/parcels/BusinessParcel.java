@@ -18,8 +18,8 @@ public class BusinessParcel extends BaseParcel {
 	@Getter private final ParcelAgent consumer;
 
 	public BusinessParcel(ZoneAndLocation location, Business business, ParcelAgent consumer, Time plannedArrival,
-			ParcelAgent producer, ShipmentSize shipmentSize, DeliveryResults results) {
-		super(location, plannedArrival, producer, results, shipmentSize);
+			ParcelAgent producer, ShipmentSize shipmentSize, boolean isPickUp, DeliveryResults results) {
+		super(location, plannedArrival, producer, results, shipmentSize, isPickUp);
 		this.business = business;
 		this.consumer = consumer;
 		this.results.logBusinessOrder(this);

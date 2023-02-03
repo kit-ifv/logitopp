@@ -8,6 +8,7 @@ import java.util.Random;
 import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
+import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
@@ -34,8 +35,8 @@ public class Business implements ParcelAgent {
 	private final ParcelPolicyProvider policyProvider;
 	private final Random random;
 	
-	private final Collection<DistributionCenter> deliveryPartners;
-	private final Collection<DistributionCenter> shippingPartners;
+	private final Collection<CEPServiceProvider> deliveryPartners;
+	private final Collection<CEPServiceProvider> shippingPartners;
 
 	private final Collection<IParcel> currentParcels;
 	private final Collection<IParcel> delivered;
@@ -73,12 +74,12 @@ public class Business implements ParcelAgent {
 		return interval.getFirst().isBeforeOrEqualTo(currentTime) && currentTime.isBeforeOrEqualTo(interval.getSecond());
 	}
 	
-	public void addDeliveryPartner(DistributionCenter distributionCenter) {
-		this.deliveryPartners.add(distributionCenter);
+	public void addDeliveryPartner(CEPServiceProvider serviceProvider) {
+		this.deliveryPartners.add(serviceProvider);
 	}
 	
-	public void addShippingPartner(DistributionCenter distributionCenter) {
-		this.shippingPartners.add(distributionCenter);
+	public void addShippingPartner(CEPServiceProvider serviceProvider) {
+		this.shippingPartners.add(serviceProvider);
 	}
 
 	public ZoneAndLocation location() {
@@ -105,7 +106,7 @@ public class Business implements ParcelAgent {
 		if (parcel.getConsumer() instanceof DistributionCenter) {//TODO fixx
 			DistributionCenter dc = (DistributionCenter) parcel.getConsumer();
 			
-			System.out.println("Business " + this.id + " requests " + dc.getName() + " to pick up parcel " + parcel.getOId());
+//			System.out.println("Business " + this.id + " requests " + dc.getName() + " to pick up parcel " + parcel.getOId());
 			dc.requestPickup(parcel);
 		}
 	}
@@ -134,6 +135,11 @@ public class Business implements ParcelAgent {
 	
 	public Sector getSector() {
 		return this.branch.getSector();
+	}
+	
+	@Override
+	public String carrierTag() {
+		return "Business";
 	}
 
 }

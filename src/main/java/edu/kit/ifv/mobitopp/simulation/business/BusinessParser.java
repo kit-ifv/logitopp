@@ -43,7 +43,7 @@ public class BusinessParser {
 		double y = row.valueAsDouble("loc_y");
 		String zoneId = row.get("zone");
 		Zone zone = zoneRepo.getByExternalId(zoneId);
-		
+				
 		ZoneAndLocation location = new ZoneAndLocation(zone, new Location(new Point2D.Double(x, y), 0, 0));
 		
 		BusinessBuilder builder = new BusinessBuilder(seed)

@@ -6,7 +6,7 @@ import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.result.Category;
 import edu.kit.ifv.mobitopp.result.Results;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
-import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
@@ -300,14 +300,14 @@ public class DeliveryResults {
 	 * @param numOfPartners    the number of selected partners for the given
 	 *                         business
 	 */
-	public void logBusinessPartner(Business business, DistributionCenter dc, String tag, int demand,
+	public void logBusinessPartner(Business business, CEPServiceProvider cepsp, String tag, int demand,
 			double relativeCapacity, double estimatedDemand, int numOfPartners) {
 		String msg = "";
 
 		msg += business.getId() + SEP;
 		msg += business.getSector().asInt() + SEP;
-		msg += dc.getName() + SEP;
-		msg += dc.getId() + SEP;
+		msg += cepsp.getName() + SEP;
+		msg += cepsp.getId() + SEP;
 		msg += tag + SEP;
 		msg += demand + SEP;
 		msg += relativeCapacity + SEP;

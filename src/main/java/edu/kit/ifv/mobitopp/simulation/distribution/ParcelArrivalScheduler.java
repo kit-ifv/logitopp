@@ -27,7 +27,7 @@ public class ParcelArrivalScheduler implements Hook {
 		this.arrivalTimes = new HashMap<>();
 		this.lastProcessed = Time.start;
 	}
-	
+		
 	@Override
 	public void process(Time date) {
 		Set<Time> currentReturns = getTimeBefore(vehicleReturnTimes, date);

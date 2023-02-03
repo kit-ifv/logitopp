@@ -8,54 +8,57 @@ import java.util.Map;
 import java.util.function.Function;
 
 import edu.kit.ifv.mobitopp.simulation.business.Business;
-import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
+import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
 import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
 
-public class ActiveDeliveryPartnerSelector implements ParcelDemandModelStep<Business, BusinessParcelBuilder, DistributionCenter> {
+public class ActiveDeliveryPartnerSelector implements ParcelDemandModelStep<Business, BusinessParcelBuilder, CEPServiceProvider> {
 
-	private final Function<Business, Collection<DistributionCenter>> partnerProvider;
+	private final Function<Business, Collection<CEPServiceProvider>> partnerProvider;
 	private final int meanCapacity;
 	
-	private ActiveDeliveryPartnerSelector(Function<Business, Collection<DistributionCenter>> partnerProvider, int meanCapacity) {
+	private ActiveDeliveryPartnerSelector(Function<Business, Collection<CEPServiceProvider>> partnerProvider,
+										  int meanCapacity) {
+		
 		this.partnerProvider = partnerProvider;
 		this.meanCapacity = meanCapacity;
 	}
 	
-	public static ActiveDeliveryPartnerSelector forShipping(int meanCapacity) {
+	public static ActiveDeliveryPartnerSelector forShipping(int meanCapacity, MarketShareProvider shareProvider) {
 		return new ActiveDeliveryPartnerSelector(b -> b.getShippingPartners(), meanCapacity);
 	}
 	
-	public static ActiveDeliveryPartnerSelector forDelivery(int meanCapacity) {
+	public static ActiveDeliveryPartnerSelector forDelivery(int meanCapacity, MarketShareProvider shareProvider) {
 		return new ActiveDeliveryPartnerSelector(b -> b.getDeliveryPartners(), meanCapacity);
 	}
 	
 	@Override
-	public DistributionCenter select(BusinessParcelBuilder parcel, Collection<BusinessParcelBuilder> otherParcels,
+	public CEPServiceProvider select(BusinessParcelBuilder parcel, Collection<BusinessParcelBuilder> otherParcels,
 			int numOfParcels, double randomNumber) {
 		
-		Collection<DistributionCenter> choiceSet = partnerProvider.apply(parcel.getAgent());
+		Collection<CEPServiceProvider> choiceSet = partnerProvider.apply(parcel.getAgent());
 		
-		Map<DistributionCenter, Integer> capacities = 
+		Map<CEPServiceProvider, Integer> capacities = 
 			choiceSet.stream()
 				 	 .collect(toMap(Function.identity(), this::estimateRemainingCapacity));
 
 		
 		boolean allMaxed = capacities.values().stream().allMatch(v -> v <= 0);
-		for (DistributionCenter dc : choiceSet) {
+		for (CEPServiceProvider dc : choiceSet) {
 			capacities.computeIfPresent(dc, (w, prev) -> (prev > 0 || allMaxed) ? abs(prev) : 0);
 		}
 
-		DiscreteRandomVariable<DistributionCenter> randVar = new DiscreteRandomVariable<>(capacities); //TODO logit model, other parcels at same day
-		DistributionCenter selectedPartner = randVar.realization(randomNumber);
+		DiscreteRandomVariable<CEPServiceProvider> randVar = new DiscreteRandomVariable<>(capacities); //TODO logit model, other parcels at same day
+		CEPServiceProvider selectedPartner = randVar.realization(randomNumber);
 		
 		//TODO log
 		
 		return selectedPartner;
 	}
 
-	private int estimateRemainingCapacity(DistributionCenter dc) {
-		return dc.getNumEmployees() * meanCapacity - dc.currentShippingDemand() - dc.currentDeliveryDemand();
+	private int estimateRemainingCapacity(CEPServiceProvider cepsp) {
+		return cepsp.getNumVehicles() * meanCapacity - cepsp.currentShippingDemand() - cepsp.currentDeliveryDemand();
 	}
 	
 	@Override

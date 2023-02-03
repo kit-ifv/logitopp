@@ -5,7 +5,7 @@ import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.distribution.DistributionServiceProvider;
+import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,12 +15,13 @@ public abstract class ParcelBuilder<P extends ParcelAgent> {
 	@Getter private final P agent;
 	@Getter private final DeliveryResults results;
 	
-	@Getter @Setter private ValueProvider<DistributionServiceProvider> serviceProvider;
+	@Getter @Setter private ValueProvider<CEPServiceProvider> serviceProvider;
 	@Getter @Setter private ValueProvider<DistributionCenter> distributionCenter;
 	@Getter @Setter private ValueProvider<ParcelAgent> consumer;
 	@Getter @Setter private ValueProvider<ParcelAgent> producer;
 	@Setter private ValueProvider<Time> arrivalDate;
 	@Getter @Setter private ValueProvider<ShipmentSize> size;
+	@Getter @Setter private ValueProvider<Boolean> isPickUp;
 	
 	private IParcel parcel;
 	

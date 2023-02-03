@@ -1,6 +1,5 @@
 package edu.kit.ifv.mobitopp.simulation.demand;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -12,7 +11,7 @@ import edu.kit.ifv.mobitopp.simulation.demand.attributes.LatentModelStepWarpper;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedParcelDestinationSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
-import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
@@ -137,34 +136,38 @@ public class PrivateParcelDemandModelBuilder
 	/**
 	 * Builds the default private parcel model using a trivial zone filter
 	 * (true).
-	 *
-	 * @param distributionCenters the distribution centers
+	 * @param shares 
 	 * @param results             the results
+	 * @param distributionCenters the distribution centers
+	 *
 	 * @return the parcel demand model
 	 */
 	public static ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> defaultPrivateParcelModel(
-			Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
-		return defaultPrivateParcelModel(distributionCenters, z -> true, results);
+			Map<CEPServiceProvider, Double> shares, DeliveryResults results) {
+		return defaultPrivateParcelModel(shares, z -> true, results);
 	}
 
 	/**
 	 * Builds the default private parcel model.
-	 *
-	 * @param distributionCenters the distribution centers
+	 * @param shares 
 	 * @param workZoneFilter      the work zone filter, outside which WORK-delivery is not a valid
 	 *                       option
 	 * @param results             the results
+	 * @param distributionCenters the distribution centers
+	 *
 	 * @return the parcel demand model
 	 */
 	public static ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> defaultPrivateParcelModel(
-			Collection<DistributionCenter> distributionCenters, Predicate<Zone> workZoneFilter,
-			DeliveryResults results) {
+			Map<CEPServiceProvider, Double> shares,
+			Predicate<Zone> workZoneFilter, DeliveryResults results) {
 		PrivateParcelDemandModelBuilder builder = forPrivateParcels(results);
 
 		builder.useNormalDistributionNumberSelector(0.65, 0.5, 1, 10);
 
 		return builder.equalParcelDestinationSelection(workZoneFilter)
-				.privateShareBasedDistributionCenterSelection(distributionCenters).useDistributionCenterAsProducer()
+				.shareBasedCepspSelection(shares)
+				.distributionCenterSelectionInCepspByFleetsize().useDistributionCenterAsProducer()
+//				.privateShareBasedDistributionCenterSelection(distributionCenters).useDistributionCenterAsProducer()
 				.useAgentAsConsumer()
 				// .equalServiceProviderSelection(List.of("Dummy Delivery Service"))
 				.randomArrivalDaySelectionExcludeSunday().build();

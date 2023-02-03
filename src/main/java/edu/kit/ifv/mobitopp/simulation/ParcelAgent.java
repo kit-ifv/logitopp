@@ -49,5 +49,12 @@ public interface ParcelAgent {
 	 * @return the zone and location
 	 */
 	public ZoneAndLocation getZoneAndLocation();
+	
+	/**
+	 * Gets the category tag for statistics logging of the agent.
+	 *
+	 * @return the category tag
+	 */
+	public String carrierTag();
 
 }

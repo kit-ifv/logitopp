@@ -24,6 +24,7 @@ public class PrivateParcelBuilder extends ParcelBuilder<PickUpParcelPerson> {
 								 getArrivalDate(),
 								 getDistributionCenter().getValue(),
 								 getSize().getValue(),
+								 getIsPickUp().getValue(),
 								 getResults());
 	}
 

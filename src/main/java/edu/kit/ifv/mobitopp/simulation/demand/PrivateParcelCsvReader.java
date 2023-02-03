@@ -8,6 +8,7 @@ import java.util.Map;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.InstantValueProvider;
+import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
@@ -28,11 +29,12 @@ public class PrivateParcelCsvReader implements ParcelDemandModel<PickUpParcelPer
 	private final CsvFile file;
 	private final Map<Integer, Collection<Row>> rowsPerPerson;
 	private final Map<String, DistributionCenter> distributionCenters;
+	private final Map<DistributionCenter, CEPServiceProvider> serviceProviders;
 	
 	private static final String PERSON_ID = "RecipientID";
 	
 
-	public PrivateParcelCsvReader(CsvFile file, Collection<DistributionCenter> distributionCenters, DeliveryResults results) {
+	public PrivateParcelCsvReader(CsvFile file, Collection<DistributionCenter> distributionCenters, Collection<CEPServiceProvider> serviceProviders, DeliveryResults results) {
 		this.results = results;
 		this.file = file;
 		this.rowsPerPerson = new LinkedHashMap<>();
@@ -40,6 +42,9 @@ public class PrivateParcelCsvReader implements ParcelDemandModel<PickUpParcelPer
 		
 		this.distributionCenters = new LinkedHashMap<>();
 		distributionCenters.forEach(dc -> this.distributionCenters.put(dc.getName(), dc));
+		
+		this.serviceProviders = new LinkedHashMap<>();
+		serviceProviders.forEach(sp -> sp.getDistributionCenters().forEach(dc -> this.serviceProviders.put(dc, sp)));
 	}
 	
 	private void fillMap() {
@@ -76,6 +81,9 @@ public class PrivateParcelCsvReader implements ParcelDemandModel<PickUpParcelPer
 			
 			DistributionCenter distributionCenter = this.distributionCenters.get(row.get(DISTRIBUTION_CENTER).trim());
 			builder.setDistributionCenter(new InstantValueProvider<DistributionCenter>(distributionCenter));
+			
+			CEPServiceProvider serviceProvider = this.serviceProviders.get(distributionCenter);
+			builder.setServiceProvider(new InstantValueProvider<CEPServiceProvider>(serviceProvider));
 			
 			ShipmentSize size = ShipmentSize.valueOf(row.get(SIZE));
 			builder.setSize(new InstantValueProvider<>(size));

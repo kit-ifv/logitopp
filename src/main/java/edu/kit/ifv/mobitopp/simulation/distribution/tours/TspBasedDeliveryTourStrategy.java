@@ -69,7 +69,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 			Time endOfTour = currentTime.plus(maxTourDuration);
 		
 			for (int i = 0; i < Math.min(capacity, giantTour.size()); i++) { //TODO check capacity computation/restriction
-				ParcelActivityBuilder delivery = giantTour.get(i);
+				ParcelActivityBuilder delivery = giantTour.get(i).by(vehicle);
 		
 				float tripDuration = travelTime(lastZone, delivery.getZone(), time, mode);		
 				float deliveryDuration = delivery.estimateDuration();
@@ -78,7 +78,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 				if (time.plusMinutes(round(tripDuration + deliveryDuration + returnTime)).isBeforeOrEqualTo(endOfTour)) {
 					
 					time = time.plusMinutes(round(tripDuration));
-					assigned.add(delivery.plannedAt(time).by(vehicle));
+					assigned.add(delivery.plannedAt(time));
 					time = time.plusMinutes(round(deliveryDuration));
 					lastZone = delivery.getZone();
 					
@@ -92,10 +92,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 			plannedTours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, time.differenceTo(currentTime), currentTime));
 			giantTour.removeAll(assigned);
 		}
-		
-	
-		
-		
+
 		return plannedTours;
 	}
 

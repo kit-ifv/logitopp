@@ -14,6 +14,7 @@ public interface IParcel {
 	
 	public int getDeliveryAttempts();
 	public Time getDeliveryTime();
+	public boolean isPickUp();
 	
 	public ParcelState getState();
 	
@@ -36,11 +37,15 @@ public interface IParcel {
 	
 	public boolean tryDelivery(Time currentTime, DeliveryVehicle vehicle);
 	public boolean tryPickup(Time currentTime, DeliveryVehicle vehicle);
+	public void load(Time time, DeliveryVehicle vehicle);
+	public void unload(Time time, DeliveryVehicle vehicle);
 	
 //	public void returning(Time currentTime, DeliveryVehicle deliveryVehicle);
 //	public void loaded(Time currentTime, DeliveryVehicle deliveryVehicle);
 //	public void unloaded(Time currentTime, DeliveryVehicle deliveryVehicle);
 	
 	public RecipientType getRecipientType();
+
+	
 	
 }

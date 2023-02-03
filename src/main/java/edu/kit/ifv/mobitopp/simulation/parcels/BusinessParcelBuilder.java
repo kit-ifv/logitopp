@@ -18,6 +18,7 @@ public class BusinessParcelBuilder extends ParcelBuilder<Business> {
 								  getArrivalDate(),
 								  getProducer().getValue(),
 								  getSize().getValue(),
+								  getIsPickUp().getValue(),
 								  getResults());
 	}
 

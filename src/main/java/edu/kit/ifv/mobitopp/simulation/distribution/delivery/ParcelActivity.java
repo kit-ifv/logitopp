@@ -39,6 +39,7 @@ public class ParcelActivity {
 		DistributionCenter owner = vehicle.getOwner();
 		
 		parcels.forEach(owner::removeParcel);
+		parcels.forEach(p -> p.load(currentTime, vehicle));
 		pickUps.forEach(owner::removePickupRequest);
 	};
 	
