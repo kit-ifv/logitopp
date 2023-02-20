@@ -66,7 +66,11 @@ public class PlannedDeliveryTour {
 		
 		ParcelArrivalScheduler scheduler = vehicle.getOwner().getScheduler();
 		scheduler.dispatchVehicle(vehicle, returnTime);
-		scheduler.dispatchParcelActivities(actualStops, currentTime);		
+		scheduler.dispatchParcelActivities(actualStops, currentTime);
+		
+		long parcels = stops.stream().mapToInt(s -> s.getDeliveries().size()).sum();
+		long pickUps = stops.stream().mapToInt(s -> s.getPickUps().size()).sum();
+		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " leaves with " + parcels + " parcels and " + pickUps + " requested pickups");
 		
 	}
 	

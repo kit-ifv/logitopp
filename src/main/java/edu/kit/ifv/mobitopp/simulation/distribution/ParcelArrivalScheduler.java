@@ -36,7 +36,7 @@ public class ParcelArrivalScheduler implements Hook {
 		currentReturns.stream()
 					  .map(vehicleReturnTimes::get)
 					  .flatMap(x -> x.stream())
-					  .forEach(v -> v.unloadReturningParcel(date));
+					  .forEach(v -> v.unloadAndReturn(date));
 		
 		currentArrivals.stream()
 					   .map(arrivalTimes::get)

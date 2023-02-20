@@ -36,12 +36,20 @@ public class DeliveryVehicle {
 		this.pickedUpParcels.add(parcel);
 	}
 	
-	public void unloadReturningParcel(Time currentTime) {
+	public void unloadAndReturn(Time currentTime) {
+		System.out.println(this.owner.getName() + " " + this.toString() + " delivers " + pickedUpParcels.size() + " picked up parcels and returns " + returningParcels.size() + " unsuccessfull parcels.");
+		
 		this.returningParcels.forEach(p -> p.unload(currentTime, this));
 		this.returningParcels.forEach(owner::addParcel);
 		this.pickedUpParcels.forEach(p -> p.tryDelivery(currentTime, this)); //TODO unpack if container, add precalculated bike route etc. (maybe call deliver here??)
 		
 		this.returningParcels.clear();
 		this.pickedUpParcels.clear();
+		this.owner.returnVehicle(this);
+	}
+	
+	@Override
+	public String toString() {
+		return "veh_" + owner.getId() + "_" + this.id;
 	}
 }

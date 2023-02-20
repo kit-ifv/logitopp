@@ -109,13 +109,13 @@ public abstract class BaseParcel implements IParcel {
 		
 		if (success) {
 			this.recipientType = recipient.get();
-			System.out.println(this.producer.toString() + " successfully delivered " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ")");
+//			System.out.println(this.producer.toString() + " successfully delivered " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ")");
 			
 			setDelivered(currentTime, deliveryVehicle);
 			onDeliverySuccess();
 			
 		} else {
-			System.out.println(this.producer.toString() + " failed to deliver " + this.oId + "(attempt " + this.deliveryAttempts + ")");
+//			System.out.println(this.producer.toString() + " failed to deliver " + this.oId + "(attempt " + this.deliveryAttempts + ")");
 			
 			onDeliveryFailure(currentTime, deliveryVehicle);
 		}
@@ -140,13 +140,13 @@ public abstract class BaseParcel implements IParcel {
 		boolean success = recipient.isPresent();
 		if (success) {
 			this.recipientType = recipient.get();
-			System.out.println(vehicle.toString() + " successfully picked up " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ") at " + producer.toString());
+//			System.out.println(vehicle.toString() + " successfully picked up " + this.oId + "(" + this.recipientType.name() + ", attempt " + this.deliveryAttempts + ") at " + producer.toString());
 			
 			setOnDelivery(currentTime, vehicle);
 			onPickUpSuccess(currentTime, vehicle);
 			
 		} else {
-			System.out.println(vehicle.toString() + " failed to pick up " + this.oId + "(attempt " + this.deliveryAttempts + ") at " + producer.toString());
+//			System.out.println(vehicle.toString() + " failed to pick up " + this.oId + "(attempt " + this.deliveryAttempts + ") at " + producer.toString());
 			onPickUpFailure(vehicle);
 		}
 		

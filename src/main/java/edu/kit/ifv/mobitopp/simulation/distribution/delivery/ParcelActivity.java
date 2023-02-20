@@ -44,7 +44,8 @@ public class ParcelActivity {
 	};
 	
 	public void executeActivity(Time currentTime) {
-		new ArrayList<>(parcels).forEach(p -> p.tryDelivery(currentTime, vehicle));
+		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " attempts delivering " + parcels.size() + " and  picking up " + pickUps.size() + " parcels at " + stopLocation.location().toString());
+		new ArrayList<>(parcels).forEach(p -> p.tryDelivery(currentTime, vehicle));//TODO why new arraylist? because they are removed from original list when successful?
 		new ArrayList<>(pickUps).forEach(p -> p.tryPickup(currentTime, vehicle));
 	};
 

@@ -23,6 +23,7 @@ import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
+import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
@@ -136,6 +137,7 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 				);
 			}
 			
+			System.out.println("	planned " + plannedTours.size() + " tours; " + vehicles.size() + " vehicles available!");
 
 		}
 		
@@ -171,6 +173,8 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	
 	private boolean canDispatch(Time time) { //TODO extract dispatch times strategy
 		int hour=time.getHour();
+		
+		if (time.weekDay().equals(DayOfWeek.SUNDAY)) {return false;}
 		
 		return !plannedTours.isEmpty() && !vehicles.isEmpty() && 8 <= hour && hour <= 18 && plannedTours.stream().anyMatch(t -> endsBeforeEndOfDeliveryTime(time, t));
 	}
