@@ -10,7 +10,9 @@ import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
 import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 public class BusinessParcel extends BaseParcel {
 	
 	@Getter

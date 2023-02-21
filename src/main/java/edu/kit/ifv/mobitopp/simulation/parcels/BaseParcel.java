@@ -18,7 +18,9 @@ import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+@ToString
 public abstract class BaseParcel implements IParcel {
 
 	private static int OID_CNT = 0;
@@ -223,16 +225,16 @@ public abstract class BaseParcel implements IParcel {
 		}
 	}
 
-	/**
-	 * Returns a String representation of the parcel.
-	 *
-	 * @return the string
-	 */
-	@Override
-	public String toString() {
-		return "Parcel(" + this.getOId() + ")  to " + String.valueOf(this.getLocation()) + " at "
-				+ this.getPlannedArrivalDate().toString();
-	}
+//	/**
+//	 * Returns a String representation of the parcel.
+//	 *
+//	 * @return the string
+//	 */
+//	@Override
+//	public String toString() {
+//		return "Parcel(" + this.getOId() + ")  to " + String.valueOf(this.getLocation()) + " at "
+//				+ this.getPlannedArrivalDate().toString();
+//	}
 	
 
 //	@Override

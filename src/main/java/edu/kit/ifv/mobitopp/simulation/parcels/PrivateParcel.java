@@ -14,10 +14,12 @@ import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Parcel holds data about the current state of delivery of a parcel order.
  */
+@ToString
 public class PrivateParcel extends BaseParcel {
 
 	@Getter
@@ -124,17 +126,17 @@ public class PrivateParcel extends BaseParcel {
 		this.person.order(this);
 	}
 
-	/**
-	 * Returns a String representation of the parcel.
-	 *
-	 * @return the string
-	 */
-	@Override
-	public String toString() {
-		return "Parcel(" + this.getOId() + ") for person " + this.getPerson().getOid() + " to "
-				+ String.valueOf(this.getLocation()) + " (" + this.getDestinationType().toString() + ") at "
-				+ this.getPlannedArrivalDate().toString();
-	}
+//	/**
+//	 * Returns a String representation of the parcel.
+//	 *
+//	 * @return the string
+//	 */
+//	@Override
+//	public String toString() {
+//		return "Parcel(" + this.getOId() + ") for person " + this.getPerson().getOid() + " to "
+//				+ String.valueOf(this.getLocation()) + " (" + this.getDestinationType().toString() + ") at "
+//				+ this.getPlannedArrivalDate().toString();
+//	}
 
 //	@Override
 //	public boolean couldBeDeliveredWith(IParcel other) {
