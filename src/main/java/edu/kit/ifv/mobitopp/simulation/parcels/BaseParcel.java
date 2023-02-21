@@ -103,8 +103,14 @@ public abstract class BaseParcel implements IParcel {
 	public boolean tryDelivery(Time currentTime, DeliveryVehicle deliveryVehicle) {
 		verifyState("tryDelivery", ONDELIVERY);
 		this.deliveryAttempts++;
-		Optional<RecipientType> recipient = this.canDeliver(currentTime, deliveryVehicle);
-
+		
+		Optional<RecipientType> recipient;
+		if (isPickUp()) {
+			recipient = Optional.of(RecipientType.DISTRIBUTION_CENTER);
+		} else {
+			recipient = this.canDeliver(currentTime, deliveryVehicle);//TODO visitor pattern for can deliver
+		}
+		
 		boolean success = recipient.isPresent();
 		
 		if (success) {
@@ -210,10 +216,10 @@ public abstract class BaseParcel implements IParcel {
 		verifyState("unloaded result", UNDEFINED);
 	}
 
-	protected void verifyState(String operation, ParcelState ... states ) {
+	protected void verifyState(String operation, ParcelState ... states) {
 		if (!Arrays.asList(states).contains(this.state)) {
 			throw new IllegalStateException(operation + " expects one of the parcel states: " + Arrays.toString(states)
-					+ " (but current state is " + this.state.name() + ")");
+					+ " (but current state is " + this.state.name() + "): " + this.toString());
 		}
 	}
 

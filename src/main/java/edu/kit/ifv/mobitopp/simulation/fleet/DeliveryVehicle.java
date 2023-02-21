@@ -37,7 +37,7 @@ public class DeliveryVehicle {
 	}
 	
 	public void unloadAndReturn(Time currentTime) {
-		System.out.println(this.owner.getName() + " " + this.toString() + " delivers " + pickedUpParcels.size() + " picked up parcels and returns " + returningParcels.size() + " unsuccessfull parcels.");
+		System.out.println(this.owner.getName() + " " + this.toString() + " returns with " + pickedUpParcels.size() + " picked up parcels and returns " + returningParcels.size() + " unsuccessfull parcels.");
 		
 		this.returningParcels.forEach(p -> p.unload(currentTime, this));
 		this.returningParcels.forEach(owner::addParcel);
