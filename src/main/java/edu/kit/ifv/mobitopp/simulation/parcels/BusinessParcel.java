@@ -12,7 +12,7 @@ import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.ToString;
 
-@ToString
+@ToString(callSuper=true)
 public class BusinessParcel extends BaseParcel {
 	
 	@Getter

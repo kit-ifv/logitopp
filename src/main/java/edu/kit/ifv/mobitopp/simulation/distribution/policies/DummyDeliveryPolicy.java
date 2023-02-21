@@ -29,6 +29,10 @@ public class DummyDeliveryPolicy<P extends IParcel> implements ParcelDeliveryPol
 	 */
 	@Override
 	public Optional<RecipientType> canDeliver(P parcel, Time currentTime) {
+		if (parcel.isPickUp()) {
+			return Optional.of(RecipientType.DISTRIBUTION_CENTER);
+		}
+		
 		if (this.recipientType != null) {
 			return Optional.of(recipientType);
 		} else {
