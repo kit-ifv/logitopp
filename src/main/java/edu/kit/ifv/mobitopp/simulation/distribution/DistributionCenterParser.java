@@ -103,6 +103,7 @@ public class DistributionCenterParser {
 
 	
 	private void addCenterToServiceProvider(DistributionCenter center, String cepsp) {
+		if (cepsp == "ALL") {return;}
 		
 		if (serviceProviders.containsKey(cepsp)) {
 			serviceProviders.get(cepsp).addDistributionCenter(center);
