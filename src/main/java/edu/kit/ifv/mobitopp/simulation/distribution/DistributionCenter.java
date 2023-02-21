@@ -128,6 +128,9 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		
 		if (currentTime.equals(currentTime.startOfDay().plusHours(6))) { //TODO add replanning for non-hubs
 			
+			plannedTours.clear();//TODO seperate list of planned and unplanned parcels? also filter tours that should not be thrown away
+			
+			
 			ArrayList<DeliveryVehicle> vehs = new ArrayList<>(this.vehicles);
 			vehs.addAll(returnTimes.keySet());
 			
