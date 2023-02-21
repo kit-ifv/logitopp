@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.data.ZoneRepository;
+import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
@@ -25,6 +26,7 @@ public class DistributionCenterParser {
 	private final ZoneRepository zoneRepo;
 	private final double scaleFactor;
 	private final ImpedanceIfc impedance;
+	private final DeliveryResults results;
 	
 	private final Map<String, CEPServiceProvider> serviceProviders;
 
@@ -36,10 +38,11 @@ public class DistributionCenterParser {
 	 * @param scaleFactor the scale factor to scale the fleet
 	 * @param impedance   the impedance
 	 */
-	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance) {
+	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance, DeliveryResults results) {
 		this.zoneRepo = zoneRepo;
 		this.scaleFactor = scaleFactor;
 		this.impedance = impedance;
+		this.results = results;
 		
 		this.serviceProviders = new LinkedHashMap<>();
 	}
@@ -83,7 +86,7 @@ public class DistributionCenterParser {
 		int vehicleType = row.valueAsInteger("vehicle_type");
 		VehicleType type = VehicleType.fromInt(vehicleType);
 
-		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location, scaleVehicles(vehicles), attempts, type, impedance);
+		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location, scaleVehicles(vehicles), attempts, type, impedance, results);
 		addCenterToServiceProvider(center, cepsp);
 		return center;
 	}
