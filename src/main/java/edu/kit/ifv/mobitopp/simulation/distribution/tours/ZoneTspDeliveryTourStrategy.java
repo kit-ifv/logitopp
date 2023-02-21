@@ -32,10 +32,8 @@ import edu.kit.ifv.mobitopp.time.Time;
 public class ZoneTspDeliveryTourStrategy extends TspBasedDeliveryTourStrategy {
 
 	/**
-	 * Instantiates a new {@link ZoneTspDeliveryTourStrategy} with the given
-	 * oprtions.
+	 * Instantiates a new {@link ZoneTspDeliveryTourStrategy}.
 	 *
-	 * @param skipSunday whether sunday should be skipped
 	 * @param impedance  the impedance
 	 */
 	public ZoneTspDeliveryTourStrategy(ImpedanceIfc impedance) {
@@ -46,9 +44,9 @@ public class ZoneTspDeliveryTourStrategy extends TspBasedDeliveryTourStrategy {
 	 * Plan giant tour through all delivery zones using a TSP 2 approximation.
 	 *
 	 * @param dc          the {@link DistributionCenter}
-	 * @param agent
-	 * @param deliveries  the {@link DeliveryPerson}
+	 * @param deliveries  the planned delibvery/pickup activities
 	 * @param currentTime the current {@link Time}
+	 * @param mode        the mode
 	 * @return tour of parcel activities through zones as ordered list
 	 */
 	@Override

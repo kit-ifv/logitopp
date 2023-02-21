@@ -13,6 +13,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
 
+// TODO: Auto-generated Javadoc
 /**
  * TA selector for partner relations between businesses and cep service
  * providers ({@link CEPServiceProvider}). A greedy selection algorithm that
@@ -24,14 +25,31 @@ import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
  */
 public class ShareBasedBusinessPartnerSelector implements BusinessPartnerSelector {
 
+	/** The number model. */
 	private final NumberOfPartnersModel numberModel;
+	
+	/** The aggregate. */
 	private final Map<CEPServiceProvider, Double> aggregate;
+	
+	/** The total. */
 	private double total;
+	
+	/** The count. */
 	private int count;
+	
+	/** The demand provider. */
 	private final Function<Business, Integer> demandProvider;
+	
+	/** The share provider. */
 	private final Function<CEPServiceProvider, Double> shareProvider;
+	
+	/** The capacity provider. */
 	private final Function<CEPServiceProvider, Double> capacityProvider;
+	
+	/** The results. */
 	private final DeliveryResults results;
+	
+	/** The tag. */
 	private final String tag;
 
 	/**
@@ -242,10 +260,12 @@ public class ShareBasedBusinessPartnerSelector implements BusinessPartnerSelecto
 	/**
 	 * Create {@link ShareBasedBusinessPartnerSelector}.
 	 *
-	 * @param numberModel         the number model
-	 * @param serviceProviders	  the service providers
-	 * @param shareProvider		  the share provider function
-	 * @param results             the results
+	 * @param numberModel      the number model
+	 * @param serviceProviders the service providers
+	 * @param shareProvider    the share provider function
+	 * @param demandProvider   the demand provider
+	 * @param results          the results
+	 * @param tag              the tag
 	 * @return the share based business partner selector
 	 */
 	public static ShareBasedBusinessPartnerSelector createFor(NumberOfPartnersModel numberModel,

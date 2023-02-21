@@ -46,10 +46,10 @@ public class DeliveryResults {
 	/**
 	 * Log change of private parcel state.
 	 *
-	 * @param parcel      the parcel
-	 * @param deliveryGuy the delivery guy
-	 * @param currentTime the current time
-	 * @param isAttempt   whether the state change was a delivery attempt
+	 * @param parcel          the parcel
+	 * @param deliveryVehicle the delivery vehicle
+	 * @param currentTime     the current time
+	 * @param isAttempt       whether the state change was a delivery attempt
 	 */
 	public void logChange(PrivateParcel parcel, DeliveryVehicle deliveryVehicle, Time currentTime, boolean isAttempt) {
 		String msg = "";
@@ -85,10 +85,10 @@ public class DeliveryResults {
 	/**
 	 * Log change of business parcel state.
 	 *
-	 * @param parcel      the parcel
-	 * @param deliveryGuy the delivery guy
-	 * @param currentTime the current time
-	 * @param isAttempt   whether the state change was a delivery attempt
+	 * @param parcel          the parcel
+	 * @param deliveryVehicle the delivery vehicle
+	 * @param currentTime     the current time
+	 * @param isAttempt       whether the state change was a delivery attempt
 	 */
 	public void logChange(BusinessParcel parcel, DeliveryVehicle deliveryVehicle, Time currentTime, boolean isAttempt) {
 		String msg = "";
@@ -292,7 +292,7 @@ public class DeliveryResults {
 	 * Log potential business partner.
 	 *
 	 * @param business         the business
-	 * @param dc               the distribution center
+	 * @param cepsp            the cep service provider
 	 * @param tag              the tag to identify the context of the partnership
 	 * @param demand           the parcel demand of the given business
 	 * @param relativeCapacity the relative capacity of the given business

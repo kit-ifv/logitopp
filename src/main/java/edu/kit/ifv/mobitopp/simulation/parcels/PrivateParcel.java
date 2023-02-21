@@ -39,7 +39,8 @@ public class PrivateParcel extends BaseParcel {
 	 * @param location           the location
 	 * @param plannedArrival     the planned arrival date
 	 * @param distributionCenter the distribution center
-	 * @param shipmentSize 		 the shipment size
+	 * @param shipmentSize       the shipment size
+	 * @param isPickUp           whether the parcel is to be picked up
 	 * @param results            the results to log state changes
 	 */
 	public PrivateParcel(PickUpParcelPerson person, ParcelDestinationType destination, ZoneAndLocation location,

@@ -135,7 +135,9 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param results                    the results
 	 * @param personFilter               the person filter
 	 * @param businesses                 the businesses
-	 * @param partnerSelector            the cep-partner selector for businesses
+	 * @param consumptionPartnerSelector the consumption partner selector
+	 * @param productionPartnerSelector  the production partner selector
+	 * @param distributionCenters        the distribution centers
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
@@ -174,7 +176,9 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param results                    the results
 	 * @param personFilter               the person filter
 	 * @param businesses                 the businesses
-	 * @param partnerSelector            the cep-partner selector for businesses
+	 * @param consumptionPartnerSelector the consumption partner selector
+	 * @param productionPartnerSelector  the production partner selector
+	 * @param distributionCenters        the distribution centers
 	 */
 	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
 			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,

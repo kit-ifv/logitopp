@@ -65,13 +65,15 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	/**
 	 * Instantiates a new distribution center.
 	 *
-	 * @param id            the id
-	 * @param name          the distribution centers name
-	 * @param organization  the organizations name
-	 * @param zone          the zone
-	 * @param location      the location
-	 * @param numVehicles   the number of vehicles
-	 * @param attempts      the maximum number of delivery attempts
+	 * @param id           the id
+	 * @param name         the distribution centers name
+	 * @param organization the organizations name
+	 * @param zone         the zone
+	 * @param location     the location
+	 * @param numVehicles  the number of vehicles
+	 * @param attempts     the maximum number of delivery attempts
+	 * @param vehicleType  the vehicle type
+	 * @param impedance    the impedance
 	 */
 	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numVehicles,
 			int attempts, VehicleType vehicleType, ImpedanceIfc impedance) {

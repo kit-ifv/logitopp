@@ -136,9 +136,8 @@ public class PrivateParcelDemandModelBuilder
 	/**
 	 * Builds the default private parcel model using a trivial zone filter
 	 * (true).
-	 * @param shares 
+	 * @param shares 			  the cep market shares 
 	 * @param results             the results
-	 * @param distributionCenters the distribution centers
 	 *
 	 * @return the parcel demand model
 	 */
@@ -149,11 +148,11 @@ public class PrivateParcelDemandModelBuilder
 
 	/**
 	 * Builds the default private parcel model.
-	 * @param shares 
-	 * @param workZoneFilter      the work zone filter, outside which WORK-delivery is not a valid
-	 *                       option
+	 * 
+	 * @param shares              the cep market shares
+	 * @param workZoneFilter      the work zone filter, outside which WORK-delivery
+	 *                            is not a valid option
 	 * @param results             the results
-	 * @param distributionCenters the distribution centers
 	 *
 	 * @return the parcel demand model
 	 */

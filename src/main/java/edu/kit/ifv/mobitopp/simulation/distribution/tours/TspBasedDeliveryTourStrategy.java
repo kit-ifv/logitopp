@@ -42,11 +42,11 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 	/**
 	 * Returns the travel time form origin to destination.
 	 *
-	 * @param person      the person
 	 * @param origin      the origin
 	 * @param destination the destination
 	 * @param time        the time
-	 * @return the float
+	 * @param mode        the mode
+	 * @return the travel time
 	 */
 	protected float travelTime(Zone origin, Zone destination, Time time, Mode mode) {
 		return impedance.getTravelTime(origin.getId(), destination.getId(), mode, time);
@@ -98,14 +98,12 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 
 	/**
 	 * Plan giant tour through all delivery locations using a TSP 2 approximation.
-	 * 
-	 * @param distributionCenter
-	 * @param currentTime
-	 * @param deliveries
 	 *
-	 * @param dc                 the {@link DistributionCenter}
-	 * @param person             the {@link DeliveryPerson}
+	 * @param distributionCenter the distribution center
+	 * @param deliveries         the deliveries
 	 * @param currentTime        the current {@link Time}
+	 * @param mode               the mode
+	 * @return an approximation of a giant tsp tour
 	 */
 	protected List<ParcelActivityBuilder> planGiantTour(DistributionCenter distributionCenter, Collection<ParcelActivityBuilder> deliveries,
 			Time currentTime, Mode mode) {
