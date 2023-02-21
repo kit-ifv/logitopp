@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.data.Zone;
+import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.Hook;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
@@ -61,7 +62,8 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	@Getter			private final ParcelArrivalScheduler scheduler;
 	
 	
-
+	@Getter private final DeliveryResults results;
+	
 	/**
 	 * Instantiates a new distribution center.
 	 *
@@ -76,7 +78,7 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	 * @param impedance    the impedance
 	 */
 	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numVehicles,
-			int attempts, VehicleType vehicleType, ImpedanceIfc impedance) {
+			int attempts, VehicleType vehicleType, ImpedanceIfc impedance, DeliveryResults results) {
 		this.id = id;
 		this.name = name;
 		this.organization = organization;
@@ -99,6 +101,7 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		this.impedance = impedance;
 		
 		this.scheduler = new ParcelArrivalScheduler(this);
+		this.results = results;
 
 		initVehicles();
 		
@@ -165,6 +168,11 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 			if (tour.isPresent()) {
 				DeliveryVehicle vehicle = vehicles.iterator().next();
 				tour.get().dispatchTour(currentTime, vehicle, impedance);
+				
+				int parcels = tour.get().getStops().stream().mapToInt(s -> s.getDeliveries().size()).sum();
+				int pickUps = tour.get().getStops().stream().mapToInt(s -> s.getPickUps().size()).sum();
+				results.logLoadEvent(vehicle, currentTime, parcels, pickUps, getZoneAndLocation());
+				
 				
 				plannedTours.remove(tour.get());
 				

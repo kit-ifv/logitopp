@@ -37,8 +37,8 @@ public class DeliveryVehicle {
 	}
 	
 	public void unloadAndReturn(Time currentTime) {
-		System.out.println(this.owner.getName() + " " + this.toString() + " returns with " + pickedUpParcels.size() + " picked up parcels and returns " + returningParcels.size() + " unsuccessfull parcels.");
-		
+		owner.getResults().logUnloadEvent(this, currentTime, owner.getZoneAndLocation());
+				
 		this.returningParcels.forEach(p -> p.unload(currentTime, this));
 		this.returningParcels.forEach(owner::addParcel);
 		this.pickedUpParcels.forEach(p -> p.tryDelivery(currentTime, this)); //TODO unpack if container, add precalculated bike route etc. (maybe call deliver here??)

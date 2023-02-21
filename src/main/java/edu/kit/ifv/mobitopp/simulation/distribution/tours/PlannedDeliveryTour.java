@@ -16,8 +16,8 @@ import lombok.Getter;
 
 public class PlannedDeliveryTour {
 	
-	private final List<ParcelActivityBuilder> stops;
-	private final VehicleType vehicleType;
+	@Getter private final List<ParcelActivityBuilder> stops;
+	@Getter private final VehicleType vehicleType;
 	@Getter private final RelativeTime plannedDuration;
 	@Getter private final Time plannedAt;
 	
@@ -48,6 +48,7 @@ public class PlannedDeliveryTour {
 		
 		Time time = Time.start.plus(currentTime.fromStart());
 		Zone position = vehicle.getOwner().getZone();
+		int stopNo = 1;
 		
 		for (ParcelActivityBuilder stop : stops) {
 			Zone destination = stop.getZone();
@@ -55,7 +56,7 @@ public class PlannedDeliveryTour {
 			float tripDuration = impedance.getTravelTime(position.getId(), destination.getId(), vehicle.getType().getMode(), time);
 			time = time.plusMinutes(Math.round(tripDuration));
 			
-			stop.by(vehicle).plannedAt(time);
+			stop.by(vehicle).plannedAt(time).asStopNo(stopNo++);
 			time = time.plusMinutes(stop.estimateDuration());
 			
 			actualStops.add(stop.buildWorkerActivity());
@@ -66,11 +67,7 @@ public class PlannedDeliveryTour {
 		
 		ParcelArrivalScheduler scheduler = vehicle.getOwner().getScheduler();
 		scheduler.dispatchVehicle(vehicle, returnTime);
-		scheduler.dispatchParcelActivities(actualStops, currentTime);
-		
-		long parcels = stops.stream().mapToInt(s -> s.getDeliveries().size()).sum();
-		long pickUps = stops.stream().mapToInt(s -> s.getPickUps().size()).sum();
-		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " leaves with " + parcels + " parcels and " + pickUps + " requested pickups");
+		scheduler.dispatchParcelActivities(actualStops, currentTime);	
 		
 	}
 	

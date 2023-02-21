@@ -27,6 +27,7 @@ public class DeliveryResults {
 	private final static Category resultCategoryBusinessOrder = createResultCategoryBusinessOrder();
 	private final static Category resultCategoryBusinessProduction = createResultCategoryBusinessProduction();
 	private final static Category resultCategoryNeighbordeliveries = createResultCategoryNeighborDeliveries();
+	private final static Category resultCategoryVehicleEvents = createResultCategoryVehicleEvents();
 
 	private final static Category resultCategoryPartners = createResultCategoryPartners();
 
@@ -326,5 +327,66 @@ public class DeliveryResults {
 		return new Category("business_partners", Arrays.asList("Business", "Sector", "DictributionCenter", "DcId",
 				"Tag", "BusinessDemand", "CapacityFactor", "EstimatedDemand", "NumOfPartners"));
 	}
+	
+	
+	
+	
+	
+	/**
+	 * Creates the result category vehicle events.
+	 *
+	 * @return the result category which defines the header for partners of businesses
+	 */
+	private static Category createResultCategoryVehicleEvents() {
+		return new Category("vehicle_events", Arrays.asList("day", "time", "sim_sec", "cepsp", "dc", "dc_id", "veh_id",
+				"event", "stop_no", "to_deliver", "success_delivery", "to_pickup", "success_pickup", "returning", "collected",
+				"zone_id", "zopne_column", "location"));
+	}
+	
+	public void logLoadEvent(DeliveryVehicle vehicle, Time time, int toDeliver, int toPickUp, ZoneAndLocation location) {
+		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " leaves with " + toDeliver + " parcels and " + toPickUp + " requested pickups");
+		this.logVehicleEvent(vehicle, time, "load", 0, toDeliver, 0, toPickUp, 0, location);
+	}
+	
+	public void logStopEvent(DeliveryVehicle vehicle, Time time, int no, int toDeliver, int deliverySuccess, int toPickUp, int pickUpSuccess, ZoneAndLocation location) {
+		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " delivers " + deliverySuccess + "/" + toDeliver + " and  picks up " + pickUpSuccess + "/" + toPickUp + " parcels at " + location.location().toString());
+		this.logVehicleEvent(vehicle, time, "stop", no, toDeliver, deliverySuccess, toPickUp, pickUpSuccess, location);
+	}
+	
+	public void logUnloadEvent(DeliveryVehicle vehicle, Time time, ZoneAndLocation location) {
+		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " returns with " + vehicle.getPickedUpParcels().size() + " picked up parcels and returns " + vehicle.getReturningParcels().size() + " unsuccessfull parcels.");
+		this.logVehicleEvent(vehicle, time, "unload", -1, 0, 0, 0, 0, location);
+	}
+	
+	private void logVehicleEvent(DeliveryVehicle vehicle, Time time, String event, int no, int toDeliver, int deliverySuccess, int toPickUp, int pickUpSuccess, ZoneAndLocation location) {
+		String msg = "";
+		
+		msg += time.getDay() + SEP;
+		msg += time.toString() + SEP;
+		msg += time.toSeconds() + SEP;
+		
+		msg += vehicle.getOwner().carrierTag() + SEP;
+		msg += vehicle.getOwner().getName() + SEP;
+		msg += vehicle.getOwner().getId() + SEP;
+		
+		msg += vehicle.getId() + SEP;
+		
+		msg += event + SEP;
+		msg += no + SEP;
+		
+		msg += toDeliver + SEP;
+		msg += deliverySuccess + SEP;
+		msg += toPickUp + SEP;
+		msg += pickUpSuccess+ SEP;
+		msg += vehicle.getReturningParcels().size() + SEP;
+		msg += vehicle.getPickedUpParcels().size() + SEP;
+		
+		msg += location.zone().getId().getExternalId() + SEP;
+		msg += location.zone().getId().getMatrixColumn() + SEP;
+		msg += location.location().toString();
+		
+		
+		this.results.write(resultCategoryVehicleEvents, msg);
 
+	}
 }

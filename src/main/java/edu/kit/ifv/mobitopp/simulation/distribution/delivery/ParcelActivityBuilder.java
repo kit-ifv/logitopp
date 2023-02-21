@@ -16,6 +16,7 @@ import lombok.Getter;
 public class ParcelActivityBuilder {
 	protected DeliveryVehicle deliveryVehicle;
 	protected Time plannedArrivalTime;
+	protected int no;
 	
 	protected final List<IParcel> allParcels;
 	protected final List<IParcel> deliveries;
@@ -46,8 +47,13 @@ public class ParcelActivityBuilder {
 		return this;
 	}
 	
+	public ParcelActivityBuilder asStopNo(int no) {
+		this.no = no;
+		return this;
+	}
+	
 	public ParcelActivity buildWorkerActivity() {
-		return new ParcelActivity(stopLocation, deliveries, pickUps, deliveryVehicle, plannedArrivalTime);		
+		return new ParcelActivity(no, stopLocation, deliveries, pickUps, deliveryVehicle, plannedArrivalTime);		
 	}	
 		
 

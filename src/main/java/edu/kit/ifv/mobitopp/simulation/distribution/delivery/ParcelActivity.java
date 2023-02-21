@@ -13,13 +13,15 @@ import lombok.Getter;
 @Getter
 public class ParcelActivity {
 	
+	protected final int no;
 	protected final Collection<IParcel> parcels;
 	protected final Collection<IParcel> pickUps;
 	protected final ZoneAndLocation stopLocation;
 	protected final Time plannedTime;
 	protected final DeliveryVehicle vehicle;
 	
-	public ParcelActivity(ZoneAndLocation stopLocation, Collection<IParcel> parcels, Collection<IParcel> pickUps, DeliveryVehicle vehicle, Time plannedTime) {
+	public ParcelActivity(int no, ZoneAndLocation stopLocation, Collection<IParcel> parcels, Collection<IParcel> pickUps, DeliveryVehicle vehicle, Time plannedTime) {
+		this.no = no;
 		this.parcels = new ArrayList<>(parcels);
 		this.pickUps = new ArrayList<>(pickUps);
 		this.stopLocation = stopLocation;
@@ -44,9 +46,13 @@ public class ParcelActivity {
 	};
 	
 	public void executeActivity(Time currentTime) {
-		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " attempts delivering " + parcels.size() + " and  picking up " + pickUps.size() + " parcels at " + stopLocation.location().toString());
-		new ArrayList<>(parcels).forEach(p -> p.tryDelivery(currentTime, vehicle));//TODO why new arraylist? because they are removed from original list when successful?
-		new ArrayList<>(pickUps).forEach(p -> p.tryPickup(currentTime, vehicle));
+		//todo executed flag for protection of reexecution
+		//TODO why new arraylist? because they are removed from original list when successful?
+		
+		int successDelivery =  new ArrayList<>(parcels).stream().mapToInt(p -> p.tryDelivery(currentTime, vehicle) ? 1 : 0).sum();
+		int successPickUp = new ArrayList<>(pickUps).stream().mapToInt(p -> p.tryPickup(currentTime, vehicle) ? 1 : 0).sum();
+		
+		vehicle.getOwner().getResults().logStopEvent(vehicle, currentTime, no, getParcels().size(), successDelivery, getPickUps().size(), successPickUp, stopLocation);
 	};
 
 
