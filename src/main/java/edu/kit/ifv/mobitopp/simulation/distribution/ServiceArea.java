@@ -22,4 +22,12 @@ public class ServiceArea {
 	public boolean canServe(IParcel parcel) {
 		return this.zones.contains(parcel.getZone());
 	}
+
+	public int size() {
+		return zones.size();
+	}
+	
+	public boolean exists() {
+		return !zones.isEmpty();
+	}
 }

@@ -57,6 +57,7 @@ public class DistributionCenterParser {
 	 * @return the collection of parsed distribution centers
 	 */
 	public Collection<DistributionCenter> parse(CsvFile file) {
+		System.out.println("\nService Areas:");
 		return file.stream().map(r -> parse(r)).collect(Collectors.toList());
 	}
 
@@ -91,6 +92,8 @@ public class DistributionCenterParser {
 		int serviceAreaCode = row.valueAsInteger("service_area");
 		ServiceArea serviceArea = serviceAreaFactory.fromIntCode(zone, serviceAreaCode);
 		
+		System.out.println(name + " (" + id + ") serves " + serviceArea.size() + " zones!");
+				
 
 		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location, scaleVehicles(vehicles), attempts, type, serviceArea, impedance, results);
 		addCenterToServiceProvider(center, cepsp);

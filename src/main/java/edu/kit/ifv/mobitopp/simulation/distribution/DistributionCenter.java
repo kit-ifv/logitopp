@@ -16,6 +16,8 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChainFactory;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
@@ -65,6 +67,9 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	@Getter private final Collection<DistributionCenter> relatedDeliveryHubs;
 	@Getter private final Collection<DistributionCenter> relatedPickUpHubs;
 	
+	private Collection<TransportChain> deliveryChains;
+	private Collection<TransportChain> pickUpChains;
+	
 	@Getter private final DeliveryResults results;
 	@Getter private final ServiceArea serviceArea;
 	
@@ -112,6 +117,8 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		
 		this.relatedDeliveryHubs = new ArrayList<>();
 		this.relatedPickUpHubs = new ArrayList<>();
+		this.deliveryChains = null;
+		this.pickUpChains = null;
 
 		initVehicles();
 		
@@ -385,6 +392,22 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 				+ " -> " + this.id + " <- " +
 				this.relatedPickUpHubs.stream().map(dc -> dc.id + "").collect(Collectors.joining(","))
 		);
+	}
+	
+	public Collection<TransportChain> getDeliveryChains() {
+		if (this.deliveryChains == null) {
+			this.deliveryChains = TransportChainFactory.buildDeliveryChains(this);
+		}
+		
+		return this.deliveryChains;
+	}
+	
+	public Collection<TransportChain> getPickUpChains() {
+		if (this.pickUpChains == null) {
+			this.pickUpChains = TransportChainFactory.buildPickUpChains(this);
+		}
+		
+		return this.pickUpChains;
 	}
 
 }
