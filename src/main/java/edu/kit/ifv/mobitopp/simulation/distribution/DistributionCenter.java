@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
@@ -57,12 +58,15 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	
 			@Setter	private DeliveryTourAssignmentStrategy tourStrategy;
 			@Setter	private ParcelPolicyProvider policyProvider;
-			@Setter	private DeliveryClusteringStrategy clusteringStrategy;
-	@Getter	@Setter private DeliveryDurationModel durationModel;
+			@Setter	private DeliveryClusteringStrategy clusteringStrategy; //TODO move to tour planning strategy
+	@Getter	@Setter private DeliveryDurationModel durationModel; //TODO move to tour planning model??
 	@Getter			private final ParcelArrivalScheduler scheduler;
 	
+	@Getter private final Collection<DistributionCenter> relatedDeliveryHubs;
+	@Getter private final Collection<DistributionCenter> relatedPickUpHubs;
 	
 	@Getter private final DeliveryResults results;
+	@Getter private final ServiceArea serviceArea;
 	
 	/**
 	 * Instantiates a new distribution center.
@@ -75,10 +79,11 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	 * @param numVehicles  the number of vehicles
 	 * @param attempts     the maximum number of delivery attempts
 	 * @param vehicleType  the vehicle type
+	 * @param serviceArea  the center's service area
 	 * @param impedance    the impedance
 	 */
 	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numVehicles,
-			int attempts, VehicleType vehicleType, ImpedanceIfc impedance, DeliveryResults results) {
+			int attempts, VehicleType vehicleType, ServiceArea serviceArea, ImpedanceIfc impedance, DeliveryResults results) {
 		this.id = id;
 		this.name = name;
 		this.organization = organization;
@@ -93,6 +98,8 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		this.returnTimes = new LinkedHashMap<>();
 		this.vehicleType = vehicleType;
 		this.vehicles = new ArrayList<>();
+		
+		this.serviceArea = serviceArea;
 
 		this.currentParcels = new ArrayList<>();
 		this.collectedPickups = new ArrayList<>();
@@ -102,6 +109,9 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		
 		this.scheduler = new ParcelArrivalScheduler(this);
 		this.results = results;
+		
+		this.relatedDeliveryHubs = new ArrayList<>();
+		this.relatedPickUpHubs = new ArrayList<>();
 
 		initVehicles();
 		
@@ -354,5 +364,27 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		return this.name;
 	}
 
+	public void addRelatedDeliveryHub(DistributionCenter hub) {
+		if (!this.relatedDeliveryHubs.contains(hub)) {
+			this.relatedDeliveryHubs.add(hub);
+			
+			hub.addRelatedPickUpHub(this);
+		}
+	}
+	
+	public void addRelatedPickUpHub(DistributionCenter hub) {
+		if (!this.relatedPickUpHubs.contains(hub)) {
+			this.relatedPickUpHubs.add(hub);
+			
+			hub.addRelatedDeliveryHub(this);
+		}
+	}
+	
+	public void printRelations() {
+		System.out.println(this.relatedDeliveryHubs.stream().map(dc -> dc.id + "").collect(Collectors.joining(",")) 
+				+ " -> " + this.id + " <- " +
+				this.relatedPickUpHubs.stream().map(dc -> dc.id + "").collect(Collectors.joining(","))
+		);
+	}
 
 }

@@ -29,6 +29,7 @@ public class DistributionCenterParser {
 	private final DeliveryResults results;
 	
 	private final Map<String, CEPServiceProvider> serviceProviders;
+	private ServiceAreaFactory serviceAreaFactory;
 
 	
 	/**
@@ -43,6 +44,7 @@ public class DistributionCenterParser {
 		this.scaleFactor = scaleFactor;
 		this.impedance = impedance;
 		this.results = results;
+		this.serviceAreaFactory = new ServiceAreaFactory(zoneRepo, impedance);
 		
 		this.serviceProviders = new LinkedHashMap<>();
 	}
@@ -85,8 +87,12 @@ public class DistributionCenterParser {
 		
 		int vehicleType = row.valueAsInteger("vehicle_type");
 		VehicleType type = VehicleType.fromInt(vehicleType);
+		
+		int serviceAreaCode = row.valueAsInteger("service_area");
+		ServiceArea serviceArea = serviceAreaFactory.fromIntCode(zone, serviceAreaCode);
+		
 
-		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location, scaleVehicles(vehicles), attempts, type, impedance, results);
+		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location, scaleVehicles(vehicles), attempts, type, serviceArea, impedance, results);
 		addCenterToServiceProvider(center, cepsp);
 		return center;
 	}

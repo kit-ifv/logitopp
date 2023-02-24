@@ -358,6 +358,7 @@ public class DeliveryResults {
 		this.logVehicleEvent(vehicle, time, "unload", -1, 0, 0, 0, 0, location);
 	}
 	
+	//TODO log distance and duration of tour/trip
 	private void logVehicleEvent(DeliveryVehicle vehicle, Time time, String event, int no, int toDeliver, int deliverySuccess, int toPickUp, int pickUpSuccess, ZoneAndLocation location) {
 		String msg = "";
 		

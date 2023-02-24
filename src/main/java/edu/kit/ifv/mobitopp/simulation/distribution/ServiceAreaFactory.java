@@ -2,7 +2,6 @@ package edu.kit.ifv.mobitopp.simulation.distribution;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import edu.kit.ifv.mobitopp.data.Zone;
@@ -20,16 +19,36 @@ public class ServiceAreaFactory {
 		this.zoneRepository = zoneRepository;
 	}
 	
-	public Collection<Zone> fullServiceArea() {
-		return new ArrayList<>(zoneRepository.getZones());
+	public ServiceArea fullServiceArea() {
+		return new ServiceArea(zoneRepository.getZones());
 	}
 	
-	public Collection<Zone> serviceAreaByDistance(Zone center, float distance) {
+	public ServiceArea serviceAreaByDistance(Zone center, float distance) {
 		ZoneId centerId = center.getId();
 		
-		return fullServiceArea().stream()
-						 		.filter(z -> impedance.getDistance(centerId, z.getId()) <= distance)
-						 		.collect(toList());
+		Collection<Zone> zones = 
+			   zoneRepository.getZones()
+							 .stream()
+						 	 .filter(z -> impedance.getDistance(centerId, z.getId()) <= distance)
+						 	 .collect(toList());
+		
+		return new ServiceArea(zones);
+	}
+	
+	public ServiceArea noServiceArea() {
+		return ServiceArea.empty();
+	}
+	
+	public ServiceArea fromIntCode(Zone zone, int code) {
+		if (code < 0) {
+			return this.noServiceArea();
+		}
+		
+		if (code == 0)  {
+			return this.fullServiceArea();
+		}
+		
+		return this.serviceAreaByDistance(zone, code);
 	}
 
 }
