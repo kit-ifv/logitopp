@@ -15,15 +15,15 @@ import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryTourAssignmentStrategy;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.TourPlanningStrategy;
 import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
 
-public class PrecalculatedTourAssignment implements DeliveryTourAssignmentStrategy {
+public class PrecalculatedTourAssignment implements TourPlanningStrategy {
 	
 	private final Map<DayOfWeek, Collection<Route>> routes;
 	private DayOfWeek lastUpdate = null;

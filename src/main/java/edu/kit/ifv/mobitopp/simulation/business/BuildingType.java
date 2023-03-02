@@ -1,9 +1,5 @@
 package edu.kit.ifv.mobitopp.simulation.business;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import static edu.kit.ifv.mobitopp.simulation.business.Branch.A;
 import static edu.kit.ifv.mobitopp.simulation.business.Branch.B;
 import static edu.kit.ifv.mobitopp.simulation.business.Branch.C;
@@ -25,6 +21,10 @@ import static edu.kit.ifv.mobitopp.simulation.business.Branch.R;
 import static edu.kit.ifv.mobitopp.simulation.business.Branch.S;
 import static edu.kit.ifv.mobitopp.simulation.business.Branch.T;
 import static edu.kit.ifv.mobitopp.simulation.business.Branch.U;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public enum BuildingType {
 	

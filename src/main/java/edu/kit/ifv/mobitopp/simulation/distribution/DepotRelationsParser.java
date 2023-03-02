@@ -29,7 +29,7 @@ public class DepotRelationsParser {
 		csv.stream().forEach(this::parse);
 		
 		System.out.println("\nDepot relations: (" + csv.getLength() + ")");
-		this.centerIds.values().forEach(DistributionCenter::printRelations);
+		this.centerIds.values().forEach(dc -> dc.getRegionalStructure().printRelations());
 		System.out.println();
 	}
 
@@ -44,6 +44,6 @@ public class DepotRelationsParser {
 		DistributionCenter from = centerIds.get(from_id);
 		DistributionCenter to = centerIds.get(to_id);
 		
-		from.addRelatedDeliveryHub(to);
+		from.getRegionalStructure().addRelatedDeliveryHub(to);
 	}
 }

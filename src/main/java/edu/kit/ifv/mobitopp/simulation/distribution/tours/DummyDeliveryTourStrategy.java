@@ -5,14 +5,14 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
  * The Class DummyDeliveryTourStrategy is an exemplary implementation of the DeliveryTourAssignmentStrategy interface.
  */
-public class DummyDeliveryTourStrategy implements DeliveryTourAssignmentStrategy {
+public class DummyDeliveryTourStrategy implements TourPlanningStrategy {
 
 	
 	@Override

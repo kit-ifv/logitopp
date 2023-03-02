@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.Hook;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class ParcelArrivalScheduler implements Hook {
@@ -56,7 +56,7 @@ public class ParcelArrivalScheduler implements Hook {
 		
 		vehicleReturnTimes.merge(returnTime, new ArrayList<>(List.of(vehicle)), this::mergeIntoFirst);
 		
-		operator.bookVehicleUntil(vehicle, returnTime);		
+		operator.getFleet().bookVehicleUntil(vehicle, returnTime);		
 	}
 	
 	public void dispatchParcelActivities(Collection<ParcelActivity> activities, Time currentTime) {

@@ -18,7 +18,7 @@ import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -31,7 +31,7 @@ import edu.kit.ifv.mobitopp.time.Time;
  * order, until their capacity (160 parcels) is reached, or the estimated
  * duration of the tour reaches 8h. The giant tour is recalculated every day.
  */
-public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrategy {
+public class TspBasedDeliveryTourStrategy implements TourPlanningStrategy {
 
 	private final ImpedanceIfc impedance;
 	

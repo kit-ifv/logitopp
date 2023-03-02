@@ -14,7 +14,9 @@ import edu.kit.ifv.mobitopp.data.ZoneRepository;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Location;
-import edu.kit.ifv.mobitopp.simulation.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceArea;
+import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceAreaFactory;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
 import edu.kit.ifv.mobitopp.util.dataimport.Row;
 
@@ -95,7 +97,7 @@ public class DistributionCenterParser {
 		System.out.println(name + " (" + id + ") serves " + serviceArea.size() + " zones!");
 				
 
-		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location, scaleVehicles(vehicles), attempts, type, serviceArea, impedance, results);
+		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location, scaleVehicles(vehicles), attempts, type, serviceArea);
 		addCenterToServiceProvider(center, cepsp);
 		return center;
 	}

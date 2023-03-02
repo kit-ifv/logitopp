@@ -7,7 +7,8 @@ import java.util.List;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
@@ -33,8 +34,8 @@ public class ParcelActivityBuilder {
 		parcels.stream().filter(p -> !p.isPickUp()).forEach(deliveries::add);
 	}
 	
-	public int estimateDuration() {
-		return (int) this.deliveryVehicle.getOwner().getDurationModel().estimateDuration(deliveryVehicle, getAllParcels()); //TODO distinguish pickups and deliveries in duration model?
+	public int estimateDuration(DeliveryDurationModel durationModel) {
+		return (int) durationModel.estimateDuration(deliveryVehicle, getAllParcels()); //TODO distinguish pickups and deliveries in duration model?
 	}
 
 	public ParcelActivityBuilder plannedAt(Time time) {

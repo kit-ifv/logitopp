@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution;
+package edu.kit.ifv.mobitopp.simulation.distribution.region;
 
 import static java.util.stream.Collectors.toList;
 

@@ -24,7 +24,7 @@ public class CEPServiceProvider {//TODO ParcelAgent?
 	}
 
 	public int getNumVehicles() {
-		return this.distributionCenters.stream().mapToInt(DistributionCenter::getNumVehicles).sum();
+		return this.distributionCenters.stream().mapToInt(DistributionCenter::getTotalVehicles).sum();
 	}
 
 	public int currentShippingDemand() {
