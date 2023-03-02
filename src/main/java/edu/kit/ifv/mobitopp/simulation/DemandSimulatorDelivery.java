@@ -1,6 +1,9 @@
 package edu.kit.ifv.mobitopp.simulation;
 
+import static java.util.Comparator.comparingInt;
+
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -261,23 +264,32 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * the business production model.
 	 */
 	protected void initBusinessDemand() {
+		
 		this.businesses.stream().filter(businessDemandFilter).forEach(b -> {
 			createBusinessParcelDemand(b).forEach(schedulerHook::addParcel);
 		});
-
 		this.businessDemandModel.printStatistics("business");
 
+		
 		this.businesses.stream().filter(businessProductionFilter).forEach(b -> {
 			createBusinessParcelProduction(b).forEach(schedulerHook::addParcel);
 		});
-
 		this.businessProductionModel.printStatistics("produced");
 
-		this.businesses.stream().filter(businessDemandFilter).filter(b -> b.getDemandQuantity().getConsumption() > 0)
-				.forEach(b -> consumptionPartnerSelector.select(b).forEach(b::addDeliveryPartner));
+		
+		Comparator<Business> compareConsumptionDemand = comparingInt(b -> b.getDemandQuantity().getConsumption());
+		this.businesses.stream()
+					   .filter(businessDemandFilter)
+					   .filter(b -> b.getDemandQuantity().getConsumption() > 0)
+					   .sorted(compareConsumptionDemand.reversed())
+					   .forEach(b -> consumptionPartnerSelector.select(b).forEach(b::addDeliveryPartner));
 
-		this.businesses.stream().filter(businessProductionFilter).filter(b -> b.getDemandQuantity().getProduction() > 0)
-				.forEach(b -> productionPartnerSelector.select(b).forEach(b::addShippingPartner));
+		Comparator<Business> compareProductionDemand = comparingInt(b -> b.getDemandQuantity().getProduction());
+		this.businesses.stream()
+					   .filter(businessProductionFilter)
+					   .filter(b -> b.getDemandQuantity().getProduction() > 0)
+					   .sorted(compareProductionDemand.reversed())
+					   .forEach(b -> productionPartnerSelector.select(b).forEach(b::addShippingPartner));
 
 		consumptionPartnerSelector.printStatistics();
 		productionPartnerSelector.printStatistics();

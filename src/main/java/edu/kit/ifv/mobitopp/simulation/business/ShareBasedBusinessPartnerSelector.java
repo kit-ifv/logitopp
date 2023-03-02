@@ -13,7 +13,6 @@ import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
 
-// TODO: Auto-generated Javadoc
 /**
  * TA selector for partner relations between businesses and cep service
  * providers ({@link CEPServiceProvider}). A greedy selection algorithm that
@@ -24,37 +23,22 @@ import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
  * @author ar0305
  */
 public class ShareBasedBusinessPartnerSelector implements BusinessPartnerSelector {
-
-	/** The number model. */
+	
 	private final NumberOfPartnersModel numberModel;
-	
-	/** The aggregate. */
 	private final Map<CEPServiceProvider, Double> aggregate;
-	
-	/** The total. */
 	private double total;
-	
-	/** The count. */
 	private int count;
-	
-	/** The demand provider. */
 	private final Function<Business, Integer> demandProvider;
-	
-	/** The share provider. */
 	private final Function<CEPServiceProvider, Double> shareProvider;
-	
-	/** The capacity provider. */
 	private final Function<CEPServiceProvider, Double> capacityProvider;
-	
-	/** The results. */
 	private final DeliveryResults results;
-	
-	/** The tag. */
 	private final String tag;
 
 	/**
 	 * Instantiates a new share based business partner selector using the given
 	 * market share provider.
+	 * 
+	 * Service providers with share 0 are ignored.
 	 *
 	 * @param numberModel         the number model
 	 * @param serviceProviders	  the service providers
@@ -76,7 +60,9 @@ public class ShareBasedBusinessPartnerSelector implements BusinessPartnerSelecto
 		this.total = 0.0;
 		this.count = 0;
 		this.aggregate = new LinkedHashMap<>();
-		serviceProviders.forEach(d -> this.aggregate.put(d, 0.0));
+		serviceProviders.stream()
+						.filter(cepsp -> shareProvider.apply(cepsp) > 0)
+						.forEach(cepsp -> this.aggregate.put(cepsp, 0.0));
 
 		this.demandProvider = demandProvider;
 		this.shareProvider = shareProvider;
