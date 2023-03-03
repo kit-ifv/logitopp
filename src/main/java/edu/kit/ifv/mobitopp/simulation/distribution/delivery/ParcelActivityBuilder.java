@@ -17,12 +17,14 @@ public class ParcelActivityBuilder {
 	protected DeliveryVehicle deliveryVehicle;
 	protected Time plannedArrivalTime;
 	protected int no;
+	protected int tripDuration;
+	protected double distance;
 	
 	protected final List<IParcel> allParcels;
 	protected final List<IParcel> deliveries;
 	protected final List<IParcel> pickUps;
 	protected final ZoneAndLocation stopLocation;
-
+	
 	public ParcelActivityBuilder(Collection<IParcel> parcels, ZoneAndLocation stopLocation) {
 		this.allParcels = new ArrayList<>(parcels);
 		this.deliveries = new ArrayList<>();
@@ -52,8 +54,14 @@ public class ParcelActivityBuilder {
 		return this;
 	}
 	
+	public ParcelActivityBuilder afterTrip(double distance, int duration) {
+		this.distance = distance;
+		this.tripDuration = duration;
+		return this;
+	}
+	
 	public ParcelActivity buildWorkerActivity() {
-		return new ParcelActivity(no, stopLocation, deliveries, pickUps, deliveryVehicle, plannedArrivalTime);		
+		return new ParcelActivity(no, stopLocation, deliveries, pickUps, deliveryVehicle, plannedArrivalTime, distance, tripDuration, estimateDuration());		
 	}	
 		
 

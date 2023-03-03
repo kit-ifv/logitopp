@@ -89,7 +89,7 @@ public class TspBasedDeliveryTourStrategy implements DeliveryTourAssignmentStrat
 		
 			}
 
-			plannedTours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, time.differenceTo(currentTime), currentTime));
+			plannedTours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, time.differenceTo(currentTime), currentTime, impedance));
 			giantTour.removeAll(assigned);
 		}
 

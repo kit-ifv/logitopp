@@ -21,15 +21,18 @@ public class PlannedDeliveryTour {
 	@Getter private final RelativeTime plannedDuration;
 	@Getter private final Time plannedAt;
 	
-	public PlannedDeliveryTour(VehicleType vehicleType, RelativeTime plannedDuration, Time plannedAt) {
+	private final ImpedanceIfc impedance;
+	
+	public PlannedDeliveryTour(VehicleType vehicleType, RelativeTime plannedDuration, Time plannedAt, ImpedanceIfc impedance) {
 		this.stops = new ArrayList<>();
 		this.vehicleType = vehicleType;
 		this.plannedDuration = plannedDuration;
 		this.plannedAt = plannedAt;
+		this.impedance = impedance;
 	}
 	
-	public PlannedDeliveryTour(VehicleType vehicleType, List<ParcelActivityBuilder> plannedStops, RelativeTime plannedDuration, Time plannedAt) {
-		this(vehicleType, plannedDuration, plannedAt);
+	public PlannedDeliveryTour(VehicleType vehicleType, List<ParcelActivityBuilder> plannedStops, RelativeTime plannedDuration, Time plannedAt, ImpedanceIfc impedance) {
+		this(vehicleType, plannedDuration, plannedAt, impedance);
 		addStops(plannedStops);
 	}
 	
@@ -41,34 +44,65 @@ public class PlannedDeliveryTour {
 		this.stops.addAll(plannedStops);
 	}
 	
-	public void dispatchTour(Time currentTime, DeliveryVehicle vehicle, ImpedanceIfc impedance) {
+	public void dispatchTour(Time currentTime, DeliveryVehicle vehicle) {
 		validate(vehicle);
 		
 		List<ParcelActivity> actualStops = new ArrayList<>();
 		
 		Time time = Time.start.plus(currentTime.fromStart());
-		Zone position = vehicle.getOwner().getZone();
+		Zone position = depot(vehicle);
+		
 		int stopNo = 1;
+		int totalTripTime = 0;
+		int totalDeliveryTime = 0;
+		int totalDistance = 0;
+		int totalDeliveries = 0;
+		int totalPickups = 0;
 		
 		for (ParcelActivityBuilder stop : stops) {
 			Zone destination = stop.getZone();
 			
-			float tripDuration = impedance.getTravelTime(position.getId(), destination.getId(), vehicle.getType().getMode(), time);
-			time = time.plusMinutes(Math.round(tripDuration));
+			int tripDuration = travelTime(position, destination, time);
+			double distance = distance(position, destination);
+			int deliveryDuration = stop.estimateDuration();
 			
-			stop.by(vehicle).plannedAt(time).asStopNo(stopNo++);
-			time = time.plusMinutes(stop.estimateDuration());
-			
+			time = time.plusMinutes(tripDuration);
+			stop.by(vehicle).plannedAt(time).asStopNo(stopNo++).afterTrip(distance, tripDuration);
 			actualStops.add(stop.buildWorkerActivity());
+
+			time = time.plusMinutes(deliveryDuration);
 			position = destination;
+			
+			totalTripTime += tripDuration;
+			totalDistance += distance;
+			totalDeliveryTime += deliveryDuration;
+			totalDeliveries += stop.getDeliveries().size();
+			totalPickups += stop.getPickUps().size();
 		}
 		
-		Time returnTime = time.plusMinutes(Math.round(impedance.getTravelTime(position.getId(), vehicle.getOwner().getZone().getId(), vehicle.getType().getMode(), time))); 
+		int returnDuration = travelTime(position, depot(vehicle), time);
+		totalTripTime += returnDuration;
+		totalDistance += distance(position, depot(vehicle));
+		
+		Time returnTime = time.plusMinutes(returnDuration); 
 		
 		ParcelArrivalScheduler scheduler = vehicle.getOwner().getScheduler();
 		scheduler.dispatchVehicle(vehicle, returnTime);
-		scheduler.dispatchParcelActivities(actualStops, currentTime);	
+		scheduler.dispatchParcelActivities(actualStops, currentTime);
 		
+		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, totalDeliveries, totalPickups, vehicle.getOwner().getZoneAndLocation(), totalDistance, totalTripTime, totalDeliveryTime);
+	}
+
+	private Zone depot(DeliveryVehicle vehicle) {
+		return vehicle.getOwner().getZone();
+	}
+
+	private float distance(Zone position, Zone destination) {
+		return impedance.getDistance(position.getId(), destination.getId());
+	}
+
+	private int travelTime(Zone origin, Zone destination, Time time) {
+		return Math.round(impedance.getTravelTime(origin.getId(), destination.getId(), vehicleType.getMode(), time));
 	}
 	
 	private void validate(DeliveryVehicle vehicle) {

@@ -340,26 +340,25 @@ public class DeliveryResults {
 	private static Category createResultCategoryVehicleEvents() {
 		return new Category("vehicle_events", Arrays.asList("day", "time", "sim_sec", "cepsp", "dc", "dc_id", "veh_id",
 				"event", "stop_no", "to_deliver", "success_delivery", "to_pickup", "success_pickup", "returning", "collected",
-				"zone_id", "zopne_column", "location"));
+				"zone_id", "zone_column", "location", "distance", "trip-duration", "delivery-duration"));
 	}
 	
-	public void logLoadEvent(DeliveryVehicle vehicle, Time time, int toDeliver, int toPickUp, ZoneAndLocation location) {
+	public void logLoadEvent(DeliveryVehicle vehicle, Time time, int toDeliver, int toPickUp, ZoneAndLocation location, double distance, int tripDuration, int deliveryDuration) {
 		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " leaves with " + toDeliver + " parcels and " + toPickUp + " requested pickups");
-		this.logVehicleEvent(vehicle, time, "load", 0, toDeliver, 0, toPickUp, 0, location);
+		this.logVehicleEvent(vehicle, time, "load", 0, toDeliver, 0, toPickUp, 0, location, distance, tripDuration, deliveryDuration);
 	}
 	
-	public void logStopEvent(DeliveryVehicle vehicle, Time time, int no, int toDeliver, int deliverySuccess, int toPickUp, int pickUpSuccess, ZoneAndLocation location) {
+	public void logStopEvent(DeliveryVehicle vehicle, Time time, int no, int toDeliver, int deliverySuccess, int toPickUp, int pickUpSuccess, ZoneAndLocation location, double distance, int tripDuration, int deliveryDuration) {
 		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " delivers " + deliverySuccess + "/" + toDeliver + " and  picks up " + pickUpSuccess + "/" + toPickUp + " parcels at " + location.location().toString());
-		this.logVehicleEvent(vehicle, time, "stop", no, toDeliver, deliverySuccess, toPickUp, pickUpSuccess, location);
+		this.logVehicleEvent(vehicle, time, "stop", no, toDeliver, deliverySuccess, toPickUp, pickUpSuccess, location, distance, tripDuration, deliveryDuration);
 	}
 	
 	public void logUnloadEvent(DeliveryVehicle vehicle, Time time, ZoneAndLocation location) {
 		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " returns with " + vehicle.getPickedUpParcels().size() + " picked up parcels and returns " + vehicle.getReturningParcels().size() + " unsuccessfull parcels.");
-		this.logVehicleEvent(vehicle, time, "unload", -1, 0, 0, 0, 0, location);
+		this.logVehicleEvent(vehicle, time, "unload", -1, 0, 0, 0, 0, location, 0.0, 0, 0);
 	}
 	
-	//TODO log distance and duration of tour/trip
-	private void logVehicleEvent(DeliveryVehicle vehicle, Time time, String event, int no, int toDeliver, int deliverySuccess, int toPickUp, int pickUpSuccess, ZoneAndLocation location) {
+	private void logVehicleEvent(DeliveryVehicle vehicle, Time time, String event, int no, int toDeliver, int deliverySuccess, int toPickUp, int pickUpSuccess, ZoneAndLocation location, double distance, int tripDuration, int deliveryDuration) {
 		String msg = "";
 		
 		msg += time.getDay() + SEP;
@@ -384,7 +383,11 @@ public class DeliveryResults {
 		
 		msg += location.zone().getId().getExternalId() + SEP;
 		msg += location.zone().getId().getMatrixColumn() + SEP;
-		msg += location.location().toString();
+		msg += location.location().toString() + SEP;
+		
+		msg += distance + SEP;
+		msg += tripDuration + SEP;
+		msg += deliveryDuration;
 		
 		
 		this.results.write(resultCategoryVehicleEvents, msg);

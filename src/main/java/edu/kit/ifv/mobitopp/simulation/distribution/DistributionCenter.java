@@ -184,13 +184,8 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 			
 			if (tour.isPresent()) {
 				DeliveryVehicle vehicle = vehicles.iterator().next();
-				tour.get().dispatchTour(currentTime, vehicle, impedance);
-				
-				int parcels = tour.get().getStops().stream().mapToInt(s -> s.getDeliveries().size()).sum();
-				int pickUps = tour.get().getStops().stream().mapToInt(s -> s.getPickUps().size()).sum();
-				results.logLoadEvent(vehicle, currentTime, parcels, pickUps, getZoneAndLocation());
-				
-				
+				tour.get().dispatchTour(currentTime, vehicle);
+
 				plannedTours.remove(tour.get());
 				
 				dispatchAvailableTours(currentTime);

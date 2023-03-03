@@ -18,14 +18,22 @@ public class ParcelActivity {
 	protected final Collection<IParcel> pickUps;
 	protected final ZoneAndLocation stopLocation;
 	protected final Time plannedTime;
+	protected final double distance;
+	protected final int tripDuration;
+	protected final int deliveryDuration;
 	protected final DeliveryVehicle vehicle;
 	
-	public ParcelActivity(int no, ZoneAndLocation stopLocation, Collection<IParcel> parcels, Collection<IParcel> pickUps, DeliveryVehicle vehicle, Time plannedTime) {
+	public ParcelActivity(int no, ZoneAndLocation stopLocation, Collection<IParcel> parcels, Collection<IParcel> pickUps, DeliveryVehicle vehicle, Time plannedTime, double distance, int tripDuration, int deliveryDuration) {
 		this.no = no;
 		this.parcels = new ArrayList<>(parcels);
 		this.pickUps = new ArrayList<>(pickUps);
 		this.stopLocation = stopLocation;
 		this.plannedTime = plannedTime;
+		
+		this.distance = distance;
+		this.tripDuration = tripDuration;
+		this.deliveryDuration = deliveryDuration;
+		
 		this.vehicle = vehicle;
 	}
 	
@@ -52,7 +60,7 @@ public class ParcelActivity {
 		int successDelivery =  new ArrayList<>(parcels).stream().mapToInt(p -> p.tryDelivery(currentTime, vehicle) ? 1 : 0).sum();
 		int successPickUp = new ArrayList<>(pickUps).stream().mapToInt(p -> p.tryPickup(currentTime, vehicle) ? 1 : 0).sum();
 		
-		vehicle.getOwner().getResults().logStopEvent(vehicle, currentTime, no, getParcels().size(), successDelivery, getPickUps().size(), successPickUp, stopLocation);
+		vehicle.getOwner().getResults().logStopEvent(vehicle, currentTime, no, getParcels().size(), successDelivery, getPickUps().size(), successPickUp, stopLocation, distance, tripDuration, deliveryDuration);
 	};
 
 
