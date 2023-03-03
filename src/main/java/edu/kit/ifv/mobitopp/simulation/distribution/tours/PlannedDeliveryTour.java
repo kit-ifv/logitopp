@@ -90,7 +90,7 @@ public class PlannedDeliveryTour {
 		scheduler.dispatchVehicle(vehicle, returnTime);
 		scheduler.dispatchParcelActivities(actualStops, currentTime);
 		
-		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, totalDeliveries, totalPickups, vehicle.getOwner().getZoneAndLocation(), totalDistance, totalTripTime, totalDeliveryTime);
+		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, stops.size(), totalDeliveries, totalPickups, vehicle.getOwner().getZoneAndLocation(), totalDistance, totalTripTime, totalDeliveryTime);
 	}
 
 	private Zone depot(DeliveryVehicle vehicle) {
