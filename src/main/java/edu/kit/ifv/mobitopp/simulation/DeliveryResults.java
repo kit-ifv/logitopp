@@ -343,9 +343,9 @@ public class DeliveryResults {
 				"zone_id", "zone_column", "location", "distance", "trip-duration", "delivery-duration"));
 	}
 	
-	public void logLoadEvent(DeliveryVehicle vehicle, Time time, int toDeliver, int toPickUp, ZoneAndLocation location, double distance, int tripDuration, int deliveryDuration) {
+	public void logLoadEvent(DeliveryVehicle vehicle, Time time, int numStops, int toDeliver, int toPickUp, ZoneAndLocation location, double distance, int tripDuration, int deliveryDuration) {
 		System.out.println(vehicle.getOwner().getName() + " " + vehicle.toString() + " leaves with " + toDeliver + " parcels and " + toPickUp + " requested pickups");
-		this.logVehicleEvent(vehicle, time, "load", 0, toDeliver, 0, toPickUp, 0, location, distance, tripDuration, deliveryDuration);
+		this.logVehicleEvent(vehicle, time, "load", numStops, toDeliver, 0, toPickUp, 0, location, distance, tripDuration, deliveryDuration);
 	}
 	
 	public void logStopEvent(DeliveryVehicle vehicle, Time time, int no, int toDeliver, int deliverySuccess, int toPickUp, int pickUpSuccess, ZoneAndLocation location, double distance, int tripDuration, int deliveryDuration) {
