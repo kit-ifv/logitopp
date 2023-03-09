@@ -26,12 +26,11 @@ public class DepotOperations {
 	
 	private final ImpedanceIfc impedance;
 	private final DeliveryResults results;
-	
-//	@Setter	private DeliveryClusteringStrategy clusteringStrategy; //TODO move to tour planning strategy
-//	@Setter private DeliveryDurationModel durationModel; //TODO move to tour planning model??
+
 	
 	public DepotOperations(TourPlanningStrategy tourStrategy, ParcelPolicyProvider policyProvider, DispatchStrategy dispatchStrategy, DistributionCenter center, DeliveryResults results, ImpedanceIfc impedance) {
 		this.center = center;
+		
 		this.tourStrategy = tourStrategy;
 		this.policyProvider = policyProvider;
 		this.dispatchStrategy = dispatchStrategy;
@@ -39,6 +38,8 @@ public class DepotOperations {
 		this.results = results;
 		
 		this.scheduler = new ParcelArrivalScheduler(center);
+		
+		center.setOperations(this);
 	}
 	
 	public void update(Time time) {
@@ -52,16 +53,16 @@ public class DepotOperations {
 		
 		if (tourStrategy.shouldReplanTours(center, currentTime)) { //TODO add replanning for non-hubs
 			
-			Collection<PlannedDeliveryTour> plannedTours = plannedTours();
 			
-			plannedTours.clear();//TODO seperate list of planned and unplanned parcels? also filter tours that should not be thrown away
-					
+			DepotStorage storage = center.getStorage();
+			
+			plannedTours().stream().filter(PlannedDeliveryTour::isReplan).forEach(storage::deletePlannedTour);					
 
-			plannedTours.addAll(
-				this.tourStrategy.planTours(center.getStorage().getCurrentParcels(), center.getStorage().getPickupRequests(), center.getFleet())
+			storage.addPlannedTours(
+				this.tourStrategy.planTours(center.getStorage().getParcels(), center.getStorage().getRequests(), center.getFleet(), currentTime)
 			);
 			
-			System.out.println("	planned " + plannedTours.size() + " tours; " + center.getFleet().size() + " vehicles available!");
+			System.out.println("	planned " + plannedTours().size() + " tours; " + center.getFleet().size() + " vehicles available!");
 
 		}
 		
@@ -76,22 +77,30 @@ public class DepotOperations {
 
 	private void dispatchAvailableTours(Time currentTime) {
 		
-		Optional<PlannedDeliveryTour> tour = null;
+		Optional<PlannedDeliveryTour> tourCheck = null;
 		
-		while ((tour = canDispatch(currentTime)).isPresent()) {
+		while ((tourCheck = canDispatch(currentTime)).isPresent()) {
 			
-			Optional<DeliveryVehicle> vehicle = center.getFleet().getAvailableVehicle();
+			Optional<DeliveryVehicle> vehicleCheck = center.getFleet().getAvailableVehicle();
 			
-			if (vehicle.isPresent()) {
-				tour.get().dispatchTour(currentTime, vehicle.get(), impedance);
+			PlannedDeliveryTour tour = tourCheck.get();
+
+			if (vehicleCheck.isPresent()) {
 				
-				int parcels = tour.get().getStops().stream().mapToInt(s -> s.getDeliveries().size()).sum();
-				int pickUps = tour.get().getStops().stream().mapToInt(s -> s.getPickUps().size()).sum();
-				results.logLoadEvent(vehicle.get(), currentTime, parcels, pickUps, center.getZoneAndLocation());
+				DeliveryVehicle vehicle = vehicleCheck.get();
+				
+				Time returnTime = tour.prepare(currentTime, vehicle, impedance);
+				
+				scheduler.dispatchVehicle(vehicle, returnTime);
+				scheduler.dispatchParcelActivities(tour, currentTime);	
+				
+				int parcels = tour.getStops().stream().mapToInt(s -> s.getDeliveries().size()).sum();
+				int pickUps = tour.getStops().stream().mapToInt(s -> s.getPickUps().size()).sum();
+				results.logLoadEvent(vehicle, currentTime, parcels, pickUps, center.getZoneAndLocation());
 			}
 			
 			
-			plannedTours().remove(tour.get());
+			center.getStorage().pickPlannedTour(tour);
 			
 			dispatchAvailableTours(currentTime);
 		}

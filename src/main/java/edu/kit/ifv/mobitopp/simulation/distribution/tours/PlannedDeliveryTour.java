@@ -1,35 +1,44 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
-import edu.kit.ifv.mobitopp.simulation.distribution.ParcelArrivalScheduler;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
+@Getter
 public class PlannedDeliveryTour {
 	
-	@Getter private final List<ParcelActivityBuilder> stops;
-	@Getter private final VehicleType vehicleType;
-	@Getter private final RelativeTime plannedDuration;
-	@Getter private final Time plannedAt;
+	private final List<ParcelActivityBuilder> stops;
+	private final List<ParcelActivity> preparedStops;
+	private final VehicleType vehicleType;
+	private final RelativeTime plannedDuration;
+	private final Time plannedAt;
+	private final boolean replan;
 	
-	public PlannedDeliveryTour(VehicleType vehicleType, RelativeTime plannedDuration, Time plannedAt) {
+	 
+	public PlannedDeliveryTour(VehicleType vehicleType, RelativeTime plannedDuration, Time plannedAt, boolean replan) {
 		this.stops = new ArrayList<>();
+		this.preparedStops = new  ArrayList<>();
 		this.vehicleType = vehicleType;
 		this.plannedDuration = plannedDuration;
 		this.plannedAt = plannedAt;
+		this.replan = replan;
 	}
 	
-	public PlannedDeliveryTour(VehicleType vehicleType, List<ParcelActivityBuilder> plannedStops, RelativeTime plannedDuration, Time plannedAt) {
-		this(vehicleType, plannedDuration, plannedAt);
+	public PlannedDeliveryTour(VehicleType vehicleType, List<ParcelActivityBuilder> plannedStops, RelativeTime plannedDuration, Time plannedAt, boolean replan) {
+		this(vehicleType, plannedDuration, plannedAt, replan);
 		addStops(plannedStops);
 	}
 	
@@ -41,7 +50,7 @@ public class PlannedDeliveryTour {
 		this.stops.addAll(plannedStops);
 	}
 	
-	public void dispatchTour(Time currentTime, DeliveryVehicle vehicle, ImpedanceIfc impedance) {
+	public Time prepare(Time currentTime, DeliveryVehicle vehicle, ImpedanceIfc impedance) {
 		validate(vehicle);
 		
 		List<ParcelActivity> actualStops = new ArrayList<>();
@@ -57,17 +66,16 @@ public class PlannedDeliveryTour {
 			time = time.plusMinutes(Math.round(tripDuration));
 			
 			stop.by(vehicle).plannedAt(time).asStopNo(stopNo++);
-			time = time.plusMinutes(stop.estimateDuration());
+			time = time.plusMinutes(stop.getDeliveryMinutes());
 			
 			actualStops.add(stop.buildWorkerActivity());
 			position = destination;
 		}
 		
-		Time returnTime = time.plusMinutes(Math.round(impedance.getTravelTime(position.getId(), vehicle.getOwner().getZone().getId(), vehicle.getType().getMode(), time))); 
+		this.preparedStops.addAll(actualStops);
 		
-		ParcelArrivalScheduler scheduler = vehicle.getOwner().getScheduler();
-		scheduler.dispatchVehicle(vehicle, returnTime);
-		scheduler.dispatchParcelActivities(actualStops, currentTime);	
+		Time returnTime = time.plusMinutes(Math.round(impedance.getTravelTime(position.getId(), vehicle.getOwner().getZone().getId(), vehicle.getType().getMode(), time))); 
+		return returnTime;
 		
 	}
 	
@@ -78,6 +86,14 @@ public class PlannedDeliveryTour {
 		}
 		
 		// TODO validate capacity
+	}
+	
+	public Collection<IParcel> getDeliveryParcels() {
+		return this.stops.stream().flatMap(stop -> stop.getDeliveries().stream()).collect(toList());
+	}
+	
+	public Collection<IParcel> getPickUpRequests() {
+		return this.stops.stream().flatMap(stop -> stop.getPickUps().stream()).collect(toList());
 	}
 	
 	

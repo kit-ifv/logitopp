@@ -15,6 +15,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceArea;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The Class DistributionCenter represents a distribution center from where
@@ -35,7 +36,7 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	
 	@Getter private final DepotStorage storage;
 	@Getter private final RegionalReach regionalStructure;
-	private DepotOperations operations;
+	@Getter @Setter private DepotOperations operations;
 	
 	@Getter private final  Fleet fleet;
 	
