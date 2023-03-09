@@ -27,12 +27,9 @@ import edu.kit.ifv.mobitopp.util.dataimport.Row;
 public class DistributionCenterParser {
 	private final ZoneRepository zoneRepo;
 	private final double scaleFactor;
-	private final ImpedanceIfc impedance;
-	private final DeliveryResults results;
 	
 	private final Map<String, CEPServiceProvider> serviceProviders;
 	private ServiceAreaFactory serviceAreaFactory;
-
 	
 	/**
 	 * Instantiates a new distribution center parser.
@@ -44,8 +41,6 @@ public class DistributionCenterParser {
 	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance, DeliveryResults results) {
 		this.zoneRepo = zoneRepo;
 		this.scaleFactor = scaleFactor;
-		this.impedance = impedance;
-		this.results = results;
 		this.serviceAreaFactory = new ServiceAreaFactory(zoneRepo, impedance);
 		
 		this.serviceProviders = new LinkedHashMap<>();
