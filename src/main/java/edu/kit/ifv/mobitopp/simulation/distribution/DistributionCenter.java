@@ -53,7 +53,6 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	 * @param attempts     the maximum number of delivery attempts
 	 * @param vehicleType  the vehicle type
 	 * @param serviceArea  the center's service area
-	 * @param impedance    the impedance
 	 */
 	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numVehicles,
 			int attempts, VehicleType vehicleType, ServiceArea serviceArea) {
