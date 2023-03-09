@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.fleet;
+package edu.kit.ifv.mobitopp.simulation.distribution.fleet;
 
 import java.util.Arrays;
 

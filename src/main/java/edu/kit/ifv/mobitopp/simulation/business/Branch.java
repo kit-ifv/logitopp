@@ -12,8 +12,8 @@ import static edu.kit.ifv.mobitopp.simulation.business.BuildingType.WAREHOUSE;
 import static edu.kit.ifv.mobitopp.simulation.business.Sector.ADMINISTRATION;
 import static edu.kit.ifv.mobitopp.simulation.business.Sector.HOSPITALITY;
 import static edu.kit.ifv.mobitopp.simulation.business.Sector.INDUSTRY;
-import static edu.kit.ifv.mobitopp.simulation.business.Sector.SERVICE;
 import static edu.kit.ifv.mobitopp.simulation.business.Sector.RETAIL;
+import static edu.kit.ifv.mobitopp.simulation.business.Sector.SERVICE;
 
 import java.util.Arrays;
 import java.util.Collection;

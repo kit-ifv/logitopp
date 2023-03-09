@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.fleet;
+package edu.kit.ifv.mobitopp.simulation.distribution.fleet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,8 @@ public class DeliveryVehicle {
 		
 		this.returningParcels.clear();
 		this.pickedUpParcels.clear();
-		this.owner.returnVehicle(this);
+		
+		this.owner.getFleet().returnVehicle(this);
 	}
 	
 	@Override

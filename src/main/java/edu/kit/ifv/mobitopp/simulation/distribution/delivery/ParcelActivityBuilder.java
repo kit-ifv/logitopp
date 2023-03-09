@@ -7,8 +7,10 @@ import java.util.List;
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
@@ -19,6 +21,7 @@ public class ParcelActivityBuilder {
 	protected int no;
 	protected int tripDuration;
 	protected double distance;
+	protected RelativeTime duration;
 	
 	protected final List<IParcel> allParcels;
 	protected final List<IParcel> deliveries;
@@ -35,10 +38,6 @@ public class ParcelActivityBuilder {
 		parcels.stream().filter(p -> !p.isPickUp()).forEach(deliveries::add);
 	}
 	
-	public int estimateDuration() {
-		return (int) this.deliveryVehicle.getOwner().getDurationModel().estimateDuration(deliveryVehicle, getAllParcels()); //TODO distinguish pickups and deliveries in duration model?
-	}
-
 	public ParcelActivityBuilder plannedAt(Time time) {
 		this.plannedArrivalTime = time;
 		return this;
@@ -60,8 +59,23 @@ public class ParcelActivityBuilder {
 		return this;
 	}
 	
+	public ParcelActivityBuilder withDuration(int minutes) {
+		this.duration = RelativeTime.ofMinutes(minutes);
+		return this;
+	}
+	
+	public ParcelActivityBuilder withDuration(DeliveryDurationModel durationModel) {
+		int minutes = Math.round(durationModel.estimateDuration(deliveryVehicle, getAllParcels()));
+		this.duration = RelativeTime.ofMinutes(minutes);
+		return this;
+	}
+	
+	public int getDeliveryMinutes() {
+		return this.getDuration().toMinutes();
+	}
+	
 	public ParcelActivity buildWorkerActivity() {
-		return new ParcelActivity(no, stopLocation, deliveries, pickUps, deliveryVehicle, plannedArrivalTime, distance, tripDuration, estimateDuration());		
+		return new ParcelActivity(no, stopLocation, deliveries, pickUps, deliveryVehicle, plannedArrivalTime, distance, tripDuration, duration.toMinutes());		
 	}	
 		
 

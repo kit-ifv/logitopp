@@ -16,6 +16,7 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
@@ -34,10 +35,12 @@ public class ZoneTspDeliveryTourStrategy extends TspBasedDeliveryTourStrategy {
 	/**
 	 * Instantiates a new {@link ZoneTspDeliveryTourStrategy}.
 	 *
-	 * @param impedance  the impedance
+	 * @param impedance          the impedance
+	 * @param clusteringStrategy a clustering strategy for clustering parcels to delivery stops
+	 * @param durationModel      a model for estimating the duration of delivery activity
 	 */
-	public ZoneTspDeliveryTourStrategy(ImpedanceIfc impedance) {
-		super(impedance);
+	public ZoneTspDeliveryTourStrategy(ImpedanceIfc impedance, DeliveryClusteringStrategy clusteringStrategy, DeliveryDurationModel durationModel) {
+		super(impedance, clusteringStrategy, durationModel);
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.chains;
+package edu.kit.ifv.mobitopp.simulation.distribution.region;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class TransportChain {
 	}
 	
 	public boolean canTransport(IParcel parcel) {
-		return last().getServiceArea().canServe(parcel);
+		return last().getRegionalStructure().getServiceArea().canServe(parcel);
 	}
 	
 }

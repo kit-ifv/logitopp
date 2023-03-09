@@ -31,7 +31,7 @@ public class DistributionCenterSelectorByFleetSize<A extends ParcelAgent, P exte
 		}
 		
 		Map<DistributionCenter, Double> shares = distributionCenters.stream()
-			  														 .collect(toMap(d -> d, d -> (double) d.getNumVehicles()));
+			  														 .collect(toMap(d -> d, d -> (double) d.getTotalVehicles()));
 		
 		
 		 return new ShareBasedSelector<>(shares).select(randomNumber);

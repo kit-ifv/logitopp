@@ -7,7 +7,7 @@ import edu.kit.ifv.mobitopp.result.Category;
 import edu.kit.ifv.mobitopp.result.Results;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;

@@ -1,29 +1,18 @@
 package edu.kit.ifv.mobitopp.simulation.demand;
 
-import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelectorTest.assertDayPrecision;
-import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelectorTest.assertIn;
-import static edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelectorTest.assertMinutePrecision;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.HOME;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.PACK_STATION;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType.WORK;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
@@ -31,12 +20,9 @@ import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.Household;
 import edu.kit.ifv.mobitopp.simulation.Location;
-import edu.kit.ifv.mobitopp.simulation.demand.quantity.NormalDistributedNumberOfParcelsSelector;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
-import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
-import edu.kit.ifv.mobitopp.time.Time;
 
 public class DefaultParcelOrderModelTest {
 	

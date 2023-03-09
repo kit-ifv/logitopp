@@ -1,7 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.distribution;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,8 @@ import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.Hook;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
-import edu.kit.ifv.mobitopp.simulation.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class ParcelArrivalScheduler implements Hook {
@@ -56,10 +56,14 @@ public class ParcelArrivalScheduler implements Hook {
 		
 		vehicleReturnTimes.merge(returnTime, new ArrayList<>(List.of(vehicle)), this::mergeIntoFirst);
 		
-		operator.bookVehicleUntil(vehicle, returnTime);		
+		operator.getFleet().bookVehicleUntil(vehicle, returnTime);		
 	}
 	
-	public void dispatchParcelActivities(Collection<ParcelActivity> activities, Time currentTime) {
+	public void dispatchParcelActivities(PlannedDeliveryTour tour, Time currentTime) {
+		this.dispatchParcelActivities(tour.getPreparedStops(), currentTime);
+	}
+	
+	public void dispatchParcelActivities(List<ParcelActivity> activities, Time currentTime) {
 		activities.forEach(a -> dispatchParcelActivity(a, currentTime));
 	}
 	
