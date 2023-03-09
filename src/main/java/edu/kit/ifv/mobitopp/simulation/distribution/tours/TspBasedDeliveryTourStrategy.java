@@ -19,6 +19,7 @@ import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -31,11 +32,12 @@ import edu.kit.ifv.mobitopp.time.Time;
  * order, until their capacity (160 parcels) is reached, or the estimated
  * duration of the tour reaches 8h. The giant tour is recalculated every day.
  */
-public class TspBasedDeliveryTourStrategy implements TourPlanningStrategy {
+public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 
 	private final ImpedanceIfc impedance;
 	
-	public TspBasedDeliveryTourStrategy(ImpedanceIfc impedance) {
+	public TspBasedDeliveryTourStrategy(ImpedanceIfc impedance, DeliveryClusteringStrategy clusteringStrategy, DeliveryDurationModel durationModel) {
+		super(clusteringStrategy, durationModel);
 		this.impedance = impedance;
 	}
 
@@ -72,7 +74,7 @@ public class TspBasedDeliveryTourStrategy implements TourPlanningStrategy {
 				ParcelActivityBuilder delivery = giantTour.get(i).by(vehicle);
 		
 				float tripDuration = travelTime(lastZone, delivery.getZone(), time, mode);		
-				float deliveryDuration = delivery.estimateDuration();
+				float deliveryDuration = delivery.withDuration(durationModel).getDeliveryMinutes();
 				float returnTime = travelTime(delivery.getZone(), vehicle.getOwner().getZone(), time, mode);
 				
 				if (time.plusMinutes(round(tripDuration + deliveryDuration + returnTime)).isBeforeOrEqualTo(endOfTour)) {
@@ -89,7 +91,7 @@ public class TspBasedDeliveryTourStrategy implements TourPlanningStrategy {
 		
 			}
 
-			plannedTours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, time.differenceTo(currentTime), currentTime));
+			plannedTours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, time.differenceTo(currentTime), currentTime, true));
 			giantTour.removeAll(assigned);
 		}
 

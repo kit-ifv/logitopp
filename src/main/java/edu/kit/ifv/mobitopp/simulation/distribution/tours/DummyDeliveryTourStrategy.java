@@ -6,15 +6,20 @@ import java.util.List;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
 /**
  * The Class DummyDeliveryTourStrategy is an exemplary implementation of the DeliveryTourAssignmentStrategy interface.
  */
-public class DummyDeliveryTourStrategy implements TourPlanningStrategy {
+public class DummyDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 
 	
+	public DummyDeliveryTourStrategy(DeliveryClusteringStrategy clusteringStrategy,	DeliveryDurationModel durationModel) {
+		super(clusteringStrategy, durationModel);
+	}
+
 	@Override
 	public List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle,
 			Time currentTime, RelativeTime maxTourDuration) {
@@ -25,10 +30,10 @@ public class DummyDeliveryTourStrategy implements TourPlanningStrategy {
 		RelativeTime counter = copy(maxTourDuration);
 		
 		for (ParcelActivityBuilder activity : activities) {
-			counter = counter.minusMinutes(activity.estimateDuration() + 5);
+			counter = counter.minusMinutes(activity.withDuration(durationModel).getDeliveryMinutes() + 5);
 			
 			if (counter.isNegative())  {
-				tours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, maxTourDuration.minus(counter), currentTime));
+				tours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, maxTourDuration.minus(counter), currentTime, true));
 				assigned = new ArrayList<>();
 				counter = copy(maxTourDuration);
 				
@@ -39,7 +44,7 @@ public class DummyDeliveryTourStrategy implements TourPlanningStrategy {
 		}
 		
 		if (!assigned.isEmpty()) {
-			tours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, maxTourDuration.minus(counter), currentTime));
+			tours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, maxTourDuration.minus(counter), currentTime, true));
 		}
 		
 

@@ -17,12 +17,19 @@ public interface TourPlanningStrategy {
 	/**
 	 * Compute delivery tours for the given delivery/pickup activities.
 	 *
-	 * @param parcels the parcels
-	 * @param center  the center
-	 * @return a list of planned tours for the given parcels operated by the given {@link DistributionCenter}
+	 * @param deliveries the deliveries
+	 * @param pickUps    the pick ups
+	 * @param fleet      the fleet
+	 * @param time       the time
+	 * @return a list of planned tours for the given parcels operated by the given
+	 *         {@link DistributionCenter}
 	 */
-	public List<PlannedDeliveryTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps, Fleet fleet);
-	
+	public List<PlannedDeliveryTour> planTours(
+			Collection<IParcel> deliveries, 
+			Collection<IParcel> pickUps, Fleet fleet,
+			Time time
+	);
+
 	public boolean shouldReplanTours(DistributionCenter center, Time time);
 
 }
