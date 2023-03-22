@@ -129,6 +129,9 @@ public class PlannedDeliveryTour {
 		return this.stops.stream().flatMap(stop -> stop.getPickUps().stream()).collect(toList());
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "Planned tour: " + this.vehicleType.name() + ", " + this.stops.size() + " stops";
+	}
 
 }
