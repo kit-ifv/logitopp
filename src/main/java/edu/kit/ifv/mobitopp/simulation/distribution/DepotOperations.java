@@ -52,11 +52,15 @@ public class DepotOperations {
 	private void planTours(Time currentTime) {
 		
 		if (tourStrategy.shouldReplanTours(center, currentTime)) { //TODO add replanning for non-hubs
-			
+			System.out.println("Replan tours!");
 			
 			DepotStorage storage = center.getStorage();
-			
-			plannedTours().stream().filter(t -> t != null).filter(PlannedDeliveryTour::isReplan).forEach(storage::deletePlannedTour);					
+
+			for (PlannedDeliveryTour t : plannedTours()) {
+				if (t.isReplan()) {
+					storage.deletePlannedTour(t);
+				}
+			}
 
 			storage.addPlannedTours(
 				this.tourStrategy.planTours(center.getStorage().getParcels(), center.getStorage().getRequests(), center.getFleet(), currentTime)

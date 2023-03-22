@@ -41,7 +41,7 @@ public class TimeWindowDispatchStrategy implements DispatchStrategy {
 	}
 	
 	private boolean endsBeforeEndOfDeliveryTime(Time time, PlannedDeliveryTour t) {
-		return time.plus(t.getPlannedDuration()).getHour() <= 21;
+		return time.plus(t.getPlannedDuration()).isBefore(time.startOfDay().plusHours(21));
 	}
 
 }

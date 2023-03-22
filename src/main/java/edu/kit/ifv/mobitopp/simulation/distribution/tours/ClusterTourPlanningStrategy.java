@@ -37,7 +37,6 @@ public abstract class ClusterTourPlanningStrategy implements TourPlanningStrateg
 
 	@Override
 	public boolean shouldReplanTours(DistributionCenter center, Time time) {
-		System.out.println("Replan tours!");
 		return time.equals(time.startOfDay().plusHours(6));
 	}
 
