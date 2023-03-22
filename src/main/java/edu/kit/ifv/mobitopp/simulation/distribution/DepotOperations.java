@@ -1,5 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.distribution;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -109,7 +110,7 @@ public class DepotOperations {
 	}
 
 	private Collection<PlannedDeliveryTour> plannedTours() {
-		return center.getStorage().getPlannedTours();
+		return new ArrayList<>(center.getStorage().getPlannedTours());
 	}
 
 	
