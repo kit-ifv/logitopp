@@ -14,7 +14,7 @@ public class TimeWindowDispatchStrategy implements DispatchStrategy {
 	@Override
 	public Optional<PlannedDeliveryTour> canDispatch(Collection<PlannedDeliveryTour> tours, Fleet fleet, Time time) {
 		
-		if ( isInDispatchHours(time) || isSunday(time) || isFleetAbsent(fleet) || noTourPlanned(tours) ) {
+		if ( !isInDispatchHours(time) || isSunday(time) || isFleetAbsent(fleet) || noTourPlanned(tours) ) {
 			return Optional.empty();
 		}
 

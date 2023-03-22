@@ -56,7 +56,7 @@ public class DepotOperations {
 			
 			DepotStorage storage = center.getStorage();
 			
-			plannedTours().stream().filter(PlannedDeliveryTour::isReplan).forEach(storage::deletePlannedTour);					
+			plannedTours().stream().filter(t -> t != null).filter(PlannedDeliveryTour::isReplan).forEach(storage::deletePlannedTour);					
 
 			storage.addPlannedTours(
 				this.tourStrategy.planTours(center.getStorage().getParcels(), center.getStorage().getRequests(), center.getFleet(), currentTime)
