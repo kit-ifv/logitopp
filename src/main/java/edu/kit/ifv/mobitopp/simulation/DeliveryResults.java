@@ -1,6 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.result.Category;
@@ -8,7 +9,10 @@ import edu.kit.ifv.mobitopp.result.Results;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.region.TransportChain;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -28,6 +32,7 @@ public class DeliveryResults {
 	private final static Category resultCategoryBusinessProduction = createResultCategoryBusinessProduction();
 	private final static Category resultCategoryNeighbordeliveries = createResultCategoryNeighborDeliveries();
 	private final static Category resultCategoryVehicleEvents = createResultCategoryVehicleEvents();
+	private final static Category resultCategoryChainPreferences = createResultCategoryChainPreference();
 
 	private final static Category resultCategoryPartners = createResultCategoryPartners();
 
@@ -392,5 +397,34 @@ public class DeliveryResults {
 		
 		this.results.write(resultCategoryVehicleEvents, msg);
 
+	}
+	
+	private static Category createResultCategoryChainPreference() {
+		return new Category("chain_preferences", Arrays.asList("parcel_id", "is_pickup", 
+				"from_hub", "to_hub", "modes", "selected", 
+				"probability", "utility", "cost", "duration", "distance", 
+				"time", "sim_minute"));
+	}
+	
+	public void logTransportChainPreference(IParcel parcel, TransportChain chain, String selected, double probability, double utility, double cost, double duration, double distance, Time time) {
+		String msg = "";
+		
+		msg += parcel.getOId() + SEP;
+		msg += parcel.isPickUp() + SEP;
+		
+		msg += chain.first().getName() + SEP;
+		msg += chain.last().getName() + SEP;
+		msg += chain.getVehicleTypes().stream().map(VehicleType::name).collect(Collectors.joining("-"));
+		msg += selected + SEP;
+		
+		msg += utility + SEP;
+		msg += cost + SEP;
+		msg += duration + SEP;
+		msg += distance + SEP;
+		
+		msg += time.toString() + SEP;
+		msg += time.toMinutes();
+		
+		this.results.write(resultCategoryChainPreferences, msg);
 	}
 }

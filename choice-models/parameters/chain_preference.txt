@@ -1,0 +1,16 @@
+asc_last_other	= 0
+b_cost_other	= 0
+b_time_other	= 0
+b_dist_other	= 0
+asc_last_bike	=  3.0
+b_cost_bike		= -1.0
+b_time_bike		= -1.0
+b_dist_bike		=  1.0
+asc_last_truck	=  1.0
+b_cost_truck	= -1.0
+b_time_truck	= -1.0
+b_dist_truck	=  1.0
+asc_last_tram	= 0
+b_cost_tram		= 0
+b_time_tram		= 0
+b_dist_tram		= 0
