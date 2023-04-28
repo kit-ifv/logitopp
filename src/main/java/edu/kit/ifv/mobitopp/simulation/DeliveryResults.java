@@ -414,9 +414,10 @@ public class DeliveryResults {
 		
 		msg += chain.first().getName() + SEP;
 		msg += chain.last().getName() + SEP;
-		msg += chain.getVehicleTypes().stream().map(VehicleType::name).collect(Collectors.joining("-"));
+		msg += chain.getVehicleTypes().stream().map(VehicleType::name).collect(Collectors.joining("-")) + SEP;
 		msg += selected + SEP;
 		
+		msg += probability + SEP;
 		msg += utility + SEP;
 		msg += cost + SEP;
 		msg += duration + SEP;
