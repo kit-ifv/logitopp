@@ -43,7 +43,7 @@ public enum VehicleType {
 	TRAM(3) {
 		@Override
 		public	Mode getMode() {
-			return StandardMode.UNKNOWN;//TODO check if exception ok
+			return StandardMode.PUBLICTRANSPORT;//TODO check if exception ok
 		}
 
 		@Override

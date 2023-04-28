@@ -150,12 +150,7 @@ public class LogitTransportChainPreferenceModel implements TransportChainPrefere
 		double dist = estimateDistance(chain, parcel) / capacity;
 		
 		String mode = chain.last().getFleet().getVehicleType().asString().toLowerCase();
-		
-		System.out.println("asc_last_" +  mode);
-		System.out.println("b_cost_" +  mode);
-		System.out.println("b_time_" +  mode);
-		System.out.println("b_dist_" +  mode);
-		
+				
 		double utility = parameters.get("asc_last_"+mode) + parameters.get("b_cost_" + mode) * cost 
 												+ parameters.get("b_time_" + mode) * time 
 												+ parameters.get("b_dist_" + mode) * dist;
