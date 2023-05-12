@@ -1,7 +1,5 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains;
 
-import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.BIKE;
-import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.TRAM;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize.EXTRA_LARGE;
 import static java.util.stream.Collectors.toList;
 
@@ -9,12 +7,10 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
-import edu.kit.ifv.mobitopp.simulation.distribution.region.TransportChain;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChainStatistics;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -26,21 +22,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class LogitTransportChainPreferenceModel implements TransportChainPreferenceModel {
-
-	private final static int TRANSFER_TIME_MIN = 5;
-	private final static double FUEL_COST_FACTOR = 1.42; // Verhältnis Kraftstoff- bzw. Energieverbrauch. HBEFA-Daten, Quelle angeben!
-	private final static double LABOUR_COST = 28.99/60.0;  // Euro per hour normalized down to minutes
 	
 	private final LogitParameters parameters;
-	private final ImpedanceIfc impedance;
-	private final TimeTable timeTable;
+	private final TransportChainStatistics stats;
 	
 	private final DeliveryResults results;
 		
-	public LogitTransportChainPreferenceModel(LogitParameters parameters, ImpedanceIfc impedance, TimeTable timeTable, DeliveryResults results) {
+	public LogitTransportChainPreferenceModel(LogitParameters parameters,  TransportChainStatistics stats, DeliveryResults results) {
 		this.parameters = parameters;
-		this.impedance = impedance;
-		this.timeTable = timeTable;
+		this.stats = stats;
 		this.results = results;
 	}
 	
@@ -91,27 +81,22 @@ public class LogitTransportChainPreferenceModel implements TransportChainPrefere
 		return utility;
 	}
 	
-	private Collection<TransportChain> filterChoiceSet(IParcel parcel, Collection<TransportChain> choiceSet, Time time) {
+	@Override
+	public Collection<TransportChain> filterChoiceSet(IParcel parcel, Collection<TransportChain> choiceSet, Time time) {
 		return choiceSet.stream()
 						.filter(chain -> canBeUsed(chain, parcel, time))
 						.collect(toList());
 	}
 	
 	private boolean canBeUsed(TransportChain chain, IParcel parcel, Time time) {
-		return chain.canTransport(parcel) && !(isXL(parcel) && usesBike(chain)) && tramAvailableIfRequired(chain, time);
+		return chain.canTransport(parcel) && !(isXL(parcel) && stats.usesBike(chain)) && stats.tramAvailableIfRequired(chain, time);
 	}
 
 	private boolean isXL(IParcel parcel) {
 		return parcel.getShipmentSize().equals(EXTRA_LARGE);
 	}
 
-	private boolean usesBike(TransportChain chain) {
-		return chain.getVehicleTypes().contains(BIKE);
-	}
 	
-	private boolean tramAvailableIfRequired(TransportChain chain, Time time) {
-		return chain.legsOfType(TRAM).stream().allMatch(p -> timeTable.hasNextConnection(p.getFirst(), p.getSecond(), time));
-	}
 	
 	
 	
@@ -145,9 +130,9 @@ public class LogitTransportChainPreferenceModel implements TransportChainPrefere
 		
 		int capacity = getVehicleCapacity(chain.last());
 		
-		double cost = estimateCost(chain, parcel, currentTime) / capacity;
-		double time = estimateDuration(chain, parcel, currentTime) / capacity;
-		double dist = estimateDistance(chain, parcel) / capacity;
+		double cost = stats.estimateCost(chain, parcel, currentTime) / capacity;
+		double time = stats.estimateDuration(chain, parcel, currentTime) / capacity;
+		double dist = stats.estimateDistance(chain, parcel) / capacity;
 		
 		String mode = chain.last().getFleet().getVehicleType().asString().toLowerCase();
 				
@@ -158,119 +143,8 @@ public class LogitTransportChainPreferenceModel implements TransportChainPrefere
 		return new UtilLog(utility, cost, utility, dist);
 	}
 
-	private double estimateDuration(TransportChain chain, IParcel parcel, Time currentTime) {
-		double duration = 0;
-		
-		DistributionCenter origin = chain.first();
-		for (DistributionCenter destination : chain.tail()) {
-			
-			duration += getTravelTime(origin, destination, currentTime);
-			duration += TRANSFER_TIME_MIN;
-			
-			origin = destination;
-		}
-		
-		
-		duration += getTravelTime(origin, parcel.getZone(), currentTime); // TODO within tour factor
-		
-		return duration;
-	}
 	
-	private double estimateDistance(TransportChain chain, IParcel parcel) {
-		double distance = 0;
-		
-		DistributionCenter origin = chain.first();
-		for (DistributionCenter destination : chain.tail()) {
-			
-			distance += getDistance(origin, destination);
-			origin = destination;
-		}
-		
-		
-		distance += getDistance(origin, parcel.getZone()); // TODO within tour factor
-		
-		return distance;
-	}
-	
-	private double estimateCost(TransportChain chain, IParcel parcel, Time currentTime) {
-		double cost = 0;
-		
-		DistributionCenter origin = chain.first();
-		for (DistributionCenter destination : chain.tail()) {
-			
-			cost += getCost(origin, destination, currentTime) * vehicleCostFator(origin);
-			cost += (getTravelTime(origin, destination, currentTime) + TRANSFER_TIME_MIN) * timeCostFactor(origin);
-			
-			origin = destination;
-		}
-		
-		
-		cost += getCost(origin, parcel.getZone(), currentTime) * vehicleCostFator(origin); // TODO within tour factor
-		cost += (getTravelTime(origin, parcel.getZone(), currentTime) + TRANSFER_TIME_MIN) * timeCostFactor(origin);
-		
-		return cost;
-	}
-	
-
-	private float getTravelTime(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
-		VehicleType vehicleType = origin.getFleet().getVehicleType();
-		
-		if (vehicleType.equals(TRAM)) {
-			return timeTable.getNextDuration(origin, destination, currentTime);
-		}
-		
-		return getTravelTime(origin, destination.getZone(), currentTime);
-	}
-	
-	private float getTravelTime(DistributionCenter origin, Zone destination, Time currentTime) {		
-		return impedance.getTravelTime(origin.getZone().getId(), destination.getId(),  origin.getFleet().getVehicleType().getMode(), currentTime);
-	}
-	
-	private float getDistance(DistributionCenter origin, DistributionCenter destination) {
-		return getDistance(origin, destination.getZone());
-	}
-	
-	private float getDistance(DistributionCenter origin, Zone destination) {
-		return impedance.getDistance(origin.getZone().getId(), destination.getId());
-	}
-	
-	private float getCost(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
-		return getCost(origin, destination.getZone(), currentTime);
-	}
-	
-	private float getCost(DistributionCenter origin, Zone destination, Time currentTime) {
-		return impedance.getTravelCost(origin.getZone().getId(), destination.getId(), origin.getFleet().getVehicleType().getMode(), currentTime);
-	}
-	
-	private double vehicleCostFator(DistributionCenter hub) {
-		switch (hub.getFleet().getVehicleType()) {
-			case TRUCK:
-				return FUEL_COST_FACTOR;
-	
-			case BIKE:
-			case OTHER:
-			case TRAM:
-			default:
-				return 1.0;
-
-		}
-	}
-	
-	private double timeCostFactor(DistributionCenter hub) {
-		switch (hub.getFleet().getVehicleType()) {
-			case TRUCK:
-			case BIKE:	
-				return LABOUR_COST;
-
-			case OTHER:
-			case TRAM:
-			default:
-				return 0.0;
-
-		}
-	}
-	
-	private int getVehicleCapacity(DistributionCenter hub) { //TODO fix vehicle capacity
+	public int getVehicleCapacity(DistributionCenter hub) { //TODO fix vehicle capacity
 		switch (hub.getFleet().getVehicleType()) {
 			case TRUCK:
 				return 157;
@@ -285,6 +159,7 @@ public class LogitTransportChainPreferenceModel implements TransportChainPrefere
 	
 		}
 	}
+	
 	
 	@Getter
 	@Setter

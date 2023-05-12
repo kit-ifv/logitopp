@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChainFactory;
 import lombok.Getter;
 
 @Getter

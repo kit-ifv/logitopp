@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.region;
+package edu.kit.ifv.mobitopp.simulation.distribution.chains;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.region;
+package edu.kit.ifv.mobitopp.simulation.distribution.chains;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.region.RegionalReach;
 
 public class TransportChainFactory {
 	

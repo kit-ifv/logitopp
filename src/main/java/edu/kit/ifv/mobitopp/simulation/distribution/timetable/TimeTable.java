@@ -23,6 +23,10 @@ public class TimeTable {
 		return getNextConnection(origin, destination, currentTime).get().getDurationMinutes();
 	}
 	
+	public Time getNextDeparture(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
+		return getNextConnection(origin, destination, currentTime).get().getDeparture();
+	}
+	
 	public boolean hasNextConnection(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
 		return getNextConnection(origin, destination, currentTime).isPresent();
 	}

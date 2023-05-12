@@ -8,8 +8,8 @@ import edu.kit.ifv.mobitopp.result.Results;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
-import edu.kit.ifv.mobitopp.simulation.distribution.region.TransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.TourPlanningStrategy;
@@ -48,7 +48,7 @@ public class TourChainModel implements TourPlanningStrategy {
 		Collection<TransportChain> pickupChains = distributionCenter.getRegionalStructure().getPickUpChains();
 		
 		for (IParcel parcel: deliveries) {
-			preferenceModel.selectPreference(parcel, deliveryChains, time, random.nextDouble());
+			preferenceModel.selectPreference(parcel, deliveryChains, time, random.nextDouble()); //TODO build transport chain departures with fixed departure times
 		}
 		
 		for (IParcel parcel: pickUps) {
