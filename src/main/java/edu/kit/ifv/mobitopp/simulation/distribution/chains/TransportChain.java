@@ -1,5 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.chains;
 
+import static java.util.stream.Collectors.joining;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,7 +40,7 @@ public class TransportChain {
 	}
 	
 	public VehicleType lastMileVehicle() {
-		return this.hubs.get(hubs.size() - 1).getFleet().getVehicleType();
+		return this.hubs.get(hubs.size() - 1).getVehicleType();
 	}
 	
 	public List<DistributionCenter> tail() {
@@ -62,7 +64,7 @@ public class TransportChain {
 	}
 	
 	public Collection<VehicleType> getVehicleTypes() {
-		return hubs.stream().map(dc -> dc.getFleet().getVehicleType()).collect(Collectors.toList());
+		return hubs.stream().map(dc -> dc.getVehicleType()).collect(Collectors.toList());
 	}
 	
 	public Collection<Pair<DistributionCenter, DistributionCenter>> legsOfType(VehicleType type) {
@@ -71,7 +73,7 @@ public class TransportChain {
 		DistributionCenter origin = first();
 		for (DistributionCenter destination: tail()) {
 			
-			if (origin.getFleet().getVehicleType().equals(type)) {
+			if (origin.getVehicleType().equals(type)) {
 				legs.add(new Pair<>(origin, destination));
 			}
 			
@@ -81,4 +83,8 @@ public class TransportChain {
 		return legs;
 	}
 	
+	@Override
+	public String toString() {
+		return hubs.stream().map(DistributionCenter::toString).collect(joining(", "));
+	}
 }

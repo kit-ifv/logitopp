@@ -133,7 +133,7 @@ public class LogitTransportChainPreferenceModel implements TransportChainPrefere
 		double time = stats.estimateDuration(chain, parcel, currentTime) / capacity;
 		double dist = stats.estimateDistance(chain, parcel) / capacity;
 		
-		String mode = chain.last().getFleet().getVehicleType().asString().toLowerCase();
+		String mode = chain.last().getVehicleType().asString().toLowerCase();
 				
 		double utility = parameters.get("asc_last_"+mode) + parameters.get("b_cost_" + mode) * cost 
 												+ parameters.get("b_time_" + mode) * time 
@@ -144,7 +144,7 @@ public class LogitTransportChainPreferenceModel implements TransportChainPrefere
 
 	
 	public int getVehicleCapacity(DistributionCenter hub) { //TODO fix vehicle capacity
-		switch (hub.getFleet().getVehicleType()) {
+		switch (hub.getVehicleType()) {
 			case TRUCK:
 				return 157;
 	

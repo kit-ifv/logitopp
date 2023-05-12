@@ -97,7 +97,7 @@ public class TransportChainStatistics {
 	
 
 	public float getTravelTime(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
-		VehicleType vehicleType = origin.getFleet().getVehicleType();
+		VehicleType vehicleType = origin.getVehicleType();
 		
 		if (vehicleType.equals(TRAM)) {
 			return timeTable.getNextDuration(origin, destination, currentTime);
@@ -107,7 +107,7 @@ public class TransportChainStatistics {
 	}
 	
 	private float getTravelTime(DistributionCenter origin, Zone destination, Time currentTime) {		
-		return impedance.getTravelTime(origin.getZone().getId(), destination.getId(),  origin.getFleet().getVehicleType().getMode(), currentTime);
+		return impedance.getTravelTime(origin.getZone().getId(), destination.getId(),  origin.getVehicleType().getMode(), currentTime);
 	}
 	
 	private float getDistance(DistributionCenter origin, DistributionCenter destination) {
@@ -123,11 +123,11 @@ public class TransportChainStatistics {
 	}
 	
 	private float getCost(DistributionCenter origin, Zone destination, Time currentTime) {
-		return impedance.getTravelCost(origin.getZone().getId(), destination.getId(), origin.getFleet().getVehicleType().getMode(), currentTime);
+		return impedance.getTravelCost(origin.getZone().getId(), destination.getId(), origin.getVehicleType().getMode(), currentTime);
 	}
 	
 	private double vehicleCostFator(DistributionCenter hub) {
-		switch (hub.getFleet().getVehicleType()) {
+		switch (hub.getVehicleType()) {
 			case TRUCK:
 				return FUEL_COST_FACTOR;
 	
@@ -141,7 +141,7 @@ public class TransportChainStatistics {
 	}
 	
 	private double timeCostFactor(DistributionCenter hub) {
-		switch (hub.getFleet().getVehicleType()) {
+		switch (hub.getVehicleType()) {
 			case TRUCK:
 			case BIKE:	
 				return LABOUR_COST;
@@ -167,7 +167,7 @@ public class TransportChainStatistics {
 	}
 
 	
-	public int getTransferTime(DistributionCenter hub) {
+	public int getTransferTime(DistributionCenter origin, DistributionCenter destination) {
 		return TRANSFER_TIME_MIN; //TODO transfer time depending on vehicle type??
 	}
 }

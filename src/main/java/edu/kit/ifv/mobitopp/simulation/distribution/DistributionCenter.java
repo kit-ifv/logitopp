@@ -200,6 +200,10 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		return this.fleet.size();
 	}
 	
+	public VehicleType getVehicleType() {
+		return this.fleet.getVehicleType();
+	}
+		
 	public DeliveryResults getResults() {
 		return this.operations.getResults();
 	}
