@@ -1,6 +1,5 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.chains;
 
-import java.util.List;
 import java.util.Map;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;

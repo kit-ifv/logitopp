@@ -1,7 +1,5 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.timetable;
 
-import static java.lang.String.valueOf;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
