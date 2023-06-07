@@ -8,12 +8,42 @@ import java.util.Random;
 
 public enum ShipmentSize {
 
-	SMALL(420, 18240),
-	MEDIUM(18240, 38760),
-	LARGE(38760, 82080),
-	EXTRA_LARGE(820080, 171000),
-	PALLET(0, 0),
-	CONTAINER(0, 0);
+	SMALL(420, 18240) {
+		@Override
+		public ParcelUnit toParcelUnits() {
+			return ParcelUnit.of(1);
+		}
+	},
+	MEDIUM(18240, 38760) {
+		@Override
+		public ParcelUnit toParcelUnits() {
+			return ParcelUnit.of(2);
+		}
+	},
+	LARGE(38760, 82080) {
+		@Override
+		public ParcelUnit toParcelUnits() {
+			return ParcelUnit.of(3);
+		}
+	},
+	EXTRA_LARGE(820080, 171000) {
+		@Override
+		public ParcelUnit toParcelUnits() {
+			return ParcelUnit.of(5);
+		}
+	},
+	PALLET(0, 0) {
+		@Override
+		public ParcelUnit toParcelUnits() {
+			return ParcelUnit.of(-1);
+		}
+	},
+	CONTAINER(0, 0) {
+		@Override
+		public ParcelUnit toParcelUnits() {
+			return ParcelUnit.of(-1);
+		}
+	};
 	
 	private final int minVolume;
 	private final int meanVolume;
@@ -35,5 +65,7 @@ public enum ShipmentSize {
 		
 		return (int) min(max(minVolume, round(scaledGauss)), maxVolume);
 	}
+	
+	public abstract ParcelUnit toParcelUnits();
 	
 }

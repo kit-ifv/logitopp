@@ -1,10 +1,12 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.timetable;
 
+import static java.util.Comparator.comparing;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -20,15 +22,15 @@ public class TimeTable {
 	public int getNextDuration(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
 		return getNextConnection(origin, destination, currentTime).get().getDurationMinutes();
 	}
-	
+
 	public Time getNextDeparture(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
 		return getNextConnection(origin, destination, currentTime).get().getDeparture();
 	}
-	
+
 	public boolean hasNextConnection(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
 		return getNextConnection(origin, destination, currentTime).isPresent();
 	}
-	
+
 	public Optional<Connection> getNextConnection(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
 		
 		Optional<Connection> connection = 
@@ -36,9 +38,27 @@ public class TimeTable {
 					   .filter(c -> c.getFrom().equals(origin))
 					   .filter(c -> c.getTo().equals(destination))
 					   .filter(c -> c.getDeparture().isAfterOrEqualTo(currentTime))
-					   .sorted(Comparator.comparing(Connection::getDeparture))
+					   .sorted(comparing(Connection::getDeparture))
 					   .findFirst();
 		
 		return connection;
+	}
+
+	public Stream<Connection> getConnections(DistributionCenter origin, DistributionCenter destination) {
+		return connections.stream()
+						  .filter(c -> c.getFrom().equals(origin))
+						  .filter(c -> c.getTo().equals(destination))
+						  .sorted(comparing(Connection::getDeparture));
+	}
+	
+	public Stream<Connection> getConnectionsOnDay(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
+		return getConnections(origin, destination)
+				.filter(c -> c.getDeparture().getDay() == currentTime.getDay())
+				.filter(c -> c.getDeparture().isAfterOrEqualTo(currentTime));
+	}
+	
+	public Stream<Connection> getFreeConnectionsOnDay(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
+		return getConnectionsOnDay(origin, destination, currentTime)
+				.filter(c -> c.hasFreeCapacity());
 	}
 }

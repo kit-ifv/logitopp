@@ -52,7 +52,9 @@ public class TimeTableParser {
 		
 		int trip_duration = row.valueAsInteger("trip_duration");
 		
-		return new Connection(origin, destination, departure, trip_duration);
+		int capacity = row.valueAsInteger("capacity");
+		
+		return new Connection(origin, destination, departure, trip_duration, capacity);
 	}
 	
 	

@@ -1,0 +1,9 @@
+id;name;cepsp;vehicles;attempts;loc_x;loc_y;zone;vehicle_type;service_area
+1;DHL_Karlsruhe_Rupurerstr;DHL;83;1;8.40720182;48.99552615;328;2;0
+2;DHL_Bruchsal;DHL;15;1;8.558917;49.120139;4136;2;0
+3;DHL_KA_Knielingerstr;DHL;58;1;8.34975;49.023889;1028;2;0
+4;Hermes_Ettlingen;Hermes;52;3;8.3745;48.9392;3835;2;0
+5;UPS_Groetzingen;UPS;39;3;8.469694;49.026528;2019;2;0
+6;DPD_Malsch;DPD;35;2;8.313194;48.8925;6413;2;0
+7;GLS_Rheinstetten;GLS;24;1;8.336111;48.979944;3954;2;0
+8;Fedex_Hagseld;Fedex;21;3;8.473843;49.030145;2019;2;0

@@ -1,13 +1,16 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.chains;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
+import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class TimedTransportChainBuilder {
@@ -16,15 +19,21 @@ public class TimedTransportChainBuilder {
 	private final Map<DistributionCenter, Integer> durations;
 	private final Map<DistributionCenter, Integer> transfers;
 	private final Map<DistributionCenter, Time> departures;
+	private final List<Connection> connections;
 	private Time start;
+	private double distance;
+	private double cost;
 
 	public TimedTransportChainBuilder(TransportChain chain) {
 		this.chain = chain;
 		this.durations = new LinkedHashMap<>();
 		this.transfers = new LinkedHashMap<>();
 		this.departures = new LinkedHashMap<>();
+		this.connections = new ArrayList<>();
 		durations.put(chain.last(), 0);//TODO default value
 		transfers.put(chain.last(), 0);//TODO default value
+		this.distance = 0.0;
+		this.cost = 0.0;
 	}
 	
 	public TimedTransportChainBuilder setDuration(DistributionCenter hub, int durMinutes, int transferMinutes) {
@@ -38,7 +47,7 @@ public class TimedTransportChainBuilder {
 		int prefixDur = getPrefixDuration(prefix, hub);
 		
 		if (start == null) {
-			// set start time with gievn departure as fixed pole
+			// set start time with given departure as fixed pole
 			start = departure.minusMinutes(prefixDur);
 			
 		} else {
@@ -65,31 +74,59 @@ public class TimedTransportChainBuilder {
 		return this;
 	}
 	
-	public TimedTransportChainBuilder useDurationsFromStats(TransportChainStatistics stats, Time currentTime) {//TODO error on legs before first tram leg with fixed departure as start dep is approximated via current time
+	public TimedTransportChainBuilder useDurationsFromStats(TimeTable timeTable, ImpedanceIfc impedance, Time currentTime) {//TODO error on legs before first tram leg with fixed departure as start dep is approximated via current time
 		DistributionCenter origin = chain.first();
 		int durationSum = 0;
+		
 		for (DistributionCenter destination : chain.tail()) {
+			VehicleType vehicle = origin.getVehicleType();
+			
+			this.cost += tripCost(impedance, origin, destination, currentTime, vehicle);
+			this.distance += tripDistance(impedance, origin, destination);
 			
 			Time time = (start == null) ? currentTime : start;
 			time = time.plusMinutes(durationSum);	
 			
-			int transfer = stats.getTransferTime(origin, destination);
+			int transfer = getTransferTime(origin, destination);
 			int dur;
-			if (origin.getVehicleType().equals(VehicleType.TRAM)) {
-				Connection connection = stats.nextReachableConnection(destination, origin, time).get(); //TODO what if no connection is found, chain should not exist in that case
+						
+			if (vehicle.equals(VehicleType.TRAM)) {
+				Connection connection = timeTable.getFreeConnectionsOnDay(origin, destination, currentTime)
+											 	 .findFirst().get();//TODO what if no connection is found, chain should not exist in that case
+				
 				dur = connection.getDurationMinutes();
 				fixedDepartureAt(origin, connection.getDeparture(), dur, transfer);
+				connections.add(connection);
 				
 			} else {
-				dur = Math.round(stats.getTravelTime(origin, destination, time));
+				dur = tripDuration(impedance, origin, destination, time, vehicle);
 				setDuration(origin, dur, transfer);
 			}
 			
 			durationSum += dur + transfer;
+			origin = destination;
 		}
 		
 		
 		return this;
+	}
+
+	private int getTransferTime(DistributionCenter origin, DistributionCenter destination) {
+		return 5;
+	}
+
+	private int tripDuration(ImpedanceIfc impedance, DistributionCenter origin, DistributionCenter destination,
+			Time time, VehicleType vehicle) {
+		return Math.round(impedance.getTravelTime(origin.getZone().getId(), destination.getZone().getId(), vehicle.getMode(), time));
+	}
+	
+	private double tripDistance(ImpedanceIfc impedance, DistributionCenter origin, DistributionCenter destination) {
+		return impedance.getDistance(origin.getZone().getId(), destination.getZone().getId());
+	}
+	
+	private double tripCost(ImpedanceIfc impedance, DistributionCenter origin, DistributionCenter destination,
+			Time time, VehicleType vehicle) {
+		return impedance.getTravelCost(origin.getZone().getId(), destination.getZone().getId(), vehicle.getMode(), time);
 	}
 	
 	public int getPrefixDuration(DistributionCenter hub) {
@@ -126,18 +163,15 @@ public class TimedTransportChainBuilder {
 			throw new IllegalStateException("Cannot build TimedTransportChain since start departure is not set.");
 		}
 		
-//		Map<DistributionCenter, Time> arrivals = new LinkedHashMap<>();
-		
 		Time time = start.plusMinutes(0);
 		for (DistributionCenter hub: chain.getHubs()) {
 			departures.put(hub, time);
 			time = time.plusMinutes(durations.get(hub));
-			
-//			arrivals.put(hub, time);
+
 			time = time.plusMinutes(transfers.get(hub));		   
 		}
 		
-		return new TimedTransportChain(chain, departures, durations);
+		return new TimedTransportChain(chain, departures, durations, connections, distance, cost);
 	}
 
 }

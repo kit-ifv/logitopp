@@ -1,15 +1,21 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.chains;
 
+import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.BIKE;
+import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.TRAM;
 import static java.util.stream.Collectors.joining;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
+import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.collections.Pair;
 import lombok.Getter;
 
@@ -59,12 +65,23 @@ public class TransportChain {
 		return hubs.subList(1, hubs.size() - 1);
 	}
 	
+	public int size() {
+		return hubs.size();
+	}
+	
 	public boolean canTransport(IParcel parcel) {
 		return last().getRegionalStructure().getServiceArea().canServe(parcel);
+	}
+	public boolean contains(DistributionCenter hub) {
+		return this.hubs.contains(hub);
 	}
 	
 	public Collection<VehicleType> getVehicleTypes() {
 		return hubs.stream().map(dc -> dc.getVehicleType()).collect(Collectors.toList());
+	}
+	
+	public boolean uses(VehicleType vehicle) {
+		return getVehicleTypes().contains(vehicle);
 	}
 	
 	public Collection<Pair<DistributionCenter, DistributionCenter>> legsOfType(VehicleType type) {
@@ -81,6 +98,36 @@ public class TransportChain {
 		}
 		
 		return legs;
+	}
+	
+	public Optional<DistributionCenter> nextHubAfter(DistributionCenter hub) {
+		if (!hubs.contains(hub)) {
+			throw new IllegalArgumentException("This transport chain [" + this.hubs + "] does not contain the requested hub: " + hub);
+		}
+		
+		int index = hubs.indexOf(hub) + 1;
+		
+		return index < hubs.size() ? Optional.of(hubs.get(index)) : Optional.empty();
+	}
+	
+	public int maxNumberOfTripsOnDayAfter(TimeTable timeTable, Time time) {
+		
+		int minConnectionCapacity = Integer.MAX_VALUE;
+		for (Pair<DistributionCenter, DistributionCenter> leg : legsOfType(TRAM)) {
+			int capacity =
+				timeTable.getConnectionsOnDay(leg.getFirst(), leg.getSecond(), time)
+						 .mapToInt(Connection::freeCapacity)
+						 .sum();
+			minConnectionCapacity = Math.min(capacity, minConnectionCapacity);
+		}
+		
+		int lastMileDepartures = last().getFleet().size();
+		
+		if (lastMileVehicle().equals(BIKE)) {
+			lastMileDepartures *= 3; //TODO configurable? 2,3 or 4
+		}
+		
+		return Math.min(lastMileDepartures, minConnectionCapacity);
 	}
 	
 	@Override

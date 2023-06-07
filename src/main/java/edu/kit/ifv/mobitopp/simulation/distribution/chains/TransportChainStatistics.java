@@ -13,6 +13,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.Time;
+import lombok.Getter;
 
 public class TransportChainStatistics {
 	public final static int TRANSFER_TIME_MIN = 5;
@@ -20,7 +21,7 @@ public class TransportChainStatistics {
 	private final static double LABOUR_COST = 28.99/60.0;  // Euro per hour normalized down to minutes
 	
 	private final ImpedanceIfc impedance;
-	private final TimeTable timeTable;
+	@Getter private final TimeTable timeTable;
 	
 	public TransportChainStatistics(ImpedanceIfc impedance, TimeTable timeTable) {
 		this.impedance = impedance;

@@ -4,6 +4,7 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 
 import java.awt.geom.Point2D;
+import java.io.File;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,13 +39,22 @@ public class DistributionCenterParser {
 	 * @param scaleFactor the scale factor to scale the fleet
 	 * @param impedance   the impedance
 	 * @param results     the results
+	 * @param serviceAreaFactory 
 	 */
-	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance, DeliveryResults results) {
+	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ServiceAreaFactory serviceAreaFactory) {
 		this.zoneRepo = zoneRepo;
 		this.scaleFactor = scaleFactor;
-		this.serviceAreaFactory = new ServiceAreaFactory(zoneRepo, impedance);
+		this.serviceAreaFactory = serviceAreaFactory;
 		
 		this.serviceProviders = new LinkedHashMap<>();
+	}
+	
+	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance) {
+		this(zoneRepo, scaleFactor, new ServiceAreaFactory(zoneRepo, impedance));
+	}
+	
+	public Collection<DistributionCenter> parse(File file) {
+		return parse(CsvFile.createFrom(file));
 	}
 	
 
