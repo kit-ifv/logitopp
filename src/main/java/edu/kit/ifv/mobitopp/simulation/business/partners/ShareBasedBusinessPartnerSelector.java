@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.business;
+package edu.kit.ifv.mobitopp.simulation.business.partners;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
+import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;

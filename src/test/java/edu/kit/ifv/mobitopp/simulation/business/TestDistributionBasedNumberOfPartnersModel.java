@@ -10,6 +10,7 @@ import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import edu.kit.ifv.mobitopp.simulation.business.partners.DistributionBasedNumberOfPartnersModel;
 import edu.kit.ifv.mobitopp.util.random.BoxPlotDistribution;
 
 public class TestDistributionBasedNumberOfPartnersModel {

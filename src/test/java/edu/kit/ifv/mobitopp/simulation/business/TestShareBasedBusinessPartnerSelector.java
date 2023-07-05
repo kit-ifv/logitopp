@@ -16,6 +16,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
+import edu.kit.ifv.mobitopp.simulation.business.partners.BusinessPartnerSelector;
+import edu.kit.ifv.mobitopp.simulation.business.partners.DistributionBasedNumberOfPartnersModel;
+import edu.kit.ifv.mobitopp.simulation.business.partners.NumberOfPartnersModel;
+import edu.kit.ifv.mobitopp.simulation.business.partners.ShareBasedBusinessPartnerSelector;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.util.random.BoxPlotDistribution;

@@ -1,7 +1,8 @@
-package edu.kit.ifv.mobitopp.simulation.business;
+package edu.kit.ifv.mobitopp.simulation.business.partners;
 
 import java.util.function.Function;
 
+import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.util.random.BoxPlotDistribution;
 
 public class DistributionBasedNumberOfPartnersModel implements NumberOfPartnersModel {

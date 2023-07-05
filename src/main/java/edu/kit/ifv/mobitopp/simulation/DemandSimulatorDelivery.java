@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityPeriodFixer;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.randomizer.ActivityStartAndDurationRandomizer;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
-import edu.kit.ifv.mobitopp.simulation.business.BusinessPartnerSelector;
+import edu.kit.ifv.mobitopp.simulation.business.partners.BusinessPartnerSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.BusinessParcelDemandModelBuilder;
 import edu.kit.ifv.mobitopp.simulation.demand.ParcelDemandModel;
 import edu.kit.ifv.mobitopp.simulation.demand.PrivateParcelDemandModelBuilder;

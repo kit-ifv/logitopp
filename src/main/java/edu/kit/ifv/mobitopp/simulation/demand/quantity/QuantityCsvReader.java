@@ -1,10 +1,10 @@
-package edu.kit.ifv.mobitopp.simulation.business;
+package edu.kit.ifv.mobitopp.simulation.demand.quantity;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.kit.ifv.mobitopp.simulation.demand.quantity.ParcelQuantityModel;
+import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
 
 public class QuantityCsvReader implements ParcelQuantityModel<Business> {
