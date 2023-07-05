@@ -82,8 +82,9 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 			do {
 				
 				int accessDur = round(travelTime(currentZone, zone, currentTime));
+				List<ParcelActivityBuilder> possibleStops = activitiesPerZone.get(zone);
 				Pair<List<ParcelActivityBuilder>, RelativeTime> stopsInZone = 
-					pickStopsWithWorktime(vehicle, zone, currentTime, stopsOfTour, remainingDur.minusMinutes(accessDur), capacity);
+					pickStopsWithWorktime(vehicle, zone, currentTime, possibleStops, remainingDur.minusMinutes(accessDur), capacity);
 				
 				if (!stopsInZone.getFirst().isEmpty()) {
 					RelativeTime durAfterZone = stopsInZone.getSecond();
@@ -97,8 +98,10 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 				}
 				
 				zonestToTest.remove(zone);
-				zone = nextZoneByDist(currentTime, zone, zonestToTest);
-				
+				if (!zonestToTest.isEmpty()) {
+					zone = nextZoneByDist(currentTime, zone, zonestToTest);
+				}
+
 			} while(!zonestToTest.isEmpty() && capacity > 0 && enoughTimeForReturn(vehicle, remainingDur, currentTime, zone) );
 			
 			tours.add(new PlannedDeliveryTour(vehicle.getType(), stopsOfTour, duration.minus(remainingDur), currentTime, true, impedance));
@@ -169,7 +172,7 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 	}
 	
 	private boolean timeIsSufficient(RelativeTime remainingTime, int dur) {
-		return remainingTime.minusMinutes(dur).isNegative();
+		return !remainingTime.minusMinutes(dur).isNegative();
 	}
 
 	private boolean enoughTimeForReturn(DeliveryVehicle vehicle, RelativeTime remainingDur, Time currentTime,
