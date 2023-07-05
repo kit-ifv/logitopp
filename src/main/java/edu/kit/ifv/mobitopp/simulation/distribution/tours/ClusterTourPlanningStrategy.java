@@ -41,7 +41,7 @@ public abstract class ClusterTourPlanningStrategy implements TourPlanningStrateg
 	}
 
 	
-	private List<ParcelActivityBuilder> getDeliveryActivities(Collection<IParcel> deliveries, Collection<IParcel> pickUps) {
+	protected List<ParcelActivityBuilder> getDeliveryActivities(Collection<IParcel> deliveries, Collection<IParcel> pickUps) {
 		List<ParcelActivityBuilder> activities = new ArrayList<>();
 	
 		List<IParcel> available = new ArrayList<>(deliveries);

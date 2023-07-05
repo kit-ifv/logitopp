@@ -44,4 +44,8 @@ public class Pair<F,S> {
 		return this.first.equals(that.first) && this.second.equals(that.second);
 	}
 	
+	public static <F,S> Pair<F,S> of(F f, S s) {
+		return new Pair<>(f, s);
+	}
+	
 }
