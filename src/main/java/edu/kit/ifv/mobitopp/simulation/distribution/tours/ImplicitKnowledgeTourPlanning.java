@@ -56,6 +56,7 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 	@Override
 	protected List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle,
 			Time time, RelativeTime duration) {
+		System.out.println(vehicle.getOwner().getName() + " plans delivery areas + tours for " + activities.size() + "stops.");
 		List<PlannedDeliveryTour> tours = new ArrayList<>();
 		
 		Map<Zone, List<ParcelActivityBuilder>> activitiesPerZone = 
@@ -79,10 +80,14 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 			
 			Zone zone = zonePriority.minElement();
 			List<Zone> zonestToTest = new ArrayList<>(activitiesPerZone.keySet());
+			System.out.print("Processing zones: ");
 			do {
 				
 				int accessDur = round(travelTime(currentZone, zone, currentTime));
 				List<ParcelActivityBuilder> possibleStops = activitiesPerZone.get(zone);
+				
+				System.out.print(zone.getId().getExternalId() + "(" + possibleStops.size() +"), ");
+				
 				Pair<List<ParcelActivityBuilder>, RelativeTime> stopsInZone = 
 					pickStopsWithWorktime(vehicle, zone, currentTime, possibleStops, remainingDur.minusMinutes(accessDur), capacity);
 				
@@ -106,6 +111,8 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 			
 			tours.add(new PlannedDeliveryTour(vehicle.getType(), stopsOfTour, duration.minus(remainingDur), currentTime, true, impedance));
 		}
+		System.out.println();
+		System.out.println("Generated " + tours.size() + "tours!");
 		
 		return tours;
 	}
