@@ -106,12 +106,13 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 				if (!zonestToTest.isEmpty()) {
 					zone = nextZoneByDist(currentTime, zone, zonestToTest);
 				}
-
+				
 			} while(!zonestToTest.isEmpty() && capacity > 0 && enoughTimeForReturn(vehicle, remainingDur, currentTime, zone) );
 			
+			System.out.println();
 			tours.add(new PlannedDeliveryTour(vehicle.getType(), stopsOfTour, duration.minus(remainingDur), currentTime, true, impedance));
 		}
-		System.out.println();
+		
 		System.out.println("Generated " + tours.size() + "tours!");
 		
 		return tours;
