@@ -1,13 +1,14 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours;
 
 import static java.lang.Math.round;
+import static java.util.stream.Collectors.groupingBy;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.routing.util.PriorityQueue;
@@ -59,8 +60,9 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 		System.out.println(vehicle.getOwner().getName() + " plans delivery areas + tours for " + activities.size() + "stops.");
 		List<PlannedDeliveryTour> tours = new ArrayList<>();
 		
-		Map<Zone, List<ParcelActivityBuilder>> activitiesPerZone = 
-				activities.stream().collect(Collectors.groupingBy(ParcelActivityBuilder::getZone));
+		Map<Zone, List<ParcelActivityBuilder>> activitiesPerZone = new LinkedHashMap<>(
+				activities.stream().collect(groupingBy(ParcelActivityBuilder::getZone))
+		);
 		
 		
 		PriorityQueue<Zone> zonePriority = priorityByDemand(activitiesPerZone);
@@ -100,6 +102,8 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 					capacity -= countParcels(stopsInZone.getFirst());
 					
 					updateRemainingStops(activitiesPerZone, zonePriority, stopsInZone.getFirst(), zone);
+				} else {
+					System.out.print("(no stops selected!)");
 				}
 				
 				zonestToTest.remove(zone);
@@ -137,6 +141,8 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 			if (timeIsSufficient(remainingTime, duration+returnTime) && remainingCapacity >= stop.size()) {
 				selectedStops.add(stop);
 			} else {
+				if (!timeIsSufficient(remainingTime, duration+returnTime)) { System.out.print("(insufficient time: " + remainingTime.toMinutes() + " < " + (duration+returnTime) + " dur+ret)");}
+				if (!(remainingCapacity >= stop.size())) { System.out.print("insufficient capacity: " + remainingCapacity + " < " + stop.size()); }
 				break;
 			}
 			
