@@ -11,11 +11,8 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.data.Zone;
-import edu.kit.ifv.mobitopp.routing.util.PriorityQueue;
-import edu.kit.ifv.mobitopp.routing.util.SimplePQ;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
@@ -30,6 +27,8 @@ import edu.kit.ifv.mobitopp.util.collections.Pair;
 public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 
 	private final ImpedanceIfc impedance;
+
+	private List<IParcel> processed = new ArrayList<>();
 	
 	public ImplicitKnowledgeTourPlanning(DeliveryClusteringStrategy clusteringStrategy,
 			DeliveryDurationModel durationModel, ImpedanceIfc impedance) {
@@ -41,24 +40,8 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 	public List<PlannedDeliveryTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps, Fleet fleet,
 			Time time) {
 		
-		DeliveryVehicle vehicle = fleet.getVehicles().iterator().next();
-		List<PlannedDeliveryTour> tours = new ArrayList<>();
-		
-		System.out.print(vehicle.getOwner().getName() + " plans delivery: ");
-		List<ParcelActivityBuilder> delActivities = getDeliveryActivities(deliveries, List.of());
-		tours.addAll(
-				this.planTours(delActivities, vehicle, time, RelativeTime.ofHours(6))
-		);
-		System.out.println(" -> " + tours.size());
-		
-		System.out.print(vehicle.getOwner().getName() + " plans delivery: ");
-		List<ParcelActivityBuilder> pickActivities = getDeliveryActivities(List.of(), pickUps);
-		tours.addAll(
-				this.planTours(pickActivities, vehicle, time.startOfDay().plusHours(14), RelativeTime.ofHours(6))
-		);
-		System.out.println(" -> " + tours.size());
-		
-		return tours;
+		processed.clear();
+		return super.planTours(deliveries, pickUps, fleet, time);
 	}
 
 	@Override
@@ -72,6 +55,7 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 		);
 		
 		//iterate start zone
+		iterateStartZone:
 		while(!activitiesPerZone.isEmpty()) { //each iteration at least one zone is removed
 			Zone origin = vehicle.getOwner().getZone();
 			Zone zone = selectMinBySize(activitiesPerZone);
@@ -81,27 +65,29 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 			activitiesPerZone.remove(zone);
 			
 			Time arrivalInZone = time.plusMinutes(round(travelTime(origin, zone, time)));
-			do {// if zone has more than 150 parcels, create tours until less than 150 left
+			while (countParcels(stops) >= 150) {// if zone has more than 150 parcels, create tours until less than 150 left
 				
 				Pair<List<ParcelActivityBuilder>, RelativeTime> selected = selectStops(stops, arrivalInZone, duration, zone, 150, true); //list contains at least one element
 				
 				RelativeTime tourDur = selected.getSecond();
 				List<ParcelActivityBuilder> selectedStops = selected.getFirst();
-				stops.removeAll(selectedStops);
+				
 				
 				PlannedDeliveryTour newTour = createTour(vehicle, time, origin, startZone, zone, tourDur, selectedStops);
 				tours.add(newTour);
-				log(zone, newTour, "!,");
+				log(zone, stops.size(), newTour, "f!,");
+				stops.removeAll(selectedStops);
 				
-			} while (countParcels(stops) >= 150); // removes at least one stop per iteration
+			} // removes at least one stop per iteration
 			
+			int possibleStops = stops.size();
 			
 			// process remaining parcels of start zone
 			List<ParcelActivityBuilder> stopsForTour = new ArrayList<>();
 			stopsForTour.addAll(stops);
 			stops.clear();
 
-			if (stopsForTour.isEmpty()) { continue; } // if none are left, continue with next start zone
+			if (stopsForTour.isEmpty()) { continue iterateStartZone; } // if none are left, continue with next start zone
 			
 			int capacity = 150;
 			Time currentTime = arrivalInZone;
@@ -131,19 +117,21 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 				PlannedDeliveryTour newTour = createTour(vehicle, time, origin, startZone, zone, tourDur, stopsForTour);
 				tours.add(newTour);
 				
-				log(zone, newTour, "!");
+				log(zone, possibleStops, newTour, "r!;");
 				continue;
 			}
 			
-			System.out.print(zone.getId().getExternalId() + "!,");
+			System.out.print(zone.getId().getExternalId() + "(" + possibleStops + ")rc!,");
 			
 			// if capacity not reached check neighboring zones
 			List<Zone> zonesToTest = new ArrayList<>(activitiesPerZone.keySet());
 			do {
 				
-				Zone nextZone = nextZoneByDist(currentTime, zone, new ArrayList<>(activitiesPerZone.keySet()));
+				Zone nextZone = nextZoneByDist(currentTime, zone, new ArrayList<>(zonesToTest));
 				List<ParcelActivityBuilder> newStops = new ArrayList<>(activitiesPerZone.get(nextZone));
+				
 				zonesToTest.remove(nextZone);
+				possibleStops += newStops.size();
 				
 				int accessDur = round(travelTime(zone, nextZone, currentTime));
 				
@@ -160,7 +148,10 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 				}
 				
 				zone = nextZone;
+				activitiesPerZone.remove(nextZone);
 				if (countParcels(newStops) <= capacity) { // take all parcels of next zone
+					System.out.print(nextZone.getId().getExternalId() + "(" + newStops.size() + ")c!,");
+					
 					for (ParcelActivityBuilder stop: newStops) {
 						stop.plannedAt(currentTime);
 						int dur = stop.withDuration(durationModel).getDeliveryMinutes();
@@ -171,7 +162,6 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 						remainingTime = remainingTime.minusMinutes(dur);
 						capacity -= stop.size();
 						
-						System.out.print(nextZone.getId().getExternalId() + "!,");
 					}
 					
 				} else { // take only a few parcels, put rest back in map
@@ -203,9 +193,9 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 			tours.add(newTour);
 			
 			if (activitiesPerZone.containsKey(zone)) {
-				log(zone, newTour, "?;");
+				log(zone, possibleStops, newTour, "rp?;");
 			} else {
-				log(zone, newTour, "!;");
+				log(zone, possibleStops, newTour, "rc!;");
 			}
 			
 		}
@@ -214,12 +204,17 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 		return tours;
 	}
 
-	private void log(Zone zone, PlannedDeliveryTour newTour, String tag) {
-		System.out.print(zone.getId().getExternalId() + "(" + newTour.getStops().size() + "/" + countParcels(newTour.getStops()) + ")" + tag);
+	private void log(Zone zone, int stops, PlannedDeliveryTour newTour, String tag) {
+		System.out.print(zone.getId().getExternalId() + "(" + newTour.getStops().size() + "/"  + stops + "=" + countParcels(newTour.getStops()) + "p)" + tag);
 	}
 
+	
 	private PlannedDeliveryTour createTour(DeliveryVehicle vehicle, Time time, Zone origin, Zone startZone, Zone lastZone,
 			RelativeTime tourDur, List<ParcelActivityBuilder> selectedStops) {
+		
+		if (selectedStops.stream().anyMatch(s -> s.getAllParcels().stream().anyMatch(processed::contains))) {
+			System.out.println("Error: some parcels seem to be already processed in a tour");
+		}
 		
 		int accessDur = round(travelTime(origin, startZone, time));
 		int returnDur = round(travelTime(lastZone, origin, time));
@@ -227,6 +222,10 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 		
 		PlannedDeliveryTour newTour = newTour(vehicle, time, totalDur);
 		newTour.addStops(selectedStops);
+		
+		processed.addAll(newTour.getDeliveryParcels());
+		processed.addAll(newTour.getPickUpRequests());
+		
 		return newTour;
 	}
 

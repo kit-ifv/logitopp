@@ -19,7 +19,7 @@ import lombok.ToString;
 /**
  * Parcel holds data about the current state of delivery of a parcel order.
  */
-@ToString(callSuper=true)
+@ToString(callSuper=true, exclude = {"person"})
 public class PrivateParcel extends BaseParcel {
 
 	@Getter
