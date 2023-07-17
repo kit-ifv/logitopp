@@ -78,8 +78,8 @@ public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 				float deliveryDuration = delivery.withDuration(durationModel).getDeliveryMinutes();
 				float returnTime = travelTime(delivery.getZone(), vehicle.getOwner().getZone(), time, mode);
 				
-				if (sufficientTime(time, endOfTour, tripDuration + deliveryDuration + returnTime) && remainingCapacity >= delivery.size()) {
-					
+				if (assigned.isEmpty() || ( sufficientTime(time, endOfTour, tripDuration + deliveryDuration + returnTime) && remainingCapacity >= delivery.size() ) ) {
+					//TODO find any with fitting size in zone??
 					time = time.plusMinutes(round(tripDuration));
 					assigned.add(delivery.plannedAt(time));
 					time = time.plusMinutes(round(deliveryDuration));
