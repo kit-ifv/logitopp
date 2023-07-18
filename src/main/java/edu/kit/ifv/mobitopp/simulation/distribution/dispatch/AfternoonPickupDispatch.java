@@ -3,7 +3,9 @@ package edu.kit.ifv.mobitopp.simulation.distribution.dispatch;
 import static edu.kit.ifv.mobitopp.time.DayOfWeek.SUNDAY;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
@@ -20,11 +22,11 @@ public class AfternoonPickupDispatch implements DispatchStrategy {
 		
 		return tours.stream()
 					.filter(t -> noPickupBeforeAfternoon(t, time))
-					.filter(t -> endsBeforeEndOfDeliveryTime(time, t))
+					.sorted((t1, t2) -> Boolean.compare(!t1.getPickUpRequests().isEmpty(), !t2.getPickUpRequests().isEmpty()) )
+					//.filter(t -> endsBeforeEndOfDeliveryTime(time, t))
 					.findFirst();
 	}
 	
-
 	private boolean isInDispatchHours(Time time) {
 		int hour=time.getHour();
 		return 8 <= hour && hour <= 18;
