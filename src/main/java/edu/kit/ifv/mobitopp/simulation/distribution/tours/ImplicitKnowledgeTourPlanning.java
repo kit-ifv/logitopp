@@ -11,6 +11,8 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
@@ -73,9 +75,9 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 				List<ParcelActivityBuilder> selectedStops = selected.getFirst();
 				
 				
-				PlannedDeliveryTour newTour = createTour(vehicle, time, origin, startZone, zone, tourDur, selectedStops);
-				tours.add(newTour);
-				log(zone, stops.size(), newTour, "f!,");
+				List<PlannedDeliveryTour> newTours = createTour(vehicle, time, origin, startZone, zone, tourDur, selectedStops);
+				tours.addAll(newTours);
+				log(zone, stops.size(), newTours, "f!,");
 				stops.removeAll(selectedStops);
 				
 			} // removes at least one stop per iteration
@@ -114,10 +116,10 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 			// package to tour if constraints reached or no other zones available
 			if (capacity <= 0 || remainingTime.isNegative() || activitiesPerZone.keySet().isEmpty()) {
 				RelativeTime tourDur = duration.minus(remainingTime);
-				PlannedDeliveryTour newTour = createTour(vehicle, time, origin, startZone, zone, tourDur, stopsForTour);
-				tours.add(newTour);
+				List<PlannedDeliveryTour> newTours = createTour(vehicle, time, origin, startZone, zone, tourDur, stopsForTour);
+				tours.addAll(newTours);
 				
-				log(zone, possibleStops, newTour, "r!;");
+				log(zone, possibleStops, newTours, "r!;");
 				continue;
 			}
 			
@@ -172,8 +174,11 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 					currentTime = currentTime.plus(tourDur);
 					
 					List<ParcelActivityBuilder> selectedStops = selected.getFirst();
-					stopsForTour.addAll(selectedStops);
-					newStops.removeAll(selectedStops);
+					
+					if (countParcels(selectedStops) <= capacity) {
+						stopsForTour.addAll(selectedStops);
+						newStops.removeAll(selectedStops);
+					}
 					
 					if (!newStops.isEmpty()) {
 						activitiesPerZone.put(nextZone, newStops);
@@ -189,44 +194,95 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 			} while (!zonesToTest.isEmpty());
 			
 			RelativeTime tourDur = duration.minus(remainingTime);
-			PlannedDeliveryTour newTour = createTour(vehicle, currentTime, origin, startZone, zone, tourDur, stopsForTour);
-			tours.add(newTour);
+			
+			List<PlannedDeliveryTour> newTours = createTour(vehicle, currentTime, origin, startZone, zone, tourDur, stopsForTour);
+			tours.addAll(
+					newTours
+			);
 			
 			if (activitiesPerZone.containsKey(zone)) {
-				log(zone, possibleStops, newTour, "rp?;");
+				log(zone, possibleStops, newTours, "rp?;");
 			} else {
-				log(zone, possibleStops, newTour, "rc!;");
+				log(zone, possibleStops, newTours, "rc!;");
 			}
 			
 		}
 		
-		
+		System.out.println();
+		System.out.println("Tour parcel counts: " + tours.stream().map(t -> countParcels(t.getStops())).map(i -> ""+i).collect(Collectors.joining(", ")));
+		System.out.println();
 		return tours;
 	}
 
-	private void log(Zone zone, int stops, PlannedDeliveryTour newTour, String tag) {
-		System.out.print(zone.getId().getExternalId() + "(" + newTour.getStops().size() + "/"  + stops + "=" + countParcels(newTour.getStops()) + "p)" + tag);
+	private void log(Zone zone, int stops, List<PlannedDeliveryTour> newTours, String tag) {
+		for (PlannedDeliveryTour newTour : newTours) {
+			System.out.print(zone.getId().getExternalId() + "(" + newTour.getStops().size() + "/"  + stops + "=" + countParcels(newTour.getStops()) + "p)" + tag);
+		}
 	}
 
 	
-	private PlannedDeliveryTour createTour(DeliveryVehicle vehicle, Time time, Zone origin, Zone startZone, Zone lastZone,
+	private List<PlannedDeliveryTour> createTour(DeliveryVehicle vehicle, Time time, Zone origin, Zone startZone, Zone lastZone,
 			RelativeTime tourDur, List<ParcelActivityBuilder> selectedStops) {
+		return createTour(vehicle, time, origin, startZone, lastZone, tourDur, selectedStops, true);
+	}
+	
+	private List<PlannedDeliveryTour> createTour(DeliveryVehicle vehicle, Time time, Zone origin, Zone startZone, Zone lastZone,
+			RelativeTime tourDur, List<ParcelActivityBuilder> selectedStops, boolean reduce) {
 		
 		if (selectedStops.stream().anyMatch(s -> s.getAllParcels().stream().anyMatch(processed::contains))) {
 			System.out.println("Error: some parcels seem to be already processed in a tour");
 		}
+		
+		List<PlannedDeliveryTour> tours = new ArrayList<>();
+		List<ParcelActivityBuilder> remainingStops = new ArrayList<>(selectedStops);
+		
+		int cnt;
+		if ((cnt = countParcels(selectedStops)) > 150 && reduce) {
+			
+			List<ParcelActivityBuilder> removedStops = new ArrayList<>();
+			while(cnt  - countParcels(removedStops) > 150) {
+				
+				Optional<ParcelActivityBuilder> minStop = 
+					selectedStops.stream()
+								 .filter(s -> !removedStops.contains(s))
+								 .min(Comparator.comparing(ParcelActivityBuilder::size));
+				
+				if (minStop.isPresent()) {
+					removedStops.add(minStop.get());
+					
+				} else {
+					break;
+				}				
+				
+			}
+			
+			if (!removedStops.isEmpty()) {
+				tours.addAll(createTour(vehicle, time, origin, startZone, lastZone, tourDur, removedStops, removedStops.size() > 1));
+				
+				remainingStops.removeAll(removedStops);
+			}
+
+		}
+		
+		if (remainingStops.isEmpty()) {
+			return tours;
+		}
+
+		
 		
 		int accessDur = round(travelTime(origin, startZone, time));
 		int returnDur = round(travelTime(lastZone, origin, time));
 		RelativeTime totalDur = tourDur.plusMinutes(accessDur + returnDur);
 		
 		PlannedDeliveryTour newTour = newTour(vehicle, time, totalDur);
-		newTour.addStops(selectedStops);
+		newTour.addStops(remainingStops);
 		
 		processed.addAll(newTour.getDeliveryParcels());
 		processed.addAll(newTour.getPickUpRequests());
 		
-		return newTour;
+		tours.add(newTour);
+		
+		return tours;
 	}
 
 	private Zone selectMinBySize(Map<Zone, List<ParcelActivityBuilder>> activitiesPerZone) {
