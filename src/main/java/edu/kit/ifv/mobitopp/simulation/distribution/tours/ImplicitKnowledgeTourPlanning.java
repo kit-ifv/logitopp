@@ -39,16 +39,9 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 	}
 	
 	@Override
-	public List<PlannedDeliveryTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps, Fleet fleet,
-			Time time) {
-		
-		processed.clear();
-		return super.planTours(deliveries, pickUps, fleet, time);
-	}
-
-	@Override
 	protected List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle,
 			Time time, RelativeTime duration) {
+		processed.clear();
 		List<PlannedDeliveryTour> tours = new ArrayList<>();
 		
 		
