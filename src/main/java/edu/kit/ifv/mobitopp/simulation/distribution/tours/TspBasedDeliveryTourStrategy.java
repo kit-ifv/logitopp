@@ -70,21 +70,25 @@ public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 			Time time = currentTime;
 			Time endOfTour = currentTime.plus(maxTourDuration);
 		
-			for (int i = 0; i < Math.min(capacity, giantTour.size()); i++) { //TODO check capacity computation/restriction
+			int remainingCapacity = capacity;
+			for (int i = 0; i < giantTour.size() && remainingCapacity > 0; i++) { //TODO check capacity computation/restriction
 				ParcelActivityBuilder delivery = giantTour.get(i).by(vehicle);
 		
 				float tripDuration = travelTime(lastZone, delivery.getZone(), time, mode);		
 				float deliveryDuration = delivery.withDuration(durationModel).getDeliveryMinutes();
 				float returnTime = travelTime(delivery.getZone(), vehicle.getOwner().getZone(), time, mode);
 				
-				if (time.plusMinutes(round(tripDuration + deliveryDuration + returnTime)).isBeforeOrEqualTo(endOfTour)) {
-					
+				if (assigned.isEmpty() || ( sufficientTime(time, endOfTour, tripDuration + deliveryDuration + returnTime) && remainingCapacity >= delivery.size() ) ) {
+					//TODO find any with fitting size in zone??
 					time = time.plusMinutes(round(tripDuration));
 					assigned.add(delivery.plannedAt(time));
 					time = time.plusMinutes(round(deliveryDuration));
 					lastZone = delivery.getZone();
 					
+					remainingCapacity-= delivery.size();
+					
 				} else {
+					returnTime = travelTime(lastZone, vehicle.getOwner().getZone(), time, mode);
 					time = time.plusMinutes(round(returnTime));
 					break;
 				}
@@ -96,6 +100,10 @@ public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 		}
 
 		return plannedTours;
+	}
+
+	private boolean sufficientTime(Time time, Time endOfTour, float durationWithReturn) {
+		return time.plusMinutes(round(durationWithReturn)).isBeforeOrEqualTo(endOfTour);
 	}
 
 	/**

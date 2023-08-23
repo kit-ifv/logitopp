@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import java.util.Comparator;
 import java.util.List;
 
+import edu.kit.ifv.mobitopp.data.ZoneId;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 
@@ -16,7 +17,11 @@ public class LinkDeliveryClustering implements DeliveryClusteringStrategy {
 	}
 	 
 	private boolean areOnSameLink(IParcel a, IParcel b) {
-		return linkId(a) == linkId(b);
+		return zoneId(a).equals(zoneId(b)) && linkId(a) == linkId(b);
+	}
+
+	private ZoneId zoneId(IParcel p) {
+		return p.getZone().getId();
 	}
 
 	private int linkId(IParcel a) {
