@@ -11,13 +11,15 @@ import lombok.Getter;
 
 public class TransportPreference {
 	
+	@Getter private final int choiceId;
 	@Getter private final IParcel parcel;
 	private final Map<TimedTransportChain, Double> probabilities;
 	@Getter private TimedTransportChain preference;
 	
 	private final Random random;
 	
-	public TransportPreference(IParcel parcel, Map<TimedTransportChain, Double> probaility, long seed) {
+	public TransportPreference(int choiceId, IParcel parcel, Map<TimedTransportChain, Double> probaility, long seed) {
+		this.choiceId = choiceId;
 		this.parcel = parcel;
 		this.probabilities = new LinkedHashMap<>(probaility);
 		this.random = new Random(seed);

@@ -400,31 +400,28 @@ public class DeliveryResults {
 	}
 	
 	private static Category createResultCategoryChainPreference() {
-		return new Category("chain_preferences", Arrays.asList("parcel_id", "is_pickup", 
-				"from_hub", "to_hub", "modes", "selected", 
-				"probability", "utility", "cost", "duration", "distance", 
-				"time", "sim_minute"));
+		return new Category("chain_preferences", Arrays.asList("choice_id", "parcel_id", "is_pickup", 
+				"from_hub", "to_hub", "modes",
+				"probability", "utility", "cost", "duration", "distance", "capacity"));
 	}
 	
-	public void logTransportChainPreference(IParcel parcel, TransportChain chain, String selected, double probability, double utility, double cost, double duration, double distance, Time time) {
+	public void logTransportChainPreference(int choiceId, IParcel parcel, TransportChain chain, double probability, double utility, double cost, double duration, double distance, int capacity) {
 		String msg = "";
 		
+		msg += choiceId + SEP;
 		msg += parcel.getOId() + SEP;
 		msg += parcel.isPickUp() + SEP;
 		
 		msg += chain.first().getName() + SEP;
 		msg += chain.last().getName() + SEP;
 		msg += chain.getVehicleTypes().stream().map(VehicleType::name).collect(Collectors.joining("-")) + SEP;
-		msg += selected + SEP;
 		
 		msg += probability + SEP;
 		msg += utility + SEP;
 		msg += cost + SEP;
 		msg += duration + SEP;
 		msg += distance + SEP;
-		
-		msg += time.toString() + SEP;
-		msg += time.toMinutes();
+		msg += capacity;
 		
 		this.results.write(resultCategoryChainPreferences, msg);
 	}
