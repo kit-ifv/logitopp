@@ -194,5 +194,15 @@ public class TimedTransportChainBuilder {
 		
 		return new TimedTransportChain(chain, departures, durations, connections, distance, cost);
 	}
+	
+	
+	public static TimedTransportChainFactory asFactory(CostFunction costFunction, TransferTimeModel transferTime, TimeTable timeTable, ImpedanceIfc impedance) {
+		
+		return (chain, time) 
+			-> new TimedTransportChainBuilder(chain, costFunction, transferTime)
+					.useDurationsFromStats(timeTable, impedance, time)
+					.defaultDeparture(time)
+					.build();
+	}
 
 }

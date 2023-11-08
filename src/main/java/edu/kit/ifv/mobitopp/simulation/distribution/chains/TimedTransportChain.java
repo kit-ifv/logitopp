@@ -12,17 +12,27 @@ import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
 public class TimedTransportChain extends TransportChain {
-
+	private static int idCount = 0;
+	
+	@Getter
+	private final int id;
 	private final Map<DistributionCenter, Time> departures;
 	private final Map<DistributionCenter, Integer> durations;
 	@Getter private final double distance;
 	@Getter private final double cost;
-	private final List<Connection> connections;
+	@Getter private final List<Connection> connections;
 
 	public TimedTransportChain(TransportChain chain, Map<DistributionCenter, Time> departures,
 			Map<DistributionCenter, Integer> durations, List<Connection> connections,
 			double distance, double cost) {
-		super(chain.getHubs(), chain.isDeliveryDirection());
+		this(idCount++, chain.getHubs(), chain.isDeliveryDirection(), departures, durations, connections, distance, cost);
+	}
+	
+	private TimedTransportChain(int id, List<DistributionCenter> hubs, boolean isDeliveryDirection, Map<DistributionCenter, Time> departures,
+			Map<DistributionCenter, Integer> durations, List<Connection> connections,
+			double distance, double cost) {
+		super(hubs, isDeliveryDirection);
+		this.id = id;
 		this.departures = departures;
 		this.durations = durations;
 		this.distance = distance;
@@ -63,6 +73,56 @@ public class TimedTransportChain extends TransportChain {
 
 	public void bookConnections() {
 		this.connections.forEach(c -> c.book(this));
+	}
+	
+	public boolean canBookConnections() {
+		return this.connections.stream().allMatch(Connection::hasFreeCapacity);
+	}
+	
+	public TimedTransportChain copy() {
+		return new TimedTransportChain(id, hubs, deliveryDirection, departures, durations, connections, distance, cost);
+	}
+	
+	public TimedTransportChain getTimedTail() {
+		if (hubs.size() <= 1) { throw new IllegalArgumentException("Cannot create timed tail of chain with size <= 1"); }
+		
+		TimedTransportChain copy = new TimedTransportChain(
+				-Math.abs(id), 
+				hubs, 
+				deliveryDirection, 
+				departures, 
+				durations, 
+				connections, 
+				-1.0, //TODO cannot compute cost/distance when dropping first hub
+				-1.0
+			);
+		
+		copy.hubs.remove(first());
+		copy.departures.remove(first());
+		copy.durations.remove(first());
+		
+		for (Connection c : copy.connections) {
+			if (c.getFrom().equals(first())) {
+				copy.connections.remove(c);
+			}
+		}
+		
+		return copy;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {return true;}
+		if (obj == null) {return false;}
+	    if (!(obj instanceof TimedTransportChain)) {return false;}
+	    
+	    TimedTransportChain other = (TimedTransportChain) obj;
+	    return this.id == other.id;
+	}
+	
+	@Override
+	public int hashCode() {
+		return id;
 	}
 
 }

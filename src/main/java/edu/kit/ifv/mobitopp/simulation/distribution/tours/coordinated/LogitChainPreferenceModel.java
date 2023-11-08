@@ -38,7 +38,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 	}
 
 	@Override
-	public TransportPreference selectPreference(IParcel parcel, Collection<TimedTransportChain> choiceSet, double randomNumber) {
+	public TransportPreferences selectPreference(IParcel parcel, Collection<TimedTransportChain> choiceSet, double randomNumber) {
 		int choiceId = choiceCnt++;
 		
 		Map<TimedTransportChain, UtilResults> utility = computeUtilities(parcel, choiceSet);
@@ -53,7 +53,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 		
 		long seed = Math.round(randomNumber * Long.MAX_VALUE);
 		
-		return new TransportPreference(choiceId, parcel, probabilities, seed);
+		return new TransportPreferences(choiceId, parcel, probabilities, seed);
 	}
 	
 	private Map<TimedTransportChain, UtilResults> computeUtilities(IParcel parcel, Collection<TimedTransportChain> choiceSet) {

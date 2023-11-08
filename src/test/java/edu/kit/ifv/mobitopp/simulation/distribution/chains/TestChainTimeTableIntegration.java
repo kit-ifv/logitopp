@@ -1,10 +1,10 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.chains;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,6 +39,8 @@ import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTableParser;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.TourPlanningStrategy;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.CostFunction;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.StaticTransferTimeModel;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class TestChainTimeTableIntegration {
@@ -180,8 +182,8 @@ public class TestChainTimeTableIntegration {
 					System.out.println(chain + ": " + chain.getVehicleTypes());
 					for (int i=1; i <= maxTrips; i++) {
 						
-						TimedTransportChain timedChain = new TimedTransportChainBuilder(chain)
-															.useDurationsFromStats(new TransportChainStatistics(impedance, timeTable), Time.start)
+						TimedTransportChain timedChain = new TimedTransportChainBuilder(chain, new CostFunction(impedance), new StaticTransferTimeModel())
+															.useDurationsFromStats(timeTable, impedance, Time.start)
 															.defaultDeparture(Time.start.plusHours(7).plusMinutes(45))
 															.build();
 						System.out.println("\n" + i + ":");

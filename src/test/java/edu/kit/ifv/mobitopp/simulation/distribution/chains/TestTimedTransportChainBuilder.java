@@ -12,9 +12,14 @@ import org.junit.jupiter.api.Test;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.CostFunction;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.StaticTransferTimeModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.TransferTimeModel;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class TestTimedTransportChainBuilder {
+	private CostFunction cost = new CostFunction(null);
+	private TransferTimeModel transfer = new StaticTransferTimeModel();
 	
 	private TransportChain chainSimple;
 	private List<DistributionCenter> hubsSimple;
@@ -66,7 +71,7 @@ public class TestTimedTransportChainBuilder {
 	public void buildManual() {
 		List<DistributionCenter> hubs = hubsSimple;
 	
-		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainSimple);
+		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainSimple, cost, transfer);
 
 		TimedTransportChain timedChain = 
 			builder.setDuration(hubs.get(0), 8, 2)
@@ -82,7 +87,7 @@ public class TestTimedTransportChainBuilder {
 	public void buildManualComplex() {
 		List<DistributionCenter> hubs = hubsComplex;
 		
-		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainComplex);
+		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainComplex, cost, transfer);
 		
 		
 		TimedTransportChain timedChain = 
@@ -102,7 +107,7 @@ public class TestTimedTransportChainBuilder {
 	@Test
 	public void buildMissingStart() {
 		List<DistributionCenter> hubs = hubsNoTram;
-		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainNoTram);
+		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainNoTram, cost, transfer);
 		
 		builder.setDuration(hubs.get(0), 8, 2)
 			   .setDuration(hubs.get(1), 5, 3);
@@ -117,7 +122,7 @@ public class TestTimedTransportChainBuilder {
 	@Test
 	public void buildDefaultStart() {
 		List<DistributionCenter> hubs = hubsNoTram;
-		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainNoTram);
+		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainNoTram, cost, transfer);
 		
 		TimedTransportChain timedChain = 
 			builder.setDuration(hubs.get(0), 8, 2)
@@ -133,7 +138,7 @@ public class TestTimedTransportChainBuilder {
 	@Test
 	public void buildDefaultStartAlreadySet() {
 		List<DistributionCenter> hubs = hubsNoTram;
-		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainNoTram);
+		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainNoTram, cost, transfer);
 		
 		TimedTransportChain timedChain = 
 			builder.setDuration(hubs.get(0), 8, 2)
@@ -151,7 +156,7 @@ public class TestTimedTransportChainBuilder {
 	public void missingPrefixDuration() {
 		List<DistributionCenter> hubs = hubsComplex;
 		
-		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainComplex)
+		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainComplex, cost, transfer)
 			.setDuration(hubs.get(0), 8, 2);
 		
 		assertThrows(IllegalStateException.class,
@@ -165,7 +170,7 @@ public class TestTimedTransportChainBuilder {
 	public void invalidDepartureInPast() {
 		List<DistributionCenter> hubs = hubsComplex;
 		
-		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainComplex);
+		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainComplex, cost, transfer);
 
 		builder.setDuration(hubs.get(0), 8, 2)
 			   .setDuration(hubs.get(1), 5, 3)

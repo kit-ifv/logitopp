@@ -21,8 +21,8 @@ import lombok.Getter;
 
 public class TransportChain {
 
-	@Getter private final List<DistributionCenter> hubs;
-	@Getter private final boolean deliveryDirection;
+	@Getter protected final List<DistributionCenter> hubs;
+	@Getter protected final boolean deliveryDirection;
 	
 	public TransportChain(List<DistributionCenter> hubs, boolean deliveryDirection) { //TODO validate relations and size
 		this.hubs = hubs;
@@ -129,7 +129,7 @@ public class TransportChain {
 		
 		return Math.min(lastMileDepartures, minConnectionCapacity);
 	}
-	
+		
 	@Override
 	public String toString() {
 		return hubs.stream().map(DistributionCenter::toString).collect(joining(", "));

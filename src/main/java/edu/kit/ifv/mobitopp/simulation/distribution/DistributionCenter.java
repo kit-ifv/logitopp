@@ -1,6 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.distribution;
 
-import java.util.Map;
+import java.util.Random;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
@@ -9,14 +9,12 @@ import edu.kit.ifv.mobitopp.simulation.Hook;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.region.RegionalReach;
 import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceArea;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.ParcelUnit;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +41,8 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	@Getter @Setter private DepotOperations operations;
 	
 	@Getter private final  Fleet fleet;
+	
+	@Getter private final Random random;
 	
 	
 	/**
@@ -72,6 +72,8 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		this.storage = new DepotStorage();
 		this.regionalStructure = new RegionalReach(this, serviceArea);
 		this.fleet = new Fleet(vehicleType, numVehicles, this);
+		
+		this.random = new Random(id);
 		
 	}
 	
