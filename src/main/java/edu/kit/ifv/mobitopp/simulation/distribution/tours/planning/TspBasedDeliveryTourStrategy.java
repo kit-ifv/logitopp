@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.planning;
 
 import static java.lang.Math.round;
 
@@ -19,6 +19,9 @@ import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -55,13 +58,13 @@ public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 	}
 
 	@Override
-	public List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> deliveries, DeliveryVehicle vehicle,
+	public List<PlannedTour> planTours(Collection<ParcelActivityBuilder> deliveries, DeliveryVehicle vehicle,
 			Time currentTime, RelativeTime maxTourDuration) {
 		
 		Mode mode = vehicle.getType().getMode();
 		int capacity = vehicle.getCapacity();
 		
-		List<PlannedDeliveryTour> plannedTours = new ArrayList<>();
+		List<PlannedTour> plannedTours = new ArrayList<>();
 		List<ParcelActivityBuilder> giantTour = planGiantTour(vehicle.getOwner(), deliveries, currentTime, mode);
 		
 		while (!giantTour.isEmpty()) {

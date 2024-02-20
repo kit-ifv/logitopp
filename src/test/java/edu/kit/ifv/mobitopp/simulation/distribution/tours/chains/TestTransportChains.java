@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.chains;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains;
 
 import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.BIKE;
 import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.TRAM;
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.util.collections.Pair;
 

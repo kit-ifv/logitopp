@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation;
+package edu.kit.ifv.mobitopp.simulation.demand;
 
 /**
  * The Class DemandQuantity holds data about the estimated produced and consumed

@@ -29,6 +29,10 @@ public class Tour<E> implements Iterable<E> {
 	public int size() {
 		return elements.size();
 	}
+	
+	public boolean isEmpty() {
+		return size() == 0;
+	}
 
 	@Override
 	public Iterator<E> iterator() {
@@ -66,34 +70,41 @@ public class Tour<E> implements Iterable<E> {
 	}
 	
 	public float minInsertionCost(E elem) {
+		if(isEmpty()) {return 0.0f;}
 		return getInsertionCost(elem, findMinInsertionIndex(elem));
 	}
 	
 	public int findMinInsertionIndex(E elem) {
+		if(isEmpty()) {return 0;}
 		return findMinInsertionIndex(elem, this::getInsertionCost);
 	}
 	
 	public int findMinInsertionIndex(ZoneAndLocation loc) {
+		if(isEmpty()) {return 0;}
 		return findMinInsertionIndex(loc, this::getInsertionCost);
 	}
 	
 	public float getInsertionCost(ZoneAndLocation loc, int index) {
+		if(isEmpty()) {return 0.0f;}
 		E prev = getModulo(index-1);
 		E next = getModulo(index);
 		return getInsertionCost(prev, loc, next);
 	}
 	
-	public float getInsertionCost(E prev, ZoneAndLocation hub, E next) {
+	private float getInsertionCost(E prev, ZoneAndLocation hub, E next) {
+		if(isEmpty()) {return 0.0f;}
 		return travelTimeProvider.getTravelTime(prev, hub) + travelTimeProvider.getTravelTime(hub, next) - travelTimeProvider.getTravelTime(prev, next);
 	}
 	
-	public float getInsertionCost(E element, int index) {
+	private float getInsertionCost(E element, int index) {
+		if(isEmpty()) {return 0.0f;}
 		E prev = getModulo(index-1);
 		E next = getModulo(index);
 		return getInsertionCost(prev, element, next);
 	}
 	
-	public float getInsertionCost(E prev, E element, E next) {
+	private float getInsertionCost(E prev, E element, E next) {
+		if(isEmpty()) {return 0.0f;}
 		return travelTimeProvider.getTravelTime(prev, element) + travelTimeProvider.getTravelTime(element, next) - travelTimeProvider.getTravelTime(prev, next);
 	}
 	

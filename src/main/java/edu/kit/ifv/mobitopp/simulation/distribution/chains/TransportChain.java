@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.joining;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +36,13 @@ public class TransportChain {
 	
 	public static TransportChain inPickUpDirection(List<DistributionCenter> hubs) {
 		return new TransportChain(hubs, false);
+	}
+	
+	public TransportChain getOppositeDirection() {
+		List<DistributionCenter> copy = new ArrayList<>();
+		copy.addAll(hubs);
+		Collections.reverse(copy);
+		return new TransportChain(copy, !deliveryDirection);
 	}
 	
 	public DistributionCenter first() {

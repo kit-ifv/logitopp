@@ -18,16 +18,23 @@ import lombok.Getter;
 public class TspSolver<E> {
 	
 	@Getter
-	private final CachedTravelTime<E> dijkstra;
+	private final CachedTravelTime<E> travelTimes;
 	
-	public TspSolver(SimulationContext context, Function<E, Location> embedding) {
+	public TspSolver(TravelTimeProvider<E> travelTime) {
+
+		this.travelTimes = new CachedTravelTime<>(travelTime);
+	}
+	
+	public static <E> TspSolver<E> createSolverUsingDijkstraTimes(SimulationContext context, Function<E, Location> embedding) {
 		
 		File visumFile = new File(context.configuration().getVisumFile());
 		String carCode = context.configuration().getVisumToMobitopp().getCarTransportSystemCode();
+		System.out.println(carCode);
 		VisumNetwork visumNet = new VisumNetworkReader().readNetwork(visumFile, carCode);
 		
 		DijkstraSolver<E> solver = new DijkstraSolver<E>(visumNet, embedding);
-		this.dijkstra = new CachedTravelTime<>(solver);
+		
+		return new TspSolver<>(solver);
 	}
 
 	public Tour<E> findTour(Collection<E> elements) {
@@ -49,9 +56,9 @@ public class TspSolver<E> {
 			graph.addVertex(element);
 
 			for (E other: graph.vertexSet()) {
-				float weight = dijkstra.getTravelTime(element, other);
+				float weight = travelTimes.getTravelTime(element, other);
 				
-				if (weight > 0) { //TODO allow 0 weight?
+				if (weight > 0 && !other.equals(element)) { //TODO allow 0 weight?
 					DefaultWeightedEdge edge = graph.addEdge(element, other);
 					graph.setEdgeWeight(edge, weight);
 				}
@@ -64,7 +71,7 @@ public class TspSolver<E> {
 		TwoApproxMetricTSP<E, DefaultWeightedEdge> tspAlg = new TwoApproxMetricTSP<>();
 		GraphPath<E, DefaultWeightedEdge> path = tspAlg.getTour(graph);
 		
-		return new Tour<E>(path.getVertexList(), (float) path.getWeight(), dijkstra);		
+		return new Tour<E>(path.getVertexList(), (float) path.getWeight(), travelTimes);		
 	}
 	
 }

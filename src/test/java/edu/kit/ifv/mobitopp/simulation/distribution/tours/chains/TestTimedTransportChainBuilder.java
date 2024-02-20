@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.chains;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,10 +11,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChainBuilder;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.CostFunction;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.StaticTransferTimeModel;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.TransferTimeModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.CostFunction;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.StaticTransferTimeModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.TransferTimeModel;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class TestTimedTransportChainBuilder {

@@ -1,5 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
+import java.util.Collection;
+import java.util.List;
+
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
@@ -47,5 +50,7 @@ public interface IParcel {
 	public RecipientType getRecipientType();
 
 	
-	
+	default Collection<IParcel> getContainedParcels() {
+		return List.of(this);
+	}
 }

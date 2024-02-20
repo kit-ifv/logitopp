@@ -1,10 +1,11 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.planning;
 
 import java.util.Collection;
 import java.util.List;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -24,7 +25,7 @@ public interface TourPlanningStrategy {
 	 * @return a list of planned tours for the given parcels operated by the given
 	 *         {@link DistributionCenter}
 	 */
-	public List<PlannedDeliveryTour> planTours(
+	public List<PlannedTour> planTours(
 			Collection<IParcel> deliveries, 
 			Collection<IParcel> pickUps, Fleet fleet,
 			Time time

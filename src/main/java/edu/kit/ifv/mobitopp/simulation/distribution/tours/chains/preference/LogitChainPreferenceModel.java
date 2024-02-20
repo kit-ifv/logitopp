@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference;
 
 import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.BIKE;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize.EXTRA_LARGE;
@@ -13,6 +13,7 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.CostFunction;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.util.logit.DefaultLogitModel;
 import edu.kit.ifv.mobitopp.util.parameter.LogitParameters;

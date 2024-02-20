@@ -5,9 +5,11 @@ import static java.util.stream.Collectors.toList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
+import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
@@ -18,14 +20,16 @@ import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
 @Getter
-public class PlannedDeliveryTour {
+public class PlannedDeliveryTour implements PlannedTour {
+	
+	private final boolean isReturning = false;
 	
 	private final List<ParcelActivityBuilder> stops;
 	private final List<ParcelActivity> preparedStops;
 	private final VehicleType vehicleType;
 	private final RelativeTime plannedDuration;
 	private final Time plannedAt;
-	private final boolean replan;
+	private final boolean replanningAllowed;
 	private final ImpedanceIfc impedance;
 	
 	public PlannedDeliveryTour(VehicleType vehicleType, RelativeTime plannedDuration, Time plannedAt, boolean replan, ImpedanceIfc impedance) {
@@ -34,7 +38,7 @@ public class PlannedDeliveryTour {
 		this.vehicleType = vehicleType;
 		this.plannedDuration = plannedDuration;
 		this.plannedAt = plannedAt;
-		this.replan = replan;
+		this.replanningAllowed = replan;
 		this.impedance = impedance;
 	}
 	
@@ -132,6 +136,18 @@ public class PlannedDeliveryTour {
 	@Override
 	public String toString() {
 		return "Planned tour: " + this.vehicleType.name() + ", " + this.stops.size() + " stops";
+	}
+
+	@Override
+	public Collection<IParcel> getAllParcels() {
+		List<IParcel> list = new ArrayList<>(getDeliveryParcels());
+		list.addAll(getPickUpRequests());
+		return list;
+	}
+
+	@Override
+	public Optional<DistributionCenter> nextHub() {
+		return Optional.empty();
 	}
 
 }

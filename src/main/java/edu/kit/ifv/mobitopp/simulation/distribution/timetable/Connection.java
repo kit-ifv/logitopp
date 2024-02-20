@@ -22,6 +22,9 @@ public class Connection {
 	private Collection<TimedTransportChain> bookings;
 	
 	public Connection(DistributionCenter from, DistributionCenter to, Time departure, int durationMinutes, int capacity) {
+		assert from != null;
+		assert to != null;
+		
 		this.from = from;
 		this.to = to;
 		this.departure = departure;

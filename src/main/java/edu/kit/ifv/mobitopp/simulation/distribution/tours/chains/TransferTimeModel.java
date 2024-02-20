@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;

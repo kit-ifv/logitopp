@@ -9,24 +9,24 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.dispatch.DispatchStrategy;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.TourPlanningStrategy;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.planning.TourPlanningStrategy;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 
 @Getter
 public class DepotOperations {
 
-	private final DistributionCenter center;
+	protected final DistributionCenter center;
 	
 	private final TourPlanningStrategy tourStrategy;
 	private final ParcelPolicyProvider policyProvider;
-	private final DispatchStrategy dispatchStrategy;
+	protected final DispatchStrategy dispatchStrategy;
 	
-	private final ParcelArrivalScheduler scheduler;
+	protected final ParcelArrivalScheduler scheduler;
 	
 	private final ImpedanceIfc impedance;
-	private final DeliveryResults results;
+	protected final DeliveryResults results;
 
 	
 	public DepotOperations(TourPlanningStrategy tourStrategy, ParcelPolicyProvider policyProvider, DispatchStrategy dispatchStrategy, DistributionCenter center, DeliveryResults results, ImpedanceIfc impedance) {
@@ -38,7 +38,7 @@ public class DepotOperations {
 		this.impedance = impedance;
 		this.results = results;
 		
-		this.scheduler = new ParcelArrivalScheduler(center);
+		this.scheduler = new ParcelArrivalScheduler(); //TODO singleton scheduler
 		
 		center.setOperations(this);
 	}
@@ -50,15 +50,15 @@ public class DepotOperations {
 		dispatchAvailableTours(time);
 	}
 	
-	private void planTours(Time currentTime) {
+	protected void planTours(Time currentTime) {
 		
 		if (tourStrategy.shouldReplanTours(center, currentTime)) { //TODO add replanning for non-hubs
 			System.out.println("Replan tours!");
 			
 			DepotStorage storage = center.getStorage();
 
-			for (PlannedDeliveryTour t : plannedTours()) {
-				if (t.isReplan()) {
+			for (PlannedTour t : plannedTours()) {
+				if (t.isReplanningAllowed()) {
 					storage.deletePlannedTour(t);
 				}
 			}
@@ -67,55 +67,48 @@ public class DepotOperations {
 				this.tourStrategy.planTours(center.getStorage().getParcels(), center.getStorage().getRequests(), center.getFleet(), currentTime)
 			);
 			
+			
 			System.out.println("	planned " + plannedTours().size() + " tours; " + center.getFleet().size() + " vehicles available!");
-
 		}
 		
-		// TODO Auto-generated method stub
-		// TODO check if it is time to (re)?plan delivery tours
-		// TODO group deliveries and pickups to parcelActivities
-		// TODO plan tours for parcel activities
-		// TODO store planned tours
+		
 	}
 
 
 
-	private void dispatchAvailableTours(Time currentTime) {
+	protected void dispatchAvailableTours(Time currentTime) {
 		
-		Optional<PlannedDeliveryTour> tourCheck = null;
+		Optional<PlannedTour> tourCheck = null;
 		
 		while ((tourCheck = canDispatch(currentTime)).isPresent()) {
+			PlannedTour tour = tourCheck.get();
+			Optional<DeliveryVehicle> vehicle = dispatchStrategy.getVehicleForTour(tour, center, currentTime);
 			
-			Optional<DeliveryVehicle> vehicleCheck = center.getFleet().getAvailableVehicle();
-			
-			PlannedDeliveryTour tour = tourCheck.get();
-
-			if (vehicleCheck.isPresent()) {
-				
-				DeliveryVehicle vehicle = vehicleCheck.get();
-				
-				Time returnTime = tour.prepare(currentTime, vehicle, impedance);
-				
-				scheduler.dispatchVehicle(vehicle, returnTime);
-				scheduler.dispatchParcelActivities(tour, currentTime);	
-				
+			if (vehicle.isPresent()) {
+				dispatchTour(currentTime, tour, vehicle.get());
 			}
 			
-			
-			center.getStorage().pickPlannedTour(tour);
-			
-			dispatchAvailableTours(currentTime);
 		}
 		
 	}
 
-	private Collection<PlannedDeliveryTour> plannedTours() {
+	protected void dispatchTour(Time currentTime, PlannedTour tour, DeliveryVehicle vehicle) {
+		
+		Time returnTime = tour.prepare(currentTime, vehicle, impedance);
+		
+		scheduler.dispatchVehicle(vehicle, returnTime);
+		scheduler.dispatchParcelActivities(tour, currentTime);	
+		center.getStorage().pickPlannedTour(tour);
+
+	}
+
+	protected Collection<PlannedTour> plannedTours() {
 		return new ArrayList<>(center.getStorage().getPlannedTours());
 	}
 
 	
-	private Optional<PlannedDeliveryTour> canDispatch(Time time) {
-		return this.dispatchStrategy.canDispatch(plannedTours(), center.getFleet(), time);
+	protected Optional<PlannedTour> canDispatch(Time time) {
+		return plannedTours().stream().filter(t -> this.dispatchStrategy.canDispatch(t, center, time)).findFirst();
 	}
 
 }

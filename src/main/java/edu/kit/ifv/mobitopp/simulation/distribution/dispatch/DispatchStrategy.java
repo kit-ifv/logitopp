@@ -1,16 +1,28 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.dispatch;
 
-import java.util.Collection;
 import java.util.Optional;
 
-import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public interface DispatchStrategy {
 
-	public Optional<PlannedDeliveryTour> canDispatch(Collection<PlannedDeliveryTour> tours, Fleet fleet, Time time);
+	public boolean canDispatch(PlannedTour tour, DistributionCenter origin, Time time);
 	
-	//TODO estimate dispatch times?
+	default public Optional<DeliveryVehicle> getVehicleForTour(PlannedTour tour, DistributionCenter origin, Time time) {
+		DistributionCenter dc = (tour.isReturning()) ? tour.nextHub().get() : origin;
+		
+		VehicleType mode = dc.getVehicleType();
+		
+		if (mode.equals(VehicleType.TRAM)) {
+			
+			return Optional.of(new DeliveryVehicle(mode, 1, dc));
+		}	
+		
+		return dc.getFleet().getAvailableVehicle();
+	}
 	
 }

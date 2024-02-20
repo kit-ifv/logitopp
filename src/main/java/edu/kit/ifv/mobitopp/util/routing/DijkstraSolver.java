@@ -83,13 +83,13 @@ public class DijkstraSolver<E> implements TravelTimeProvider<E> {
 	}
 
 	@Override
-	public void setMode(StandardMode mode) {
-		// TODO Auto-generated method stub
+	public boolean setMode(StandardMode mode) {
+		return false;
 	}
 
 	@Override
-	public void setTime(Time time) {
-		// TODO Auto-generated method stub
+	public boolean setTime(Time time) {
+		return false;
 	}
 
 }

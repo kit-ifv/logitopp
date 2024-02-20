@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.planning;
 
 import static java.util.stream.Collectors.toList;
 
@@ -16,6 +16,7 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.time.Time;
 

@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference;
 
 import java.util.Collection;
 

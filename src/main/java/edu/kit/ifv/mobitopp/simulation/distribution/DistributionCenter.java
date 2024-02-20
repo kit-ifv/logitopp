@@ -4,7 +4,7 @@ import java.util.Random;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
+import edu.kit.ifv.mobitopp.simulation.demand.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.Hook;
 import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;

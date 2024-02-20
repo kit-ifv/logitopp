@@ -11,8 +11,8 @@ import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.CostFunction;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.TransferTimeModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.CostFunction;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.TransferTimeModel;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class TimedTransportChainBuilder {
@@ -90,7 +90,7 @@ public class TimedTransportChainBuilder {
 		int durationSum = 0;
 
 		for (DistributionCenter destination : chain.tail()) {
-			VehicleType vehicle = origin.getVehicleType();
+			VehicleType vehicle = (chain.isDeliveryDirection()) ? origin.getVehicleType() : destination.getVehicleType();
 
 			this.distances.put(origin, tripDistance(impedance, origin, destination));
 
@@ -115,7 +115,8 @@ public class TimedTransportChainBuilder {
 
 			durationSum += dur + transfer;
 			origin = destination;
-		}
+			
+		}//TODO for reverse order, sometimes box is picked up, should this be considered? effective travel time of box is accurate but not of vehicle
 
 		return this;
 	}

@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.planning;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,6 +8,8 @@ import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
@@ -24,7 +26,7 @@ public abstract class ClusterTourPlanningStrategy implements TourPlanningStrateg
 	}
 	
 	@Override
-	public List<PlannedDeliveryTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps,
+	public List<PlannedTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps,
 			Fleet fleet, Time time) {
 		
 		List<ParcelActivityBuilder> activities = getDeliveryActivities(deliveries, pickUps);
@@ -33,7 +35,7 @@ public abstract class ClusterTourPlanningStrategy implements TourPlanningStrateg
 		return planTours(activities, vehicle, time, RelativeTime.ofHours(8));
 	}
 
-	protected abstract List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle, Time time, RelativeTime duration);
+	protected abstract List<PlannedTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle, Time time, RelativeTime duration);
 
 	@Override
 	public boolean shouldReplanTours(DistributionCenter center, Time time) {

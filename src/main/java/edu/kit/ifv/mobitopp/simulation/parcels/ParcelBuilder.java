@@ -1,7 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.parcels;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
+import edu.kit.ifv.mobitopp.simulation.demand.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;

@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.planning;
 
 import static java.lang.Math.round;
 import static java.util.Comparator.comparing;
@@ -19,7 +19,9 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
-import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
@@ -39,7 +41,7 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 	}
 	
 	@Override
-	protected List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle,
+	protected List<PlannedTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle,
 			Time time, RelativeTime duration) {
 		processed.clear();
 		List<PlannedDeliveryTour> tours = new ArrayList<>();
@@ -204,7 +206,7 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 		System.out.println();
 		System.out.println("Tour parcel counts: " + tours.stream().map(t -> countParcels(t.getStops())).map(i -> ""+i).collect(Collectors.joining(", ")));
 		System.out.println();
-		return tours;
+		return new ArrayList<PlannedTour>(tours);
 	}
 
 	private void log(Zone zone, int stops, List<PlannedDeliveryTour> newTours, String tag) {

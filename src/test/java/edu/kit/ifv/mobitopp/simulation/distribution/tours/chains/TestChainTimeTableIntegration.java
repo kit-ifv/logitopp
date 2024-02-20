@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.chains;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +30,9 @@ import edu.kit.ifv.mobitopp.simulation.distribution.DepotOperations;
 import edu.kit.ifv.mobitopp.simulation.distribution.DepotRelationsParser;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenterParser;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChainBuilder;
+import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.dispatch.TimeWindowDispatchStrategy;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
@@ -38,9 +41,9 @@ import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceAreaFactory;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTableParser;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.TourPlanningStrategy;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.CostFunction;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated.StaticTransferTimeModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.CostFunction;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.StaticTransferTimeModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.planning.TourPlanningStrategy;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class TestChainTimeTableIntegration {

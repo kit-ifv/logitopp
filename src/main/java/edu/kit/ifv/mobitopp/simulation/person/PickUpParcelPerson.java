@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
+import edu.kit.ifv.mobitopp.simulation.demand.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.NullParcelProducer;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;

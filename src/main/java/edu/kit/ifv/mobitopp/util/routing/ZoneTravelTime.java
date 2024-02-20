@@ -18,8 +18,8 @@ public class ZoneTravelTime<E> implements TravelTimeProvider<E> {
 	public ZoneTravelTime(Function<E, Zone> mapping, ImpedanceIfc impedance, StandardMode mode, Time time) {
 		this.embedding = mapping;
 		this.impedance = impedance;
-		this.setTime(time);
-		this.setMode(mode);
+		this.time = time;
+		this.mode = mode;
 	}
 
 	@Override
@@ -42,12 +42,16 @@ public class ZoneTravelTime<E> implements TravelTimeProvider<E> {
 		return impedance.getTravelTime(origin.zone().getId(), destination.zone().getId(), mode, time);
 	}
 
-	public void setMode(StandardMode mode) {
+	public boolean setMode(StandardMode mode) {
+		boolean changed = !this.mode.equals(mode);
 		this.mode = mode;
+		return changed;
 	}
 
-	public void setTime(Time time) {
+	public boolean setTime(Time time) {
+		boolean changed = !this.time.equals(time);
 		this.time = time;
+		return changed;
 	}
 
 }

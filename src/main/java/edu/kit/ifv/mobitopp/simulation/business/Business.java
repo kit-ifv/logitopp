@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
 
-import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
+import edu.kit.ifv.mobitopp.simulation.demand.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;

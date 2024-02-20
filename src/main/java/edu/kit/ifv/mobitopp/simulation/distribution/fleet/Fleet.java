@@ -73,4 +73,8 @@ public class Fleet {
 		}
 	}
 	
+	public boolean hasAvailableVehicle() {
+		return !availableVehicles.isEmpty();
+	}
+	
 }

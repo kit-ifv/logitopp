@@ -8,7 +8,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
-import edu.kit.ifv.mobitopp.simulation.DemandQuantity;
+import edu.kit.ifv.mobitopp.simulation.demand.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;

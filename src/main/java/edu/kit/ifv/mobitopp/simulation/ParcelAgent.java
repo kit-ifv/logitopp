@@ -1,5 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation;
 
+import edu.kit.ifv.mobitopp.simulation.demand.DemandQuantity;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 

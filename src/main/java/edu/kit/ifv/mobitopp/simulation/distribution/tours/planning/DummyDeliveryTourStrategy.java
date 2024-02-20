@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.planning;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +7,9 @@ import java.util.List;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -24,10 +27,10 @@ public class DummyDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 	}
 
 	@Override
-	public List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle,
+	public List<PlannedTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle,
 			Time currentTime, RelativeTime maxTourDuration) {
 		
-		List<PlannedDeliveryTour> tours = new ArrayList<>();
+		List<PlannedTour> tours = new ArrayList<>();
 		
 		List<ParcelActivityBuilder> assigned = new ArrayList<>();
 		RelativeTime counter = copy(maxTourDuration);

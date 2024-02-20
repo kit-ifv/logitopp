@@ -72,15 +72,22 @@ public class TimedTransportChain extends TransportChain {
 	}
 
 	public void bookConnections() {
-		this.connections.forEach(c -> c.book(this));
+		if (this.isDeliveryDirection()) { //TODO INFO: pickup direction are handeled first come first serve
+			this.connections.forEach(c -> c.book(this));
+		}
 	}
 	
-	public boolean canBookConnections() {
-		return this.connections.stream().allMatch(Connection::hasFreeCapacity);
+	public boolean canBookConnections() { //TODO maybe only book later if space is available??
+		
+		return (!this.isDeliveryDirection()) || this.connections.stream().allMatch(Connection::hasFreeCapacity);
 	}
 	
 	public TimedTransportChain copy() {
 		return new TimedTransportChain(id, hubs, deliveryDirection, departures, durations, connections, distance, cost);
+	}
+	
+	public TimedTransportChain copyNexId() {
+		return new TimedTransportChain(idCount++, hubs, deliveryDirection, departures, durations, connections, distance, cost);
 	}
 	
 	public TimedTransportChain getTimedTail() {

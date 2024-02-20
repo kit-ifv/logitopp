@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.planning;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +7,8 @@ import java.util.List;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
@@ -23,11 +25,11 @@ public class SeparatePickupTourPlanning extends ClusterTourPlanningStrategy {
 	}
 
 	@Override
-	public List<PlannedDeliveryTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps, Fleet fleet,
+	public List<PlannedTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps, Fleet fleet,
 			Time time) {
 		
 		DeliveryVehicle vehicle = fleet.getVehicles().iterator().next();
-		List<PlannedDeliveryTour> tours = new ArrayList<>();
+		List<PlannedTour> tours = new ArrayList<>();
 		
 		System.out.print(vehicle.getOwner().getName() + " plans delivery: ");
 		List<ParcelActivityBuilder> delActivities = getDeliveryActivities(deliveries, List.of());
@@ -47,7 +49,7 @@ public class SeparatePickupTourPlanning extends ClusterTourPlanningStrategy {
 	}
 
 	@Override
-	protected List<PlannedDeliveryTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle,
+	protected List<PlannedTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle,
 			Time time, RelativeTime duration) {
 		throw new UnsupportedOperationException("planTours(clusters) Should not be called on decorator " + this.getClass().getSimpleName());
 	}

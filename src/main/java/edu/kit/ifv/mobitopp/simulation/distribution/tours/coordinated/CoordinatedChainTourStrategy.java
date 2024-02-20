@@ -15,21 +15,26 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
+
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
-import edu.kit.ifv.mobitopp.simulation.SimulationContext;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.TourPlanningStrategy;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference.TransportPreferences;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.planning.TourPlanningStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.box.ParcelBox;
+import edu.kit.ifv.mobitopp.simulation.parcels.box.ParcelWithReturnInfo;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.ParcelCluster;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
@@ -47,22 +52,21 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	private final DeliveryClusteringStrategy clustering;
 	private final DeliveryDurationModel durationModel;
 	
-	public CoordinatedChainTourStrategy(CapacityCoordinator coordinator, SimulationContext context, DeliveryClusteringStrategy clustering, ImpedanceIfc impedance, DeliveryDurationModel durationModel) {
+	public CoordinatedChainTourStrategy(CapacityCoordinator coordinator, DeliveryClusteringStrategy clustering, ImpedanceIfc impedance, DeliveryDurationModel durationModel, TspSolver<ParcelCluster> tspSolver) {
 		this.impedance = impedance;
 		this.coordinator = coordinator;
-		this.solver = new TspSolver<>(context, c -> c.getZoneAndLocation().location());
+		this.solver = tspSolver;
 		this.clustering = clustering;
 		this.durationModel = durationModel;
 	}
 	
 	@Override
 	public boolean shouldReplanTours(DistributionCenter center, Time time) {
-		// TODO Auto-generated method stub
-		return false;
+		return time.equals(time.startOfDay().plusHours(6));
 	}
 	
 	@Override
-	public List<PlannedDeliveryTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps, Fleet fleet,
+	public List<PlannedTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps, Fleet fleet,
 			Time time) {
 		
 		DistributionCenter dc = fleet.getDistributionCenter();
@@ -71,6 +75,8 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		List<TimedTransportChain> chains = assignment.getChains(dc);
 		
 		Map<IParcel, TransportPreferences> preferences = getPreferencesByParcel(dc, assignment);
+		
+		//plan giant tours for distinct chains (duplicates are here ignored)
 		Map<TimedTransportChain, Tour<ParcelCluster>> initialTours = createInitialTours(deliveries, pickUps, chains, preferences);
 		
 		//Some chains have multiple copies (e.g. if multiple truck vehicle are available):split demand to form smaller subtours
@@ -97,23 +103,27 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		}
 		
 		
-		List<PlannedDeliveryTour> plannedTours = new ArrayList<>();
+		
+		
+		
+		List<PlannedTour> plannedTours = new ArrayList<>();
 		validTours.keySet().forEach(chain -> {
-			plannedTours.put(chain, new ArrayList<>());
-			
+						
 			validTours.get(chain).forEach(tour -> {
 				
 				if (tour.tour.size() > 0) {
 					float accessEgress = tour.tour.selectMinInsertionStart(chain.last().getZoneAndLocation());
 					
 					PlannedDeliveryTour planned = new PlannedDeliveryTour(chain.lastMileVehicle(), RelativeTime.ofMinutes((int) ceil(tour.tour.getTravelTime() + accessEgress)), time, false, impedance);
-					int no = 0;
-					tour.tour.iterator().forEachRemaining(stop -> {
-						ParcelActivityBuilder activity = new ParcelActivityBuilder(stop.getParcels(), stop.getZoneAndLocation());
-						activity.withDuration(durationModel);
-					});
 					
+					if (chain.uses(VehicleType.TRAM)) { //Encode return tour here
+						fillTramTourPlan(chain, tour, accessEgress, planned);
+						
+					} else {
+						fillDefaultTourPlan(chain, tour, accessEgress, planned);
+					}
 					
+					plannedTours.add(planned);
 					
 				}
 				
@@ -121,7 +131,37 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		});	
 		
 		
-		return lastMileTours;
+		return plannedTours;
+	}
+
+	public void fillTramTourPlan(TimedTransportChain chain, LastMileTour tour, float accessEgress,
+			PlannedDeliveryTour planned) {
+		Time returnDeparture = chain.getArrival(chain.last()).plusMinutes((int) ceil(accessEgress + tour.tour.getTravelTime()));
+		TimedTransportChain returnChain = coordinator.createReturnChain(chain, returnDeparture);
+		ParcelBox returningParcelBox =  ParcelBox.createReturning(returnChain, List.of(), List.of(), impedance);
+		
+		tour.tour.iterator().forEachRemaining(stop -> {
+			Collection<IParcel> wrappedParcels = stop.getParcels()
+													 .stream()
+													 .map(p -> 
+													 		new ParcelWithReturnInfo(returningParcelBox, returningParcelBox)
+													 ).collect(toList());
+			
+			ParcelActivityBuilder activity = new ParcelActivityBuilder(wrappedParcels, stop.getZoneAndLocation());						
+			activity.withDuration(durationModel);
+			planned.addStop(activity);
+		});
+	}
+	
+	public void fillDefaultTourPlan(TimedTransportChain chain, LastMileTour tour, float accessEgress,
+			PlannedDeliveryTour planned) {
+
+		tour.tour.iterator().forEachRemaining(stop -> {
+			ParcelActivityBuilder activity = new ParcelActivityBuilder(stop.getParcels(), stop.getZoneAndLocation());						
+			activity.withDuration(durationModel);
+			planned.addStop(activity);
+		});
+		
 	}
 	
 	private DeliveryClusteringStrategy preferenceAwareClustering(Map<IParcel, TransportPreferences> preferences) {
@@ -256,7 +296,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				&& (!checkCostNegative || lmt.tour.getRemovalCost(stop) < 0)
 			) {
 				removedParcels.addAll(stop.getParcels());
-				float cost = lmt.tour.remove(stop);
+				lmt.tour.remove(stop);//float cost = 
 				lmt.accessEgress = lmt.tour.selectMinInsertionStart(chain.last().getZoneAndLocation());
 				overflowCapacity -= stop.getParcels().size();
 			}
@@ -360,7 +400,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				tour.selectMinInsertionStart(chain.last().getZoneAndLocation());
 				
 				int capacity = chain.last().getVehicleType().getCapacity();
-				Tour<ParcelCluster> subTour = new Tour<>(solver.getDijkstra());
+				Tour<ParcelCluster> subTour = new Tour<>(solver.getTravelTimes());
 				
 				//iterate all parcels preferring this kind of delivery chain
 				for (Iterator<ParcelCluster> iter = tour.iterator(); iter.hasNext(); ) {
@@ -372,7 +412,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 						TimedTransportChain copy = remainingChainCopies.remove(0);
 						float accessEgress = tour.selectMinInsertionStart(copy.last().getZoneAndLocation());
 						subTours.add(new LastMileTour(copy, subTour, accessEgress));
-						subTour = new Tour<>(solver.getDijkstra());
+						subTour = new Tour<>(solver.getTravelTimes());
 					}
 					
 				}
@@ -384,7 +424,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				
 				//if not all chain copies were needed, create empty tours for remaining
 				remainingChainCopies.forEach(c -> {
-					subTours.add(new LastMileTour(c, new Tour<>(solver.getDijkstra()), 0));
+					subTours.add(new LastMileTour(c, new Tour<>(solver.getTravelTimes()), 0));
 				});
 				
 				
@@ -414,15 +454,18 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	
 	
 
+	// here duplicates of chains are removed to gather all preferences in single giant tour, later divide if constraints are violated
 	private Map<TimedTransportChain, Tour<ParcelCluster>> createInitialTours(Collection<IParcel> deliveries,
 			Collection<IParcel> pickUps, List<TimedTransportChain> chains,
 			Map<IParcel, TransportPreferences> preferences) {
 		
+		List<TimedTransportChain> distinctChains = chains.stream().distinct().collect(toList());
+		
 		Collection<IParcel> allParcel = combine(deliveries, pickUps);
-		Map<TimedTransportChain, List<IParcel>> initialAssignment = resolveInitialAssignment(chains, preferences, allParcel);
+		Map<TimedTransportChain, List<IParcel>> initialAssignment = resolveInitialAssignment(distinctChains, preferences, allParcel);
 		Map<TimedTransportChain, Collection<ParcelCluster>> clusters = computeClusters(initialAssignment);		
 		
-		return chains.stream()
+		return distinctChains.stream()
 					 .collect(Collectors.toMap(
 							 Function.identity(), 
 							 c -> solver.findTour(clusters.get(c)

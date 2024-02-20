@@ -3,7 +3,7 @@ package edu.kit.ifv.mobitopp.simulation.distribution;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 
 public class DepotStorage {
@@ -11,7 +11,7 @@ public class DepotStorage {
 	private final Collection<IParcel> currentParcels;
 	private final Collection<IParcel> collectedPickups;
 	private final Collection<IParcel> pickupRequests;
-	private final Collection<PlannedDeliveryTour> plannedTours;
+	private final Collection<PlannedTour> plannedTours;
 	
 	public DepotStorage() {
 		this.currentParcels = new ArrayList<>();
@@ -76,22 +76,22 @@ public class DepotStorage {
 	
 	
 	
-	public void addPlannedTour(PlannedDeliveryTour tour) {
+	public void addPlannedTour(PlannedTour tour) {
 		this.plannedTours.add(tour);
 		
 		removeParcels(tour.getDeliveryParcels());
 		removeRequests(tour.getPickUpRequests());
 	}
 	
-	public void addPlannedTours(Collection<PlannedDeliveryTour> tours) {
+	public void addPlannedTours(Collection<PlannedTour> tours) {
 		tours.forEach(this::addPlannedTour);
 	}
 	
-	public void pickPlannedTour(PlannedDeliveryTour tour) {
+	public void pickPlannedTour(PlannedTour tour) {
 		this.plannedTours.remove(tour);
 	}
 	
-	public void deletePlannedTour(PlannedDeliveryTour tour) {
+	public void deletePlannedTour(PlannedTour tour) {
 		this.plannedTours.remove(tour);
 		
 		addParcels(tour.getDeliveryParcels());
@@ -109,7 +109,7 @@ public class DepotStorage {
 	}
 
 
-	public Collection<PlannedDeliveryTour> getPlannedTours() {
+	public Collection<PlannedTour> getPlannedTours() {
 		return this.plannedTours;
 	}
 

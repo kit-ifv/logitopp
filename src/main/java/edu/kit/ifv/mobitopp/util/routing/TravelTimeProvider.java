@@ -15,7 +15,7 @@ public interface TravelTimeProvider<E> {
 	public float getTravelTime(ZoneAndLocation origin, ZoneAndLocation destination);
 	
 	
-	public void setMode(StandardMode mode);
-	public void setTime(Time time);
+	public boolean setMode(StandardMode mode); //TODO check where called
+	public boolean setTime(Time time);
 
 }

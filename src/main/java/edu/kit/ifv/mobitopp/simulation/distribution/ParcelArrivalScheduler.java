@@ -10,19 +10,17 @@ import java.util.stream.Collectors;
 import edu.kit.ifv.mobitopp.simulation.Hook;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class ParcelArrivalScheduler implements Hook {
-	
-	private final DistributionCenter operator;
+
 	private final Map<Time, List<DeliveryVehicle>> vehicleReturnTimes;
 	private final Map<Time, List<ParcelActivity>> arrivalTimes;
 
 	private Time lastProcessed;
 	
-	public ParcelArrivalScheduler(DistributionCenter operator) {
-		this.operator = operator;
+	public ParcelArrivalScheduler() {
 		this.vehicleReturnTimes = new HashMap<>();
 		this.arrivalTimes = new HashMap<>();
 		this.lastProcessed = Time.start;
@@ -54,12 +52,11 @@ public class ParcelArrivalScheduler implements Hook {
 			System.err.println("Cannot dispatch vehicle due to return in the past: est. return " + returnTime + ", simulation time " + lastProcessed);
 		}
 		
-		vehicleReturnTimes.merge(returnTime, new ArrayList<>(List.of(vehicle)), this::mergeIntoFirst);
-		
-		operator.getFleet().bookVehicleUntil(vehicle, returnTime);		
+		vehicleReturnTimes.merge(returnTime, new ArrayList<>(List.of(vehicle)), this::mergeIntoFirst);		
+		vehicle.getOwner().getFleet().bookVehicleUntil(vehicle, returnTime);		
 	}
 	
-	public void dispatchParcelActivities(PlannedDeliveryTour tour, Time currentTime) {
+	public void dispatchParcelActivities(PlannedTour tour, Time currentTime) {
 		this.dispatchParcelActivities(tour.getPreparedStops(), currentTime);
 	}
 	

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference.TransportPreferences;
 
 public class ChainAssignment {
 	private final Map<DistributionCenter, List<TimedTransportChain>> chains;
@@ -28,10 +29,10 @@ public class ChainAssignment {
 	}
 	
 	public void assignAll(Map<DistributionCenter, List<TimedTransportChain>> chainAssignment) {
-		chains.forEach((dc, chains) -> this.assign(dc, chains));
+		chainAssignment.forEach((dc, chains) -> this.assign(dc, chains));
 	}
 	
-	public void regiter(DistributionCenter dc, List<TransportPreferences> preferences) {
+	public void register(DistributionCenter dc, List<TransportPreferences> preferences) {
 		this.preferences.get(dc).addAll(preferences);
 	}
 	

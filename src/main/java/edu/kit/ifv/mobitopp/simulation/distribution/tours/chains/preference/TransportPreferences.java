@@ -1,4 +1,4 @@
-package edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated;
+package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -16,7 +16,7 @@ public class TransportPreferences {
 	
 	@Getter private final int choiceId;
 	@Getter private final IParcel parcel;
-	private final Map<TimedTransportChain, Double> probabilities;
+	@Getter private final Map<TimedTransportChain, Double> probabilities;
 	@Getter private TimedTransportChain selected;
 	
 	private final Random random;
@@ -26,6 +26,8 @@ public class TransportPreferences {
 		this.parcel = parcel;
 		this.probabilities = new LinkedHashMap<>(probaility);
 		this.random = new Random(seed);
+		
+		selectNewPreference();
 	}
 	
 	public TimedTransportChain selectNewPreference() {

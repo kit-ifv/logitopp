@@ -54,13 +54,28 @@ public class CachedTravelTime<E> implements TravelTimeProvider<E> {
 	}
 
 	@Override
-	public void setMode(StandardMode mode) {
-		travelTime.setMode(mode);
+	public boolean setMode(StandardMode mode) {
+		boolean modeChanged = travelTime.setMode(mode);
+		if (modeChanged) {
+			clearCaches();
+		}
+		return modeChanged;
 	}
 
 	@Override
-	public void setTime(Time time) {
-		travelTime.setTime(time);
+	public boolean setTime(Time time) {
+		boolean timeChanged = travelTime.setTime(time);
+		if (timeChanged) {
+			clearCaches();
+		}
+		return timeChanged;
+	}
+	
+	private void clearCaches() {
+		cache.clear();
+		accessCache.clear();
+		egressCache.clear();
+		otherCache.clear();
 	}
 	
 	
