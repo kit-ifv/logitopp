@@ -1,0 +1,34 @@
+ProbabilityClass edu.kit.ifv.mobitopp.simulation.demand.attributes.destination.generated.GeneratedParcelDestinationModel
+
+Interface        edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep<
+					edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson,
+					edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder,
+					edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType>
+Signature        select(edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder parcel,
+							java.util.Collection<edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder> otherParcels,
+							int numOfParcels,
+							double randomNumber):edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType
+
+UtilityClass     edu.kit.ifv.mobitopp.simulation.demand.attributes.destination.generated.GeneratedParcelDestinationUtility
+HelperClass      edu.kit.ifv.mobitopp.simulation.demand.attributes.destination.generated.GeneratedParcelDestinationHelper
+
+root: {
+	<home:U_home>
+	<work?U_work>
+	<locker:U_locker>
+}
+
+HOME: U_home = 0
+
+WORK: U_work =    b_age2_work * [25 <= AGE <= 44] 
+				+ b_age3_work * [45 <= AGE <= 64]
+				+ b_age4_work * [65 <= AGE]
+				+ b_single_hh_work * SINGLE_HH
+
+
+PACK_STATION: U_locker = 
+				  b_age2_locker * [25 <= AGE <= 44] 
+				+ b_age3_locker * [45 <= AGE <= 64]
+				+ b_age4_locker * [65 <= AGE]
+				+ b_trip_chaim_shopping_locker * TRIP_CHAIN_SHOPPING
+				+ b_transit_pass_locker * TRANSIT_PASS

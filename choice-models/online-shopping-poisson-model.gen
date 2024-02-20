@@ -1,0 +1,21 @@
+ProbabilityClass edu.kit.ifv.mobitopp.simulation.demand.quantity.poisson.generated.GeneratedPoissonParcelQuantityModel
+
+Interface        edu.kit.ifv.mobitopp.simulation.demand.quantity.ParcelQuantityModel<edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson>
+Signature        select(edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson recipient,
+							double randomNumber
+				 ):int
+
+UtilityClass     edu.kit.ifv.mobitopp.simulation.demand.quantity.poisson.generated.GeneratedPoissonParcelQuantityUtility
+HelperClass      edu.kit.ifv.mobitopp.simulation.demand.quantity.poisson.generated.GeneratedPoissonParcelQuantityHelper
+
+root: {
+
+}
+
+Y: U_y = intercept
+	   + job1 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+	   + ageGroup2 * [25 <= AGE <= 44] 
+	   + ageGroup3 * [45 <= AGE <= 64] 
+	   + ageGroup4 * [65 <= AGE]
+	   + leisureFreqlow * [LEISURE_FREQ < 3]
+	   + leisureFreqmedium * [3 <= LEISURE_FREQ <= 5]

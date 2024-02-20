@@ -1,0 +1,25 @@
+ProbabilityClass edu.kit.ifv.mobitopp.simulation.demand.quantity.binary.generated.GeneratedBinaryParcelQuantityModel
+
+Interface        edu.kit.ifv.mobitopp.simulation.demand.quantity.ParcelQuantityModel<edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson>
+Signature        select(edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson recipient,
+							double randomNumber
+				 ):int
+
+UtilityClass     edu.kit.ifv.mobitopp.simulation.demand.quantity.binary.generated.GeneratedBinaryParcelQuantityUtility
+HelperClass      edu.kit.ifv.mobitopp.simulation.demand.quantity.binary.generated.GeneratedBinaryParcelQuantityHelper
+
+root: {}
+
+True: U_true = asc_Part
+				+ b_male1 * IS_GENDER_MALE
+				+ b_income2_1 * [2500 <= HOUSEHOLD_MONTHLY_INCOME_EUR < 4000]
+				+ b_income3_1 * [4000 <= HOUSEHOLD_MONTHLY_INCOME_EUR]
+				+ b_job1_1 * [IS_EMPLOYMENT_FULLTIME + IS_EMPLOYMENT_PARTTIME + IS_EMPLOYMENT_MARGINAL > 0]
+				+ b_age2_1 * [25 <= AGE <= 44] 
+				+ b_age3_1 * [45 <= AGE <= 64]
+				+ b_age4_1 * [65 <= AGE]
+				+ b_WEShop * WEEKEND_SHOPPING
+				+ b_inStore * SHOPPING_FREQ
+				+ b_leisure * LEISURE_FREQ
+
+False: U_false = 0
