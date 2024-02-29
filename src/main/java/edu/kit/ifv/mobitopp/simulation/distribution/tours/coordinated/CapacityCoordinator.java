@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -97,9 +98,11 @@ public class CapacityCoordinator {
 			int tourDurHours = (deliveryChain.lastMileVehicle().equals(VehicleType.BIKE)) ? 2 : 8 ; //TODO assumed tour duration??
 			Time returnDeparture = deliveryChain.getArrival(deliveryChain.last()).plusHours(tourDurHours);
 			
-			result.put(
-				createReturnChain(deliveryChain, returnDeparture),
-				deliveryChain
+			createReturnChain(deliveryChain, returnDeparture).ifPresent( returnChain -> 
+				result.put(
+					returnChain,
+					deliveryChain
+				)
 			);
 			
 		});
@@ -107,7 +110,7 @@ public class CapacityCoordinator {
 		return result;
 	}
 
-	public TimedTransportChain createReturnChain(TimedTransportChain deliveryChain, Time returnDeparture) {
+	public Optional<TimedTransportChain> createReturnChain(TimedTransportChain deliveryChain, Time returnDeparture) {
 		TransportChain oppositeDirection = deliveryChain.getOppositeDirection();
 		System.out.println("reverse :" + deliveryChain.getHubs());
 		System.out.println(" ==> " + oppositeDirection.getHubs());
@@ -224,6 +227,8 @@ public class CapacityCoordinator {
 				.getDeliveryChains()
 				.stream()
 				.map(c -> timedChainFactory.create(c, earliestDeparture))
+				.filter(Optional::isPresent)
+				.map(Optional::get)
 				.collect(toList());
 	}
 

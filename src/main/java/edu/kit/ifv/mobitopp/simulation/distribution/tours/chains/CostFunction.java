@@ -53,7 +53,7 @@ public class CostFunction { //TODO abstract class
 	private double estimateCost(DistributionCenter origin, Zone zone,
 				Time time, VehicleType vehicle, double travelTime, double transferTime, double distance) {
 		
-		double cost = getCost(origin, zone, time) * vehicleCostFator(origin);
+		double cost = getCost(origin, zone, time) * vehicleCostFactor(origin);
 		cost += (transferTime + transferTime) * timeCostFactor(origin);
 		
 		return cost;
@@ -63,7 +63,7 @@ public class CostFunction { //TODO abstract class
 		return impedance.getTravelCost(origin.getZone().getId(), destination.getId(), origin.getVehicleType().getMode(), currentTime);
 	}
 	
-	private double vehicleCostFator(DistributionCenter hub) {
+	private double vehicleCostFactor(DistributionCenter hub) {
 		switch (hub.getVehicleType()) {
 			case TRUCK:
 				return FUEL_COST_FACTOR;

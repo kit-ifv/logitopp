@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
@@ -26,6 +27,8 @@ public class TimedTransportChainBuilder {
 	private final Map<DistributionCenter, Double> distances;
 	private final List<Connection> connections;
 	private Time start;
+	
+	private boolean valid = true;
 
 
 	public TimedTransportChainBuilder(TransportChain chain, CostFunction costFunction, TransferTimeModel transferTime) {
@@ -43,14 +46,15 @@ public class TimedTransportChainBuilder {
 
 	}
 
-	public TimedTransportChainBuilder setDuration(DistributionCenter hub, int durMinutes, int transferMinutes) {
+	public TimedTransportChainBuilder setDuration(DistributionCenter hub, int durMinutes, int transferMinutes, double distance) {
 		this.durations.put(hub, durMinutes);
 		this.transfers.put(hub, transferMinutes);
+		this.distances.put(hub, distance);
 		return this;
 	}
 
 	public TimedTransportChainBuilder fixedDepartureAt(DistributionCenter hub, Time departure, int durMinutes,
-			int transferMinutes) {
+			int transferMinutes, double distance) {
 		List<DistributionCenter> prefix = getPrefixHubs(hub);
 		int prefixDur = getPrefixDuration(prefix, hub);
 
@@ -72,7 +76,7 @@ public class TimedTransportChainBuilder {
 			transfers.compute(predecessor, (key, val) -> val + waitMin);
 		}
 
-		this.setDuration(hub, durMinutes, transferMinutes);
+		this.setDuration(hub, durMinutes, transferMinutes, distance);
 		return this;
 	}
 
@@ -92,7 +96,7 @@ public class TimedTransportChainBuilder {
 		for (DistributionCenter destination : chain.tail()) {
 			VehicleType vehicle = (chain.isDeliveryDirection()) ? origin.getVehicleType() : destination.getVehicleType();
 
-			this.distances.put(origin, tripDistance(impedance, origin, destination));
+			double dist =  tripDistance(impedance, origin, destination);
 
 			Time time = (start == null) ? currentTime : start;
 			time = time.plusMinutes(durationSum);
@@ -101,16 +105,22 @@ public class TimedTransportChainBuilder {
 			int dur;
 
 			if (vehicle.equals(VehicleType.TRAM)) {
-				Connection connection = timeTable.getFreeConnectionsOnDay(origin, destination, currentTime).findFirst()
-						.get();// TODO what if no connection is found, chain should not exist in that case
+				Optional<Connection> maybeConnection = timeTable.getFreeConnectionsOnDay(origin, destination, currentTime).findFirst();
+				
+				if (maybeConnection.isEmpty()) {
+					this.valid = false;
+					return this;
+				}
+				
+				Connection connection = maybeConnection.get();
 
 				dur = connection.getDurationMinutes();
-				fixedDepartureAt(origin, connection.getDeparture(), dur, transfer);
+				fixedDepartureAt(origin, connection.getDeparture(), dur, transfer, dist);
 				connections.add(connection);
 
 			} else {
 				dur = tripDuration(impedance, origin, destination, time, vehicle);
-				setDuration(origin, dur, transfer);
+				setDuration(origin, dur, transfer, dist);
 			}
 
 			durationSum += dur + transfer;
@@ -166,7 +176,11 @@ public class TimedTransportChainBuilder {
 		return prefix;
 	}
 
-	public TimedTransportChain build() {
+	public Optional<TimedTransportChain> build() {
+		if (!valid) {
+			return Optional.empty();
+		}
+		
 		if (start== null) {
 			throw new IllegalStateException("Cannot build TimedTransportChain since start departure is not set.");
 		}
@@ -184,16 +198,21 @@ public class TimedTransportChainBuilder {
 		DistributionCenter origin = chain.first();
 		for (DistributionCenter destination : chain.tail()) {
 			cost += costFunction.estimateCost(
-					origin, destination, 
-					departures.get(origin), origin.getVehicleType(), 
-					durations.get(origin), transfers.get(origin), distances.get(origin));
+					origin,
+					destination,
+					departures.get(origin),
+					origin.getVehicleType(),
+					durations.get(origin),
+					transfers.get(origin),
+					distances.get(origin)
+			);
 			
 			distance += distances.get(origin);
 			
 			origin = destination;
 		}
 		
-		return new TimedTransportChain(chain, departures, durations, connections, distance, cost);
+		return Optional.of(new TimedTransportChain(chain, departures, durations, connections, distance, cost));
 	}
 	
 	

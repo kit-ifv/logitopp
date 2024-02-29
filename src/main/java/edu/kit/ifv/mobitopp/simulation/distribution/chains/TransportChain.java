@@ -56,6 +56,9 @@ public class TransportChain {
 	public VehicleType lastMileVehicle() {
 		return this.hubs.get(hubs.size() - 1).getVehicleType();
 	}
+	public VehicleType firstMileVehicle() {
+		return this.hubs.get(0).getVehicleType();
+	}
 	
 	public List<DistributionCenter> tail() {
 		if (hubs.size() <= 1) {

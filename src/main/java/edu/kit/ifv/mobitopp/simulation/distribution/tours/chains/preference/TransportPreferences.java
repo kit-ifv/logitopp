@@ -45,7 +45,7 @@ public class TransportPreferences {
 	}
 	
 	public List<TimedTransportChain> options() {
-		return probabilities.entrySet().stream().sorted(Comparator.comparing(e -> e.getValue())).map(e -> e.getKey()).collect(Collectors.toList());
+		return probabilities.entrySet().stream().sorted(Map.Entry.comparingByValue()).map(Map.Entry::getKey).collect(Collectors.toList());
 	}
 
 }

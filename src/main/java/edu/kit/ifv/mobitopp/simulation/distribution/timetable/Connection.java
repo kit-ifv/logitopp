@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.ToString;
@@ -64,4 +65,11 @@ public class Connection {
 			&& chain.nextHubAfter(from).map(to::equals).orElse(false)
 			&& chain.getDeparture(from).equals(departure);
 	}
+
+	public String getTag() {
+		return VehicleType.TRAM.name() + "_" + from.getId() + "_" + to.getId() + "_"
+				+ departure.getDay() + "_" + departure.getHour() + "_" + departure.getMinute()
+				+ durationMinutes + "_" + capacity;
+	}
+
 }

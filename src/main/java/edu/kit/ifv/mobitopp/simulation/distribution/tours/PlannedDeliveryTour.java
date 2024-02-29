@@ -14,6 +14,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -21,9 +22,12 @@ import lombok.Getter;
 
 @Getter
 public class PlannedDeliveryTour implements PlannedTour {
+
+	private static int idCnt = -1;
 	
 	private final boolean isReturning = false;
-	
+
+	private final int id = idCnt--;
 	private final List<ParcelActivityBuilder> stops;
 	private final List<ParcelActivity> preparedStops;
 	private final VehicleType vehicleType;
@@ -78,7 +82,11 @@ public class PlannedDeliveryTour implements PlannedTour {
 			int deliveryDuration = stop.getDeliveryMinutes();
 			
 			time = time.plusMinutes(tripDuration);
-			stop.by(vehicle).plannedAt(time).asStopNo(stopNo++).afterTrip(distance, tripDuration);
+			stop.by(vehicle)
+				.plannedAt(time)
+				.asStopNo(stopNo++)
+				.onTour(id)
+				.afterTrip(distance, tripDuration);
 			actualStops.add(stop.buildWorkerActivity());
 
 			time = time.plusMinutes(deliveryDuration);
@@ -99,8 +107,8 @@ public class PlannedDeliveryTour implements PlannedTour {
 		
 		Time returnTime = time.plusMinutes(returnDuration); 
 		
-		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, stops.size(), totalDeliveries, totalPickups, vehicle.getOwner().getZoneAndLocation(), totalDistance, totalTripTime, totalDeliveryTime);
-	
+		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, id, stops.size(),  totalDeliveries, totalPickups, vehicle.getOwner().getZoneAndLocation(), totalDistance, totalTripTime, totalDeliveryTime);
+
 		return returnTime;
 	}
 
@@ -147,6 +155,11 @@ public class PlannedDeliveryTour implements PlannedTour {
 
 	@Override
 	public Optional<DistributionCenter> nextHub() {
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<Connection> usedConnection() {
 		return Optional.empty();
 	}
 

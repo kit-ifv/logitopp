@@ -30,4 +30,8 @@ public class ServiceArea {
 	public boolean exists() {
 		return !zones.isEmpty();
 	}
+
+	public Collection<Zone> getZones() {
+		return new ArrayList<>(this.zones);
+	}
 }

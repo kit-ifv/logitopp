@@ -67,7 +67,7 @@ dependencies {
 test {
     useJUnitPlatform()
     enableAssertions = "true"
-    maxHeapSize = "2G"
+//    maxHeapSize = "2G"
     testLogging.showStandardStreams = true
 }
 

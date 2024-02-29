@@ -19,6 +19,7 @@ public class ParcelActivityBuilder {
 	protected DeliveryVehicle deliveryVehicle;
 	protected Time plannedArrivalTime;
 	protected int no;
+	protected int tourId;
 	protected int tripDuration;
 	protected double distance;
 	protected RelativeTime duration;
@@ -52,6 +53,11 @@ public class ParcelActivityBuilder {
 		this.no = no;
 		return this;
 	}
+
+	public ParcelActivityBuilder onTour(int tourId) {
+		this.tourId = tourId;
+		return this;
+	}
 	
 	public ParcelActivityBuilder afterTrip(double distance, int duration) {
 		this.distance = distance;
@@ -75,7 +81,7 @@ public class ParcelActivityBuilder {
 	}
 	
 	public ParcelActivity buildWorkerActivity() {
-		return new ParcelActivity(no, stopLocation, deliveries, pickUps, deliveryVehicle, plannedArrivalTime, distance, tripDuration, duration.toMinutes());		
+		return new ParcelActivity(no, tourId, stopLocation, deliveries, pickUps, deliveryVehicle, plannedArrivalTime, distance, tripDuration, duration.toMinutes());
 	}	
 		
 

@@ -31,26 +31,27 @@ public class DistributionCenterParser {
 	
 	private final Map<String, CEPServiceProvider> serviceProviders;
 	private ServiceAreaFactory serviceAreaFactory;
+	private DeliveryResults result;
 	
 	/**
 	 * Instantiates a new distribution center parser.
 	 *
 	 * @param zoneRepo    the zone repository for assigning depot location
 	 * @param scaleFactor the scale factor to scale the fleet
-	 * @param impedance   the impedance
-	 * @param results     the results
-	 * @param serviceAreaFactory 
+	 * @param result     the results logger
+	 * @param serviceAreaFactory a factory to create service areas
 	 */
-	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ServiceAreaFactory serviceAreaFactory) {
+	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ServiceAreaFactory serviceAreaFactory, DeliveryResults result) {
 		this.zoneRepo = zoneRepo;
 		this.scaleFactor = scaleFactor;
 		this.serviceAreaFactory = serviceAreaFactory;
 		
 		this.serviceProviders = new LinkedHashMap<>();
+		this.result = result;
 	}
 	
-	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance) {
-		this(zoneRepo, scaleFactor, new ServiceAreaFactory(zoneRepo, impedance));
+	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance, DeliveryResults result) {
+		this(zoneRepo, scaleFactor, new ServiceAreaFactory(zoneRepo, impedance), result);
 	}
 	
 	public Collection<DistributionCenter> parse(File file) {
@@ -66,7 +67,7 @@ public class DistributionCenterParser {
 	 */
 	public Collection<DistributionCenter> parse(CsvFile file) {
 		System.out.println("\nService Areas:");
-		return file.stream().map(r -> parse(r)).collect(Collectors.toList());
+		return file.stream().map(this::parse).collect(Collectors.toList());
 	}
 
 	
@@ -99,12 +100,13 @@ public class DistributionCenterParser {
 		
 		int serviceAreaCode = row.valueAsInteger("service_area");
 		ServiceArea serviceArea = serviceAreaFactory.fromIntCode(zone, serviceAreaCode);
-		
-		System.out.println(name + " (" + id + ") serves " + serviceArea.size() + " zones!");
-				
 
-		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location, scaleVehicles(vehicles), attempts, type, serviceArea);
+		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location, scaleVehicles(vehicles), attempts, type, serviceArea, result);
 		addCenterToServiceProvider(center, cepsp);
+
+		System.out.println(name + " (" + id + ") serves " + serviceArea.size() + " zones!");
+		result.logServiceArea(center);
+
 		return center;
 	}
 	

@@ -6,15 +6,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.time.Time;
+import lombok.Getter;
 
+@Getter
 public class TimeTable {
 	
 	private final List<Connection> connections;
-	
+
 	public TimeTable(Collection<Connection> connections) {
 		this.connections = new ArrayList<>(connections);
 	}
@@ -59,6 +62,11 @@ public class TimeTable {
 	
 	public Stream<Connection> getFreeConnectionsOnDay(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
 		return getConnectionsOnDay(origin, destination, currentTime)
-				.filter(c -> c.hasFreeCapacity());
+				.filter(Connection::hasFreeCapacity);
+	}
+	
+	@Override
+	public String toString() {
+		return "{" + connections.stream().map(Object::toString).collect(Collectors.joining("|\n")) + "}";
 	}
 }

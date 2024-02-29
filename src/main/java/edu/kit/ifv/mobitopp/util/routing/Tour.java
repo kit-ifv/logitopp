@@ -50,6 +50,7 @@ public class Tour<E> implements Iterable<E> {
 	}
 	
 	public int indexModulo(int index) {
+		if (index < 0) { return indexModulo(index + size()); }
 		return index % size();
 	}
 	
@@ -185,7 +186,12 @@ public class Tour<E> implements Iterable<E> {
 			
 		}
 		
-		return index;
+		return indexModulo(index);
+	}
+	
+	@Override
+	public String toString() {
+		return elements.toString();
 	}
 
 }

@@ -18,12 +18,27 @@ public class DeliveryVehicle {
 	private final int capacity;
 	private final List<IParcel> returningParcels;
 	private final List<IParcel> pickedUpParcels;
-	
+	private final String tag;
+
+	@Getter
+	private int currentTour = 0;
+
 	public DeliveryVehicle(VehicleType type, int capacity, DistributionCenter owner) {
 		this.id = idCnt++;
 		this.owner = owner;
 		this.type = type;
 		this.capacity = capacity;
+		this.tag = type.name() + "_" + owner.getId() + "_" + this.id;
+		this.returningParcels = new ArrayList<>();
+		this.pickedUpParcels = new ArrayList<>();
+	}
+
+	public DeliveryVehicle(VehicleType type, int capacity, DistributionCenter owner, String tag) {
+		this.id = idCnt++;
+		this.owner = owner;
+		this.type = type;
+		this.capacity = capacity;
+		this.tag = tag;
 		this.returningParcels = new ArrayList<>();
 		this.pickedUpParcels = new ArrayList<>();
 	}
@@ -37,7 +52,7 @@ public class DeliveryVehicle {
 	}
 	
 	public void unloadAndReturn(Time currentTime) {
-		owner.getResults().logUnloadEvent(this, currentTime, owner.getZoneAndLocation());
+		owner.getResults().logUnloadEvent(this, currentTour, currentTime, owner.getZoneAndLocation());
 		
 		this.returningParcels.forEach(owner::addParcel);		
 		this.returningParcels.forEach(p -> p.unload(currentTime, this));
@@ -46,12 +61,17 @@ public class DeliveryVehicle {
 		
 		this.returningParcels.clear();
 		this.pickedUpParcels.clear();
-		
+		setCurrentTour(0);
+
 		this.owner.getFleet().returnVehicle(this);
 	}
-	
+
+	public void setCurrentTour(int currentTour) {
+		this.currentTour = currentTour;
+	}
+
 	@Override
 	public String toString() {
-		return "veh_" + owner.getId() + "_" + this.id;
+		return this.tag;
 	}
 }

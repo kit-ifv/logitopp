@@ -2,7 +2,9 @@ package edu.kit.ifv.mobitopp.util.routing;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.tour.TwoApproxMetricTSP;
@@ -38,6 +40,9 @@ public class TspSolver<E> {
 	}
 
 	public Tour<E> findTour(Collection<E> elements) {
+		if (elements.isEmpty()) {
+			return new Tour<E>(List.of(), 0.0f, travelTimes);
+		}
 		
 		
 		SimpleWeightedGraph<E, DefaultWeightedEdge> graph 
@@ -70,8 +75,10 @@ public class TspSolver<E> {
 		// Use 2-approx algorithm for solving tsp
 		TwoApproxMetricTSP<E, DefaultWeightedEdge> tspAlg = new TwoApproxMetricTSP<>();
 		GraphPath<E, DefaultWeightedEdge> path = tspAlg.getTour(graph);
-		
-		return new Tour<E>(path.getVertexList(), (float) path.getWeight(), travelTimes);		
+			
+		List<E> vertexList = path.getVertexList().stream().distinct().collect(Collectors.toList());
+				
+		return new Tour<E>(vertexList, (float) path.getWeight(), travelTimes);		
 	}
 	
 }

@@ -2,6 +2,8 @@ package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,8 +23,8 @@ import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.TransferTimeMod
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class TestTimedTransportChainBuilder {
-	private CostFunction cost = new CostFunction(null);
-	private TransferTimeModel transfer = new StaticTransferTimeModel();
+	private CostFunction cost;
+	private final TransferTimeModel transfer = new StaticTransferTimeModel();
 	
 	private TransportChain chainSimple;
 	private List<DistributionCenter> hubsSimple;
@@ -38,6 +40,10 @@ public class TestTimedTransportChainBuilder {
 
 	@BeforeEach
 	public void setup() {
+		cost = mock(CostFunction.class);
+		when(cost.estimateCost(any(),any(), any(), any(), anyDouble(), anyDouble(), anyDouble())).thenReturn(4.2d);
+		when(cost.estimateLastMileCost(any(),any(), any())).thenReturn(13.37d);
+
 		DistributionCenter hub1 = mock(DistributionCenter.class);
 		when(hub1.getVehicleType()).thenReturn(VehicleType.TRUCK);
 		when(hub1.toString()).thenReturn("A1");
@@ -77,9 +83,9 @@ public class TestTimedTransportChainBuilder {
 		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainSimple, cost, transfer);
 
 		TimedTransportChain timedChain = 
-			builder.setDuration(hubs.get(0), 8, 2)
-				   .fixedDepartureAt(hubs.get(1), departure, 8, 4)
-				   .build();
+			builder.setDuration(hubs.get(0), 8, 2, 1)
+				   .fixedDepartureAt(hubs.get(1), departure, 8, 4, 1)
+				   .build().get();
 				
 		assertEquals(departure.minusMinutes(10), 	timedChain.getDeparture(hubs.get(0)));
 		assertEquals(departure, 					timedChain.getDeparture(hubs.get(1)));
@@ -94,11 +100,32 @@ public class TestTimedTransportChainBuilder {
 		
 		
 		TimedTransportChain timedChain = 
-			builder.setDuration(hubs.get(0), 8, 2)
-				   .setDuration(hubs.get(1), 5, 3)
-				   .fixedDepartureAt(hubs.get(2), departure, 8, 4)
-				   .fixedDepartureAt(hubs.get(3), departure2, 18, 6)
-				   .build();
+			builder.setDuration(hubs.get(0), 8, 2, 1)
+				   .setDuration(hubs.get(1), 5, 3,1 )
+				   .fixedDepartureAt(hubs.get(2), departure, 8, 4, 1)
+				   .fixedDepartureAt(hubs.get(3), departure2, 18, 6, 1)
+				   .build().get();
+
+		assertEquals(departure.minusMinutes(18), 	timedChain.getDeparture(hubs.get(0)));
+		assertEquals(departure.minusMinutes(8),		timedChain.getDeparture(hubs.get(1)));
+		assertEquals(departure,						timedChain.getDeparture(hubs.get(2)));
+		assertEquals(departure2,					timedChain.getDeparture(hubs.get(3)));
+		assertEquals(departure2.plusMinutes(24),	timedChain.getDeparture(hubs.get(4)));
+	}
+
+	@Test
+	public void buildInvalid() {
+		List<DistributionCenter> hubs = hubsComplex;
+
+		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainComplex, cost, transfer);
+
+
+		TimedTransportChain timedChain =
+				builder.setDuration(hubs.get(0), 8, 2, 1)
+						.setDuration(hubs.get(1), 5, 3,1 )
+						.fixedDepartureAt(hubs.get(2), departure, 8, 4, 1)
+						.fixedDepartureAt(hubs.get(3), departure2, 18, 6, 1)
+						.build().get();
 
 		assertEquals(departure.minusMinutes(18), 	timedChain.getDeparture(hubs.get(0)));
 		assertEquals(departure.minusMinutes(8),		timedChain.getDeparture(hubs.get(1)));
@@ -112,13 +139,11 @@ public class TestTimedTransportChainBuilder {
 		List<DistributionCenter> hubs = hubsNoTram;
 		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainNoTram, cost, transfer);
 		
-		builder.setDuration(hubs.get(0), 8, 2)
-			   .setDuration(hubs.get(1), 5, 3);
+		builder.setDuration(hubs.get(0), 8, 2,1)
+			   .setDuration(hubs.get(1), 5, 3, 1);
 		
 		assertThrows(IllegalStateException.class,
-			() -> {
-					builder.build();
-			}
+				builder::build
 		);
 	}
 
@@ -128,10 +153,10 @@ public class TestTimedTransportChainBuilder {
 		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainNoTram, cost, transfer);
 		
 		TimedTransportChain timedChain = 
-			builder.setDuration(hubs.get(0), 8, 2)
-				   .setDuration(hubs.get(1), 5, 3)
+			builder.setDuration(hubs.get(0), 8, 2, 1)
+				   .setDuration(hubs.get(1), 5, 3, 1)
 				   .defaultDeparture(departure2)
-				   .build();
+				   .build().get();
 		
 		assertEquals(departure2, 				timedChain.getDeparture(hubs.get(0)));
 		assertEquals(departure2.plusMinutes(10),timedChain.getDeparture(hubs.get(1)));
@@ -144,11 +169,11 @@ public class TestTimedTransportChainBuilder {
 		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainNoTram, cost, transfer);
 		
 		TimedTransportChain timedChain = 
-			builder.setDuration(hubs.get(0), 8, 2)
-				   .setDuration(hubs.get(1), 5, 3)
+			builder.setDuration(hubs.get(0), 8, 2, 1)
+				   .setDuration(hubs.get(1), 5, 3, 1)
 				   .defaultDeparture(departure2)
 				   .defaultDeparture(departure)
-				   .build();
+				   .build().get();
 		
 		assertEquals(departure2, 				timedChain.getDeparture(hubs.get(0)));
 		assertEquals(departure2.plusMinutes(10),timedChain.getDeparture(hubs.get(1)));
@@ -160,11 +185,11 @@ public class TestTimedTransportChainBuilder {
 		List<DistributionCenter> hubs = hubsComplex;
 		
 		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainComplex, cost, transfer)
-			.setDuration(hubs.get(0), 8, 2);
+			.setDuration(hubs.get(0), 8, 2, 1);
 		
 		assertThrows(IllegalStateException.class,
 			() -> {
-				builder.fixedDepartureAt(hubs.get(2), departure, 8, 4);
+				builder.fixedDepartureAt(hubs.get(2), departure, 8, 4, 1);
 			}
 		);
 	}
@@ -175,13 +200,13 @@ public class TestTimedTransportChainBuilder {
 		
 		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainComplex, cost, transfer);
 
-		builder.setDuration(hubs.get(0), 8, 2)
-			   .setDuration(hubs.get(1), 5, 3)
-			   .fixedDepartureAt(hubs.get(2), departure2, 8, 4);
+		builder.setDuration(hubs.get(0), 8, 2, 1)
+			   .setDuration(hubs.get(1), 5, 3, 1)
+			   .fixedDepartureAt(hubs.get(2), departure2, 8, 4, 1);
 				   
 	    assertThrows(IllegalArgumentException.class,
 			() -> {
-				builder.fixedDepartureAt(hubs.get(3), departure, 18, 6);
+				builder.fixedDepartureAt(hubs.get(3), departure, 18, 6, 1);
 			}
 		);
 	}

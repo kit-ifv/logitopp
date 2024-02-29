@@ -1,17 +1,14 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -120,6 +117,7 @@ public class TestChainTimeTableIntegration {
 		when(zoneRepo.getByExternalId(Mockito.anyString())).thenAnswer(input -> zoneMap.get(input.getArgument(0)));
 		
 		createServiceAreaFactory();
+		readFiles();
 	}
 	
 	private void createServiceAreaFactory() {
@@ -135,21 +133,19 @@ public class TestChainTimeTableIntegration {
 				}
 			};
 	}
-		
-	@Test
-	public void combineTimeTableAndChains() {
-	
-		DistributionCenterParser parser = new DistributionCenterParser(zoneRepo , 1.0, serviceAreaFactory);
-		
-		Collection<DistributionCenter> depots = new ArrayList<>();
-		depots.addAll(parser.parse(DC_FILE));
-		
-		Collection<CEPServiceProvider> serviceProviders = new ArrayList<>(parser.getServiceProviders());
+
+	private TimeTable timeTable;
+	private Map<Integer, DistributionCenter> depotMap;
+
+	private void readFiles() {
+		DistributionCenterParser parser = new DistributionCenterParser(zoneRepo , 1.0, serviceAreaFactory, results);
+
+		Collection<DistributionCenter> depots = new ArrayList<>(parser.parse(DC_FILE));
 		depots.addAll(parser.parse(HUB_FILE));
-		
+
 		DepotRelationsParser relationParser = new DepotRelationsParser(depots);
 		relationParser.parseRelations(RELATION_FILE);
-		
+
 		depots.forEach(d -> {
 			new DepotOperations(
 					tourChainStrategy,
@@ -158,19 +154,54 @@ public class TestChainTimeTableIntegration {
 					d,
 					results,
 					impedance);
+
 		});
-		
-		Map<Integer, DistributionCenter> depotMap = new LinkedHashMap<>();
+
+		this.depotMap = new LinkedHashMap<>();
 		depots.forEach(d -> depotMap.put(d.getId(), d));
-		
-		TimeTable timeTable = new TimeTableParser(depots).parse(TIMETABLE_FILE);
-		
-		
-		Stream<Connection> conns = timeTable.getConnectionsOnDay(depotMap.get(12), depotMap.get(9), Time.start);
-		System.out.println(conns.collect(Collectors.toList()));
-		
-		
-		
+
+		this.timeTable = new TimeTableParser(depots).parse(TIMETABLE_FILE);
+
+	}
+
+	@Test
+	public void missingConnection() {
+		DistributionCenter start = depotMap.get(7);
+		Collection<TransportChain> chains = start.getRegionalStructure().getDeliveryChains();
+
+		TransportChain tramChain = chains.stream().filter(c -> c.uses(VehicleType.TRAM)).findFirst().get();
+
+		Time departure = Time.start.plusHours(12).plusMinutes(45);
+		TimedTransportChainBuilder timedChain =
+			new TimedTransportChainBuilder(tramChain, new CostFunction(impedance), new StaticTransferTimeModel())
+					.defaultDeparture(departure)
+					.useDurationsFromStats(timeTable, impedance, departure);
+
+		assertTrue(timedChain.build().isEmpty());
+	}
+
+	@Test
+	public void buildReverseDirection() {
+		DistributionCenter start = depotMap.get(7);
+		Collection<TransportChain> chains = start.getRegionalStructure().getDeliveryChains();
+
+		TransportChain tramChain = chains.stream().filter(c -> c.uses(VehicleType.TRAM)).findFirst().get();
+		TransportChain reversed = tramChain.getOppositeDirection();
+
+		Time departure = Time.start.plusHours(15).plusMinutes(45);
+
+
+		Optional<TimedTransportChain> timedChain =
+				new TimedTransportChainBuilder(reversed, new CostFunction(impedance), new StaticTransferTimeModel())
+						.useDurationsFromStats(timeTable, impedance, Time.start)
+						.defaultDeparture(departure).build();
+
+		assertTrue(timedChain.isPresent());
+	}
+
+	@Test
+	public void combineTimeTableAndChains() {
+
 		for (int k : depotMap.keySet()) {
 			Collection<TransportChain> chains = depotMap.get(k).getRegionalStructure().getDeliveryChains();
 			
@@ -188,7 +219,7 @@ public class TestChainTimeTableIntegration {
 						TimedTransportChain timedChain = new TimedTransportChainBuilder(chain, new CostFunction(impedance), new StaticTransferTimeModel())
 															.useDurationsFromStats(timeTable, impedance, Time.start)
 															.defaultDeparture(Time.start.plusHours(7).plusMinutes(45))
-															.build();
+															.build().get();
 						System.out.println("\n" + i + ":");
 						System.out.println(timedChain);
 						timedChain.bookConnections();
@@ -198,12 +229,9 @@ public class TestChainTimeTableIntegration {
 
 				} else {
 					maxTrips /= (chain.lastMileVehicle().equals(VehicleType.BIKE)) ? 3 : 1;
-					assertEquals(chain.last().getFleet().size(), maxTrips, ""+chain+": " + chain.getVehicleTypes());
+					assertEquals(chain.last().getFleet().size(), maxTrips, chain+": " + chain.getVehicleTypes());
 				}
-				
-				
-				
-				
+
 			}
 		}
 		

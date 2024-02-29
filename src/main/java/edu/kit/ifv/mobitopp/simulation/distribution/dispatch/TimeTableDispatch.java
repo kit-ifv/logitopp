@@ -47,7 +47,5 @@ public class TimeTableDispatch implements DispatchStrategy {
 	private boolean useTimeTable(PlannedTour tour) {
 		return isInputHub != tour.isReturning();
 	}
-	
-	
 
 }

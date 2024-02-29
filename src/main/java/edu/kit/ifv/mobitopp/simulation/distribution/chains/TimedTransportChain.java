@@ -1,8 +1,10 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.chains;
 
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,26 +95,24 @@ public class TimedTransportChain extends TransportChain {
 	public TimedTransportChain getTimedTail() {
 		if (hubs.size() <= 1) { throw new IllegalArgumentException("Cannot create timed tail of chain with size <= 1"); }
 		
+		//Remove connections involving the first stop since it is not part of the tail
+		DistributionCenter first = first();
+		List<Connection> tailConnections = connections.stream().filter(c -> !c.getFrom().equals(first)).collect(toList());
+		
 		TimedTransportChain copy = new TimedTransportChain(
 				-Math.abs(id), 
-				hubs, 
+				new ArrayList<>(hubs), 
 				deliveryDirection, 
-				departures, 
-				durations, 
-				connections, 
+				new LinkedHashMap<>(departures), 
+				new LinkedHashMap<>(durations),
+				new ArrayList<>(tailConnections), 
 				-1.0, //TODO cannot compute cost/distance when dropping first hub
 				-1.0
 			);
 		
-		copy.hubs.remove(first());
-		copy.departures.remove(first());
-		copy.durations.remove(first());
-		
-		for (Connection c : copy.connections) {
-			if (c.getFrom().equals(first())) {
-				copy.connections.remove(c);
-			}
-		}
+		copy.hubs.remove(first);
+		copy.departures.remove(first);
+		copy.durations.remove(first);
 		
 		return copy;
 	}

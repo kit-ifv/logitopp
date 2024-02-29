@@ -8,15 +8,20 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public interface PlannedTour {
+
+	public int getId();
 	
 	public boolean isReturning();
 	
 	public Optional<DistributionCenter> nextHub();
+
+	public Optional<Connection > usedConnection();
 	
 	public boolean isReplanningAllowed();
 	

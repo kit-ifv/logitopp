@@ -23,26 +23,27 @@ import lombok.Setter;
  * The Class DistributionCenter represents a distribution center from where
  * delivery persons start to deliver parcels.
  */
+@Getter
 public class DistributionCenter implements NullParcelProducer, Hook {
-	@Getter private final int id;
-	@Getter private final String organization;
-	@Getter private final String name;
-	@Getter private final Zone zone;
-	@Getter private final Location location;
+	private final int id;
+	private final String organization;
+	private final String name;
+	private final Zone zone;
+	private final Location location;
 	
 	
-	@Getter private int attempts;
+	private final int attempts;
 	
-	@Getter private final DemandQuantity demandQuantity;
+	private final DemandQuantity demandQuantity;
 	
 	
-	@Getter private final DepotStorage storage;
-	@Getter private final RegionalReach regionalStructure;
-	@Getter @Setter private DepotOperations operations;
+	private final DepotStorage storage;
+	private final RegionalReach regionalStructure;
+	@Setter private DepotOperations operations;
 	
-	@Getter private final  Fleet fleet;
+	private final  Fleet fleet;
 	
-	@Getter private final Random random;
+	private final Random random;
 	
 	
 	/**
@@ -57,9 +58,10 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	 * @param attempts     the maximum number of delivery attempts
 	 * @param vehicleType  the vehicle type
 	 * @param serviceArea  the center's service area
+	 * @param results		results logger
 	 */
 	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numVehicles,
-			int attempts, VehicleType vehicleType, ServiceArea serviceArea) {
+							  int attempts, VehicleType vehicleType, ServiceArea serviceArea, DeliveryResults results) {
 		this.id = id;
 		this.name = name;
 		this.organization = organization;
@@ -71,14 +73,12 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		
 		this.storage = new DepotStorage();
 		this.regionalStructure = new RegionalReach(this, serviceArea);
-		this.fleet = new Fleet(vehicleType, numVehicles, this);
+		this.fleet = new Fleet(vehicleType, numVehicles, this, results);
 		
 		this.random = new Random(id);
-		
+
 	}
-	
-	
-	
+
 	
 	
 	@Override

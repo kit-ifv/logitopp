@@ -2,6 +2,8 @@ package edu.kit.ifv.mobitopp.simulation.parcels.box;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
@@ -14,6 +16,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
+import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
@@ -25,9 +28,6 @@ import lombok.Setter;
 
 public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console logging , later csv logging
 	
-	private static int OID_CNT = -1;
-	
-	@Getter	protected final int oId = OID_CNT--;
 	@Getter protected final boolean isPickUp = false;
 	@Getter protected final ShipmentSize shipmentSize = ShipmentSize.CONTAINER;
 	@Getter protected RecipientType recipientType = RecipientType.DISTRIBUTION_CENTER;
@@ -54,10 +54,6 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 		this.impedance = impedance;
 //		this.timeTable = timeTable;
 	}
-	
-
-	
-	
 
 	@Override
 	public boolean tryPickup(Time currentTime, DeliveryVehicle vehicle) {
@@ -91,11 +87,13 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 		VehicleType veh = (isReturning() ? consumer : producer).getVehicleType();
 		
 		//TODO respect time table!
-		preparedStop = new ParcelActivity(-1, consumer.getZoneAndLocation(), List.of(this), List.of(), vehicle, departure, -1, chain.getDuration(producer), 0);
+		int duration = chain.getDuration(producer);
+		Time arrival = departure.plusMinutes(duration);
+		preparedStop = new ParcelActivity(-1, getId(), consumer.getZoneAndLocation(), List.of(this), List.of(), vehicle, arrival, -1, duration, 0);
 		
-		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, 1, 1, 0, vehicle.getOwner().getZoneAndLocation(), -1, -1, -1);
+		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, getId(), 1, 1, 0, vehicle.getOwner().getZoneAndLocation(), -1, -1, -1);
 		
-		Time returnTime = departure.plusMinutes(chain.getDuration(producer)).plusMinutes(chain.getDuration(producer));
+		Time returnTime = departure.plusMinutes(duration).plusMinutes(duration);
 		return returnTime;
 	}
 
@@ -165,16 +163,46 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 		}
 		
 	}
+
+	public static ParcelBox spawnReturning(TimedTransportChain chain, Collection<IParcel> returning, Collection<IParcel> pickedUp, ImpedanceIfc impedance, int boxId) {
+
+		ParcelBox box = createReturning(chain, returning, pickedUp, impedance, boxId);
+		return new ReturningBoxChain(chain, impedance, box);
+	}
 	
-	public static ParcelBox createReturning(TimedTransportChain chain, Collection<IParcel> returning, Collection<IParcel> pickedUp, ImpedanceIfc impedance) {
+	public static ParcelBox createReturning(TimedTransportChain chain, Collection<IParcel> returning, Collection<IParcel> pickedUp, ImpedanceIfc impedance, int boxId) {
 		
 		if (chain.size() == 2) {
-			return new ReturningParcelBox(chain, impedance, returning, pickedUp);
+			return new ReturningParcelBox(chain, impedance, returning, pickedUp, boxId);
 		} else {
-			ParcelBox remainingTour = createReturning(chain.getTimedTail(), returning, pickedUp, impedance);
+			ParcelBox remainingTour = createReturning(chain.getTimedTail(), returning, pickedUp, impedance, boxId);
 			return new ReturningBoxChain(chain, impedance, remainingTour);
 		}
 		
 	}
+	
+	@Override
+	public String toString() {
+		return "Box[" + getId() + "] " + producer + "->" + consumer;
+	}
+
+	@Override
+	public Optional<Connection> usedConnection() {
+
+		DistributionCenter owner = chain.isDeliveryDirection() ? chain.first() : chain.tail().get(0);
+
+		if (owner.getVehicleType().equals(VehicleType.TRAM)) {
+
+			return chain.getConnections().stream()
+					.filter(c -> c.getFrom().equals(chain.first()))
+					.filter(c -> c.getTo().equals(chain.tail().get(0)))
+					.findFirst(); //there must be a connection in chain if tram is used
+
+		}
+
+		return Optional.empty();
+
+	}
+
 
 }

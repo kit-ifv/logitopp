@@ -33,6 +33,8 @@ public class TransportChainBox extends ParcelBox {
 		this.state = ParcelState.DELIVERED;
 
 		consumer.getStorage().addPlannedTour(preplannedTour);
+		
+		System.out.println("Box was delivered to " + consumer + ": " + this);
 
 		return true;
 	}
@@ -77,5 +79,19 @@ public class TransportChainBox extends ParcelBox {
 	public Optional<DistributionCenter> nextHub() {
 		return Optional.of(chain.tail().get(0));
 	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + "[" + preplannedTour + "]";
+	}
 
+	@Override
+	public int getOId() {
+		return preplannedTour.getId();
+	}
+
+	@Override
+	public int getId() {
+		return preplannedTour.getId();
+	}
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
@@ -21,29 +22,39 @@ public class Fleet {
 	private final List<DeliveryVehicle> availableVehicles;
 	private final Map<DeliveryVehicle, Time> returnTimes;
 	private final VehicleType vehicleType;
+	private final DeliveryResults results;
 	
-	public Fleet(VehicleType vehicleType, int numVehicles, DistributionCenter distributionCenter) {
+	public Fleet(VehicleType vehicleType, int numVehicles, DistributionCenter distributionCenter, DeliveryResults results) {
 		this.distributionCenter = distributionCenter;
 		this.numVehicles = numVehicles;
-		
+		this.results = results;
+
 		this.returnTimes = new LinkedHashMap<>();
 		this.vehicleType = vehicleType;
 		this.vehicles = new ArrayList<>();
 		this.availableVehicles = new ArrayList<>();
 		
 		initVehicles();
-		this.availableVehicles.addAll(vehicles);
 	}
 
 	private void initVehicles() {
 			
 		for (int i = 0; i < numVehicles; i++) {
-			vehicles.add(new DeliveryVehicle(vehicleType, 150, distributionCenter)); //TODO determine capacity in vehicle type
+			addVehicle(
+					new DeliveryVehicle(vehicleType, 150, distributionCenter)
+			); //TODO determine capacity in vehicle type
 		}
 		
 	}
+
+	public void addVehicle(DeliveryVehicle vehicle) {
+		this.vehicles.add(vehicle);
+		this.availableVehicles.add(vehicle);
+		results.logVehicle(vehicle);
+	}
 	
 	public void bookVehicleUntil(DeliveryVehicle vehicle, Time returnTime) {
+		if (vehicleType.equals(VehicleType.TRAM)) {return;}
 		if (this.returnTimes.containsKey(vehicle)) {
 			throw new IllegalArgumentException("Vehicle is already booked:" + vehicle + " until " + returnTimes.get(vehicle));
 		}
@@ -53,6 +64,7 @@ public class Fleet {
 	}
 	
 	public void returnVehicle(DeliveryVehicle vehicle) {
+		if (vehicleType.equals(VehicleType.TRAM)) {return;}
 		if (!this.returnTimes.containsKey(vehicle)) {
 			throw new IllegalArgumentException("The given vehicle is not booked and cannot be returned: " + vehicle);
 		}

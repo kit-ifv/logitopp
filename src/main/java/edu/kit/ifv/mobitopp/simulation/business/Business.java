@@ -124,7 +124,7 @@ public class Business implements ParcelAgent {
 	
 	@Override
 	public String toString() {
-		return this.id+"";
+		return "B"+this.id;
 	}
 
 

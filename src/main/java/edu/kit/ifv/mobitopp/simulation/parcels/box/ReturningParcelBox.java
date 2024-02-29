@@ -17,18 +17,26 @@ public class ReturningParcelBox extends ParcelBox {
 	
 	private final Collection<IParcel> returning;
 	private final Collection<IParcel> pickedUp;
+	private final int id;
 
-	public ReturningParcelBox(TimedTransportChain remainingChain, ImpedanceIfc impedance, Collection<IParcel> returning, Collection<IParcel> pickedUp) {
+	public ReturningParcelBox(TimedTransportChain remainingChain, ImpedanceIfc impedance, Collection<IParcel> returning, Collection<IParcel> pickedUp, int boxId) {
 		super(remainingChain, impedance);
 		this.returning = new ArrayList<>(returning);
 		this.pickedUp = new ArrayList<>(pickedUp);
+		this.id = boxId;
 	}
+
 
 	@Override
 	public boolean tryDelivery(Time currentTime, DeliveryVehicle vehicle) {
 		
+		returning.forEach(p -> p.unload(currentTime, vehicle));
 		returning.forEach(consumer::addParcel);
+		pickedUp.forEach(p -> p.tryDelivery(currentTime, vehicle));
 		pickedUp.forEach(consumer::addDelivered);
+		
+		returning.clear();
+		pickedUp.clear();
 
 		return true;
 	}
@@ -74,5 +82,20 @@ public class ReturningParcelBox extends ParcelBox {
 	public Optional<DistributionCenter> nextHub() {
 		return Optional.of(chain.last());
 	}
-	
+
+	@Override
+	public int getId() {
+		return id;
+	}
+
+	@Override
+	public int getOId() {
+		return id;
+	}
+
+	@Override
+	public String toString() {
+		return "Returning" + super.toString();
+	}
+
 }

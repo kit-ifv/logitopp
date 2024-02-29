@@ -48,13 +48,15 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 		utility.forEach((c, ul) -> util.put(c, ul.getUtility()));
 		
 		Map<TimedTransportChain, Double> probabilities = new DefaultLogitModel<TimedTransportChain>().calculateProbabilities(util);
-		probabilities.forEach((c, p) -> 
-			logUtility(choiceId, c, parcel, utility.get(c), p)
-		);		
-		
+
 		long seed = Math.round(randomNumber * Long.MAX_VALUE);
-		
-		return new TransportPreferences(choiceId, parcel, probabilities, seed);
+		TransportPreferences transportPreferences = new TransportPreferences(choiceId, parcel, probabilities, seed);
+
+		probabilities.forEach((c, p) ->
+			logUtility(choiceId, c, parcel, utility.get(c), p, transportPreferences.getSelected().equals(c))
+		);		
+
+		return transportPreferences;
 	}
 	
 	private Map<TimedTransportChain, UtilResults> computeUtilities(IParcel parcel, Collection<TimedTransportChain> choiceSet) {
@@ -131,7 +133,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 	}
 
 	
-	private void logUtility(int choiceId, TransportChain chain, IParcel parcel, UtilResults res, double probability) {
-		results.logTransportChainPreference(choiceId, parcel, chain, probability, res.utility, res.cost, res.duration, res.distance, res.capacity);
+	private void logUtility(int choiceId, TransportChain chain, IParcel parcel, UtilResults res, double probability, boolean selected) {
+		results.logTransportChainPreference(choiceId, parcel, chain, probability, res.utility, res.cost, res.duration, res.distance, res.capacity, selected);
 	}
 }

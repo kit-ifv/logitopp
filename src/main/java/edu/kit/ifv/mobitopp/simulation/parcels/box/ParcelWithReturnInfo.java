@@ -105,7 +105,7 @@ public class ParcelWithReturnInfo implements IParcel {
 			vehicle.getReturningParcels().remove(delegate);
 			returnTour.addReturning(delegate);
 		}
-		registerReturnTourBox(vehicle);
+//		registerReturnTourBox(vehicle);
 		
 		return success;
 	}
@@ -118,19 +118,21 @@ public class ParcelWithReturnInfo implements IParcel {
 			vehicle.getPickedUpParcels().remove(delegate);
 			returnTour.addPickedUp(delegate);
 		}
-		registerReturnTourBox(vehicle);
+//		registerReturnTourBox(vehicle);
 		
 		return success;
 	}
 	
 	private void registerReturnTourBox(DeliveryVehicle vehicle) {
 		if (!vehicle.getPickedUpParcels().contains(returnTour)) {
+			returnTour.load(getDeliveryTime(), vehicle);
 			vehicle.addPickedUpParcel(returnTour);
 		}
 	}
 	
 	@Override
 	public void load(Time time, DeliveryVehicle vehicle) {
+		registerReturnTourBox(vehicle);
 		delegate.load(time, vehicle);
 	}
 	
@@ -144,6 +146,20 @@ public class ParcelWithReturnInfo implements IParcel {
 		return delegate.getRecipientType();
 	}
 	
+	@Override
+	public String toString() {
+		return "(Ret)" + delegate.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return delegate.equals(obj);
+	}
+	
+	@Override
+	public int hashCode() {
+		return delegate.hashCode();
+	}
 	
 
 }

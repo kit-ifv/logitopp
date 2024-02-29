@@ -78,10 +78,17 @@ public class DepotOperations {
 
 	protected void dispatchAvailableTours(Time currentTime) {
 		
+		
+		
 		Optional<PlannedTour> tourCheck = null;
 		
 		while ((tourCheck = canDispatch(currentTime)).isPresent()) {
 			PlannedTour tour = tourCheck.get();
+			
+			System.out.println(this.center.getName() + " tries dispatch: ");
+			System.out.println(tour.getAllParcels().stream().map(p -> ";"+p.getOId()).reduce((arg0, arg1) -> arg0+arg1).orElse("[]") );
+			
+			
 			Optional<DeliveryVehicle> vehicle = dispatchStrategy.getVehicleForTour(tour, center, currentTime);
 			
 			if (vehicle.isPresent()) {
@@ -95,8 +102,10 @@ public class DepotOperations {
 	protected void dispatchTour(Time currentTime, PlannedTour tour, DeliveryVehicle vehicle) {
 		
 		Time returnTime = tour.prepare(currentTime, vehicle, impedance);
+
+		results.logPlannedTour(center, vehicle, tour, currentTime);
 		
-		scheduler.dispatchVehicle(vehicle, returnTime);
+		scheduler.dispatchVehicle(vehicle, returnTime, tour);
 		scheduler.dispatchParcelActivities(tour, currentTime);	
 		center.getStorage().pickPlannedTour(tour);
 

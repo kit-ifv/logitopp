@@ -12,13 +12,12 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
@@ -79,6 +78,10 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		//plan giant tours for distinct chains (duplicates are here ignored)
 		Map<TimedTransportChain, Tour<ParcelCluster>> initialTours = createInitialTours(deliveries, pickUps, chains, preferences);
 		
+		initialTours.values().forEach(t -> System.out.println( 
+				t.getElements().stream().flatMap(c -> c.getParcels().stream().map(IParcel::getOId)).sorted().map(Object::toString).collect(Collectors.joining(" "))
+		));
+		
 		//Some chains have multiple copies (e.g. if multiple truck vehicle are available):split demand to form smaller subtours
 		Map<TimedTransportChain, List<LastMileTour>> lastMileTours = splitToursForChainCopies(chains, initialTours);
 		
@@ -98,7 +101,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		resolveCapacityViolation(capacityViolated, validTours, removedParcels);
 		
 		List<IParcel> remaining = addRemovedParcelsToOtherExistingStops(preferences, validTours, removedParcels);
-		if (remaining.isEmpty()) {
+		if (!remaining.isEmpty()) {
 			System.out.println("Not all parcels (" + remaining.size() + ") could be included in any of their preferred/allowed tours: " + remaining.stream().map(p -> ""+p.getOId()).collect(joining(",")));
 		}
 		
@@ -111,19 +114,28 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 						
 			validTours.get(chain).forEach(tour -> {
 				
-				if (tour.tour.size() > 0) {
+				if (!tour.tour.isEmpty()) {
 					float accessEgress = tour.tour.selectMinInsertionStart(chain.last().getZoneAndLocation());
 					
-					PlannedDeliveryTour planned = new PlannedDeliveryTour(chain.lastMileVehicle(), RelativeTime.ofMinutes((int) ceil(tour.tour.getTravelTime() + accessEgress)), time, false, impedance);
-					
+					PlannedDeliveryTour plannedLastMile = new PlannedDeliveryTour(chain.lastMileVehicle(), RelativeTime.ofMinutes((int) ceil(tour.tour.getTravelTime() + accessEgress)), time, false, impedance);
+
+					PlannedTour planned;
 					if (chain.uses(VehicleType.TRAM)) { //Encode return tour here
-						fillTramTourPlan(chain, tour, accessEgress, planned);
+						fillTramTourPlan(chain, tour, accessEgress, plannedLastMile);
+						
+						planned = ParcelBox.createDelivery(chain, plannedLastMile, impedance);
 						
 					} else {
-						fillDefaultTourPlan(chain, tour, accessEgress, planned);
+						fillDefaultTourPlan(tour, plannedLastMile);
+						planned = plannedLastMile;
+					}
+					
+					if (planned.getAllParcels().stream().distinct().count() < planned.getAllParcels().size()) {
+						System.out.println("error duplicate");
 					}
 					
 					plannedTours.add(planned);
+					
 					
 				}
 				
@@ -134,17 +146,23 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		return plannedTours;
 	}
 
-	public void fillTramTourPlan(TimedTransportChain chain, LastMileTour tour, float accessEgress,
-			PlannedDeliveryTour planned) {
+	private void fillTramTourPlan(
+			TimedTransportChain chain,
+			LastMileTour tour,
+			float accessEgress,
+			PlannedDeliveryTour planned
+	) {
+		int boxId = planned.getId();
+		
 		Time returnDeparture = chain.getArrival(chain.last()).plusMinutes((int) ceil(accessEgress + tour.tour.getTravelTime()));
-		TimedTransportChain returnChain = coordinator.createReturnChain(chain, returnDeparture);
-		ParcelBox returningParcelBox =  ParcelBox.createReturning(returnChain, List.of(), List.of(), impedance);
+		TimedTransportChain returnChain = coordinator.createReturnChain(chain, returnDeparture).get();
+		ParcelBox returningParcelBox =  ParcelBox.spawnReturning(returnChain, List.of(), List.of(), impedance, boxId);
 		
 		tour.tour.iterator().forEachRemaining(stop -> {
 			Collection<IParcel> wrappedParcels = stop.getParcels()
 													 .stream()
 													 .map(p -> 
-													 		new ParcelWithReturnInfo(returningParcelBox, returningParcelBox)
+													 		new ParcelWithReturnInfo(returningParcelBox, p)
 													 ).collect(toList());
 			
 			ParcelActivityBuilder activity = new ParcelActivityBuilder(wrappedParcels, stop.getZoneAndLocation());						
@@ -153,8 +171,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		});
 	}
 	
-	public void fillDefaultTourPlan(TimedTransportChain chain, LastMileTour tour, float accessEgress,
-			PlannedDeliveryTour planned) {
+	private void fillDefaultTourPlan(LastMileTour tour, PlannedDeliveryTour planned) {
 
 		tour.tour.iterator().forEachRemaining(stop -> {
 			ParcelActivityBuilder activity = new ParcelActivityBuilder(stop.getParcels(), stop.getZoneAndLocation());						
@@ -195,7 +212,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			List<LastMileTour> nonFullTours = 
 				preferredChains.options()
 							   .stream()
-							   .flatMap(c -> validTours.get(c).stream())
+							   .flatMap(c -> validTours.getOrDefault(c, List.of()).stream())
 							   .filter(lmt -> lmt.parcels() < 150) //TODO capacity
 							   .collect(toList());
 			
@@ -463,7 +480,12 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		
 		Collection<IParcel> allParcel = combine(deliveries, pickUps);
 		Map<TimedTransportChain, List<IParcel>> initialAssignment = resolveInitialAssignment(distinctChains, preferences, allParcel);
+		
 		Map<TimedTransportChain, Collection<ParcelCluster>> clusters = computeClusters(initialAssignment);		
+		
+		clusters.values().forEach(t -> System.out.println( 
+				t.stream().flatMap(c -> c.getParcels().stream().map(IParcel::getOId)).sorted().map(Object::toString).collect(Collectors.joining(" "))
+		));
 		
 		return distinctChains.stream()
 					 .collect(Collectors.toMap(
@@ -485,7 +507,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	}
 
 	private Collection<IParcel> combine(Collection<IParcel> deliveries, Collection<IParcel> pickUps) {
-		Collection<IParcel> allParcel = new ArrayList<>(deliveries);
+		Collection<IParcel> allParcel = new LinkedHashSet<>(deliveries);
 		allParcel.addAll(pickUps);
 		return allParcel;
 	}

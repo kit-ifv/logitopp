@@ -2,21 +2,23 @@ package edu.kit.ifv.mobitopp.simulation.distribution;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 
 public class DepotStorage {
 	
-	private final Collection<IParcel> currentParcels;
+	private final Map<Integer, IParcel> currentParcels;
 	private final Collection<IParcel> collectedPickups;
-	private final Collection<IParcel> pickupRequests;
+	private final Map<Integer, IParcel> pickupRequests;
 	private final Collection<PlannedTour> plannedTours;
 	
 	public DepotStorage() {
-		this.currentParcels = new ArrayList<>();
+		this.currentParcels = new LinkedHashMap<>();
 		this.collectedPickups = new ArrayList<>();
-		this.pickupRequests = new ArrayList<>();
+		this.pickupRequests = new LinkedHashMap<>();
 		
 		this.plannedTours = new ArrayList<>();
 		
@@ -24,44 +26,44 @@ public class DepotStorage {
 	
 	
 	public void addParcel(IParcel parcel) {
-		this.currentParcels.add(parcel);
+		this.currentParcels.put(parcel.getOId(), parcel);
 	}
 	
 	public void addParcels(Collection<IParcel> parcels) {
-		this.currentParcels.addAll(parcels);
+		parcels.forEach(this::addParcel);
 	}
 	
 	public void removeParcel(IParcel parcel) {
-		this.currentParcels.remove(parcel);
+		this.currentParcels.remove(parcel.getOId());
 	}
 	
 	public void removeParcels(Collection<IParcel> parcels) {
-		this.currentParcels.removeAll(parcels);
+		parcels.forEach(this::removeParcel);
 	}
 	
 	public Collection<IParcel> getParcels() {
-		return this.currentParcels;
+		return this.currentParcels.values();
 	}
 	
 	
 	public void addRequest(IParcel request) {
-		this.pickupRequests.add(request);
+		this.pickupRequests.put(request.getOId(), request);
 	}
 	
 	public void addRequests(Collection<IParcel> requests) {
-		this.pickupRequests.addAll(requests);
+		requests.forEach(this::addRequest);
 	}
 	
 	public void removeRequest(IParcel parcel) {
-		this.pickupRequests.remove(parcel);
+		this.pickupRequests.remove(parcel.getOId());
 	}
 	
 	public void removeRequests(Collection<IParcel> parcels) {
-		this.pickupRequests.removeAll(parcels);
+		parcels.forEach(this::removeRequest);
 	}
 	
 	public Collection<IParcel> getRequests() {
-		return this.pickupRequests; //TODO only return view?
+		return this.pickupRequests.values(); //TODO only return view?
 	}
 	
 	

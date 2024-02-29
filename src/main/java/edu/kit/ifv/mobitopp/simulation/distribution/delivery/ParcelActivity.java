@@ -2,6 +2,8 @@ package edu.kit.ifv.mobitopp.simulation.distribution.delivery;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
@@ -14,6 +16,7 @@ import lombok.Getter;
 public class ParcelActivity {
 	
 	protected final int no;
+	protected final int tourId;
 	protected final Collection<IParcel> parcels;
 	protected final Collection<IParcel> pickUps;
 	protected final ZoneAndLocation stopLocation;
@@ -23,8 +26,9 @@ public class ParcelActivity {
 	protected final int deliveryDuration;
 	protected final DeliveryVehicle vehicle;
 	
-	public ParcelActivity(int no, ZoneAndLocation stopLocation, Collection<IParcel> parcels, Collection<IParcel> pickUps, DeliveryVehicle vehicle, Time plannedTime, double distance, int tripDuration, int deliveryDuration) {
+	public ParcelActivity(int no, int tourId, ZoneAndLocation stopLocation, Collection<IParcel> parcels, Collection<IParcel> pickUps, DeliveryVehicle vehicle, Time plannedTime, double distance, int tripDuration, int deliveryDuration) {
 		this.no = no;
+		this.tourId = tourId;
 		this.parcels = new ArrayList<>(parcels);
 		this.pickUps = new ArrayList<>(pickUps);
 		this.stopLocation = stopLocation;
@@ -60,8 +64,19 @@ public class ParcelActivity {
 		int successDelivery =  new ArrayList<>(parcels).stream().mapToInt(p -> p.tryDelivery(currentTime, vehicle) ? 1 : 0).sum();
 		int successPickUp = new ArrayList<>(pickUps).stream().mapToInt(p -> p.tryPickup(currentTime, vehicle) ? 1 : 0).sum();
 		
-		vehicle.getOwner().getResults().logStopEvent(vehicle, currentTime, no, getParcels().size(), successDelivery, getPickUps().size(), successPickUp, stopLocation, distance, tripDuration, deliveryDuration);
+		vehicle.getOwner().getResults().logStopEvent(vehicle, currentTime, no, tourId, getParcels().size(), successDelivery, getPickUps().size(), successPickUp, stopLocation, distance, tripDuration, deliveryDuration);
 	};
+	
+	public Collection<IParcel> getAllParcels() {
+		List<IParcel> list = new ArrayList<>(parcels);
+		list.addAll(pickUps);
+		return list;
+	}
+	
+	@Override
+	public String toString() {
+		return "Delivery " + no + " by " + vehicle + " at " + plannedTime + ":" + getAllParcels().stream().map(IParcel::getOId).collect(Collectors.toList());
+	}
 
 
 }

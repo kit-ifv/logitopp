@@ -31,4 +31,19 @@ public class ReturningBoxChain extends TransportChainBox {
 		this.remainingTour.addReturning(parcel);
 	}
 	
+	@Override
+	public String toString() {
+		return "ReturnTour" + super.toString();
+	}
+
+	@Override
+	public int getOId() {
+		return remainingTour.getOId();
+	}
+
+	@Override
+	public int getId() {
+		return remainingTour.getId();
+	}
+
 }

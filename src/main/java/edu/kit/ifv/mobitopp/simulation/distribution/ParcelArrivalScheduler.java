@@ -47,13 +47,15 @@ public class ParcelArrivalScheduler implements Hook {
 		this.lastProcessed = Time.start.plus(date.fromStart());
 	}
 	
-	public void dispatchVehicle(DeliveryVehicle vehicle, Time returnTime) {
+	public void dispatchVehicle(DeliveryVehicle vehicle, Time returnTime, PlannedTour tour) {
 		if (returnTime.isBefore(lastProcessed)) {
 			System.err.println("Cannot dispatch vehicle due to return in the past: est. return " + returnTime + ", simulation time " + lastProcessed);
 		}
 		
-		vehicleReturnTimes.merge(returnTime, new ArrayList<>(List.of(vehicle)), this::mergeIntoFirst);		
-		vehicle.getOwner().getFleet().bookVehicleUntil(vehicle, returnTime);		
+		vehicleReturnTimes.merge(returnTime, new ArrayList<>(List.of(vehicle)), this::mergeIntoFirst);
+		vehicle.setCurrentTour(tour.getId());
+
+		vehicle.getOwner().getFleet().bookVehicleUntil(vehicle, returnTime);
 	}
 	
 	public void dispatchParcelActivities(PlannedTour tour, Time currentTime) {
