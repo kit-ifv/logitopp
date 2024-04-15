@@ -32,6 +32,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference.TransportPreferences;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.planning.TourPlanningStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.box.BoxOnBike;
 import edu.kit.ifv.mobitopp.simulation.parcels.box.ParcelBox;
 import edu.kit.ifv.mobitopp.simulation.parcels.box.ParcelWithReturnInfo;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
@@ -117,7 +118,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				if (!tour.tour.isEmpty()) {
 					float accessEgress = tour.tour.selectMinInsertionStart(chain.last().getZoneAndLocation());
 					
-					PlannedDeliveryTour plannedLastMile = new PlannedDeliveryTour(chain.lastMileVehicle(), RelativeTime.ofMinutes((int) ceil(tour.tour.getTravelTime() + accessEgress)), time, false, impedance);
+					PlannedDeliveryTour plannedLastMile = new PlannedDeliveryTour(chain.lastMileVehicle(), RelativeTime.ofMinutes((int) ceil(tour.tour.getTravelTime() + accessEgress)), time, false, impedance, chain.last());
 
 					PlannedTour planned;
 					if (chain.uses(VehicleType.TRAM)) { //Encode return tour here
@@ -156,7 +157,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		
 		Time returnDeparture = chain.getArrival(chain.last()).plusMinutes((int) ceil(accessEgress + tour.tour.getTravelTime()));
 		TimedTransportChain returnChain = coordinator.createReturnChain(chain, returnDeparture).get();
-		ParcelBox returningParcelBox =  ParcelBox.spawnReturning(returnChain, List.of(), List.of(), impedance, boxId);
+		BoxOnBike returningParcelBox =  ParcelBox.createBoxOnBike(returnChain, List.of(), List.of(), impedance, boxId);
 		
 		tour.tour.iterator().forEachRemaining(stop -> {
 			Collection<IParcel> wrappedParcels = stop.getParcels()

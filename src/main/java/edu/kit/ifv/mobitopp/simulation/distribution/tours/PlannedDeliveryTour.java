@@ -22,12 +22,11 @@ import lombok.Getter;
 
 @Getter
 public class PlannedDeliveryTour implements PlannedTour {
+	public static int tourIdCnt;
 
-	private static int idCnt = -1;
-	
 	private final boolean isReturning = false;
 
-	private final int id = idCnt--;
+	private final int id = tourIdCnt--;
 	private final List<ParcelActivityBuilder> stops;
 	private final List<ParcelActivity> preparedStops;
 	private final VehicleType vehicleType;
@@ -35,8 +34,10 @@ public class PlannedDeliveryTour implements PlannedTour {
 	private final Time plannedAt;
 	private final boolean replanningAllowed;
 	private final ImpedanceIfc impedance;
+	private final DistributionCenter depot;
 	
-	public PlannedDeliveryTour(VehicleType vehicleType, RelativeTime plannedDuration, Time plannedAt, boolean replan, ImpedanceIfc impedance) {
+	public PlannedDeliveryTour(VehicleType vehicleType, RelativeTime plannedDuration, Time plannedAt, boolean replan, ImpedanceIfc impedance, DistributionCenter depot) {
+		this.depot = depot;
 		this.stops = new ArrayList<>();
 		this.preparedStops = new  ArrayList<>();
 		this.vehicleType = vehicleType;
@@ -46,8 +47,8 @@ public class PlannedDeliveryTour implements PlannedTour {
 		this.impedance = impedance;
 	}
 	
-	public PlannedDeliveryTour(VehicleType vehicleType, List<ParcelActivityBuilder> plannedStops, RelativeTime plannedDuration, Time plannedAt, boolean replan, ImpedanceIfc impedance) {
-		this(vehicleType, plannedDuration, plannedAt, replan, impedance);
+	public PlannedDeliveryTour(VehicleType vehicleType, List<ParcelActivityBuilder> plannedStops, RelativeTime plannedDuration, Time plannedAt, boolean replan, ImpedanceIfc impedance, DistributionCenter depot) {
+		this(vehicleType, plannedDuration, plannedAt, replan, impedance, depot);
 		addStops(plannedStops);
 	}
 	
@@ -151,6 +152,16 @@ public class PlannedDeliveryTour implements PlannedTour {
 		List<IParcel> list = new ArrayList<>(getDeliveryParcels());
 		list.addAll(getPickUpRequests());
 		return list;
+	}
+
+	@Override
+	public int journeyId() {
+		return id;
+	}
+
+	@Override
+	public DistributionCenter depot() {
+		return depot;
 	}
 
 	@Override

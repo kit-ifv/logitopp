@@ -90,10 +90,8 @@ public class DepotOperations {
 			
 			
 			Optional<DeliveryVehicle> vehicle = dispatchStrategy.getVehicleForTour(tour, center, currentTime);
-			
-			if (vehicle.isPresent()) {
-				dispatchTour(currentTime, tour, vehicle.get());
-			}
+
+            vehicle.ifPresent(deliveryVehicle -> dispatchTour(currentTime, tour, deliveryVehicle));
 			
 		}
 		

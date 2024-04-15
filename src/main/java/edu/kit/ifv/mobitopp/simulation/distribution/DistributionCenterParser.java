@@ -15,11 +15,13 @@ import edu.kit.ifv.mobitopp.data.ZoneRepository;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceArea;
 import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceAreaFactory;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
 import edu.kit.ifv.mobitopp.util.dataimport.Row;
+import edu.kit.ifv.mobitopp.util.location.LocationProvider;
 
 /**
  * The Class DistributionCenterParser is a csv parser for
@@ -28,30 +30,33 @@ import edu.kit.ifv.mobitopp.util.dataimport.Row;
 public class DistributionCenterParser {
 	private final ZoneRepository zoneRepo;
 	private final double scaleFactor;
+	private final LocationProvider locationProvider;
 	
 	private final Map<String, CEPServiceProvider> serviceProviders;
-	private ServiceAreaFactory serviceAreaFactory;
-	private DeliveryResults result;
+	private final ServiceAreaFactory serviceAreaFactory;
+	private final DeliveryResults result;
 	
 	/**
 	 * Instantiates a new distribution center parser.
 	 *
-	 * @param zoneRepo    the zone repository for assigning depot location
-	 * @param scaleFactor the scale factor to scale the fleet
-	 * @param result     the results logger
+	 * @param zoneRepo           the zone repository for assigning depot location
+	 * @param scaleFactor        the scale factor to scale the fleet
+	 * @param locationProvider	 a factory for creating {@link edu.kit.ifv.mobitopp.simulation.ZoneAndLocation} from x/y coordinate
 	 * @param serviceAreaFactory a factory to create service areas
+	 * @param result             the results logger
 	 */
-	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ServiceAreaFactory serviceAreaFactory, DeliveryResults result) {
+	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, LocationProvider locationProvider, ServiceAreaFactory serviceAreaFactory, DeliveryResults result) {
 		this.zoneRepo = zoneRepo;
 		this.scaleFactor = scaleFactor;
+		this.locationProvider = locationProvider;
 		this.serviceAreaFactory = serviceAreaFactory;
 		
 		this.serviceProviders = new LinkedHashMap<>();
 		this.result = result;
 	}
 	
-	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance, DeliveryResults result) {
-		this(zoneRepo, scaleFactor, new ServiceAreaFactory(zoneRepo, impedance), result);
+	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance, DeliveryResults result, LocationProvider locationProvider) {
+		this(zoneRepo, scaleFactor, locationProvider, new ServiceAreaFactory(zoneRepo, impedance), result);
 	}
 	
 	public Collection<DistributionCenter> parse(File file) {
@@ -90,10 +95,11 @@ public class DistributionCenterParser {
 
 		double x = row.valueAsDouble("loc_x");
 		double y = row.valueAsDouble("loc_y");
-		Location location = new Location(new Point2D.Double(x, y), 0, 0.5);
 
 		String zoneId = row.get("zone");
 		Zone zone = zoneRepo.getByExternalId(zoneId);
+
+		ZoneAndLocation location = locationProvider.getZoneAndLocation(x, y, zone);
 		
 		int vehicleType = row.valueAsInteger("vehicle_type");
 		VehicleType type = VehicleType.fromInt(vehicleType);
@@ -101,7 +107,7 @@ public class DistributionCenterParser {
 		int serviceAreaCode = row.valueAsInteger("service_area");
 		ServiceArea serviceArea = serviceAreaFactory.fromIntCode(zone, serviceAreaCode);
 
-		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location, scaleVehicles(vehicles), attempts, type, serviceArea, result);
+		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location.location(), scaleVehicles(vehicles), attempts, type, serviceArea, result);
 		addCenterToServiceProvider(center, cepsp);
 
 		System.out.println(name + " (" + id + ") serves " + serviceArea.size() + " zones!");

@@ -336,7 +336,7 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 	}
 
 	private PlannedDeliveryTour newTour(DeliveryVehicle vehicle, Time time, RelativeTime duration) {
-		return new PlannedDeliveryTour(vehicle.getType(), duration, time, true, impedance);
+		return new PlannedDeliveryTour(vehicle.getType(), duration, time, true, impedance, vehicle.getOwner());
 	}
 	
 //	@Override

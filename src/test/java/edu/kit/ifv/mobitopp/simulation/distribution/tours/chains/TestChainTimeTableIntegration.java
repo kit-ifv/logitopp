@@ -9,9 +9,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import edu.kit.ifv.mobitopp.util.location.DummyLocationProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -22,7 +21,6 @@ import edu.kit.ifv.mobitopp.data.ZoneRepository;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
-import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DepotOperations;
 import edu.kit.ifv.mobitopp.simulation.distribution.DepotRelationsParser;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
@@ -35,11 +33,8 @@ import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceArea;
 import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceAreaFactory;
-import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTableParser;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.CostFunction;
-import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.StaticTransferTimeModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.planning.TourPlanningStrategy;
 import edu.kit.ifv.mobitopp.time.Time;
 
@@ -138,7 +133,7 @@ public class TestChainTimeTableIntegration {
 	private Map<Integer, DistributionCenter> depotMap;
 
 	private void readFiles() {
-		DistributionCenterParser parser = new DistributionCenterParser(zoneRepo , 1.0, serviceAreaFactory, results);
+		DistributionCenterParser parser = new DistributionCenterParser(zoneRepo , 1.0, new DummyLocationProvider(), serviceAreaFactory, results);
 
 		Collection<DistributionCenter> depots = new ArrayList<>(parser.parse(DC_FILE));
 		depots.addAll(parser.parse(HUB_FILE));

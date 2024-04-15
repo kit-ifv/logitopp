@@ -9,7 +9,9 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 
 import edu.kit.ifv.mobitopp.simulation.Location;
+import edu.kit.ifv.mobitopp.simulation.SimulationContext;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
+import edu.kit.ifv.mobitopp.util.location.DummyLocationProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +30,10 @@ public class BusinessParserTest {
 		ZoneRepository repo = mock(ZoneRepository.class);
 		when(repo.getByExternalId(any())).thenReturn(zone);
 
-		parser = new BusinessParser(repo, null, null) {
+		SimulationContext context = mock(SimulationContext.class);
+		when(context.zoneRepository()).thenReturn(repo);
+
+		parser = new BusinessParser(context, new DummyLocationProvider()) {
 			protected ZoneAndLocation getZoneAndLocation(double x, double y, Zone zone) {
 				return new ZoneAndLocation(
 						zone,

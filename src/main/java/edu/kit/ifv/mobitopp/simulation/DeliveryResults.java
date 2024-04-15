@@ -48,6 +48,7 @@ public class DeliveryResults {
 	private final static Category resultCategoryPlannedTour = createResultCategoryPlannedTour();
 	private final static Category resultCategoryNode = createResultCategoryNode();
 	private final static Category resultCategoryEdge = createResultCategoryEdge();
+	private final static Category resultCategoryDepotLocation = createResultCategoryDepotLocation();
 
 	private final Results results;
 
@@ -61,8 +62,14 @@ public class DeliveryResults {
 		this.results = results;
 	}
 
-	private static String locationDataLog(ZoneAndLocation start) {
+	private static String locationDataLog(ZoneAndLocation start, DistributionCenter depot) {
 		String row = "";
+		if (depot != null) {
+			row += depot.getName() + SEP;
+			row += depot.getId() + SEP;
+		} else {
+			row += SEP + SEP;
+		}
 		row += start.zone().getId().getExternalId() + SEP;
 		row += start.location().coordinatesP().getX() + SEP;
 		row += start.location().coordinatesP().getY() + SEP;
@@ -77,26 +84,44 @@ public class DeliveryResults {
 			PlannedTour tour,
 			Time currentTime
 	) {
+		DistributionCenter owner = vehicle.getOwner();
+
 		String header = "";
 
 		header += tour.getId() + SEP;
+		header += tour.journeyId() + SEP;
 		header += tour + SEP;
+		header += tour.isReturning() + SEP;
+
 		header += center.getName() + SEP;
 		header += center.getId() + SEP;
 		header += currentTime + SEP;
 		header += currentTime.toMinutes() + SEP;
+
 		header += vehicle.getId() + SEP;
 		header += vehicle.getTag() + SEP;
 		header += vehicle.getType().asInt() + SEP;
 
-		ZoneAndLocation start = center.getZoneAndLocation();
+		DistributionCenter fromDepot = vehicle.getOwner();
+		DistributionCenter toDepot;
+		if (tour.isReturning()) {
+			toDepot = tour.depot();
+		} else {
+			toDepot = tour.nextHub().orElse(null);
+		}
+
+		ZoneAndLocation start = owner.getZoneAndLocation();
 		ZoneAndLocation destination;
 		for (ParcelActivity stop : tour.getPreparedStops()) {
 			destination = stop.getStopLocation();
 
+			if (tour.isReturning()) { //in this case tour should currently only have length 1
+				destination = tour.depot().getZoneAndLocation();
+			}
+
 			String row = header;
-			row += locationDataLog(start);
-			row += locationDataLog(destination);
+			row += locationDataLog(start, fromDepot);
+			row += locationDataLog(destination, toDepot);
 			row += stop.getNo() + SEP;
 			row += stop.getPlannedTime() + SEP;
 			row += stop.getPlannedTime().toMinutes() + SEP;
@@ -104,22 +129,32 @@ public class DeliveryResults {
 			row += stop.getTripDuration() + SEP;
 			row += stop.getDeliveryDuration() + SEP;
 
-			row += stop.getParcels().stream().map(p -> p.getOId()+"").collect(Collectors.joining(",")) + SEP;
-			row += stop.getPickUps().stream().map(p -> p.getOId()+"").collect(Collectors.joining(",")) + SEP;
+			fromDepot=null;
+			toDepot=null;
 
-			row += stop.getParcels()
+			String deliveries = stop.getParcels().stream().map(p -> p.getOId()+"").collect(Collectors.joining(","));
+			String pickups = stop.getPickUps().stream().map(p -> p.getOId()+"").collect(Collectors.joining(","));
+
+			String nestedDeliveries = stop.getParcels()
 					.stream()
 					.filter(p -> p instanceof PlannedTour)
 					.flatMap(t -> ((PlannedTour) t).getDeliveryParcels().stream())
 					.map(p -> p.getOId()+"")
-					.collect(Collectors.joining(",")) + SEP;
+					.collect(Collectors.joining(","));
 
-			row += stop.getParcels()
+			String plannedPickups =  stop.getParcels()
 					.stream()
 					.filter(p -> p instanceof PlannedTour)
 					.flatMap(t -> ((PlannedTour) t).getPickUpRequests().stream())
 					.map(p -> p.getOId()+"")
 					.collect(Collectors.joining(","));
+
+			if (tour.isReturning()) {
+				row += SEP + pickups + (!pickups.isEmpty() && !deliveries.isEmpty() ? "," : "") + deliveries + SEP;
+				row += SEP + nestedDeliveries + SEP;
+			} else {
+				row += deliveries + SEP + pickups + SEP + nestedDeliveries + SEP + SEP + plannedPickups;
+			}
 
 			results.write(resultCategoryPlannedTour, row);
 
@@ -133,13 +168,13 @@ public class DeliveryResults {
 	public static Category createResultCategoryPlannedTour() {
 		return new Category("planned-tours",
 			Arrays.asList(
-					"tourId", "tourDescription", "distributionCenter", "distributionCenterId",
-					"dispatchTime", "dispatchSimMin",
+					"tourId", "journeyId", "tourDescription", "isReturning",
+					"dispatcher", "dispatcherId", "dispatchTime", "dispatchSimMin",
 					"vehicleId", "vehicleTag", "vehicleType",
-					"fromZone", "fromX", "fromY", "fromEdge", "fromEdgePos",
-					"toZone", "toX", "toY", "toEdge", "toEdgePos",
+					"fromDepot", "fromDepotId", "fromZone", "fromX", "fromY", "fromEdge", "fromEdgePos",
+					"toDepot", "toDepotId", "toZone", "toX", "toY", "toEdge", "toEdgePos",
 					"stopNo", "plannedTime", "plannedTimeSimMin", "distance", "tripDur", "deliveryDur",
-					"deliveries", "pickups", "nestedDeliveries", "nestedPickups"
+					"deliveries", "pickups", "nestedDeliveries", "nestedPickups", "plannedLastMilePickups"
 			)
 		);
 	}
@@ -187,6 +222,29 @@ public class DeliveryResults {
 	public static Category createResultCategoryBusinessLocation() {
 		return new Category("business-location",
 				Arrays.asList("business","id", "zone", "x", "y", "edge", "pos"));
+	}
+
+	public void logDepotPosition(DistributionCenter dc) {
+		ZoneAndLocation zoneAndLocation = dc.getZoneAndLocation();
+		Location location = zoneAndLocation.location();
+		Point2D coordinates = location.coordinatesP();
+
+		String msg = "";
+
+		msg += dc.getName() + SEP;
+		msg += dc.getId() + SEP;
+		msg += zoneAndLocation.zone().getId().getExternalId() + SEP;
+		msg += coordinates.getX() + SEP;
+		msg += coordinates.getY() + SEP;
+		msg += location.roadAccessEdgeId() + SEP;
+		msg += location.roadPosition();
+
+		results.write(resultCategoryDepotLocation, msg);
+	}
+
+	public static Category createResultCategoryDepotLocation() {
+		return new Category("depot-location",
+				Arrays.asList("depot","id", "zone", "x", "y", "edge", "pos"));
 	}
 
 	public void logNode(VisumNode node) {
@@ -354,11 +412,9 @@ public class DeliveryResults {
 		msg += person + SEP;
 		msg += household + SEP;
 		msg += destination + SEP;
-		msg += locationDataLog(recipientLoc);
+		msg += locationDataLog(recipientLoc, distributionCenter);
 		msg += day + SEP;
 		msg += currentTime.toString() + SEP;
-		msg += distributionCenter.getName() + SEP;
-		msg += distributionCenter.getId() + SEP;
 		msg += distributionCenter.getZone().getId().getExternalId() + SEP;
 		msg += distributionCenter.getLocation().coordinatesP().getX() + SEP;
 		msg += distributionCenter.getLocation().coordinatesP().getY();
@@ -374,8 +430,9 @@ public class DeliveryResults {
 	public static Category createResultCategoryPrivateOrder() {
 		return new Category("parcel-orders-private",
 				Arrays.asList("ParcelID", "Size", "RecipientID", "HouseholdID", "DestinationType",
+						"DistributionCenter", "DistributionCenterID",
 						"DestinationZone", "DestinationX", "DestinationY", "DestinationEdge", "DestinationEdgePos",
-						"ArrivalDay", "ArrivalTime", "DistributionCenter", "DistributionCenterID",
+						"ArrivalDay", "ArrivalTime",
 						"DcZone", "DcX", "DcY"));
 	}
 

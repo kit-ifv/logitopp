@@ -2,7 +2,6 @@ package edu.kit.ifv.mobitopp.simulation.parcels.box;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.data.Zone;
@@ -27,6 +26,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console logging , later csv logging
+
+	@Getter protected final int id = PlannedDeliveryTour.tourIdCnt--;
 	
 	@Getter protected final boolean isPickUp = false;
 	@Getter protected final ShipmentSize shipmentSize = ShipmentSize.CONTAINER;
@@ -88,13 +89,13 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 		
 		//TODO respect time table!
 		int duration = chain.getDuration(producer);
+		float distance = impedance.getDistance(producer.getZone().getId(), consumer.getZone().getId());
 		Time arrival = departure.plusMinutes(duration);
-		preparedStop = new ParcelActivity(-1, getId(), consumer.getZoneAndLocation(), List.of(this), List.of(), vehicle, arrival, -1, duration, 0);
+		preparedStop = new ParcelActivity(1, getId(), consumer.getZoneAndLocation(), List.of(this), List.of(), vehicle, arrival, distance, duration, 5); //TODO transfer time model
 		
-		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, getId(), 1, 1, 0, vehicle.getOwner().getZoneAndLocation(), -1, -1, -1);
-		
-		Time returnTime = departure.plusMinutes(duration).plusMinutes(duration);
-		return returnTime;
+		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, getId(), 1, 1, 0, vehicle.getOwner().getZoneAndLocation(), distance, duration, 5);
+
+        return departure.plusMinutes(duration).plusMinutes(duration);
 	}
 
 	@Override
@@ -126,6 +127,11 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 	@Override
 	public void setConsumer(ParcelAgent producer) {
 		throw new UnsupportedOperationException("Croducer cannot be changed in preplanned tour parcels");
+	}
+
+	@Override
+	public DistributionCenter depot() {
+		return chain.first();
 	}
 
 	@Override
@@ -164,10 +170,10 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 		
 	}
 
-	public static ParcelBox spawnReturning(TimedTransportChain chain, Collection<IParcel> returning, Collection<IParcel> pickedUp, ImpedanceIfc impedance, int boxId) {
+	public static BoxOnBike createBoxOnBike(TimedTransportChain chain, Collection<IParcel> returning, Collection<IParcel> pickedUp, ImpedanceIfc impedance, int boxId) {
 
 		ParcelBox box = createReturning(chain, returning, pickedUp, impedance, boxId);
-		return new ReturningBoxChain(chain, impedance, box);
+		return new BoxOnBike(box);
 	}
 	
 	public static ParcelBox createReturning(TimedTransportChain chain, Collection<IParcel> returning, Collection<IParcel> pickedUp, ImpedanceIfc impedance, int boxId) {
@@ -183,7 +189,7 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 	
 	@Override
 	public String toString() {
-		return "Box[" + getId() + "] " + producer + "->" + consumer;
+		return "Box[" + getId() + "] " + depot().getName() + "->" + nextHub().get().getName();
 	}
 
 	@Override
@@ -203,6 +209,5 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 		return Optional.empty();
 
 	}
-
 
 }

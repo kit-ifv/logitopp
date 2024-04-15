@@ -9,6 +9,7 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelState;
@@ -70,6 +71,11 @@ public class TransportChainBox extends ParcelBox {
 	}
 
 	@Override
+	public VehicleType getVehicleType() {
+		return chain.firstMileVehicle();
+	}
+
+	@Override
 	public void addReturning(IParcel parcel) {}
 
 	@Override
@@ -87,11 +93,11 @@ public class TransportChainBox extends ParcelBox {
 
 	@Override
 	public int getOId() {
-		return preplannedTour.getId();
+		return preplannedTour.journeyId();
 	}
 
 	@Override
-	public int getId() {
-		return preplannedTour.getId();
+	public int journeyId() {
+		return preplannedTour.journeyId();
 	}
 }

@@ -23,7 +23,8 @@ import lombok.ToString;
 @ToString
 public abstract class BaseParcel implements IParcel {
 
-	private static int OID_CNT = 0;
+	public static int OID_CNT = 0;
+
 	@Getter
 	protected final int oId = OID_CNT++;
 

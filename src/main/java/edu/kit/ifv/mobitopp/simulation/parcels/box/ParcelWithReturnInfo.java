@@ -13,10 +13,10 @@ import edu.kit.ifv.mobitopp.time.Time;
 
 public class ParcelWithReturnInfo implements IParcel {
 	
-	private final ParcelBox returnTour;
+	private final BoxOnBike returnTour;
 	private final IParcel delegate;
 	
-	public ParcelWithReturnInfo(ParcelBox returnTour, IParcel delegate) {
+	public ParcelWithReturnInfo(BoxOnBike returnTour, IParcel delegate) {
 		this.returnTour = returnTour;
 		this.delegate = delegate;
 	}

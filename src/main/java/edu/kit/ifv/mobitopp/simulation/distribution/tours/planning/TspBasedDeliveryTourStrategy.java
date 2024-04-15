@@ -98,7 +98,7 @@ public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 		
 			}
 
-			plannedTours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, time.differenceTo(currentTime), currentTime, true, impedance));
+			plannedTours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, time.differenceTo(currentTime), currentTime, true, impedance, vehicle.getOwner()));
 			giantTour.removeAll(assigned);
 		}
 

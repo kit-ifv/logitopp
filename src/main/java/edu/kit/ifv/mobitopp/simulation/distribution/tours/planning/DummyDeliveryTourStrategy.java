@@ -39,7 +39,7 @@ public class DummyDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 			counter = counter.minusMinutes(activity.withDuration(durationModel).getDeliveryMinutes() + 5);
 			
 			if (counter.isNegative())  {
-				tours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, maxTourDuration.minus(counter), currentTime, true, impedance));
+				tours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, maxTourDuration.minus(counter), currentTime, true, impedance, vehicle.getOwner()));
 				assigned = new ArrayList<>();
 				counter = copy(maxTourDuration);
 				
@@ -50,7 +50,7 @@ public class DummyDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 		}
 		
 		if (!assigned.isEmpty()) {
-			tours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, maxTourDuration.minus(counter), currentTime, true, impedance));
+			tours.add(new PlannedDeliveryTour(vehicle.getType(), assigned, maxTourDuration.minus(counter), currentTime, true, impedance, vehicle.getOwner()));
 		}
 		
 

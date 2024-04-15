@@ -38,7 +38,7 @@ public class ExternalPyTourPlanning extends ClusterTourPlanningStrategy {
 		//build tours from stops
 		// compute planned duration with return time to vehicle.owner.zone
 		RelativeTime plannedDuration = RelativeTime.ofMinutes(42);
-		PlannedDeliveryTour tour = new PlannedDeliveryTour(vehicle.getType(), plannedDuration, departure, true, impedance);
+		PlannedDeliveryTour tour = new PlannedDeliveryTour(vehicle.getType(), plannedDuration, departure, true, impedance, vehicle.getOwner());
 		tour.addStops(null); //add stops of parsed tour by id
 		
 		

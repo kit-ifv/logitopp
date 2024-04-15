@@ -9,6 +9,7 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -17,13 +18,13 @@ public class ReturningParcelBox extends ParcelBox {
 	
 	private final Collection<IParcel> returning;
 	private final Collection<IParcel> pickedUp;
-	private final int id;
+	private final int journeyId;
 
-	public ReturningParcelBox(TimedTransportChain remainingChain, ImpedanceIfc impedance, Collection<IParcel> returning, Collection<IParcel> pickedUp, int boxId) {
+	public ReturningParcelBox(TimedTransportChain remainingChain, ImpedanceIfc impedance, Collection<IParcel> returning, Collection<IParcel> pickedUp, int journeyId) {
 		super(remainingChain, impedance);
 		this.returning = new ArrayList<>(returning);
 		this.pickedUp = new ArrayList<>(pickedUp);
-		this.id = boxId;
+		this.journeyId = journeyId;
 	}
 
 
@@ -65,12 +66,12 @@ public class ReturningParcelBox extends ParcelBox {
 
 	@Override
 	public Collection<IParcel> getDeliveryParcels() {
-		return returning;
+		return getAllParcels();
 	}
 
 	@Override
 	public Collection<IParcel> getPickUpRequests() {
-		return pickedUp;
+		return List.of();
 	}
 
 	@Override
@@ -84,18 +85,23 @@ public class ReturningParcelBox extends ParcelBox {
 	}
 
 	@Override
-	public int getId() {
-		return id;
+	public int getOId() {
+		return journeyId;
 	}
 
 	@Override
-	public int getOId() {
-		return id;
+	public int journeyId() {
+		return journeyId;
 	}
 
 	@Override
 	public String toString() {
 		return "Returning" + super.toString();
+	}
+
+	@Override
+	public VehicleType getVehicleType() {
+		return chain.lastMileVehicle();
 	}
 
 }
