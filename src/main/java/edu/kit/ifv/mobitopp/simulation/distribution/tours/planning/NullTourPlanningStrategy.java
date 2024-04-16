@@ -14,7 +14,7 @@ public class NullTourPlanningStrategy implements TourPlanningStrategy {
 	@Override
 	public List<PlannedTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps, Fleet fleet,
 			Time time) {
-		throw new UnsupportedOperationException("NullTourPlanningStrategy.planToursfo " + fleet.getDistributionCenter() + " should never be called!");
+		throw new UnsupportedOperationException("NullTourPlanningStrategy.planTours " + fleet.getDistributionCenter() + " should never be called!");
 	}
 
 	@Override

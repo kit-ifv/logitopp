@@ -46,8 +46,8 @@ public class PrivateParcel extends BaseParcel {
 	 * @param results            the results to log state changes
 	 */
 	public PrivateParcel(PickUpParcelPerson person, ParcelDestinationType destination, ZoneAndLocation location,
-			Time plannedArrival, DistributionCenter distributionCenter, ShipmentSize shipmentSize, boolean isPickUp, DeliveryResults results) {
-		super(location, plannedArrival, distributionCenter, results, shipmentSize, isPickUp);
+			Time plannedArrival, DistributionCenter distributionCenter, ShipmentSize shipmentSize, double volume, boolean isPickUp, DeliveryResults results) {
+		super(location, plannedArrival, distributionCenter, results, shipmentSize, volume, isPickUp);
 		this.destinationType = destination;
 		this.setPerson(person);
 

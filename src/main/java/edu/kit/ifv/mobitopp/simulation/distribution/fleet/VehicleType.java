@@ -13,15 +13,6 @@ public enum VehicleType {
 			return StandardMode.CAR;
 		}
 
-		@Override
-		public int getVolume() {
-			return 0;
-		}
-
-		@Override
-		public int getCapacity() {
-			return 0;
-		}
 	},
 	BIKE(1) {
 		@Override
@@ -29,15 +20,6 @@ public enum VehicleType {
 			return StandardMode.BIKE;
 		}
 
-		@Override
-		public int getVolume() {
-			return 120*80*940;
-		}
-
-		@Override
-		public int getCapacity() {
-			return 50;//TODO value
-		}
 	},
 	TRUCK(2) {
 		@Override
@@ -45,15 +27,6 @@ public enum VehicleType {
 			return StandardMode.TRUCK;
 		}
 
-		@Override
-		public int getVolume() {
-			return 12*100*100*100;
-		}
-
-		@Override
-		public int getCapacity() {
-			return 160; //TODO value
-		}
 	},
 	TRAM(3) {
 		@Override
@@ -61,15 +34,6 @@ public enum VehicleType {
 			return StandardMode.PUBLICTRANSPORT;//TODO check if exception could be used here
 		}
 
-		@Override
-		public int getVolume() {
-			return 0;
-		}
-
-		@Override
-		public int getCapacity() {
-			return 0;
-		}
 	};
 	
 	private final int number;
@@ -79,11 +43,6 @@ public enum VehicleType {
 	}
 	
 	public abstract Mode getMode();
-	
-	public abstract int getVolume();
-	
-	public abstract int getCapacity();
-	
 
 	public int asInt() {
 		return this.number;
@@ -98,8 +57,6 @@ public enum VehicleType {
 		return Arrays.stream(VehicleType.values())
 					 .filter(p -> p.asInt() == number)
 					 .findFirst()
-					 .orElseGet(() -> {
-						 throw new IllegalArgumentException("Cannot parse " + number + " as vehicle type!");
-					 });
+					 .orElseThrow(() -> new IllegalArgumentException("Cannot parse " + number + " as vehicle type!"));
 	}
 }

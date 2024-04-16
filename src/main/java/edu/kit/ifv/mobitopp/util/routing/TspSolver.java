@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.tour.TwoApproxMetricTSP;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -20,11 +21,13 @@ import lombok.Getter;
 public class TspSolver<E> {
 	
 	@Getter
-	private final CachedTravelTime<E> travelTimes;
+	private final ModeTravelTimes<E> travelTimes;
 	
 	public TspSolver(TravelTimeProvider<E> travelTime) {
 
-		this.travelTimes = new CachedTravelTime<>(travelTime);
+		this.travelTimes = new ModeTravelTimes<>(
+				() -> new CachedTravelTime<>(travelTime)
+		);
 	}
 	
 	public static <E> TspSolver<E> createSolverUsingDijkstraTimes(SimulationContext context, Function<E, Location> embedding) {
@@ -39,14 +42,14 @@ public class TspSolver<E> {
 		return new TspSolver<>(solver);
 	}
 
-	public Tour<E> findTour(Collection<E> elements) {
+	public Tour<E> findTour(Collection<E> elements, StandardMode mode) {
 		if (elements.isEmpty()) {
-			return new Tour<E>(List.of(), 0.0f, travelTimes);
+			return new Tour<>(List.of(), 0.0f, travelTimes, mode);
 		}
 		
 		
 		SimpleWeightedGraph<E, DefaultWeightedEdge> graph 
-			= new SimpleWeightedGraph<E, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+			= new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
 
 
 		// Create complete graph: for each parcel add the location as vertex, also add
@@ -61,7 +64,7 @@ public class TspSolver<E> {
 			graph.addVertex(element);
 
 			for (E other: graph.vertexSet()) {
-				float weight = travelTimes.getTravelTime(element, other);
+				float weight = travelTimes.getTravelTime(mode, element, other);
 				
 				if (weight > 0 && !other.equals(element)) { //TODO allow 0 weight?
 					DefaultWeightedEdge edge = graph.addEdge(element, other);
@@ -78,7 +81,7 @@ public class TspSolver<E> {
 			
 		List<E> vertexList = path.getVertexList().stream().distinct().collect(Collectors.toList());
 				
-		return new Tour<E>(vertexList, (float) path.getWeight(), travelTimes);		
+		return new Tour<>(vertexList, (float) path.getWeight(), travelTimes, mode);
 	}
 	
 }

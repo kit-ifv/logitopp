@@ -85,6 +85,11 @@ public class BoxOnBike implements IParcel {
     }
 
     @Override
+    public double getVolume() {
+        return 0;
+    }
+
+    @Override
     public Location getLocation() {
         return returnTour.depot().getLocation();
     }

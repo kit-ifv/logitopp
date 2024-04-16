@@ -60,7 +60,7 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	 * @param serviceArea  the center's service area
 	 * @param results		results logger
 	 */
-	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numVehicles,
+	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numVehicles, double vehicleVolume,
 							  int attempts, VehicleType vehicleType, ServiceArea serviceArea, DeliveryResults results) {
 		this.id = id;
 		this.name = name;
@@ -73,7 +73,7 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		
 		this.storage = new DepotStorage();
 		this.regionalStructure = new RegionalReach(this, serviceArea);
-		this.fleet = new Fleet(vehicleType, numVehicles, this, results);
+		this.fleet = new Fleet(vehicleType, numVehicles, vehicleVolume, this, results);
 		
 		this.random = new Random(id);
 

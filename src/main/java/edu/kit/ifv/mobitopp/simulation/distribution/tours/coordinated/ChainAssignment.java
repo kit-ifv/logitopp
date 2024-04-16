@@ -29,7 +29,7 @@ public class ChainAssignment {
 	}
 	
 	public void assignAll(Map<DistributionCenter, List<TimedTransportChain>> chainAssignment) {
-		chainAssignment.forEach((dc, chains) -> this.assign(dc, chains));
+		chainAssignment.forEach(this::assign);
 	}
 	
 	public void register(DistributionCenter dc, List<TransportPreferences> preferences) {

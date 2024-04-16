@@ -3,6 +3,7 @@ package edu.kit.ifv.mobitopp.simulation;
 import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.data.Zone;
@@ -112,6 +113,13 @@ public class DeliveryResults {
 
 		ZoneAndLocation start = owner.getZoneAndLocation();
 		ZoneAndLocation destination;
+
+		double totalDeliveryVolume = tour.getPreparedStops().stream().mapToDouble(
+				s -> s.getParcels().stream().mapToDouble(IParcel::getVolume).sum()
+		).sum();
+
+		double currentVolume = totalDeliveryVolume;
+
 		for (ParcelActivity stop : tour.getPreparedStops()) {
 			destination = stop.getStopLocation();
 
@@ -135,17 +143,25 @@ public class DeliveryResults {
 			String deliveries = stop.getParcels().stream().map(p -> p.getOId()+"").collect(Collectors.joining(","));
 			String pickups = stop.getPickUps().stream().map(p -> p.getOId()+"").collect(Collectors.joining(","));
 
-			String nestedDeliveries = stop.getParcels()
+			List<IParcel> nestedParcels = stop.getParcels()
 					.stream()
 					.filter(p -> p instanceof PlannedTour)
 					.flatMap(t -> ((PlannedTour) t).getDeliveryParcels().stream())
-					.map(p -> p.getOId()+"")
-					.collect(Collectors.joining(","));
+					.collect(Collectors.toList());
 
-			String plannedPickups =  stop.getParcels()
+			List<IParcel> nestedPickups = stop.getParcels()
 					.stream()
 					.filter(p -> p instanceof PlannedTour)
 					.flatMap(t -> ((PlannedTour) t).getPickUpRequests().stream())
+					.collect(Collectors.toList());
+
+			String nestedDeliveries = nestedParcels
+					.stream()
+					.map(p -> p.getOId()+"")
+					.collect(Collectors.joining(","));
+
+			String plannedPickups =  nestedPickups
+					.stream()
 					.map(p -> p.getOId()+"")
 					.collect(Collectors.joining(","));
 
@@ -155,6 +171,17 @@ public class DeliveryResults {
 			} else {
 				row += deliveries + SEP + pickups + SEP + nestedDeliveries + SEP + SEP + plannedPickups;
 			}
+
+			double deliverVolume = stop.getParcels().stream().mapToDouble(IParcel::getVolume).sum();
+			double pickupVolume = stop.getPickUps().stream().mapToDouble(IParcel::getVolume).sum();
+
+			row += currentVolume + SEP;
+			row += (deliverVolume+pickupVolume) + SEP;
+			row += (currentVolume - deliverVolume + pickupVolume);
+			row += vehicle.getVolume();
+
+			currentVolume = currentVolume - deliverVolume + pickupVolume;
+
 
 			results.write(resultCategoryPlannedTour, row);
 
@@ -174,7 +201,8 @@ public class DeliveryResults {
 					"fromDepot", "fromDepotId", "fromZone", "fromX", "fromY", "fromEdge", "fromEdgePos",
 					"toDepot", "toDepotId", "toZone", "toX", "toY", "toEdge", "toEdgePos",
 					"stopNo", "plannedTime", "plannedTimeSimMin", "distance", "tripDur", "deliveryDur",
-					"deliveries", "pickups", "nestedDeliveries", "nestedPickups", "plannedLastMilePickups"
+					"deliveries", "pickups", "nestedDeliveries", "nestedPickups", "plannedLastMilePickups",
+					"volumeBefore", "volumeChange", "volumeAfter", "maxVolume"
 			)
 		);
 	}
@@ -288,14 +316,15 @@ public class DeliveryResults {
 		msg += vehicle.getOwner().getId() + SEP;
 		msg += vehicle.getId() + SEP;
 		msg += vehicle.getType().name() + SEP;
-		msg += vehicle.getType().asInt();
+		msg += vehicle.getType().asInt() + SEP;
+		msg += vehicle.getVolume();
 
 		results.write(resultCategoryFleet, msg);
 	}
 
 	public static Category createResultCategoryFleet() {
 		return new Category("fleet",
-				Arrays.asList("owner","ownerId", "vehicleId", "vehicleType", "vehicleTypeCode"));
+				Arrays.asList("owner","ownerId", "vehicleId", "vehicleType", "vehicleTypeCode", "maxVolume"));
 	}
 
 

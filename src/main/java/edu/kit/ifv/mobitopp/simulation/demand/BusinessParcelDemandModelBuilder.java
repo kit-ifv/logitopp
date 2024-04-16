@@ -120,6 +120,8 @@ public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<B
 				.filterRecipients(o -> zoneFilter.test(o.location().zone()))
 				.shareBasedCepspSelection(shares)
 				.distributionCenterSelectionInCepspByFleetsize()
+				.equalShipmentSizeSelection()
+				.selectVolumeBasedOnShipmentSize()
 				.randomArrivalDaySelectionExcludeSunday().build();
 	}
 

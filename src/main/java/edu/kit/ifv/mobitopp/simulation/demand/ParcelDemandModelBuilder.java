@@ -12,14 +12,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
-import edu.kit.ifv.mobitopp.simulation.demand.attributes.CopyProviderModelStep;
-import edu.kit.ifv.mobitopp.simulation.demand.attributes.DistributionCenterSelectorByFleetSize;
-import edu.kit.ifv.mobitopp.simulation.demand.attributes.LatentModelStepWarpper;
-import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
-import edu.kit.ifv.mobitopp.simulation.demand.attributes.RandomDateSelector;
-import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedMultipleModelOptionsStep;
-import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedSelector;
-import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
+import edu.kit.ifv.mobitopp.simulation.demand.attributes.*;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.FilteredNumberOfParcelsSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.NormalDistributedNumberOfParcelsSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.NullNumerOfParcelsSelector;
@@ -322,6 +315,10 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 	
 	public ParcelDemandModelBuilder<A,P> shareBasedShipmentSizeSelection(Map<ShipmentSize, Double> shares) {
 		return this.selectShareBased(shares, ParcelBuilder::setSize);
+	}
+
+	public ParcelDemandModelBuilder<A,P> selectVolumeBasedOnShipmentSize() {
+		return this.addStep(new VolumeSelector<>(), ParcelBuilder::setVolume);
 	}
 	
 	

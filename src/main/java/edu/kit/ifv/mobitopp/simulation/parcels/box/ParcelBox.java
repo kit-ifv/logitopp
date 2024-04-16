@@ -148,7 +148,12 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 	public ZoneAndLocation getZoneAndLocation() {
 		return consumer.getZoneAndLocation();
 	}
-	
+
+	@Override
+	public double getVolume() {
+		return 0;
+	}
+
 	@Override
 	public boolean isReplanningAllowed() {
 		return false;

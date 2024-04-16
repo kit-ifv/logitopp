@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import lombok.Getter;
 
@@ -12,18 +13,20 @@ public class Tour<E> implements Iterable<E> {
 	
 	@Getter private final List<E> elements;
 	@Getter private float travelTime;
-	private final TravelTimeProvider<E> travelTimeProvider;
+	private final ModeTravelTimes<E> travelTimeProvider;
+	private final StandardMode mode;
 	
 	private int start = 0;
 	
-	public Tour(CachedTravelTime<E> dijkstra) {
-		this(List.of(), 0.0f, dijkstra);
+	public Tour(ModeTravelTimes<E> timeProvider, StandardMode mode) {
+		this(List.of(), 0.0f, timeProvider, mode);
 	}
 	
-	public Tour(List<E> elements, float travelTime, CachedTravelTime<E> dijkstra) {
+	public Tour(List<E> elements, float travelTime, ModeTravelTimes<E> timeProvider, StandardMode mode) {
 		this.elements = new ArrayList<>(elements);
-		this.travelTimeProvider = dijkstra;
+		this.travelTimeProvider = timeProvider;
 		this.travelTime = travelTime;
+		this.mode = mode;
 	}
 	
 	public int size() {
@@ -94,7 +97,9 @@ public class Tour<E> implements Iterable<E> {
 	
 	private float getInsertionCost(E prev, ZoneAndLocation hub, E next) {
 		if(isEmpty()) {return 0.0f;}
-		return travelTimeProvider.getTravelTime(prev, hub) + travelTimeProvider.getTravelTime(hub, next) - travelTimeProvider.getTravelTime(prev, next);
+		return travelTimeProvider.getTravelTime(mode, prev, hub)
+			 + travelTimeProvider.getTravelTime(mode, hub, next)
+			 - travelTimeProvider.getTravelTime(mode, prev, next);
 	}
 	
 	private float getInsertionCost(E element, int index) {
@@ -106,7 +111,9 @@ public class Tour<E> implements Iterable<E> {
 	
 	private float getInsertionCost(E prev, E element, E next) {
 		if(isEmpty()) {return 0.0f;}
-		return travelTimeProvider.getTravelTime(prev, element) + travelTimeProvider.getTravelTime(element, next) - travelTimeProvider.getTravelTime(prev, next);
+		return travelTimeProvider.getTravelTime(mode, prev, element)
+			 + travelTimeProvider.getTravelTime(mode, element, next)
+			 - travelTimeProvider.getTravelTime(mode, prev, next);
 	}
 	
 	interface CostEval<E, T> {
@@ -165,7 +172,9 @@ public class Tour<E> implements Iterable<E> {
 	}
 	
 	public float getRemovalCost(E prev, E element, E next) {
-		return travelTimeProvider.getTravelTime(prev, next) - travelTimeProvider.getTravelTime(prev, element) - travelTimeProvider.getTravelTime(element, next);
+		return travelTimeProvider.getTravelTime(mode, prev, next)
+			 - travelTimeProvider.getTravelTime(mode, prev, element)
+			 - travelTimeProvider.getTravelTime(mode, element, next);
 	}
 	
 	private int findMinRemovalIndex(CostEval<E, E> costEval) {

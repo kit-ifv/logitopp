@@ -62,7 +62,7 @@ public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 			Time currentTime, RelativeTime maxTourDuration) {
 		
 		Mode mode = vehicle.getType().getMode();
-		int capacity = vehicle.getCapacity();
+		double volume = vehicle.getVolume();
 		
 		List<PlannedTour> plannedTours = new ArrayList<>();
 		List<ParcelActivityBuilder> giantTour = planGiantTour(vehicle.getOwner(), deliveries, currentTime, mode);
@@ -73,22 +73,22 @@ public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 			Time time = currentTime;
 			Time endOfTour = currentTime.plus(maxTourDuration);
 		
-			int remainingCapacity = capacity;
-			for (int i = 0; i < giantTour.size() && remainingCapacity > 0; i++) { //TODO check capacity computation/restriction
+			double remainingVolume = volume;
+			for (int i = 0; i < giantTour.size() && remainingVolume > 0; i++) { //TODO check capacity computation/restriction
 				ParcelActivityBuilder delivery = giantTour.get(i).by(vehicle);
 		
 				float tripDuration = travelTime(lastZone, delivery.getZone(), time, mode);		
 				float deliveryDuration = delivery.withDuration(durationModel).getDeliveryMinutes();
 				float returnTime = travelTime(delivery.getZone(), vehicle.getOwner().getZone(), time, mode);
 				
-				if (assigned.isEmpty() || ( sufficientTime(time, endOfTour, tripDuration + deliveryDuration + returnTime) && remainingCapacity >= delivery.size() ) ) {
+				if (assigned.isEmpty() || ( sufficientTime(time, endOfTour, tripDuration + deliveryDuration + returnTime) && remainingVolume >= delivery.size() ) ) {
 					//TODO find any with fitting size in zone??
 					time = time.plusMinutes(round(tripDuration));
 					assigned.add(delivery.plannedAt(time));
 					time = time.plusMinutes(round(deliveryDuration));
 					lastZone = delivery.getZone();
 					
-					remainingCapacity-= delivery.size();
+					remainingVolume-= delivery.volume();
 					
 				} else {
 					returnTime = travelTime(lastZone, vehicle.getOwner().getZone(), time, mode);

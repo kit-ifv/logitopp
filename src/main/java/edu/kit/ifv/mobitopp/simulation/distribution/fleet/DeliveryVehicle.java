@@ -15,7 +15,7 @@ public class DeliveryVehicle {
 	private final int id;
 	private final DistributionCenter owner;
 	private final VehicleType type;
-	private final int capacity;
+	private final double volume;
 	private final List<IParcel> returningParcels;
 	private final List<IParcel> pickedUpParcels;
 	private final String tag;
@@ -23,21 +23,21 @@ public class DeliveryVehicle {
 	@Getter
 	private int currentTour = 0;
 
-	public DeliveryVehicle(VehicleType type, int capacity, DistributionCenter owner) {
+	public DeliveryVehicle(VehicleType type, double volume, DistributionCenter owner) {
 		this.id = idCnt++;
 		this.owner = owner;
 		this.type = type;
-		this.capacity = capacity;
+		this.volume = volume;
 		this.tag = type.name() + "_" + owner.getId() + "_" + this.id;
 		this.returningParcels = new ArrayList<>();
 		this.pickedUpParcels = new ArrayList<>();
 	}
 
-	public DeliveryVehicle(VehicleType type, int capacity, DistributionCenter owner, String tag) {
+	public DeliveryVehicle(VehicleType type, int volume, DistributionCenter owner, String tag) {
 		this.id = idCnt++;
 		this.owner = owner;
 		this.type = type;
-		this.capacity = capacity;
+		this.volume = volume;
 		this.tag = tag;
 		this.returningParcels = new ArrayList<>();
 		this.pickedUpParcels = new ArrayList<>();

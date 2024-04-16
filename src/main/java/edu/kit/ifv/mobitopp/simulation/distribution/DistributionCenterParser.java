@@ -91,6 +91,7 @@ public class DistributionCenterParser {
 		String cepsp = row.get("cepsp");
 
 		int vehicles = row.valueAsInteger("vehicles");
+		double volume = row.valueAsDouble("volume");
 		int attempts = row.valueAsInteger("attempts");
 
 		double x = row.valueAsDouble("loc_x");
@@ -107,7 +108,8 @@ public class DistributionCenterParser {
 		int serviceAreaCode = row.valueAsInteger("service_area");
 		ServiceArea serviceArea = serviceAreaFactory.fromIntCode(zone, serviceAreaCode);
 
-		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location.location(), scaleVehicles(vehicles), attempts, type, serviceArea, result);
+		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location.location(), scaleVehicles(vehicles),
+				scaleVehicleVolume(volume), attempts, type, serviceArea, result);
 		addCenterToServiceProvider(center, cepsp);
 
 		System.out.println(name + " (" + id + ") serves " + serviceArea.size() + " zones!");
@@ -126,6 +128,10 @@ public class DistributionCenterParser {
 	 */
 	protected int scaleVehicles(int numOfVehicles) {
 		return (int) max(1, ceil(numOfVehicles * scaleFactor));
+	}
+
+	protected double scaleVehicleVolume(double volume) {
+		return volume * scaleFactor;
 	}
 	
 

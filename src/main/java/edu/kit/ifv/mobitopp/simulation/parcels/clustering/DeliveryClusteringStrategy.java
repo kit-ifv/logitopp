@@ -14,28 +14,32 @@ public interface DeliveryClusteringStrategy {
 	
 	public boolean canBeGrouped(IParcel a, IParcel b);
 	
-	public default Collection<ParcelCluster> cluster(List<IParcel> parcels, int maxClusterSize) {
+	public default Collection<ParcelCluster> cluster(List<IParcel> parcels, double maxVolume) {
 		return CollectionsUtil.groupBy(parcels, this::canBeGrouped)
 							  .stream()
-							  .flatMap(cluster -> partition(cluster, maxClusterSize).stream())
+							  .flatMap(cluster -> partition(cluster, maxVolume).stream())
 							  .map(cluster -> new ParcelCluster(cluster, this))
 							  .collect(toList());
 	}
 	
-	public static <T> List<List<T>> partition(List<T> cluster, int maxSize) {
-		if (cluster.size() <= maxSize) {
+	private static List<List<IParcel>> partition(List<IParcel> cluster, double maxVolume) {
+		double totalVolume = cluster.stream().mapToDouble(IParcel::getVolume).sum();
+
+		if (totalVolume <= maxVolume) {
 			return List.of(cluster);
 		}
 		
-		int numParts = (int) Math.ceil((cluster.size() * 1.0) / (maxSize * 1.0));
-		List<List<T>> partitions = new ArrayList<>(numParts);
+		int numParts = (int) Math.ceil(totalVolume / maxVolume);
+		int averageClusterSize = (int) Math.round( (cluster.size() + 1.0) / (numParts * 1.0));
+
+		List<List<IParcel>> partitions = new ArrayList<>(numParts);
 		for (int i=0; i < numParts; i++) {
-			partitions.add(new ArrayList<>(maxSize)); //TODO: average size
+			partitions.add(new ArrayList<>(averageClusterSize)); //TODO: average size
 		}
 		
 		int i = 0;
-		for (T t : cluster) {
-			partitions.get(i % numParts).add(t);
+		for (IParcel p : cluster) {
+			partitions.get(i % numParts).add(p);
 			i++;
 		}
 		

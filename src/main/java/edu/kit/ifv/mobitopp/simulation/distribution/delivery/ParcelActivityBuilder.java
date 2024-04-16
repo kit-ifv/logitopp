@@ -97,8 +97,8 @@ public class ParcelActivityBuilder {
 		return this.getAllParcels().size();
 	}
 	
-	public int volume() {
-		return getAllParcels().stream().mapToInt(p -> p.getShipmentSize().getVolume(p)).sum();
+	public double volume() {
+		return getAllParcels().stream().mapToDouble(IParcel::getVolume).sum();
 	}
 	
 }

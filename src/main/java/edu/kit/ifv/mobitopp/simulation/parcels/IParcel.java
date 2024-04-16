@@ -30,6 +30,8 @@ public interface IParcel {
 	public void setConsumer(ParcelAgent producer);
 
 	public ShipmentSize getShipmentSize();
+
+	public double getVolume();
 	
 	public Location getLocation();
 	public Zone getZone();

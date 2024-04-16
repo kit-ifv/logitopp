@@ -81,7 +81,12 @@ public class ParcelWithReturnInfo implements IParcel {
 	public ShipmentSize getShipmentSize() {
 		return delegate.getShipmentSize();
 	}
-	
+
+	@Override
+	public double getVolume() {
+		return delegate.getVolume();
+	}
+
 	@Override
 	public Location getLocation() { //todo maybe use return tour
 		return delegate.getLocation();

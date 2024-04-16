@@ -35,18 +35,20 @@ public abstract class BaseParcel implements IParcel {
 	@Getter	protected ZoneAndLocation zoneAndLocation;
 	@Getter protected RecipientType recipientType;
 	@Getter protected ShipmentSize shipmentSize;
+	@Getter protected double volume;
 	@Getter protected boolean isPickUp;
 
 	protected final DeliveryResults results;
 	@Getter protected ParcelState state = ParcelState.UNDEFINED;
 
 	public BaseParcel(ZoneAndLocation location, Time plannedArrival, ParcelAgent producer,
-			DeliveryResults results, ShipmentSize shipmentSize, boolean isPickUp) {
+			DeliveryResults results, ShipmentSize shipmentSize, double volume, boolean isPickUp) {
 		this.results = results;
 		this.plannedArrivalDate = plannedArrival;
 		this.setProducer(producer);
 		this.zoneAndLocation = location;
 		this.shipmentSize = shipmentSize;
+		this.volume = volume;
 		this.isPickUp = isPickUp;
 	}
 	

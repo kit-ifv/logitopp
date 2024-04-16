@@ -23,10 +23,18 @@ public class Fleet {
 	private final Map<DeliveryVehicle, Time> returnTimes;
 	private final VehicleType vehicleType;
 	private final DeliveryResults results;
+	private final double vehicleVolume;
 	
-	public Fleet(VehicleType vehicleType, int numVehicles, DistributionCenter distributionCenter, DeliveryResults results) {
+	public Fleet(
+			VehicleType vehicleType,
+			int numVehicles,
+			double vehicleVolume,
+			DistributionCenter distributionCenter,
+			DeliveryResults results
+	) {
 		this.distributionCenter = distributionCenter;
 		this.numVehicles = numVehicles;
+		this.vehicleVolume = vehicleVolume;
 		this.results = results;
 
 		this.returnTimes = new LinkedHashMap<>();
@@ -41,8 +49,8 @@ public class Fleet {
 			
 		for (int i = 0; i < numVehicles; i++) {
 			addVehicle(
-					new DeliveryVehicle(vehicleType, 150, distributionCenter)
-			); //TODO determine capacity in vehicle type
+					new DeliveryVehicle(vehicleType, vehicleVolume, distributionCenter)
+			);
 		}
 		
 	}

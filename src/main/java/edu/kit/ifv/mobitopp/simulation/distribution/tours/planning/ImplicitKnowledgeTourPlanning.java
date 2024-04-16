@@ -62,6 +62,8 @@ public class ImplicitKnowledgeTourPlanning extends ClusterTourPlanningStrategy {
 			activitiesPerZone.remove(zone);
 			
 			Time arrivalInZone = time.plusMinutes(round(travelTime(origin, zone, time)));
+
+			//TODO refactor to account for volume instead of number of parcels
 			while (countParcels(stops) >= 150) {// if zone has more than 150 parcels, create tours until less than 150 left
 				
 				Pair<List<ParcelActivityBuilder>, RelativeTime> selected = selectStops(stops, arrivalInZone, duration, zone, 150, true); //list contains at least one element

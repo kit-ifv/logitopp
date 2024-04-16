@@ -23,4 +23,8 @@ public class ParcelCluster {
 		return zoneAndLocation.zone().getId().getExternalId() + ":[" + parcels.stream().map(p -> p.getOId() + "").collect(Collectors.joining(", ")) + "]";
 	}
 
+	public double volume() {
+		return parcels.stream().mapToDouble(IParcel::getVolume).sum();
+	}
+
 }

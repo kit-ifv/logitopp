@@ -22,6 +22,7 @@ public abstract class ParcelBuilder<P extends ParcelAgent> {
 	@Setter private ValueProvider<Time> arrivalDate;
 	@Getter @Setter private ValueProvider<ShipmentSize> size;
 	@Getter @Setter private ValueProvider<Boolean> isPickUp;
+	@Getter @Setter private ValueProvider<Double> volume;
 	
 	private IParcel parcel;
 	

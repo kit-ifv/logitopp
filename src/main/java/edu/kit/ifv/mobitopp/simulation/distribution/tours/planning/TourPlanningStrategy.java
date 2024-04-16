@@ -18,8 +18,8 @@ public interface TourPlanningStrategy {
 	/**
 	 * Compute delivery tours for the given delivery/pickup activities.
 	 *
-	 * @param deliveries the deliveries
-	 * @param pickUps    the pick ups
+	 * @param deliveries the delivery parcels
+	 * @param pickUps    the pick up parcels
 	 * @param fleet      the fleet
 	 * @param time       the time
 	 * @return a list of planned tours for the given parcels operated by the given

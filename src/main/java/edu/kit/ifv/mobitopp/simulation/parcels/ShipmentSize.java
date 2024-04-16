@@ -8,64 +8,46 @@ import java.util.Random;
 
 public enum ShipmentSize {
 
-	SMALL(420, 18240) {
-		@Override
-		public ParcelUnit toParcelUnits() {
-			return ParcelUnit.of(1);
-		}
-	},
-	MEDIUM(18240, 38760) {
-		@Override
-		public ParcelUnit toParcelUnits() {
-			return ParcelUnit.of(2);
-		}
-	},
-	LARGE(38760, 82080) {
-		@Override
-		public ParcelUnit toParcelUnits() {
-			return ParcelUnit.of(3);
-		}
-	},
-	EXTRA_LARGE(820080, 171000) {
-		@Override
-		public ParcelUnit toParcelUnits() {
-			return ParcelUnit.of(5);
-		}
-	},
-	PALLET(0, 0) {
-		@Override
-		public ParcelUnit toParcelUnits() {
-			return ParcelUnit.of(-1);
-		}
-	},
-	CONTAINER(0, 0) {
-		@Override
-		public ParcelUnit toParcelUnits() {
-			return ParcelUnit.of(-1);
-		}
-	};
+	SMALL(1, 10, 20, 8, 60, 40),
+	MEDIUM(8, 10, 20, 17, 60, 40),
+	LARGE(17, 10, 20, 36, 60, 40),
+	EXTRA_LARGE(36, 20, 20, 75, 60, 40),
+	PALLET(0, 0, 0, 1, 1, 1),
+	CONTAINER(0, 0, 0, 1, 1, 1);
 	
-	private final int minVolume;
-	private final int meanVolume;
-	private final int maxVolume;
-	private final double stdDev;
+	private final int minX;
+	private final int minY;
+	private final int minZ;
+	private final int maxX;
+	private final int maxY;
+	private final int maxZ;
 	
-	private ShipmentSize(int minVolume, int maxVolume) {
-		this.minVolume  = minVolume;
-		this.meanVolume = minVolume + (int) ((maxVolume - minVolume) / 2.0);
-		this.maxVolume  = maxVolume;
-		this.stdDev     = (maxVolume - minVolume) * 0.1;
+	private ShipmentSize(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+		this.minX = minX;
+		this.minY = minY;
+		this.minZ = minZ;
+		this.maxX = maxX;
+		this.maxY = maxY;
+		this.maxZ = maxZ;
 	}
 	
-	public int getVolume(Object parcel) {
-		Random rand = new Random(parcel.hashCode());
-
-		double standardGauss = rand.nextGaussian();
-		double scaledGauss = stdDev*standardGauss + meanVolume;
+	public double getVolume(Random random) {
+		double x = getParcelEdge(minX, maxX, random);
+		double y = getParcelEdge(minY, maxY, random);
+		double z = getParcelEdge(minZ, maxZ, random);
 		
-		return (int) min(max(minVolume, round(scaledGauss)), maxVolume);
+		return x*y*z;
 	}
-	
-	public abstract ParcelUnit toParcelUnits();
+
+	private double getParcelEdge(double min, double max, Random random) {
+		double mean = (min + max) / 2.0;
+		double stdDev = (max-min) * 0.1;
+
+
+		double standardGauss = random.nextGaussian();
+		double scaledGauss = stdDev*standardGauss + mean;
+
+		return (int) min(max(min, round(scaledGauss)), max);
+	}
 	
 }
