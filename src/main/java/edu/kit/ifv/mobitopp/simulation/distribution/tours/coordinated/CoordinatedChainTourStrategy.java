@@ -256,6 +256,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		Optional<LastMileTour> minInsertionTour = 
 				preferredChains.options()
 							   .stream()
+							   .filter(validTours::containsKey)
 							   .flatMap(c -> validTours.get(c).stream())
 							   .filter(t -> t.tour.getTravelTime() + t.tour.minInsertionCost(newStop) + t.accessEgress < 8*60) //TODO time
 							   .min(Comparator.comparing(t -> t.tour.minInsertionCost(newStop)));

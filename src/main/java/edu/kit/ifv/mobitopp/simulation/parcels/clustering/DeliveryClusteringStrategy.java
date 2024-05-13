@@ -23,6 +23,8 @@ public interface DeliveryClusteringStrategy {
 	}
 	
 	private static List<List<IParcel>> partition(List<IParcel> cluster, double maxVolume) {
+		if (cluster.isEmpty()) {return List.of();}
+
 		double totalVolume = cluster.stream().mapToDouble(IParcel::getVolume).sum();
 
 		if (totalVolume <= maxVolume) {
@@ -30,7 +32,7 @@ public interface DeliveryClusteringStrategy {
 		}
 		
 		int numParts = (int) Math.ceil(totalVolume / maxVolume);
-		int averageClusterSize = (int) Math.round( (cluster.size() + 1.0) / (numParts * 1.0));
+		int averageClusterSize = (int) Math.round( (cluster.size() * 1.0) / (numParts * 1.0));
 
 		List<List<IParcel>> partitions = new ArrayList<>(numParts);
 		for (int i=0; i < numParts; i++) {
@@ -43,7 +45,9 @@ public interface DeliveryClusteringStrategy {
 			i++;
 		}
 		
-		return partitions;
+		return partitions.stream()
+						 .filter(c -> !c.isEmpty())
+						 .collect(toList());
 	};
 
 	public ZoneAndLocation getStopLocation(List<IParcel> deliveryCluster);

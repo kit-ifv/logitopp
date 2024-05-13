@@ -174,10 +174,10 @@ public class DeliveryResults {
 
 			double deliverVolume = stop.getParcels().stream().mapToDouble(IParcel::getVolume).sum();
 			double pickupVolume = stop.getPickUps().stream().mapToDouble(IParcel::getVolume).sum();
-
+			row += SEP;
 			row += currentVolume + SEP;
 			row += (deliverVolume+pickupVolume) + SEP;
-			row += (currentVolume - deliverVolume + pickupVolume);
+			row += (currentVolume - deliverVolume + pickupVolume) + SEP;
 			row += vehicle.getVolume();
 
 			currentVolume = currentVolume - deliverVolume + pickupVolume;
@@ -415,7 +415,7 @@ public class DeliveryResults {
 	public void logPrivateOrder(PrivateParcel parcel) {
 		int person = parcel.getPerson().getOid();
 		int household = parcel.getPerson().household().getOid();
-		this.logPrivateOrder(parcel.getOId(), person, household, parcel.getShipmentSize(),
+		this.logPrivateOrder(parcel.getOId(), person, household, parcel.getShipmentSize(), parcel.getVolume(),
 				parcel.getDestinationType().name(), parcel.getPlannedArrivalDate().getDay() + "",
                 (DistributionCenter) parcel.getProducer(), parcel.getPlannedArrivalDate(), parcel.getZoneAndLocation()
 		);
@@ -432,12 +432,13 @@ public class DeliveryResults {
 	 * @param distributionCenter the distribution center
 	 * @param currentTime        the current time
 	 */
-	private void logPrivateOrder(int pid, int person, int household, ShipmentSize shipmentSize, String destination, String day,
+	private void logPrivateOrder(int pid, int person, int household, ShipmentSize shipmentSize, double volume, String destination, String day,
 			DistributionCenter distributionCenter, Time currentTime, ZoneAndLocation recipientLoc) {
 		String msg = "";
 
 		msg += pid + SEP;
 		msg += shipmentSize + SEP;
+		msg += volume + SEP;
 		msg += person + SEP;
 		msg += household + SEP;
 		msg += destination + SEP;
@@ -458,7 +459,7 @@ public class DeliveryResults {
 	 */
 	public static Category createResultCategoryPrivateOrder() {
 		return new Category("parcel-orders-private",
-				Arrays.asList("ParcelID", "Size", "RecipientID", "HouseholdID", "DestinationType",
+				Arrays.asList("ParcelID", "Size", "Volume", "RecipientID", "HouseholdID", "DestinationType",
 						"DistributionCenter", "DistributionCenterID",
 						"DestinationZone", "DestinationX", "DestinationY", "DestinationEdge", "DestinationEdgePos",
 						"ArrivalDay", "ArrivalTime",
@@ -496,19 +497,20 @@ public class DeliveryResults {
 			toId = ((DistributionCenter) parcel.getConsumer()).getId()+"";
 		}
 
-		this.logBusinessOrder(parcel.getOId(), parcel.getShipmentSize(), fromName,
+		this.logBusinessOrder(parcel.getOId(), parcel.getShipmentSize(), parcel.getVolume(), fromName,
 				toName, fromId, toId, producerLoc.zone().getId().getExternalId(), producerLoc.location(),
 				consumerLoc.zone().getId().getExternalId(), consumerLoc.location(),
 				parcel.getPlannedArrivalDate().getDay() + "", parcel.getPlannedArrivalDate(), category);
 	}
 
-	private void logBusinessOrder(int pid, ShipmentSize size, String from, String to, String fromId, String toId,
+	private void logBusinessOrder(int pid, ShipmentSize size, double volume, String from, String to, String fromId, String toId,
 			String zoneIdFrom, Location locationFrom, String zoneIdTo, Location locationTo,
 			String day, Time currentTime, Category category) {
 		String msg = "";
 
 		msg += pid + SEP;
 		msg += size.name() + SEP;
+		msg += volume + SEP;
 		msg += from + SEP;
 		msg += fromId + SEP;
 		msg += to + SEP;
@@ -536,7 +538,7 @@ public class DeliveryResults {
 	 */
 	public static Category createResultCategoryBusinessOrder() {
 		return new Category("parcel-orders-business",
-				Arrays.asList("ParcelID", "Size",
+				Arrays.asList("ParcelID", "Size", "Volume",
 						"From", "FromId", "To", "ToId",
 						"FromZoneId", "FromLocationX", "FromLocationY", "FromEdge", "FromEdgePos",
 						"ToZoneId", "ToLocationX", "ToLocationY", "ToEdge", "ToEdgePos",
@@ -550,7 +552,7 @@ public class DeliveryResults {
 	 */
 	public static Category createResultCategoryBusinessProduction() {
 		return new Category("parcel-production-business",
-				Arrays.asList("ParcelID", "Size",
+				Arrays.asList("ParcelID", "Size", "Volume",
 						"From", "FromId", "To", "ToId",
 						"FromZoneId", "FromLocationX", "FromLocationY", "FromEdge", "FromEdgePos",
 						"ToZoneId", "ToLocationX", "ToLocationY", "ToEdge", "ToEdgePos",
