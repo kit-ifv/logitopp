@@ -128,8 +128,13 @@ public class DeliveryResults {
 			}
 
 			String row = header;
-			row += locationDataLog(start, fromDepot);
-			row += locationDataLog(destination, toDepot);
+			if (tour.isReturning()) {
+				row += locationDataLog(destination, toDepot);
+				row += locationDataLog(start, fromDepot);
+			} else {
+				row += locationDataLog(start, fromDepot);
+				row += locationDataLog(destination, toDepot);
+			}
 			row += stop.getNo() + SEP;
 			row += stop.getPlannedTime() + SEP;
 			row += stop.getPlannedTime().toMinutes() + SEP;
