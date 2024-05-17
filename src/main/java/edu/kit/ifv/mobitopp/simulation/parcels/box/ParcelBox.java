@@ -18,6 +18,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.TransferTimeModel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelState;
 import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
@@ -31,6 +32,7 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 	
 	@Getter protected final boolean isPickUp = false;
 	@Getter protected final ShipmentSize shipmentSize = ShipmentSize.CONTAINER;
+	protected final TransferTimeModel transferTime;
 	@Getter protected RecipientType recipientType = RecipientType.DISTRIBUTION_CENTER;
 		
 	@Getter protected final DistributionCenter producer;
@@ -44,7 +46,7 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 	protected final ImpedanceIfc impedance;
 //	protected final TimeTable timeTable;
 	
-	public ParcelBox(TimedTransportChain chain, ImpedanceIfc impedance) {
+	public ParcelBox(TimedTransportChain chain, ImpedanceIfc impedance, TransferTimeModel transferTime) {
 		if (chain.size() <= 1) { throw new IllegalArgumentException("Cannot construct a NestedParcel stack for an emty/singleton transport chain"); }
 		
 		this.producer = chain.first();
@@ -53,6 +55,7 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 
 		this.chain = chain;
 		this.impedance = impedance;
+		this.transferTime = transferTime;
 //		this.timeTable = timeTable;
 	}
 
@@ -86,14 +89,16 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 		}
 		
 		VehicleType veh = (isReturning() ? consumer : producer).getVehicleType();
+		VehicleType nextVeh = (isReturning() ? producer : consumer).getVehicleType();
 		
 		//TODO respect time table!
 		int duration = chain.getDuration(producer);
 		float distance = impedance.getDistance(producer.getZone().getId(), consumer.getZone().getId());
 		Time arrival = departure.plusMinutes(duration);
-		preparedStop = new ParcelActivity(1, getId(), consumer.getZoneAndLocation(), List.of(this), List.of(), vehicle, arrival, distance, duration, 5); //TODO transfer time model
+		int transfer = transferTime.estimateTransferTimeMinutes(null, veh, nextVeh, currentTime);
+		preparedStop = new ParcelActivity(1, getId(), consumer.getZoneAndLocation(), List.of(this), List.of(), vehicle, arrival, distance, duration, transfer); //TODO transfer time model
 		
-		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, getId(), 1, 1, 0, vehicle.getOwner().getZoneAndLocation(), distance, duration, 5);
+		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, getId(), 1, 1, 0, vehicle.getOwner().getZoneAndLocation(), distance, duration, transfer);
 
         return departure.plusMinutes(duration).plusMinutes(duration);
 	}
@@ -164,30 +169,30 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 	
 
 	
-	public static ParcelBox createDelivery(TimedTransportChain chain, PlannedDeliveryTour lastMileTour, ImpedanceIfc impedance) {
+	public static ParcelBox createDelivery(TimedTransportChain chain, PlannedDeliveryTour lastMileTour, ImpedanceIfc impedance, TransferTimeModel transferTime) {
 		
 		if (chain.size() == 2) {
-			return new TransportChainBox(chain, impedance, lastMileTour);
+			return new TransportChainBox(chain, impedance, transferTime, lastMileTour);
 		} else {
-			ParcelBox remainingTour = createDelivery(chain.getTimedTail(), lastMileTour, impedance);
-			return new TransportChainBox(chain, impedance, remainingTour);
+			ParcelBox remainingTour = createDelivery(chain.getTimedTail(), lastMileTour, impedance, transferTime);
+			return new TransportChainBox(chain, impedance, transferTime, remainingTour);
 		}
 		
 	}
 
-	public static BoxOnBike createBoxOnBike(TimedTransportChain chain, Collection<IParcel> returning, Collection<IParcel> pickedUp, ImpedanceIfc impedance, int boxId) {
+	public static BoxOnBike createBoxOnBike(TimedTransportChain chain, Collection<IParcel> returning, Collection<IParcel> pickedUp, ImpedanceIfc impedance, TransferTimeModel transferTime, int boxId) {
 
-		ParcelBox box = createReturning(chain, returning, pickedUp, impedance, boxId);
+		ParcelBox box = createReturning(chain, returning, pickedUp, impedance, transferTime, boxId);
 		return new BoxOnBike(box);
 	}
 	
-	public static ParcelBox createReturning(TimedTransportChain chain, Collection<IParcel> returning, Collection<IParcel> pickedUp, ImpedanceIfc impedance, int boxId) {
+	public static ParcelBox createReturning(TimedTransportChain chain, Collection<IParcel> returning, Collection<IParcel> pickedUp, ImpedanceIfc impedance, TransferTimeModel transferTime, int boxId) {
 		
 		if (chain.size() == 2) {
-			return new ReturningParcelBox(chain, impedance, returning, pickedUp, boxId);
+			return new ReturningParcelBox(chain, impedance, transferTime, returning, pickedUp, boxId);
 		} else {
-			ParcelBox remainingTour = createReturning(chain.getTimedTail(), returning, pickedUp, impedance, boxId);
-			return new ReturningBoxChain(chain, impedance, remainingTour);
+			ParcelBox remainingTour = createReturning(chain.getTimedTail(), returning, pickedUp, impedance, transferTime, boxId);
+			return new ReturningBoxChain(chain, impedance, transferTime, remainingTour);
 		}
 		
 	}

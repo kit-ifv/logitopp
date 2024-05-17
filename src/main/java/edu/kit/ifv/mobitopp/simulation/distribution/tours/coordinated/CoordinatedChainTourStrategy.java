@@ -30,6 +30,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.DeliveryDurationModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.TransferTimeModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference.TransportPreferences;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.planning.TourPlanningStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
@@ -52,13 +53,16 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	private final TspSolver<ParcelCluster> solver;
 	private final DeliveryClusteringStrategy clustering;
 	private final DeliveryDurationModel durationModel;
+
+	private final TransferTimeModel transferTime;
 	
-	public CoordinatedChainTourStrategy(CapacityCoordinator coordinator, DeliveryClusteringStrategy clustering, ImpedanceIfc impedance, DeliveryDurationModel durationModel, TspSolver<ParcelCluster> tspSolver) {
+	public CoordinatedChainTourStrategy(CapacityCoordinator coordinator, DeliveryClusteringStrategy clustering, ImpedanceIfc impedance, DeliveryDurationModel durationModel, TspSolver<ParcelCluster> tspSolver, TransferTimeModel transferTime) {
 		this.impedance = impedance;
 		this.coordinator = coordinator;
 		this.solver = tspSolver;
 		this.clustering = clustering;
 		this.durationModel = durationModel;
+		this.transferTime = transferTime;
 	}
 	
 	@Override
@@ -129,7 +133,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 							continue;
 						}
 						
-						planned = ParcelBox.createDelivery(chain, plannedLastMile, impedance);
+						planned = ParcelBox.createDelivery(chain, plannedLastMile, impedance, transferTime);
 						
 					} else {
 						fillDefaultTourPlan(tour, plannedLastMile);
@@ -170,7 +174,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 
 
 		TimedTransportChain returnChain = maybeReturnChain.get();
-		BoxOnBike returningParcelBox =  ParcelBox.createBoxOnBike(returnChain, List.of(), List.of(), impedance, boxId);
+		BoxOnBike returningParcelBox =  ParcelBox.createBoxOnBike(returnChain, List.of(), List.of(), impedance, transferTime, boxId);
 		
 		tour.tour.iterator().forEachRemaining(stop -> {
 			Collection<IParcel> wrappedParcels = stop.getParcels()

@@ -11,6 +11,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.TransferTimeModel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelState;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
@@ -20,8 +21,8 @@ public class TransportChainBox extends ParcelBox {
 	
 	protected final PlannedTour preplannedTour;
 
-	public TransportChainBox(TimedTransportChain remainingChain, ImpedanceIfc impedance, PlannedTour remainingTour) {
-		super(remainingChain, impedance);
+	public TransportChainBox(TimedTransportChain remainingChain, ImpedanceIfc impedance, TransferTimeModel transferTime, PlannedTour remainingTour) {
+		super(remainingChain, impedance, transferTime);
 		this.preplannedTour = remainingTour;
 	}
 	

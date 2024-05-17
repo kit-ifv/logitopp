@@ -36,7 +36,7 @@ public interface DeliveryClusteringStrategy {
 
 		List<List<IParcel>> partitions = new ArrayList<>(numParts);
 		for (int i=0; i < numParts; i++) {
-			partitions.add(new ArrayList<>(averageClusterSize)); //TODO: average size
+			partitions.add(new ArrayList<>(averageClusterSize));
 		}
 		
 		int i = 0;

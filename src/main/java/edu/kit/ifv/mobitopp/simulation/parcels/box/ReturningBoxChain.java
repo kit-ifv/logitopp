@@ -6,14 +6,15 @@ import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.TransferTimeModel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 
 public class ReturningBoxChain extends TransportChainBox {
 	
 	private final ParcelBox remainingTour;
 
-	public ReturningBoxChain(TimedTransportChain remainingChain, ImpedanceIfc impedance, ParcelBox remainingTour) {
-		super(remainingChain, impedance, remainingTour);
+	public ReturningBoxChain(TimedTransportChain remainingChain, ImpedanceIfc impedance, TransferTimeModel transferTime, ParcelBox remainingTour) {
+		super(remainingChain, impedance, transferTime, remainingTour);
 		this.remainingTour = remainingTour;
 	}
 	

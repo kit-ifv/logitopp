@@ -72,7 +72,7 @@ public class ParcelArrivalScheduler implements Hook {
 		}
 		
 		arrivalTimes.merge(activity.getPlannedTime(), new ArrayList<>(List.of(activity)), this::mergeIntoFirst);
-		activity.prepareAvtivity(currentTime); //TODO in prepare -> remove parcels and requests from operator 
+		activity.prepareAvtivity(currentTime);
 	}
 	
 	private <T> List<T> mergeIntoFirst(List<T> l1, List<T> l2) {
