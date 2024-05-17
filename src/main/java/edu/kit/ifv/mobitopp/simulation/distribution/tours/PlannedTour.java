@@ -26,6 +26,8 @@ public interface PlannedTour {
 	public Optional<DistributionCenter> nextHub();
 
 	public Optional<Connection > usedConnection();
+
+	public boolean usesTram();
 	
 	public boolean isReplanningAllowed();
 	

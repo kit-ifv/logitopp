@@ -215,4 +215,8 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 
 	}
 
+	@Override
+	public boolean usesTram() {
+		return chain.getVehicleTypes().contains(VehicleType.TRAM);
+	}
 }

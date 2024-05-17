@@ -78,23 +78,18 @@ public class DepotOperations {
 
 	protected void dispatchAvailableTours(Time currentTime) {
 		
-		
-		
-		Optional<PlannedTour> tourCheck = null;
-		
-		while ((tourCheck = canDispatch(currentTime)).isPresent()) {
-			PlannedTour tour = tourCheck.get();
-			
-			System.out.println(this.center.getName() + " tries dispatch: ");
-			System.out.println(tour.getAllParcels().stream().map(p -> ";"+p.getOId()).reduce((arg0, arg1) -> arg0+arg1).orElse("[]") );
-			
-			
-			Optional<DeliveryVehicle> vehicle = dispatchStrategy.getVehicleForTour(tour, center, currentTime);
+		for (PlannedTour tour : plannedTours()) {
+			if (dispatchStrategy.canDispatch(tour, center, currentTime)) {
 
-            vehicle.ifPresent(deliveryVehicle -> dispatchTour(currentTime, tour, deliveryVehicle));
-			
+				Optional<DeliveryVehicle> vehicle = dispatchStrategy.getVehicleForTour(tour, center, currentTime);
+				if (vehicle.isPresent()) {
+					System.out.println(this.center.getName() + "  dispatches " + tour);
+					dispatchTour(currentTime, tour, vehicle.get());
+				}
+
+			}
 		}
-		
+
 	}
 
 	protected void dispatchTour(Time currentTime, PlannedTour tour, DeliveryVehicle vehicle) {

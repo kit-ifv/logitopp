@@ -2,10 +2,7 @@ package edu.kit.ifv.mobitopp.simulation.distribution.timetable;
 
 import static java.util.Comparator.comparing;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,6 +55,13 @@ public class TimeTable {
 		return getConnections(origin, destination)
 				.filter(c -> c.getDeparture().getDay() == currentTime.getDay())
 				.filter(c -> c.getDeparture().isAfterOrEqualTo(currentTime));
+	}
+
+	public Stream<Connection> getFreeConnections(DistributionCenter origin, DistributionCenter destination, Time currentTime) {
+		return getConnections(origin, destination)
+				.filter(c -> c.getDeparture().isAfterOrEqualTo(currentTime))
+				.filter(Connection::hasFreeCapacity)
+				.sorted(Comparator.comparing(Connection::getDeparture));
 	}
 	
 	public Stream<Connection> getFreeConnectionsOnDay(DistributionCenter origin, DistributionCenter destination, Time currentTime) {

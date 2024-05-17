@@ -1,12 +1,14 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference;
 
 import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.BIKE;
+import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.TRAM;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize.EXTRA_LARGE;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
@@ -75,14 +77,17 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 		double lastMileCost = costFunction.estimateLastMileCost(chain, parcel, impedance);
 		
 		double cost = (chain.getCost() + lastMileCost)/ capacity;
-		double time = chain.getTotalDuration() / capacity;
+		double time = (double) chain.getTotalDuration() / capacity;
 		double dist = chain.getDistance() / capacity;
 		
 		String mode = chain.last().getVehicleType().asString().toLowerCase();
+
+		var factor = chain.getVehicleTypes().contains(TRAM) ? 100 : 0;
 				
 		double utility = parameters.get("asc_last_"+mode) + parameters.get("b_cost_" + mode) * cost 
 												+ parameters.get("b_time_" + mode) * time 
-												+ parameters.get("b_dist_" + mode) * dist;
+												+ parameters.get("b_dist_" + mode) * dist
+												+ factor;
 		
 		
 		
@@ -125,7 +130,13 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 	}
 	
 	private boolean canBeUsed(TransportChain chain, IParcel parcel) {
-		return chain.canTransport(parcel) && !(isXL(parcel) && chain.uses(BIKE));
+		return chain.canTransport(parcel)
+			&& !(isXL(parcel)
+			&& chain.uses(BIKE))
+			&& (
+					chain.last().getOrganization().equals("ALL")
+				|| chain.last().getOrganization().equals(chain.first().getOrganization())
+			);
 	}
 
 	private boolean isXL(IParcel parcel) {

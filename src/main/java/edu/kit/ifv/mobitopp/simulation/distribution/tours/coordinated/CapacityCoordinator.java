@@ -58,7 +58,8 @@ public class CapacityCoordinator {
 	}
 
 	private ChainAssignment coordinateCapacityAssignment(Time date) {
-		Time earliestDeparture = date.startOfDay().plusHours(7).plusMinutes(30); //TODO fix hard coded departure time
+		Time earliestTramDeparture = date.startOfDay().plusHours(4); //TODO fix hard coded departure time
+		Time earliestNonTramDeparture = date.startOfDay().plusHours(7);
 
 		ChainAssignment assignment = new ChainAssignment(distributionCenters);
 		
@@ -67,8 +68,8 @@ public class CapacityCoordinator {
 		List<Request> requests = new ArrayList<>();
 		for (DistributionCenter dc : distributionCenters) {
 			
-			List<TimedTransportChain> chains = getChainsFor(dc, earliestDeparture);
-			assignment.assign(dc, getNonTramChains(chains, earliestDeparture));
+			List<TimedTransportChain> chains = getChainsFor(dc, earliestTramDeparture);
+			assignment.assign(dc, getNonTramChains(chains, earliestNonTramDeparture));
 			
 			List<TransportPreferences> preferences = getPreferences(dc, chains);
 			assignment.register(dc, preferences);
@@ -78,7 +79,7 @@ public class CapacityCoordinator {
 		assignment.assignAll(assignRequests(requests));
 		
 		//for assigned delivery chains, obtain reversed direction
-		// (here first come first serve applies)
+		// (here first come, first served applies)
 		// also determine preferences for pickup requests
 		for (DistributionCenter dc : distributionCenters) {
 			Map<TimedTransportChain, TimedTransportChain> returnChainsWithCorrespondence = getReturnChainsFor(dc, assignment);
@@ -112,8 +113,6 @@ public class CapacityCoordinator {
 
 	public Optional<TimedTransportChain> createReturnChain(TimedTransportChain deliveryChain, Time returnDeparture) {
 		TransportChain oppositeDirection = deliveryChain.getOppositeDirection();
-		System.out.println("reverse :" + deliveryChain.getHubs());
-		System.out.println(" ==> " + oppositeDirection.getHubs());
 		return timedChainFactory.create(oppositeDirection, returnDeparture);
 	}
 
@@ -171,6 +170,7 @@ public class CapacityCoordinator {
 	private List<Request> getRequests(DistributionCenter dc, List<TransportPreferences> preferences) {
 		Map<TimedTransportChain, List<TimedTransportChain>> demandPerChain = preferences.stream()
 				   .map(p -> p.getSelected())
+				   .filter(c -> c.uses(VehicleType.TRAM))
 				   .collect(Collectors.groupingBy(c -> c));
 		
 		List<Request> requests = new ArrayList<>();

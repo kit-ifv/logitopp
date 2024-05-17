@@ -174,4 +174,8 @@ public class PlannedDeliveryTour implements PlannedTour {
 		return Optional.empty();
 	}
 
+	@Override
+	public boolean usesTram() {
+		return vehicleType.equals(VehicleType.TRAM);
+	}
 }

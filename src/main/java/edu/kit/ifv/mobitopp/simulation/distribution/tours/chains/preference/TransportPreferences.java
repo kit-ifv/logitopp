@@ -37,11 +37,11 @@ public class TransportPreferences {
 	}
 	
 	public void removeOption(TimedTransportChain chain) {
-		if (this.probabilities.containsKey(chain)) {
+		//if (this.probabilities.containsKey(chain)) {
 			
 			this.probabilities.remove(chain);
 			this.selectNewPreference();
-		}
+		//}
 	}
 	
 	public List<TimedTransportChain> options() {

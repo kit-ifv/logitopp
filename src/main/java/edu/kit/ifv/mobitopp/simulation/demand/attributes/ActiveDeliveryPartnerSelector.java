@@ -10,27 +10,28 @@ import java.util.function.Function;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
 import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
 
 public class ActiveDeliveryPartnerSelector implements ParcelDemandModelStep<Business, BusinessParcelBuilder, CEPServiceProvider> {
 
 	private final Function<Business, Collection<CEPServiceProvider>> partnerProvider;
-	private final int meanCapacity;
+	private final Function<VehicleType, Integer> expectedCapacity;
 	
 	private ActiveDeliveryPartnerSelector(Function<Business, Collection<CEPServiceProvider>> partnerProvider,
-										  int meanCapacity) {
+										  Function<VehicleType, Integer> expectedCapacity) {
 		
 		this.partnerProvider = partnerProvider;
-		this.meanCapacity = meanCapacity;
+		this.expectedCapacity = expectedCapacity;
 	}
 	
-	public static ActiveDeliveryPartnerSelector forShipping(int meanCapacity, MarketShareProvider shareProvider) {
-		return new ActiveDeliveryPartnerSelector(b -> b.getShippingPartners(), meanCapacity);
+	public static ActiveDeliveryPartnerSelector forShipping(Function<VehicleType, Integer> expectedCapacity) {
+		return new ActiveDeliveryPartnerSelector(Business::getShippingPartners, expectedCapacity);
 	}
 	
-	public static ActiveDeliveryPartnerSelector forDelivery(int meanCapacity, MarketShareProvider shareProvider) {
-		return new ActiveDeliveryPartnerSelector(b -> b.getDeliveryPartners(), meanCapacity);
+	public static ActiveDeliveryPartnerSelector forDelivery(Function<VehicleType, Integer> expectedCapacity) {
+		return new ActiveDeliveryPartnerSelector(Business::getDeliveryPartners, expectedCapacity);
 	}
 	
 	@Override
@@ -50,15 +51,19 @@ public class ActiveDeliveryPartnerSelector implements ParcelDemandModelStep<Busi
 		}
 
 		DiscreteRandomVariable<CEPServiceProvider> randVar = new DiscreteRandomVariable<>(capacities); //TODO logit model, other parcels at same day
-		CEPServiceProvider selectedPartner = randVar.realization(randomNumber);
-		
+
 		//TODO log
 		
-		return selectedPartner;
+		return randVar.realization(randomNumber);
 	}
 
 	private int estimateRemainingCapacity(CEPServiceProvider cepsp) {
-		return cepsp.getNumVehicles() * meanCapacity - cepsp.currentShippingDemand() - cepsp.currentDeliveryDemand();
+
+		int capacity = cepsp.getDistributionCenters().stream().mapToInt(
+				d -> d.getFleet().getNumVehicles() * expectedCapacity.apply(d.getVehicleType())
+		).sum();
+
+		return capacity - cepsp.currentShippingDemand() - cepsp.currentDeliveryDemand();
 	}
 	
 	@Override

@@ -34,6 +34,14 @@ public class CEPServiceProvider {//TODO ParcelAgent?
 	public int currentDeliveryDemand() {
 		return this.distributionCenters.stream().mapToInt(DistributionCenter::currentDeliveryDemand).sum();
 	}
+
+	public int currentShippingVolume() {
+		return this.distributionCenters.stream().mapToInt(DistributionCenter::currentShippingDemand).sum();
+	}
+
+	public int currentDeliveryVolume() {
+		return this.distributionCenters.stream().mapToInt(DistributionCenter::currentDeliveryDemand).sum();
+	}
 	
 	@Override
 		public String toString() {

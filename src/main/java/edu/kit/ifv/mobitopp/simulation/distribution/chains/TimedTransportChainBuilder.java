@@ -25,7 +25,9 @@ public class TimedTransportChainBuilder {
 	private final Map<DistributionCenter, Integer> transfers;
 	private final Map<DistributionCenter, Time> departures;
 	private final Map<DistributionCenter, Double> distances;
-	private final List<Connection> connections;
+
+	private final Map<DistributionCenter, Connection> connections;
+
 	private Time start;
 	
 	private boolean valid = true;
@@ -40,7 +42,7 @@ public class TimedTransportChainBuilder {
 		this.transfers = new LinkedHashMap<>();
 		this.departures = new LinkedHashMap<>();
 		this.distances = new LinkedHashMap<>();
-		this.connections = new ArrayList<>();
+		this.connections = new LinkedHashMap<>();
 		durations.put(chain.last(), 0);// TODO default value
 		transfers.put(chain.last(), 0);// TODO default value
 
@@ -53,10 +55,16 @@ public class TimedTransportChainBuilder {
 		return this;
 	}
 
-	public TimedTransportChainBuilder fixedDepartureAt(DistributionCenter hub, Time departure, int durMinutes,
-			int transferMinutes, double distance) {
+	public TimedTransportChainBuilder fixedDepartureAt(
+			DistributionCenter hub,
+			int prefixDur,
+			Time departure,
+			int durMinutes,
+			int transferMinutes,
+			double distance
+	) {
 		List<DistributionCenter> prefix = getPrefixHubs(hub);
-		int prefixDur = getPrefixDuration(prefix, hub);
+		//int prefixDur = getPrefixDuration(prefix, hub);
 
 		if (start == null) {
 			// set start time with given departure as fixed pole
@@ -67,7 +75,7 @@ public class TimedTransportChainBuilder {
 			int waitMin = departure.differenceTo(start).toMinutes() - prefixDur;
 
 			if (waitMin < 0) {
-				throw new IllegalArgumentException("The given departure" + departure
+				throw new IllegalArgumentException("The given departure " + departure
 						+ " is before the first possible start " + start.plusMinutes(prefixDur) + " = " + start + " + "
 						+ prefixDur + " min (delta=" + waitMin + ").");
 			}
@@ -87,9 +95,13 @@ public class TimedTransportChainBuilder {
 		return this;
 	}
 
-	public TimedTransportChainBuilder useDurationsFromStats(TimeTable timeTable, ImpedanceIfc impedance,
-			Time currentTime) {// TODO error on legs before first tram leg with fixed departure as start dep is
+	public TimedTransportChainBuilder useDurationsFromStats(
+			TimeTable timeTable,
+			ImpedanceIfc impedance,
+			Time currentTime
+	) {// TODO error on legs before first tram leg with fixed departure as start dep is
 								// approximated via current time
+
 		DistributionCenter origin = chain.first();
 		int durationSum = 0;
 
@@ -105,7 +117,7 @@ public class TimedTransportChainBuilder {
 			int dur;
 
 			if (vehicle.equals(VehicleType.TRAM)) {
-				Optional<Connection> maybeConnection = timeTable.getFreeConnectionsOnDay(origin, destination, currentTime).findFirst();
+				Optional<Connection> maybeConnection = timeTable.getFreeConnectionsOnDay(origin, destination, time).findFirst();
 				
 				if (maybeConnection.isEmpty()) {
 					this.valid = false;
@@ -113,17 +125,17 @@ public class TimedTransportChainBuilder {
 				}
 				
 				Connection connection = maybeConnection.get();
+				connections.put(origin, connection);
 
 				dur = connection.getDurationMinutes();
-				fixedDepartureAt(origin, connection.getDeparture(), dur, transfer, dist);
-				connections.add(connection);
+				fixedDepartureAt(origin, durationSum, connection.getDeparture(), dur, transfer, dist);
 
 			} else {
 				dur = tripDuration(impedance, origin, destination, time, vehicle);
 				setDuration(origin, dur, transfer, dist);
 			}
 
-			durationSum += dur + transfer;
+			durationSum += durations.get(origin) + transfers.get(origin);
 			origin = destination;
 			
 		}//TODO for reverse order, sometimes box is picked up, should this be considered? effective travel time of box is accurate but not of vehicle
@@ -161,9 +173,8 @@ public class TimedTransportChainBuilder {
 			throw new IllegalStateException(msg);
 		}
 
-		int prefixDur = prefix.stream().mapToInt(durations::get).sum() + prefix.stream().mapToInt(transfers::get).sum();
-
-		return prefixDur;
+		return prefix.stream().mapToInt(durations::get).sum()
+						+ prefix.stream().mapToInt(transfers::get).sum();
 	}
 
 	private boolean allHubsHaveDuration(List<DistributionCenter> prefix) {
@@ -187,8 +198,16 @@ public class TimedTransportChainBuilder {
 		
 		Time time = start.plusMinutes(0);
 		for (DistributionCenter hub: chain.getHubs()) {
-			departures.put(hub, time);
-			time = time.plusMinutes(durations.get(hub));
+
+			if (connections.containsKey(hub)) {
+				Connection con = connections.get(hub);
+				departures.put(hub, con.getDeparture());
+				time = time.plusMinutes(con.getDurationMinutes());
+
+			} else {
+				departures.put(hub, time);
+				time = time.plusMinutes(durations.get(hub));
+			}
 
 			time = time.plusMinutes(transfers.get(hub));
 		}
@@ -212,7 +231,7 @@ public class TimedTransportChainBuilder {
 			origin = destination;
 		}
 		
-		return Optional.of(new TimedTransportChain(chain, departures, durations, connections, distance, cost));
+		return Optional.of(new TimedTransportChain(chain, departures, durations, new ArrayList<>(connections.values()), distance, cost));
 	}
 	
 	

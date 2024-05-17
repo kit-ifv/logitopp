@@ -2,6 +2,7 @@ package edu.kit.ifv.mobitopp.simulation.demand;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
@@ -15,6 +16,7 @@ import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
 
@@ -55,23 +57,21 @@ public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<B
 	/**
 	 * Add the {@link ActiveDeliveryPartnerSelector} step for shipping.
 	 *
-	 * @param meanCapacity the mean capacity
-	 * @param shareProvider the market share provider
+	 * @param expectedCapacity the expected capacity per vehicle type
 	 * @return the private parcel demand model builder
 	 */
-	public BusinessParcelDemandModelBuilder selectActiveShippingPartner(int meanCapacity, MarketShareProvider shareProvider) {
-		return this.addBusinessStep(ActiveDeliveryPartnerSelector.forShipping(meanCapacity, shareProvider), BusinessParcelBuilder::setServiceProvider);
+	public BusinessParcelDemandModelBuilder selectActiveShippingPartner(Function<VehicleType, Integer> expectedCapacity) {
+		return this.addBusinessStep(ActiveDeliveryPartnerSelector.forShipping(expectedCapacity), BusinessParcelBuilder::setServiceProvider);
 	}
 	
 	/**
 	 * Add the {@link ActiveDeliveryPartnerSelector} step for delivery.
 	 *
-	 * @param meanCapacity the mean capacity
-	 * @param shareProvider the market share provider
+	 * @param expectedCapacity the expected capacity per vehicle type
 	 * @return the private parcel demand model builder
 	 */
-	public BusinessParcelDemandModelBuilder selectActiveDeliveryPartner(int meanCapacity, MarketShareProvider shareProvider) {
-		return this.addBusinessStep(ActiveDeliveryPartnerSelector.forDelivery(meanCapacity, shareProvider), BusinessParcelBuilder::setServiceProvider);
+	public BusinessParcelDemandModelBuilder selectActiveDeliveryPartner(Function<VehicleType, Integer> expectedCapacity) {
+		return this.addBusinessStep(ActiveDeliveryPartnerSelector.forDelivery(expectedCapacity), BusinessParcelBuilder::setServiceProvider);
 	}
 	
 	

@@ -8,22 +8,34 @@ import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class TimeWindowDispatchStrategy implements DispatchStrategy {
-	
+
 	@Override
 	public boolean canDispatch(PlannedTour tour, DistributionCenter origin, Time time) {
+
+		boolean inTimeWindow;
+
+		if (tour.usesTram()) {
+			inTimeWindow = isInTramDispatchHours(time);
+		} else {
+			inTimeWindow = isInDispatchHours(time);
+		}
 		
-		if ( !isInDispatchHours(time) || isSunday(time) || isFleetAbsent(origin.getFleet()) ) {
+		if (!inTimeWindow || isSunday(time) || isFleetAbsent(origin.getFleet()) ) {
 			return false;
 		}
 
-		
 		return endsBeforeEndOfDeliveryTime(time, tour);
 	}
 	
 
 	private boolean isInDispatchHours(Time time) {
 		int hour=time.getHour();
-		return 8 <= hour && hour <= 18;
+		return 7 <= hour && hour <= 18;
+	}
+
+	private boolean isInTramDispatchHours(Time time) {
+		int hour=time.getHour();
+		return 4 <= hour && hour <= 18;
 	}
 
 	private boolean isSunday(Time time) {

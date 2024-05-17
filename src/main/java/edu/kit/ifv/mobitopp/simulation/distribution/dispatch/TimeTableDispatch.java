@@ -1,10 +1,9 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.dispatch;
 
-import java.util.Collection;
 import java.util.Optional;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
-import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
@@ -13,17 +12,17 @@ import edu.kit.ifv.mobitopp.time.Time;
 public class TimeTableDispatch implements DispatchStrategy {
 	
 	private final TimeTable timeTable;
-	private final boolean isInputHub;	
+	private final DispatchStrategy defaultDeliveryDispatch;
 	
-	public TimeTableDispatch(TimeTable timeTable, boolean isInputHub) {
+	public TimeTableDispatch(TimeTable timeTable, DispatchStrategy defaultDeliveryDispatch) {
 		this.timeTable = timeTable;
-		this.isInputHub = isInputHub;
+		this.defaultDeliveryDispatch = defaultDeliveryDispatch;
 	}
 
 	@Override
 	public boolean canDispatch(PlannedTour tour, DistributionCenter origin, Time time) {
 		
-		if (useTimeTable(tour)) {
+		if (useTimeTable(tour, origin)) {
 			DistributionCenter destination = tour.nextHub().get();
 			
 			Optional<Connection> nextConnection = timeTable.getNextConnection(origin, destination, time);
@@ -38,14 +37,18 @@ public class TimeTableDispatch implements DispatchStrategy {
 				return destination.getFleet().hasAvailableVehicle();			
 			}
 			
-			return origin.getFleet().hasAvailableVehicle();
+			return defaultDeliveryDispatch.canDispatch(tour, origin, time);
 			
 		}
 
 	}
 	
-	private boolean useTimeTable(PlannedTour tour) {
-		return isInputHub != tour.isReturning();
+	private boolean useTimeTable(PlannedTour tour, DistributionCenter origin) {
+
+		Optional<DistributionCenter> handler = tour.isReturning() ? tour.nextHub() : Optional.of(origin);
+
+		return handler.filter(distributionCenter -> distributionCenter.getVehicleType() == VehicleType.TRAM).isPresent();
+
 	}
 
 }
