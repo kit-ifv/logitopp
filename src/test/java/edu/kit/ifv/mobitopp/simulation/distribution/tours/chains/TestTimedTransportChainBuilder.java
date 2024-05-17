@@ -84,7 +84,7 @@ public class TestTimedTransportChainBuilder {
 
 		TimedTransportChain timedChain = 
 			builder.setDuration(hubs.get(0), 8, 2, 1)
-				   .fixedDepartureAt(hubs.get(1), departure, 8, 4, 1)
+				   .fixedDepartureAt(hubs.get(1), 10, departure, 8, 4, 1)
 				   .build().get();
 				
 		assertEquals(departure.minusMinutes(10), 	timedChain.getDeparture(hubs.get(0)));
@@ -102,8 +102,8 @@ public class TestTimedTransportChainBuilder {
 		TimedTransportChain timedChain = 
 			builder.setDuration(hubs.get(0), 8, 2, 1)
 				   .setDuration(hubs.get(1), 5, 3,1 )
-				   .fixedDepartureAt(hubs.get(2), departure, 8, 4, 1)
-				   .fixedDepartureAt(hubs.get(3), departure2, 18, 6, 1)
+				   .fixedDepartureAt(hubs.get(2),18, departure, 8, 4, 1)
+				   .fixedDepartureAt(hubs.get(3), 30, departure2, 18, 6, 1)
 				   .build().get();
 
 		assertEquals(departure.minusMinutes(18), 	timedChain.getDeparture(hubs.get(0)));
@@ -123,8 +123,8 @@ public class TestTimedTransportChainBuilder {
 		TimedTransportChain timedChain =
 				builder.setDuration(hubs.get(0), 8, 2, 1)
 						.setDuration(hubs.get(1), 5, 3,1 )
-						.fixedDepartureAt(hubs.get(2), departure, 8, 4, 1)
-						.fixedDepartureAt(hubs.get(3), departure2, 18, 6, 1)
+						.fixedDepartureAt(hubs.get(2), 18, departure, 8, 4, 1)
+						.fixedDepartureAt(hubs.get(3), 30, departure2, 18, 6, 1)
 						.build().get();
 
 		assertEquals(departure.minusMinutes(18), 	timedChain.getDeparture(hubs.get(0)));
@@ -179,21 +179,7 @@ public class TestTimedTransportChainBuilder {
 		assertEquals(departure2.plusMinutes(10),timedChain.getDeparture(hubs.get(1)));
 		assertEquals(departure2.plusMinutes(18),timedChain.getDeparture(hubs.get(2)));
 	}
-	
-	@Test
-	public void missingPrefixDuration() {
-		List<DistributionCenter> hubs = hubsComplex;
-		
-		TimedTransportChainBuilder builder = new TimedTransportChainBuilder(chainComplex, cost, transfer)
-			.setDuration(hubs.get(0), 8, 2, 1);
-		
-		assertThrows(IllegalStateException.class,
-			() -> {
-				builder.fixedDepartureAt(hubs.get(2), departure, 8, 4, 1);
-			}
-		);
-	}
-	
+
 	@Test
 	public void invalidDepartureInPast() {
 		List<DistributionCenter> hubs = hubsComplex;
@@ -202,11 +188,11 @@ public class TestTimedTransportChainBuilder {
 
 		builder.setDuration(hubs.get(0), 8, 2, 1)
 			   .setDuration(hubs.get(1), 5, 3, 1)
-			   .fixedDepartureAt(hubs.get(2), departure2, 8, 4, 1);
+			   .fixedDepartureAt(hubs.get(2), 18, departure2, 8, 4, 1);
 				   
 	    assertThrows(IllegalArgumentException.class,
 			() -> {
-				builder.fixedDepartureAt(hubs.get(3), departure, 18, 6, 1);
+				builder.fixedDepartureAt(hubs.get(3), 30, departure, 18, 6, 1);
 			}
 		);
 	}
