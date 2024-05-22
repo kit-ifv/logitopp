@@ -156,7 +156,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 
 		});
 
-		System.out.println("    - planned " + plannedTours.size() + "tours for " + dc.getName() + "[" + dc.getId() + "]");
+		System.out.println("    - planned " + plannedTours.size() + " tours for " + dc.getName() + "[" + dc.getId() + "]");
 		
 		
 		return plannedTours;
@@ -284,13 +284,15 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	private void addParcelAsNewStopAtMinPosition(Map<TimedTransportChain, List<LastMileTour>> validTours,
 			List<IParcel> remaining, IParcel parcel, TransportPreferences preferredChains) {
 		ParcelCluster newStop = new ParcelCluster(new ArrayList<>(List.of(parcel)), clustering);
-		
+
+		Function<LastMileTour, Integer> workTime = lmt -> (lmt.chain.lastMileVehicle() == VehicleType.BIKE) ? 2*60 : 8*60;// TODO work time
+
 		Optional<LastMileTour> minInsertionTour = 
 				preferredChains.options()
 							   .stream()
 							   .filter(validTours::containsKey)
 							   .flatMap(c -> validTours.get(c).stream())
-							   .filter(t -> t.tour.getTravelTime() + t.tour.minInsertionCost(newStop) + t.accessEgress < 8*60) //TODO time
+							   .filter(t -> t.tour.getTravelTime() + t.tour.minInsertionCost(newStop) + t.accessEgress < workTime.apply(t))
 							   .min(Comparator.comparing(t -> t.tour.minInsertionCost(newStop)));
 
 		if (minInsertionTour.isPresent()) {
@@ -369,14 +371,19 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			Map<TimedTransportChain, List<LastMileTour>> capacityViolated,
 			Map<TimedTransportChain, List<LastMileTour>> validTours, List<IParcel> removedParcels
 	) {
-		
+
+		Map<TimedTransportChain, List<LastMileTour>> emptiedTours = new LinkedHashMap<>();
+
 		timeAndCapacityViolated.keySet().forEach(chain -> {
 			timeAndCapacityViolated.get(chain).forEach(lmt -> {
+				emptiedTours.put(chain, new ArrayList<>());
 
 				int workTime = (chain.lastMileVehicle() == VehicleType.BIKE) ? 2*60 : 8*60;// TODO work time
 				
 				while(lmt.tour.getTravelTime()+lmt.accessEgress > workTime) {
 					if (lmt.tour.isEmpty()) {
+						System.err.println("fixing time violation produced empty tour for " + chain);
+						emptiedTours.get(chain).add(lmt);
 						break;
 					}
 
@@ -399,6 +406,14 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				
 			});
 		});
+
+		for (TimedTransportChain chain : emptiedTours.keySet()) {
+			for (LastMileTour tour: emptiedTours.get(chain)) {
+				timeAndCapacityViolated.get(chain).remove(tour);
+			}
+			if (timeAndCapacityViolated.get(chain).isEmpty()) { timeAndCapacityViolated.remove(chain); }
+		}
+
 
 		for (TimedTransportChain chain : capacityViolated.keySet()) {
 			if (timeAndCapacityViolated.containsKey(chain)) {
@@ -558,12 +573,21 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 //		clusters.values().forEach(t -> System.out.println(
 //				t.stream().flatMap(c -> c.getParcels().stream().map(IParcel::getOId)).sorted().map(Object::toString).collect(Collectors.joining(" "))
 //		));
-		
-		return distinctChains.stream()
-					 .collect(Collectors.toMap(
-							 Function.identity(), 
-							 c -> solver.findTour(clusters.get(c), c.lastMileVehicle().getMode().mainMode()
-					 )));
+
+		Map<TimedTransportChain, Tour<ParcelCluster>> initTours = distinctChains.stream()
+				.collect(toMap(
+						identity(),
+						c -> solver.findTour(clusters.get(c), c.lastMileVehicle().getMode().mainMode()
+						)));
+
+		for (TimedTransportChain chain: new ArrayList<>(initTours.keySet())) {
+			if (initTours.get(chain).isEmpty()) {
+				initTours.remove(chain);
+				System.out.println("Tour planning produced empty initial tour for " + chain + "! (" + clusters.size() + " clusters)");
+			}
+		}
+
+		return initTours;
 	}
 
 	private Map<TimedTransportChain, Collection<ParcelCluster>> computeClusters(
