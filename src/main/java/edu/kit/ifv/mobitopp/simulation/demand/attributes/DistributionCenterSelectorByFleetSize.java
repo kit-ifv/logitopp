@@ -7,6 +7,7 @@ import java.util.Map;
 
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 
 //This step evaluates the serviceProvider attribute, which should be set prior to this step!!!
@@ -31,8 +32,12 @@ public class DistributionCenterSelectorByFleetSize<A extends ParcelAgent, P exte
 		}
 		
 		Map<DistributionCenter, Double> shares = distributionCenters.stream()
-			  														 .collect(toMap(d -> d, d -> (double) d.getTotalVehicles()));
-		
+																	.filter(d -> d.getVehicleType() == VehicleType.TRUCK) //TODO: external distribution center identified by truck
+																	.collect(toMap(d -> d, d -> (double) d.getTotalVehicles()));
+		if (shares.isEmpty()) {
+			shares = distributionCenters.stream()
+					.collect(toMap(d -> d, d -> (double) d.getTotalVehicles()));
+		}
 		
 		 return new ShareBasedSelector<>(shares).select(randomNumber);
 
