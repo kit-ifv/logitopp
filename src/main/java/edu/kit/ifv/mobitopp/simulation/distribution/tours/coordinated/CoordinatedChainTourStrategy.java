@@ -99,19 +99,23 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		Map<TimedTransportChain, List<LastMileTour>> validTours = new LinkedHashMap<>();
 		
 		sortTours(lastMileTours, timeAndCapacityViolated, capacityViolated, timeViolated, validTours);
-		
+		logValidation("check valid", timeAndCapacityViolated, timeViolated, capacityViolated, validTours);
+
 		List<IParcel> removedParcels = new ArrayList<>();
 		resolveTimeViolation(timeAndCapacityViolated, capacityViolated, validTours, removedParcels);
+		logValidation("fix time of time&cap", timeAndCapacityViolated, timeViolated, capacityViolated, validTours);
+
 		resolveTimeViolation(timeViolated, capacityViolated, validTours, removedParcels);
+		logValidation("fix time", timeAndCapacityViolated, timeViolated, capacityViolated, validTours);
+
 		resolveCapacityViolation(capacityViolated, validTours, removedParcels);
+		logValidation("fix cap", timeAndCapacityViolated, timeViolated, capacityViolated, validTours);
 		
 		List<IParcel> remaining = addRemovedParcelsToOtherExistingStops(preferences, validTours, removedParcels);
 		if (!remaining.isEmpty()) {
 			System.out.println("Not all parcels (" + remaining.size() + ") could be included in any of their preferred/allowed tours!");
 		}
-		
-		
-		
+
 		
 		
 		List<PlannedTour> plannedTours = new ArrayList<>();
@@ -150,10 +154,21 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				
 			}
 
-		});	
+		});
+
+		System.out.println("    - planned " + plannedTours.size() + "tours for " + dc.getName() + "[" + dc.getId() + "]");
 		
 		
 		return plannedTours;
+	}
+
+	private static void logValidation(String task, Map<TimedTransportChain, List<LastMileTour>> timeAndCapacityViolated, Map<TimedTransportChain, List<LastMileTour>> timeViolated, Map<TimedTransportChain, List<LastMileTour>> capacityViolated, Map<TimedTransportChain, List<LastMileTour>> validTours) {
+		System.out.println(
+				"    - " + task + ": valid=" + validTours.values().stream().mapToInt(List::size).sum() +
+				" time invalid=" + timeViolated.values().stream().mapToInt(List::size).sum() +
+				" cap invalid=" + capacityViolated.values().stream().mapToInt(List::size).sum() +
+				" cap&time invalid=" + timeAndCapacityViolated.values().stream().mapToInt(List::size).sum()
+		);
 	}
 
 	private boolean fillTramTourPlan(
