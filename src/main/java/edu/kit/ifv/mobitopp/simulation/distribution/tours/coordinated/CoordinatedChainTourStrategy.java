@@ -108,7 +108,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		
 		List<IParcel> remaining = addRemovedParcelsToOtherExistingStops(preferences, validTours, removedParcels);
 		if (!remaining.isEmpty()) {
-			System.out.println("Not all parcels (" + remaining.size() + ") could be included in any of their preferred/allowed tours: " + remaining.stream().map(p -> ""+p.getOId()).collect(joining(",")));
+			System.out.println("Not all parcels (" + remaining.size() + ") could be included in any of their preferred/allowed tours!");
 		}
 		
 		
