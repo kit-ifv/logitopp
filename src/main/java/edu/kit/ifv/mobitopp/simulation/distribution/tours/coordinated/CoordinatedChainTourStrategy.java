@@ -416,7 +416,10 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 
 		while(copy.getTravelTime()+accessEgress > workTime) {
 			if (copy.isEmpty()) {
-				System.err.println("fixing time violation produced empty tour for " + chain);
+				System.out.println("    - fixing time violation produced empty tour for " + chain.last().getName());
+				System.out.println("      og time: " + lmt.tour.getTravelTime() + " min > " + workTime + " min!");
+				System.out.println("      og clusters: " + lmt.tour.getElements());
+				System.out.println("      og volume: " + lmt.volume() + " !< " + lmt.maxVolume() + " = max");
 				emptiedTours.get(chain).add(lmt);
 				break;
 			}
