@@ -42,7 +42,8 @@ import edu.kit.ifv.mobitopp.simulation.parcels.clustering.ParcelCluster;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.routing.Tour;
-import edu.kit.ifv.mobitopp.util.routing.TspSolver;
+import edu.kit.ifv.mobitopp.util.routing.tsp.TspSolver;
+import edu.kit.ifv.mobitopp.util.routing.tsp.TspSolver2Approx;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
