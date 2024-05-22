@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 public class ModeTravelTimes<E> {
 
-    private final Map<Mode, CachedTravelTime<E>> modeTravelTimes = new LinkedHashMap<>();
+    private final Map<Mode, TravelTimeProvider<E>> modeTravelTimes = new LinkedHashMap<>();
     private final Supplier<TravelTimeProvider<E>> travelTimeFactory;
     private Time time = SimpleTime.start;
 
@@ -20,15 +20,15 @@ public class ModeTravelTimes<E> {
         this.travelTimeFactory = travelTimeFactory;
     }
 
-    private CachedTravelTime<E> initModeCache(StandardMode mode) {
-        CachedTravelTime<E> cache = new CachedTravelTime<>(travelTimeFactory.get());
-        modeTravelTimes.put(mode, cache);
-        cache.setMode(mode);
-        cache.setTime(time);
-        return cache;
+    private TravelTimeProvider<E> initModeCache(StandardMode mode) {
+        TravelTimeProvider<E> provider = travelTimeFactory.get();
+        modeTravelTimes.put(mode, provider);
+        provider.setMode(mode);
+        provider.setTime(time);
+        return provider;
     }
 
-    private CachedTravelTime<E> getCache(StandardMode mode) {
+    private TravelTimeProvider<E> getProvider(StandardMode mode) {
         if (modeTravelTimes.containsKey(mode)) {
             return modeTravelTimes.get(mode);
         }
@@ -38,19 +38,19 @@ public class ModeTravelTimes<E> {
 
 
     public float getTravelTime(StandardMode mode, E origin, E destination) {
-        return getCache(mode).getTravelTime(origin, destination);
+        return getProvider(mode).getTravelTime(origin, destination);
     }
 
     public float getTravelTime(StandardMode mode, ZoneAndLocation origin, E destination) {
-        return getCache(mode).getTravelTime(origin, destination);
+        return getProvider(mode).getTravelTime(origin, destination);
     }
 
     public float getTravelTime(StandardMode mode, E origin, ZoneAndLocation destination) {
-        return getCache(mode).getTravelTime(origin, destination);
+        return getProvider(mode).getTravelTime(origin, destination);
     }
 
     public float getTravelTime(StandardMode mode, ZoneAndLocation origin, ZoneAndLocation destination) {
-        return getCache(mode).getTravelTime(origin, destination);
+        return getProvider(mode).getTravelTime(origin, destination);
     }
 
     public void setTime(Time newTime) {
