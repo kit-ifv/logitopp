@@ -39,6 +39,7 @@ import edu.kit.ifv.mobitopp.simulation.parcels.box.ParcelBox;
 import edu.kit.ifv.mobitopp.simulation.parcels.box.ParcelWithReturnInfo;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStrategy;
 import edu.kit.ifv.mobitopp.simulation.parcels.clustering.ParcelCluster;
+import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.routing.Tour;
@@ -68,12 +69,13 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	
 	@Override
 	public boolean shouldReplanTours(DistributionCenter center, Time time) {
-		return time.equals(time.startOfDay().plusHours(3));
+		return  !(time.weekDay().equals(DayOfWeek.SUNDAY)) && time.equals(time.startOfDay().plusHours(3));
 	}
 	
 	@Override
 	public List<PlannedTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps, Fleet fleet,
 			Time time) {
+		System.gc();
 		
 		DistributionCenter dc = fleet.getDistributionCenter();
 		ChainAssignment assignment = coordinator.getAssignment(time);
@@ -364,8 +366,14 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		
 		timeAndCapacityViolated.keySet().forEach(chain -> {
 			timeAndCapacityViolated.get(chain).forEach(lmt -> {
+
+				int workTime = (chain.lastMileVehicle() == VehicleType.BIKE) ? 2*60 : 8*60;// TODO work time
 				
-				while(lmt.tour.getTravelTime()+lmt.accessEgress > 8*60) { // TODO work time
+				while(lmt.tour.getTravelTime()+lmt.accessEgress > workTime) {
+					if (lmt.tour.isEmpty()) {
+						break;
+					}
+
 					int toRemove = lmt.tour.findMinRemovalIndex();
 					
 					ParcelCluster cluster = lmt.tour.getModulo(toRemove);
@@ -378,7 +386,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				if (lmt.volume() > lmt.maxVolume()) {
 					capacityViolated.get(chain).add(lmt);
 				
-				} else {
+				} else if (!lmt.tour.isEmpty()) {
 					validTours.get(chain).add(lmt);
 				}
 				

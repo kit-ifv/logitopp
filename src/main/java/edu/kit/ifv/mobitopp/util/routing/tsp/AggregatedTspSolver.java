@@ -22,7 +22,7 @@ public class AggregatedTspSolver<E, A> implements TspSolver<E> {
 
     public AggregatedTspSolver(TspSolver<A> aggregateSolver, TravelTimeProvider<E> travelTime, Function<E, A> aggregation) {
         ModeTravelTimes<E> travelTimes = new ModeTravelTimes<>(
-                () -> new CachedTravelTime<>(travelTime)
+                () -> travelTime
         );
 
         this.aggregateSolver = aggregateSolver;
