@@ -109,7 +109,7 @@ public class DistributionCenterParser {
 		ServiceArea serviceArea = serviceAreaFactory.fromIntCode(zone, serviceAreaCode);
 
 		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location.location(), scaleVehicles(vehicles),
-				scaleVehicleVolume(volume), attempts, type, serviceArea, result);
+				volume, attempts, type, serviceArea, result);
 		addCenterToServiceProvider(center, cepsp);
 
 		System.out.println(name + " (" + id + ") serves " + serviceArea.size() + " zones!");

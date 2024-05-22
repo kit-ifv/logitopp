@@ -71,7 +71,7 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		this.attempts = attempts;		
 		this.demandQuantity = new DemandQuantity();
 		
-		this.storage = new DepotStorage();
+		this.storage = new DepotStorage(this);
 		this.regionalStructure = new RegionalReach(this, serviceArea);
 		this.fleet = new Fleet(vehicleType, numVehicles, vehicleVolume, this, results);
 		

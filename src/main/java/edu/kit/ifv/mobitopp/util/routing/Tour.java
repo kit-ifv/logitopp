@@ -14,7 +14,7 @@ public class Tour<E> implements Iterable<E> {
 	@Getter private final List<E> elements;
 	@Getter private float travelTime;
 	private final ModeTravelTimes<E> travelTimeProvider;
-	private final StandardMode mode;
+	@Getter private final StandardMode mode;
 	
 	private int start = 0;
 	

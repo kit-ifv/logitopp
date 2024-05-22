@@ -9,13 +9,16 @@ import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 
 public class DepotStorage {
+
+	private final DistributionCenter owner;
 	
 	private final Map<Integer, IParcel> currentParcels;
 	private final Collection<IParcel> collectedPickups;
 	private final Map<Integer, IParcel> pickupRequests;
 	private final Collection<PlannedTour> plannedTours;
 	
-	public DepotStorage() {
+	public DepotStorage(DistributionCenter owner) {
+		this.owner = owner;
 		this.currentParcels = new LinkedHashMap<>();
 		this.collectedPickups = new ArrayList<>();
 		this.pickupRequests = new LinkedHashMap<>();
@@ -86,6 +89,7 @@ public class DepotStorage {
 	}
 	
 	public void addPlannedTours(Collection<PlannedTour> tours) {
+
 		tours.forEach(this::addPlannedTour);
 	}
 	

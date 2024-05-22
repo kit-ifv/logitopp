@@ -129,7 +129,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 					PlannedDeliveryTour plannedLastMile = new PlannedDeliveryTour(chain.lastMileVehicle(), RelativeTime.ofMinutes((int) ceil(tour.tour.getTravelTime() + accessEgress)), time, false, impedance, chain.last());
 
 					PlannedTour planned;
-					if (chain.uses(VehicleType.TRAM)) { //Encode return tour here
+					if (chain.uses(VehicleType.BIKE)) { //Encode return tour here
 						boolean valid = fillTramTourPlan(chain, tour, accessEgress, plannedLastMile);
 
 						if (!valid) {
@@ -376,34 +376,9 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 
 		timeAndCapacityViolated.keySet().forEach(chain -> {
 			timeAndCapacityViolated.get(chain).forEach(lmt -> {
-				emptiedTours.put(chain, new ArrayList<>());
 
-				int workTime = (chain.lastMileVehicle() == VehicleType.BIKE) ? 2*60 : 8*60;// TODO work time
-				
-				while(lmt.tour.getTravelTime()+lmt.accessEgress > workTime) {
-					if (lmt.tour.isEmpty()) {
-						System.err.println("fixing time violation produced empty tour for " + chain);
-						emptiedTours.get(chain).add(lmt);
-						break;
-					}
+				reduceTourToMatchWorkTime(capacityViolated, validTours, removedParcels, emptiedTours, chain, lmt);
 
-					int toRemove = lmt.tour.findMinRemovalIndex();
-					
-					ParcelCluster cluster = lmt.tour.getModulo(toRemove);
-					removedParcels.addAll(cluster.getParcels());
-					
-					float cost = lmt.tour.removeAtPosition(toRemove);
-					lmt.accessEgress = lmt.tour.selectMinInsertionStart(chain.last().getZoneAndLocation());
-				}
-				
-				if (lmt.volume() > lmt.maxVolume()) {
-					capacityViolated.get(chain).add(lmt);
-				
-				} else if (!lmt.tour.isEmpty()) {
-					validTours.get(chain).add(lmt);
-				}
-				
-				
 			});
 		});
 
@@ -429,6 +404,41 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			}
 		}
 
+	}
+
+	private void reduceTourToMatchWorkTime(Map<TimedTransportChain, List<LastMileTour>> capacityViolated, Map<TimedTransportChain, List<LastMileTour>> validTours, List<IParcel> removedParcels, Map<TimedTransportChain, List<LastMileTour>> emptiedTours, TimedTransportChain chain, LastMileTour lmt) {
+		emptiedTours.put(chain, new ArrayList<>());
+
+		Tour<ParcelCluster> copy = new Tour<>(lmt.tour.getElements(), lmt.tour.getTravelTime(), solver.getTravelTimes(), lmt.tour.getMode());
+		float accessEgress = lmt.accessEgress;
+
+		int workTime = (chain.lastMileVehicle() == VehicleType.BIKE) ? 2*60 : 8*60;// TODO work time
+
+		while(copy.getTravelTime()+accessEgress > workTime) {
+			if (copy.isEmpty()) {
+				System.err.println("fixing time violation produced empty tour for " + chain);
+				emptiedTours.get(chain).add(lmt);
+				break;
+			}
+
+			int toRemove = copy.findMinRemovalIndex();
+
+			ParcelCluster cluster = copy.getModulo(toRemove);
+			removedParcels.addAll(cluster.getParcels());
+
+			float cost = copy.removeAtPosition(toRemove);
+			accessEgress = copy.selectMinInsertionStart(chain.last().getZoneAndLocation());
+		}
+
+		lmt.accessEgress = accessEgress;
+		lmt.tour = copy;
+
+		if (lmt.volume() > lmt.maxVolume()) {
+			capacityViolated.get(chain).add(lmt);
+
+		} else if (!lmt.tour.isEmpty()) {
+			validTours.get(chain).add(lmt);
+		}
 	}
 
 	private void sortTours(Map<TimedTransportChain, List<LastMileTour>> lastMileTours,
@@ -539,7 +549,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	@AllArgsConstructor
 	static class LastMileTour {
 		private final TimedTransportChain chain;
-		private final Tour<ParcelCluster> tour;
+		private Tour<ParcelCluster> tour;
 		private float accessEgress;
 
 		public double maxVolume() {
