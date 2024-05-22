@@ -75,25 +75,23 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			Time time) {
 		
 		DistributionCenter dc = fleet.getDistributionCenter();
-		
 		ChainAssignment assignment = coordinator.getAssignment(time);
 		List<TimedTransportChain> chains = assignment.getChains(dc);
-		
 		Map<IParcel, TransportPreferences> preferences = getPreferencesByParcel(dc, assignment);
+
+		System.out.println("Plan tours for " + dc.getName() + "[" + dc.getId() + "]");
+		System.out.println("    - chains: " + chains.size());
 		
 		//plan giant tours for distinct chains (duplicates are here ignored)
 		Map<TimedTransportChain, Tour<ParcelCluster>> initialTours = createInitialTours(deliveries, pickUps, chains, preferences);
-		
-//		initialTours.values().forEach(t -> System.out.println(
-//				t.getElements().stream().flatMap(c -> c.getParcels().stream().map(IParcel::getOId)).sorted().map(Object::toString).collect(Collectors.joining(" "))
-//		));
-		
+		System.out.println("    - init tours: " + initialTours.size());
+
+
 		//Some chains have multiple copies (e.g. if multiple truck vehicle are available):split demand to form smaller subtours
 		Map<TimedTransportChain, List<LastMileTour>> lastMileTours = splitToursForChainCopies(chains, initialTours);
+		System.out.println("    - last mile tours: " + lastMileTours.values().stream().mapToInt(List::size).sum());
 		
-		
-		//TODO fix tours violating tour constraints then build planned tours
-		
+
 		Map<TimedTransportChain, List<LastMileTour>> timeAndCapacityViolated = new LinkedHashMap<>();
 		Map<TimedTransportChain, List<LastMileTour>> timeViolated = new LinkedHashMap<>();
 		Map<TimedTransportChain, List<LastMileTour>> capacityViolated = new LinkedHashMap<>();
@@ -145,7 +143,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 					}
 					
 					plannedTours.add(planned);
-					
+
 					
 				}
 				

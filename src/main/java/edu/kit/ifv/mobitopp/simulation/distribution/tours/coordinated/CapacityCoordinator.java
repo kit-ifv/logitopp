@@ -58,6 +58,8 @@ public class CapacityCoordinator {
 	}
 
 	private ChainAssignment coordinateCapacityAssignment(Time date) {
+		System.out.println("Coordinate capacity of trams: " + date);
+
 		Time earliestTramDeparture = date.startOfDay().plusHours(4); //TODO fix hard coded departure time
 		Time earliestNonTramDeparture = date.startOfDay().plusHours(7);
 
@@ -67,14 +69,21 @@ public class CapacityCoordinator {
 		//for tram chains, assign slots to distribution centers
 		List<Request> requests = new ArrayList<>();
 		for (DistributionCenter dc : distributionCenters) {
+			System.out.println("Collect chains and requests for " + dc.getName() + "[" + dc.getId() + "]");
 			
 			List<TimedTransportChain> chains = getChainsFor(dc, earliestTramDeparture);
-			assignment.assign(dc, getNonTramChains(chains, earliestNonTramDeparture));
+			List<TimedTransportChain> nonTramChains = getNonTramChains(chains, earliestNonTramDeparture);
+			assignment.assign(dc, nonTramChains);
 			
 			List<TransportPreferences> preferences = getPreferences(dc, chains);
 			assignment.register(dc, preferences);
-			
-			requests.addAll(getRequests(dc, preferences));	
+
+			List<Request> dcRequests = getRequests(dc, preferences);
+			requests.addAll(dcRequests);
+
+			System.out.println("    - chains: " + chains.size());
+			System.out.println("    - non-tram chains: " + nonTramChains.size());
+			System.out.println("    - requests: " + dcRequests.size());
 		}
 		assignment.assignAll(assignRequests(requests));
 		
@@ -82,9 +91,12 @@ public class CapacityCoordinator {
 		// (here first come, first served applies)
 		// also determine preferences for pickup requests
 		for (DistributionCenter dc : distributionCenters) {
+			System.out.println("Collect return chains for: " + dc.getName() + "[" + dc.getId() + "]");
+
 			Map<TimedTransportChain, TimedTransportChain> returnChainsWithCorrespondence = getReturnChainsFor(dc, assignment);
-			
 			assignment.register(dc, getReturnPreferences(dc, returnChainsWithCorrespondence));
+
+			System.out.println("    - return chains: " + returnChainsWithCorrespondence.size());
 		}
 		
 		return assignment;
