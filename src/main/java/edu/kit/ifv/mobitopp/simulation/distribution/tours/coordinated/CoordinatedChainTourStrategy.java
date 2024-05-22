@@ -118,8 +118,6 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			System.out.println("Not all parcels (" + remaining.size() + ") could be included in any of their preferred/allowed tours!");
 		}
 
-		
-		
 		List<PlannedTour> plannedTours = new ArrayList<>();
 		validTours.keySet().forEach(chain -> {
 
@@ -167,9 +165,9 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	private static void logValidation(String task, Map<TimedTransportChain, List<LastMileTour>> timeAndCapacityViolated, Map<TimedTransportChain, List<LastMileTour>> timeViolated, Map<TimedTransportChain, List<LastMileTour>> capacityViolated, Map<TimedTransportChain, List<LastMileTour>> validTours) {
 		System.out.println(
 				"    - " + task + ": valid=" + validTours.values().stream().mapToInt(List::size).sum() +
-				" time invalid=" + timeViolated.values().stream().mapToInt(List::size).sum() +
-				" cap invalid=" + capacityViolated.values().stream().mapToInt(List::size).sum() +
-				" cap&time invalid=" + timeAndCapacityViolated.values().stream().mapToInt(List::size).sum()
+				" !time=" + timeViolated.values().stream().mapToInt(List::size).sum() +
+				" !cap=" + capacityViolated.values().stream().mapToInt(List::size).sum() +
+				" !cap&!time=" + timeAndCapacityViolated.values().stream().mapToInt(List::size).sum()
 		);
 	}
 
@@ -322,6 +320,14 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				
 			});
 		});
+
+		for (TimedTransportChain chain : validTours.keySet()) {
+			if (capacityViolated.containsKey(chain)) {
+				capacityViolated.get(chain).removeAll(validTours.get(chain));
+				if (capacityViolated.get(chain).isEmpty()) { capacityViolated.remove(chain); }
+			}
+		}
+
 	}
 
 	private void takeParcelsFromFirstStop(List<IParcel> removedParcels, LastMileTour lmt) {
@@ -393,6 +399,21 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				
 			});
 		});
+
+		for (TimedTransportChain chain : capacityViolated.keySet()) {
+			if (timeAndCapacityViolated.containsKey(chain)) {
+				timeAndCapacityViolated.get(chain).removeAll(capacityViolated.get(chain));
+				if (timeAndCapacityViolated.get(chain).isEmpty()) { timeAndCapacityViolated.remove(chain); }
+			}
+		}
+
+		for (TimedTransportChain chain : validTours.keySet()) {
+			if (timeAndCapacityViolated.containsKey(chain)) {
+				timeAndCapacityViolated.get(chain).removeAll(validTours.get(chain));
+				if (timeAndCapacityViolated.get(chain).isEmpty()) { timeAndCapacityViolated.remove(chain); }
+			}
+		}
+
 	}
 
 	private void sortTours(Map<TimedTransportChain, List<LastMileTour>> lastMileTours,

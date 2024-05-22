@@ -1,6 +1,7 @@
 package edu.kit.ifv.mobitopp.util.routing.tsp;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -47,6 +48,10 @@ public class TspSolver2Approx<E> implements TspSolver<E> {
 	public Tour<E> findTour(Collection<E> elements, StandardMode mode) {
 		if (elements.isEmpty()) {
 			return new Tour<>(List.of(), 0.0f, travelTimes, mode);
+		}
+
+		if (elements.size() == 1) {
+			return new Tour<>(new ArrayList<>(elements), 0.0f, travelTimes, mode);
 		}
 		
 		
