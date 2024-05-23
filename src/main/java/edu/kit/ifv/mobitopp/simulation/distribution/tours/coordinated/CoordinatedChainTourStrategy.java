@@ -418,7 +418,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			if (copy.isEmpty()) {
 				System.out.println("    - fixing time violation produced empty tour for " + chain.last().getName());
 				System.out.println("      og time: " + lmt.tour.getTravelTime() + " min > " + workTime + " min!");
-				System.out.println("      og clusters: " + lmt.tour.getElements());
+				System.out.println("      og clusters: " + lmt.tour.size());
 				System.out.println("      og volume: " + lmt.volume() + " !< " + lmt.maxVolume() + " = max");
 				emptiedTours.get(chain).add(lmt);
 				break;
@@ -624,7 +624,9 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			Map<IParcel, TransportPreferences> preferences, Collection<IParcel> allParcel) {
 		
 		Map<TimedTransportChain, List<IParcel>> initialAssignment = 
-			allParcel.stream().collect(groupingBy(p -> preferences.get(p).getSelected()));
+			allParcel.stream()
+					.filter(preferences::containsKey)
+					.collect(groupingBy(p -> preferences.get(p).getSelected()));
 		
 		chains.forEach(c -> {
 			initialAssignment.putIfAbsent(c, List.of());
