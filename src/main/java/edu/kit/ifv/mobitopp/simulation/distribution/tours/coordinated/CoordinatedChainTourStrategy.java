@@ -285,7 +285,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			List<IParcel> remaining, IParcel parcel, TransportPreferences preferredChains) {
 		ParcelCluster newStop = new ParcelCluster(new ArrayList<>(List.of(parcel)), clustering);
 
-		Function<LastMileTour, Integer> workTime = lmt -> (lmt.chain.lastMileVehicle() == VehicleType.BIKE) ? 2*60 : 8*60;// TODO work time
+		Function<LastMileTour, Integer> workTime = lmt -> (lmt.chain.lastMileVehicle() == VehicleType.BIKE) ? 4*60 : 8*60;// TODO work time
 
 		Optional<LastMileTour> minInsertionTour = 
 				preferredChains.options()
@@ -412,7 +412,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		Tour<ParcelCluster> copy = new Tour<>(lmt.tour.getElements(), lmt.tour.getTravelTime(), solver.getTravelTimes(), lmt.tour.getMode());
 		float accessEgress = lmt.accessEgress;
 
-		int workTime = (chain.lastMileVehicle() == VehicleType.BIKE) ? 2*60 : 8*60;// TODO work time
+		int workTime = (chain.lastMileVehicle() == VehicleType.BIKE) ? 4*60 : 8*60;// TODO work time
 
 		while(copy.getTravelTime()+accessEgress > workTime) {
 			if (copy.isEmpty()) {
