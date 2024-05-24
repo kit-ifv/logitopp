@@ -8,12 +8,21 @@ import java.util.stream.IntStream;
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import lombok.Getter;
+import lombok.Setter;
 
 public class Tour<E> implements Iterable<E> {
-	
+
+	public float getTravelTime() {
+		return travelTime + stopDuration;
+	}
+
 	@Getter private final List<E> elements;
-	@Getter private float travelTime;
+	private float travelTime;
+
+	@Getter @Setter
+	private float stopDuration;
 	private final ModeTravelTimes<E> travelTimeProvider;
+
 	@Getter private final StandardMode mode;
 	
 	private int start = 0;
@@ -26,6 +35,7 @@ public class Tour<E> implements Iterable<E> {
 		this.elements = new ArrayList<>(elements);
 		this.travelTimeProvider = timeProvider;
 		this.travelTime = travelTime;
+		this.stopDuration = (float) elements.stream().mapToDouble(e -> timeProvider.getStopDurationModel().apply(e)).sum();
 		this.mode = mode;
 	}
 	
@@ -70,6 +80,7 @@ public class Tour<E> implements Iterable<E> {
 		float delta = getInsertionCost(element, index);
 		
 		elements.add(index, element);
+		stopDuration += travelTimeProvider.getStopDurationModel().apply(element);
 		travelTime += delta; //TODO Check > 0?
 	}
 	
@@ -151,7 +162,8 @@ public class Tour<E> implements Iterable<E> {
 		float delta = getRemovalCost(index);
 		
 		travelTime += delta;
-		elements.remove(index);
+		E removed = elements.remove(index);
+		stopDuration -= travelTimeProvider.getStopDurationModel().apply(removed);
 		
 		return delta;
 	}

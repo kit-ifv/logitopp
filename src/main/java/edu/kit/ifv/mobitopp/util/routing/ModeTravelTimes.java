@@ -5,19 +5,25 @@ import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.time.SimpleTime;
 import edu.kit.ifv.mobitopp.time.Time;
+import lombok.Getter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ModeTravelTimes<E> {
 
     private final Map<Mode, TravelTimeProvider<E>> modeTravelTimes = new LinkedHashMap<>();
     private final Supplier<TravelTimeProvider<E>> travelTimeFactory;
+
+    @Getter
+    private final Function<E, Float> stopDurationModel;
     private Time time = SimpleTime.start;
 
-    public ModeTravelTimes(Supplier<TravelTimeProvider<E>> travelTimeFactory) {
+    public ModeTravelTimes(Supplier<TravelTimeProvider<E>> travelTimeFactory, Function<E, Float> stopDurationModel) {
         this.travelTimeFactory = travelTimeFactory;
+        this.stopDurationModel = stopDurationModel;
     }
 
     private TravelTimeProvider<E> initModeCache(StandardMode mode) {

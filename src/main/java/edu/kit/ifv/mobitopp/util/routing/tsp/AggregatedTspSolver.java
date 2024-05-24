@@ -2,7 +2,6 @@ package edu.kit.ifv.mobitopp.util.routing.tsp;
 
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.util.collections.CollectionsUtil;
-import edu.kit.ifv.mobitopp.util.routing.CachedTravelTime;
 import edu.kit.ifv.mobitopp.util.routing.ModeTravelTimes;
 import edu.kit.ifv.mobitopp.util.routing.Tour;
 import edu.kit.ifv.mobitopp.util.routing.TravelTimeProvider;
@@ -20,10 +19,10 @@ public class AggregatedTspSolver<E, A> implements TspSolver<E> {
     private final TspSolver<E> detailSolver;
     private final Function<E, A> aggregation;
 
-    public AggregatedTspSolver(TspSolver<A> aggregateSolver, TravelTimeProvider<E> travelTime, Function<E, A> aggregation) {
+    public AggregatedTspSolver(TspSolver<A> aggregateSolver, TravelTimeProvider<E> travelTime, Function<E, A> aggregation, Function<E, Float> stopDurationModel) {
         ModeTravelTimes<E> travelTimes = new ModeTravelTimes<>(
-                () -> travelTime
-        );
+                () -> travelTime,
+                stopDurationModel);
 
         this.aggregateSolver = aggregateSolver;
         this.detailSolver = new NullTspSolver<>(travelTimes);

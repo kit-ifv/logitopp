@@ -237,6 +237,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 
 	private List<IParcel> addRemovedParcelsToOtherExistingStops(Map<IParcel, TransportPreferences> preferences,
 			Map<TimedTransportChain, List<LastMileTour>> validTours, List<IParcel> removedParcels) {
+
 		
 		List<IParcel> remaining = new ArrayList<>();
 
@@ -266,7 +267,12 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 								.findFirst();
 					
 					if (matchingCluster.isPresent()) {
-						matchingCluster.get().getParcels().add(parcel);
+						ParcelCluster cluster = matchingCluster.get();
+						lmt.tour.remove(cluster);
+						cluster.getParcels().add(parcel);
+						lmt.tour.insertAtMinPosition(cluster);
+						lmt.tour.selectMinInsertionStart(lmt.chain.last().getZoneAndLocation());
+
 						handeled=true;
 						break;
 					}
@@ -334,7 +340,11 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	}
 
 	private void takeParcelsFromFirstStop(List<IParcel> removedParcels, LastMileTour lmt) {
-		List<IParcel> parcels = lmt.tour.getModuloFromStart(0).getParcels();
+		//TODO update stop duration
+		ParcelCluster cluster = lmt.tour.getModuloFromStart(0);
+		lmt.tour.remove(cluster);
+
+		List<IParcel> parcels = cluster.getParcels();
 		double overflowCapacity = lmt.volume() - lmt.maxVolume();
 		
 		while (overflowCapacity > 0 && parcels.size() > 1) {
@@ -342,6 +352,9 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			removedParcels.add(removedParcel);
 			overflowCapacity -= removedParcel.getVolume();
 		}
+
+		lmt.tour.insertAtMinPosition(cluster);
+		lmt.tour.selectMinInsertionStart(lmt.chain.last().getZoneAndLocation());
 	}
 
 	private void removeStopsOfMinCost(List<IParcel> removedParcels, LastMileTour lmt, boolean checkCostNegative) {

@@ -71,7 +71,7 @@ public class ParcelActivityBuilder {
 	}
 	
 	public ParcelActivityBuilder withDuration(DeliveryDurationModel durationModel) {
-		int minutes = Math.round(durationModel.estimateDuration(deliveryVehicle, getAllParcels()));
+		int minutes = Math.round(durationModel.estimateDuration(getAllParcels()));
 		this.duration = RelativeTime.ofMinutes(minutes);
 		return this;
 	}

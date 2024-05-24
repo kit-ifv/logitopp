@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.StandardMode;
 import edu.kit.ifv.mobitopp.util.routing.*;
-import edu.kit.ifv.mobitopp.util.routing.tsp.TspSolver;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.tour.TwoApproxMetricTSP;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -26,14 +25,14 @@ public class TspSolver2Approx<E> implements TspSolver<E> {
 	@Getter
 	private final ModeTravelTimes<E> travelTimes;
 	
-	public TspSolver2Approx(TravelTimeProvider<E> travelTime) {
+	public TspSolver2Approx(TravelTimeProvider<E> travelTime, Function<E, Float> stopDurationModel) {
 
 		this.travelTimes = new ModeTravelTimes<>(
-				() -> new CachedTravelTime<>(travelTime)
-		);
+				() -> new CachedTravelTime<>(travelTime),
+                stopDurationModel);
 	}
 	
-	public static <E> TspSolver2Approx<E> createSolverUsingDijkstraTimes(SimulationContext context, Function<E, Location> embedding) {
+	public static <E> TspSolver2Approx<E> createSolverUsingDijkstraTimes(SimulationContext context, Function<E, Location> embedding, Function<E, Float> stopDurationModel) {
 		
 		File visumFile = new File(context.configuration().getVisumFile());
 		String carCode = context.configuration().getVisumToMobitopp().getCarTransportSystemCode();
@@ -42,7 +41,7 @@ public class TspSolver2Approx<E> implements TspSolver<E> {
 		
 		DijkstraSolver<E> solver = new DijkstraSolver<E>(visumNet, embedding);
 		
-		return new TspSolver2Approx<>(solver);
+		return new TspSolver2Approx<>(solver, stopDurationModel);
 	}
 
 	public Tour<E> findTour(Collection<E> elements, StandardMode mode) {
