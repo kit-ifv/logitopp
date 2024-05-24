@@ -1,10 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.distribution;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.Hook;
@@ -12,11 +8,13 @@ import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.time.Time;
+import edu.kit.ifv.mobitopp.util.collections.Pair;
 
 public class ParcelArrivalScheduler implements Hook {
 
 	private final Map<Time, List<DeliveryVehicle>> vehicleReturnTimes;
 	private final Map<Time, List<ParcelActivity>> arrivalTimes;
+
 
 	private Time lastProcessed;
 	
@@ -33,12 +31,12 @@ public class ParcelArrivalScheduler implements Hook {
 		
 		currentReturns.stream()
 					  .map(vehicleReturnTimes::get)
-					  .flatMap(x -> x.stream())
+					  .flatMap(Collection::stream)
 					  .forEach(v -> v.unloadAndReturn(date));
 		
 		currentArrivals.stream()
 					   .map(arrivalTimes::get)
-					   .flatMap(x -> x.stream())
+					   .flatMap(Collection::stream)
 					   .forEach(a -> a.executeActivity(date));
 
 		currentReturns.forEach(vehicleReturnTimes::remove);

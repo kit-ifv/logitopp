@@ -157,7 +157,8 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		});
 
 		System.out.println("    - planned " + plannedTours.size() + " tours for " + dc.getName() + "[" + dc.getId() + "]");
-		
+		System.out.println("      tour parcel cnt: " + plannedTours.stream().map(t -> t.getAllParcels().size() + ", "));
+		System.out.println("      tour durations: " + plannedTours.stream().map(t -> t.getPlannedDuration() + ", "));
 		
 		return plannedTours;
 	}
@@ -411,26 +412,48 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 
 		Tour<ParcelCluster> copy = new Tour<>(lmt.tour.getElements(), lmt.tour.getTravelTime(), solver.getTravelTimes(), lmt.tour.getMode());
 		float accessEgress = lmt.accessEgress;
+		List<ParcelCluster> copyRemovedClusters = new ArrayList<>();
 
 		int workTime = (chain.lastMileVehicle() == VehicleType.BIKE) ? 4*60 : 8*60;// TODO work time
 
-		while(copy.getTravelTime()+accessEgress > workTime) {
+		while(copy.getTravelTime() + accessEgress > workTime) {
 			if (copy.isEmpty()) {
 				System.out.println("    - fixing time violation produced empty tour for " + chain.last().getName());
 				System.out.println("      og time: " + lmt.tour.getTravelTime() + " min > " + workTime + " min!");
 				System.out.println("      og clusters: " + lmt.tour.size());
 				System.out.println("      og volume: " + lmt.volume() + " !< " + lmt.maxVolume() + " = max");
 				emptiedTours.get(chain).add(lmt);
+
+
+				copy = new Tour<>(solver.getTravelTimes(), lmt.tour.getMode());
+				do {
+					ParcelCluster minCluster = copyRemovedClusters.stream().min(Comparator.comparing(c -> c.getParcels().size())).get();
+
+					copy.insertAtMinPosition(minCluster);
+					copyRemovedClusters.remove(minCluster);
+					accessEgress = copy.selectMinInsertionStart(lmt.chain.last().getZoneAndLocation());
+
+				} while (copy.getTravelTime() + accessEgress <= workTime);
+
+
+				System.out.println("      fixed time: " + copy.getTravelTime() + " min > " + workTime + " min!");
+				System.out.println("      fixed clusters: " + copy.size());
+				System.out.println("      fixed volume: " + copy.getElements().stream().mapToDouble(ParcelCluster::volume).sum());
+
 				break;
 			}
 
 			int toRemove = copy.findMinRemovalIndex();
 
 			ParcelCluster cluster = copy.getModulo(toRemove);
-			removedParcels.addAll(cluster.getParcels());
+			copyRemovedClusters.add(cluster);
 
 			float cost = copy.removeAtPosition(toRemove);
 			accessEgress = copy.selectMinInsertionStart(chain.last().getZoneAndLocation());
+		}
+
+		for (ParcelCluster cluster : copyRemovedClusters) {
+			removedParcels.addAll(cluster.getParcels());
 		}
 
 		lmt.accessEgress = accessEgress;
