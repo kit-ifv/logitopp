@@ -157,8 +157,8 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		});
 
 		System.out.println("    - planned " + plannedTours.size() + " tours for " + dc.getName() + "[" + dc.getId() + "]");
-		System.out.println("      tour parcel cnt: " + plannedTours.stream().map(t -> t.getAllParcels().size() + ", "));
-		System.out.println("      tour durations: " + plannedTours.stream().map(t -> t.getPlannedDuration() + ", "));
+		System.out.println("      tour parcel cnt: " + plannedTours.stream().map(t -> t.getAllParcels().size() + ", ").collect(joining()));
+		System.out.println("      tour durations: " + plannedTours.stream().map(t -> t.getPlannedDuration() + ", ").collect(joining()));
 		
 		return plannedTours;
 	}
