@@ -1,14 +1,12 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference;
 
 import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.BIKE;
-import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.TRAM;
 import static edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize.EXTRA_LARGE;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
@@ -17,6 +15,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.CostFunction;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.logit.DefaultLogitModel;
 import edu.kit.ifv.mobitopp.util.parameter.LogitParameters;
 import lombok.AllArgsConstructor;
@@ -41,7 +40,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 	}
 
 	@Override
-	public TransportPreferences selectPreference(IParcel parcel, Collection<TimedTransportChain> choiceSet, double randomNumber) {
+	public TransportPreferences selectPreference(IParcel parcel, Collection<TimedTransportChain> choiceSet, double randomNumber, Time time) {
 		int choiceId = choiceCnt++;
 		
 		Map<TimedTransportChain, UtilResults> utility = computeUtilities(parcel, choiceSet);
@@ -55,7 +54,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 		TransportPreferences transportPreferences = new TransportPreferences(choiceId, parcel, probabilities, seed);
 
 		probabilities.forEach((c, p) ->
-			logUtility(choiceId, c, parcel, utility.get(c), p, transportPreferences.getSelected().equals(c))
+			logUtility(choiceId, c, parcel, utility.get(c), p, transportPreferences.getSelected().equals(c), time)
 		);		
 
 		return transportPreferences;
@@ -141,7 +140,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 	}
 
 	
-	private void logUtility(int choiceId, TransportChain chain, IParcel parcel, UtilResults res, double probability, boolean selected) {
-		results.logTransportChainPreference(choiceId, parcel, chain, probability, res.utility, res.cost, res.duration, res.distance, res.capacity, selected);
+	private void logUtility(int choiceId, TransportChain chain, IParcel parcel, UtilResults res, double probability, boolean selected, Time time) {
+		results.logTransportChainPreference(choiceId, time, parcel, chain, probability, res.utility, res.cost, res.duration, res.distance, res.capacity, selected);
 	}
 }

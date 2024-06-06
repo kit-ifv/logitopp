@@ -700,15 +700,18 @@ public class DeliveryResults {
 	}
 	
 	private static Category createResultCategoryChainPreference() {
-		return new Category("chain_preferences", Arrays.asList("choice_id", "parcel_id", "is_pickup", 
+		return new Category("chain_preferences", Arrays.asList("choice_id", "time", "sim_second",
+				"parcel_id", "is_pickup",
 				"from_hub", "to_hub", "modes",
 				"probability", "utility", "cost", "duration", "distance", "capacity", "selected"));
 	}
 	
-	public void logTransportChainPreference(int choiceId, IParcel parcel, TransportChain chain, double probability, double utility, double cost, double duration, double distance, int capacity, boolean selected) {
+	public void logTransportChainPreference(int choiceId, Time time, IParcel parcel, TransportChain chain, double probability, double utility, double cost, double duration, double distance, int capacity, boolean selected) {
 		String msg = "";
 		
 		msg += choiceId + SEP;
+		msg += time.toString() + SEP;
+		msg += time.toSeconds() + SEP;
 		msg += parcel.getOId() + SEP;
 		msg += parcel.isPickUp() + SEP;
 		

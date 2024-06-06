@@ -75,7 +75,7 @@ public class CapacityCoordinator {
 			List<TimedTransportChain> nonTramChains = getNonTramChains(chains, earliestNonTramDeparture);
 			assignment.assign(dc, nonTramChains);
 			
-			List<TransportPreferences> preferences = getPreferences(dc, chains);
+			List<TransportPreferences> preferences = getPreferences(dc, chains, date);
 			assignment.register(dc, preferences);
 
 			List<Request> dcRequests = getRequests(dc, preferences);
@@ -94,7 +94,7 @@ public class CapacityCoordinator {
 			System.out.println("Collect return chains for: " + dc.getName() + "[" + dc.getId() + "]");
 
 			Map<TimedTransportChain, TimedTransportChain> returnChainsWithCorrespondence = getReturnChainsFor(dc, assignment);
-			assignment.register(dc, getReturnPreferences(dc, returnChainsWithCorrespondence));
+			assignment.register(dc, getReturnPreferences(dc, returnChainsWithCorrespondence, date));
 
 			System.out.println("    - return chains: " + returnChainsWithCorrespondence.size());
 		}
@@ -181,7 +181,7 @@ public class CapacityCoordinator {
 	
 	private List<Request> getRequests(DistributionCenter dc, List<TransportPreferences> preferences) {
 		Map<TimedTransportChain, List<TimedTransportChain>> demandPerChain = preferences.stream()
-				   .map(p -> p.getSelected())
+				   .map(TransportPreferences::getSelected)
 				   .filter(c -> c.uses(VehicleType.TRAM))
 				   .collect(Collectors.groupingBy(c -> c));
 		
@@ -197,7 +197,7 @@ public class CapacityCoordinator {
 		return requests;
 	} //TODO requests for secondary choices
 	
-	private List<TransportPreferences> getPreferences(DistributionCenter dc, List<TimedTransportChain> chains) {
+	private List<TransportPreferences> getPreferences(DistributionCenter dc, List<TimedTransportChain> chains, Time time) {
 		//only in delivery direction, returning boxes are handled first come first serve
 		//BUT: picked up parcels may also have preferences and hard rule based filter might apply (xxl not in bike)!!
 		
@@ -205,24 +205,24 @@ public class CapacityCoordinator {
 	
 		for (IParcel parcel: dc.getStorage().getParcels()) {
 			preferences.add(
-				chainPreference.selectPreference(parcel, chains, dc.getRandom().nextDouble())
+				chainPreference.selectPreference(parcel, chains, dc.getRandom().nextDouble(), time)
 			); 
 		}
 		
 		return preferences;
 	}
 	
-	private List<TransportPreferences> getReturnPreferences(DistributionCenter dc, Map<TimedTransportChain, TimedTransportChain> returnChainsWithCorrespondence) {
+	private List<TransportPreferences> getReturnPreferences(DistributionCenter dc, Map<TimedTransportChain, TimedTransportChain> returnChainsWithCorrespondence, Time time) {
 		List<TransportPreferences> preferences = new ArrayList<>();
 		
 		for (IParcel parcel: dc.getStorage().getRequests()) {
 			
 			//get preferred pickup chains for pickup parcel
-			TransportPreferences returnPreferences = chainPreference.selectPreference(parcel, returnChainsWithCorrespondence.keySet(), dc.getRandom().nextDouble());
+			TransportPreferences returnPreferences = chainPreference.selectPreference(parcel, returnChainsWithCorrespondence.keySet(), dc.getRandom().nextDouble(), time);
 			
 			//then map probabilities to corresponding delivery chains
 			Map<TimedTransportChain, Double> probabilities = returnChainsWithCorrespondence.keySet().stream().collect(Collectors.toMap(
-				c -> returnChainsWithCorrespondence.get(c),
+					returnChainsWithCorrespondence::get,
 				c -> returnPreferences.getProbabilities().getOrDefault(c, 0.0)
 			));
 
