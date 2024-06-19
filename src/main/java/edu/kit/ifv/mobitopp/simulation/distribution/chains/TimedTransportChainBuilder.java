@@ -154,8 +154,14 @@ public class TimedTransportChainBuilder {
 		double durBeforeFirstTram = 0;
 
 		DistributionCenter origin = chain.first();
+		Optional<DistributionCenter> firstTram = Optional.empty();
 		for (DistributionCenter destination : chain.tail()) {
-			if (origin.getVehicleType().equals(VehicleType.TRAM)) {break;}
+			VehicleType vehicle = (chain.isDeliveryDirection()) ? origin.getVehicleType() : destination.getVehicleType();
+
+			if (vehicle.equals(VehicleType.TRAM)) {
+				firstTram = Optional.of(origin);
+				break;
+			}
 
 			durBeforeFirstTram += tripDuration(
 					impedance,
@@ -175,7 +181,6 @@ public class TimedTransportChainBuilder {
 			return this;
 		}
 
-		Optional<DistributionCenter> firstTram = chain.hubs.stream().filter(h -> h.getVehicleType().equals(VehicleType.TRAM)).findFirst();
 		Optional<DistributionCenter> hubAfterFirstTram = firstTram.flatMap(chain::nextHubAfter);
 
 		if(firstTram.isPresent() && hubAfterFirstTram.isPresent()) {
@@ -200,7 +205,6 @@ public class TimedTransportChainBuilder {
 				return this;
 			}
 
-
 			departure = connection.getDeparture().minusMinutes((int) Math.ceil(durBeforeFirstTram));
 		}
 
@@ -209,6 +213,7 @@ public class TimedTransportChainBuilder {
 		Time time  = departure;
 		origin = chain.first();
 		for (DistributionCenter destination: chain.tail()) {
+			VehicleType vehicle = (chain.isDeliveryDirection()) ? origin.getVehicleType() : destination.getVehicleType();
 
 			this.departures.put(origin, time);
 
@@ -216,7 +221,7 @@ public class TimedTransportChainBuilder {
 			this.distances.put(origin, distance);
 
 			double duration;
-			if (origin.getVehicleType().equals(VehicleType.TRAM)) {
+			if (vehicle.equals(VehicleType.TRAM)) {
 				Optional<Connection> maybeConnection = timeTable.getFreeConnectionsOnDay(
 						origin,
 						destination,
@@ -239,7 +244,7 @@ public class TimedTransportChainBuilder {
 				}
 
 			} else {
-				duration = tripDuration(impedance, origin, destination, time, origin.getVehicleType());
+				duration = tripDuration(impedance, origin, destination, time, vehicle);
 			}
 
 			this.durations.put(origin, (int) Math.round(duration));
