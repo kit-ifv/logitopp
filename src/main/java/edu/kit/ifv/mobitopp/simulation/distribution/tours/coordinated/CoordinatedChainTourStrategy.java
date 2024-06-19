@@ -69,7 +69,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	
 	@Override
 	public boolean shouldReplanTours(DistributionCenter center, Time time) {
-		return  !(time.weekDay().equals(DayOfWeek.SUNDAY)) && time.equals(time.startOfDay().plusHours(3));
+		return  !(time.weekDay().equals(DayOfWeek.SUNDAY)) && time.equals(time.startOfDay().plusHours(3).plusMinutes(45));
 	}
 	
 	@Override

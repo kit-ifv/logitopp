@@ -49,9 +49,9 @@ public class TimedTransportChainBuilder {
 	}
 
 	public TimedTransportChainBuilder setDuration(DistributionCenter hub, int durMinutes, int transferMinutes, double distance) {
-		this.durations.put(hub, durMinutes);
-		this.transfers.put(hub, transferMinutes);
-		this.distances.put(hub, distance);
+		this.durations.put(hub, Math.max(1, durMinutes));
+		this.transfers.put(hub, Math.max(1, transferMinutes));
+		this.distances.put(hub, Math.max(0.001, distance));
 		return this;
 	}
 
@@ -112,6 +112,10 @@ public class TimedTransportChainBuilder {
 
 			Time time = (start == null) ? currentTime : start;
 			time = time.plusMinutes(durationSum);
+
+			if (time.isBefore(Time.start)) {
+				time = Time.start;
+			}
 
 			int transfer = getTransferTime(origin, destination, time);
 			int dur;
