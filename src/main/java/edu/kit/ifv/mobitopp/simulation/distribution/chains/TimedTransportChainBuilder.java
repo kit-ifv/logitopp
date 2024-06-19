@@ -273,6 +273,10 @@ public class TimedTransportChainBuilder {
 
 	private int tripDuration(ImpedanceIfc impedance, DistributionCenter origin, DistributionCenter destination,
 			Time time, VehicleType vehicle) {
+		if (time.isBefore(Time.start)) {
+			return Math.round(impedance.getTravelTime(origin.getZone().getId(), destination.getZone().getId(),
+					vehicle.getMode(), Time.start));
+		}
 		return Math.round(impedance.getTravelTime(origin.getZone().getId(), destination.getZone().getId(),
 				vehicle.getMode(), time));
 	}
