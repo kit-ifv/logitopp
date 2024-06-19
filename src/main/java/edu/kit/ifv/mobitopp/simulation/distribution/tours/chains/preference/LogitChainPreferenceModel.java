@@ -81,12 +81,11 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 		
 		String mode = chain.last().getVehicleType().asString().toLowerCase();
 
-		double utility = parameters.get("asc_last_"+mode) + parameters.get("b_cost_" + mode) * cost 
-												+ parameters.get("b_time_" + mode) * time 
-												+ parameters.get("b_dist_" + mode) * dist;
-		
-		
-		
+		double utility = parameters.get("asc_last_"+mode)
+						+ parameters.get("b_cost_" + mode) * cost
+						+ parameters.get("b_time_" + mode) * time
+						+ parameters.get("b_dist_" + mode) * dist;
+
 		return new UtilResults(utility, cost, time, dist, capacity);
 	}
 	
