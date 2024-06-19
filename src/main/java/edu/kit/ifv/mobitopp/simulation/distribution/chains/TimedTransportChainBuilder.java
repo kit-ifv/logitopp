@@ -1,10 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.chains;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
@@ -101,48 +97,166 @@ public class TimedTransportChainBuilder {
 			Time currentTime
 	) {// TODO error on legs before first tram leg with fixed departure as start dep is
 								// approximated via current time
+		return useDurationsFromStatsNew(timeTable, impedance, currentTime);
+
+//		DistributionCenter origin = chain.first();
+//		int durationSum = 0;
+//
+//		for (DistributionCenter destination : chain.tail()) {
+//			VehicleType vehicle = (chain.isDeliveryDirection()) ? origin.getVehicleType() : destination.getVehicleType();
+//
+//			double dist =  tripDistance(impedance, origin, destination);
+//
+//			Time time = (start == null) ? currentTime : start;
+//			time = time.plusMinutes(durationSum);
+//
+//			if (time.isBefore(Time.start)) {
+//				time = Time.start;
+//			}
+//
+//			int transfer = getTransferTime(origin, destination, time);
+//			int dur;
+//
+//			if (vehicle.equals(VehicleType.TRAM)) {
+//				Optional<Connection> maybeConnection = timeTable.getFreeConnectionsOnDay(origin, destination, time).findFirst();
+//
+//				if (maybeConnection.isEmpty()) {
+//					this.valid = false;
+//					return this;
+//				}
+//
+//				Connection connection = maybeConnection.get();
+//				connections.put(origin, connection);
+//
+//				dur = connection.getDurationMinutes();
+//				fixedDepartureAt(origin, durationSum, connection.getDeparture(), dur, transfer, dist);
+//
+//			} else {
+//				dur = tripDuration(impedance, origin, destination, time, vehicle);
+//				setDuration(origin, dur, transfer, dist);
+//			}
+//
+//			durationSum += durations.get(origin) + transfers.get(origin);
+//			origin = destination;
+//
+//		}//TODO for reverse order, sometimes box is picked up, should this be considered? effective travel time of box is accurate but not of vehicle
+//
+//		return this;
+	}
+
+	private TimedTransportChainBuilder useDurationsFromStatsNew(
+			TimeTable timeTable,
+			ImpedanceIfc impedance,
+			Time currentTime
+	) {
+		Time departure = currentTime.plusMinutes(0);
+
+		double durBeforeFirstTram = 0;
 
 		DistributionCenter origin = chain.first();
-		int durationSum = 0;
-
 		for (DistributionCenter destination : chain.tail()) {
-			VehicleType vehicle = (chain.isDeliveryDirection()) ? origin.getVehicleType() : destination.getVehicleType();
+			if (origin.getVehicleType().equals(VehicleType.TRAM)) {break;}
 
-			double dist =  tripDistance(impedance, origin, destination);
+			durBeforeFirstTram += tripDuration(
+					impedance,
+					origin,
+					destination,
+					departure.plusMinutes((int) Math.round(durBeforeFirstTram)),
+					origin.getVehicleType()
+			);
 
-			Time time = (start == null) ? currentTime : start;
-			time = time.plusMinutes(durationSum);
+			durBeforeFirstTram += getTransferTime(origin, destination, departure.plusMinutes((int) Math.round(durBeforeFirstTram)));
+			origin = destination;
+		}
 
-			if (time.isBefore(Time.start)) {
-				time = Time.start;
+		if (durBeforeFirstTram < 0) {
+			System.err.println("durBeforeFirstTram should not be < 0!!!");
+			this.valid = false;
+			return this;
+		}
+
+		Optional<DistributionCenter> firstTram = chain.hubs.stream().filter(h -> h.getVehicleType().equals(VehicleType.TRAM)).findFirst();
+		Optional<DistributionCenter> hubAfterFirstTram = firstTram.flatMap(chain::nextHubAfter);
+
+		if(firstTram.isPresent() && hubAfterFirstTram.isPresent()) {
+
+			Time firstTramEarliestDeparture = departure.plusMinutes((int) Math.round(durBeforeFirstTram));
+			Optional<Connection> maybeConnection = timeTable.getFreeConnectionsOnDay(
+					firstTram.get(),
+					hubAfterFirstTram.get(),
+					firstTramEarliestDeparture
+			).findFirst();
+
+			if (maybeConnection.isEmpty()) {
+				this.valid = false;
+				return this;
 			}
 
-			int transfer = getTransferTime(origin, destination, time);
-			int dur;
+			Connection connection = maybeConnection.get();
+			connections.put(origin, connection);
+			if (connection.getDeparture().isBefore(firstTramEarliestDeparture)) {
+				System.err.println("connection departure was before earliest departure: " + connection.getDeparture() + " < " + firstTramEarliestDeparture);
+				this.valid = false;
+				return this;
+			}
 
-			if (vehicle.equals(VehicleType.TRAM)) {
-				Optional<Connection> maybeConnection = timeTable.getFreeConnectionsOnDay(origin, destination, time).findFirst();
-				
+
+			departure = connection.getDeparture().minusMinutes((int) Math.ceil(durBeforeFirstTram));
+		}
+
+		DistributionCenter predecessor = null;
+
+		Time time  = departure;
+		origin = chain.first();
+		for (DistributionCenter destination: chain.tail()) {
+
+			this.departures.put(origin, time);
+
+			double distance = tripDistance(impedance, origin, destination);
+			this.distances.put(origin, distance);
+
+			double duration;
+			if (origin.getVehicleType().equals(VehicleType.TRAM)) {
+				Optional<Connection> maybeConnection = timeTable.getFreeConnectionsOnDay(
+						origin,
+						destination,
+						time
+				).findFirst();
+
 				if (maybeConnection.isEmpty()) {
 					this.valid = false;
 					return this;
 				}
-				
+
 				Connection connection = maybeConnection.get();
 				connections.put(origin, connection);
+				duration = connection.getDurationMinutes();
 
-				dur = connection.getDurationMinutes();
-				fixedDepartureAt(origin, durationSum, connection.getDeparture(), dur, transfer, dist);
+				int wait = Math.max(0, connection.getDeparture().differenceTo(time).toMinutes());
+				if (predecessor != null) {
+					int transferUpdate = transfers.get(predecessor) + wait;
+					transfers.put(predecessor, transferUpdate);
+				}
 
 			} else {
-				dur = tripDuration(impedance, origin, destination, time, vehicle);
-				setDuration(origin, dur, transfer, dist);
+				duration = tripDuration(impedance, origin, destination, time, origin.getVehicleType());
 			}
 
-			durationSum += durations.get(origin) + transfers.get(origin);
+			this.durations.put(origin, (int) Math.round(duration));
+
+			time = time.plusMinutes((int) Math.round(duration));
+
+			double transfer = getTransferTime(origin, destination, time);
+			this.transfers.put(origin, (int) Math.round(transfer));
+
+			time = time.plusMinutes((int) Math.round(transfer));
+			predecessor = origin;
 			origin = destination;
-			
-		}//TODO for reverse order, sometimes box is picked up, should this be considered? effective travel time of box is accurate but not of vehicle
+
+		}
+
+
+
 
 		return this;
 	}

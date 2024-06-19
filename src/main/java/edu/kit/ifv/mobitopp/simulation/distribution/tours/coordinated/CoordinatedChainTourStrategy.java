@@ -7,15 +7,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -44,7 +36,6 @@ import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.routing.Tour;
 import edu.kit.ifv.mobitopp.util.routing.tsp.TspSolver;
-import edu.kit.ifv.mobitopp.util.routing.tsp.TspSolver2Approx;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -57,14 +48,26 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 	private final DeliveryDurationModel durationModel;
 
 	private final TransferTimeModel transferTime;
+
+	private final int maxTruckParcels;
+	private final int maxBikeParcels;
 	
-	public CoordinatedChainTourStrategy(CapacityCoordinator coordinator, DeliveryClusteringStrategy clustering, ImpedanceIfc impedance, DeliveryDurationModel durationModel, TspSolver<ParcelCluster> tspSolver, TransferTimeModel transferTime) {
+	public CoordinatedChainTourStrategy(
+			CapacityCoordinator coordinator,
+			DeliveryClusteringStrategy clustering,
+			ImpedanceIfc impedance,
+			DeliveryDurationModel durationModel,
+			TspSolver<ParcelCluster> tspSolver,
+			TransferTimeModel transferTime,
+			int maxTruckParcels, int maxBikeParcels) {
 		this.impedance = impedance;
 		this.coordinator = coordinator;
 		this.solver = tspSolver;
 		this.clustering = clustering;
 		this.durationModel = durationModel;
 		this.transferTime = transferTime;
+		this.maxTruckParcels = maxTruckParcels;
+		this.maxBikeParcels = maxBikeParcels;
 	}
 	
 	@Override
@@ -163,6 +166,13 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		return plannedTours;
 	}
 
+	private int maxNumParcels(VehicleType vehicle) {
+		if (Objects.requireNonNull(vehicle) == VehicleType.BIKE) {
+			return maxBikeParcels;
+		}
+		return maxTruckParcels;
+	}
+
 	private static void logValidation(String task, Map<TimedTransportChain, List<LastMileTour>> timeAndCapacityViolated, Map<TimedTransportChain, List<LastMileTour>> timeViolated, Map<TimedTransportChain, List<LastMileTour>> capacityViolated, Map<TimedTransportChain, List<LastMileTour>> validTours) {
 		System.out.println(
 				"    - " + task + ": valid=" + validTours.values().stream().mapToInt(List::size).sum() +
@@ -250,6 +260,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 							   .stream()
 							   .flatMap(c -> validTours.getOrDefault(c, List.of()).stream())
 							   .filter(lmt -> lmt.volume() < lmt.maxVolume())
+								.filter(lmt -> lmt.parcelCount() < maxNumParcels(lmt.chain.lastMileVehicle()))
 							   .collect(toList());
 			
 			if (nonFullTours.isEmpty()) {
@@ -316,12 +327,12 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				
 				removeStopsOfMinCost(removedParcels, lmt, true);
 				
-				if (lmt.volume() > lmt.maxVolume()) {
+				if (lmt.volume() > lmt.maxVolume() || lmt.parcelCount() > maxNumParcels(lmt.chain.lastMileVehicle())) {
 					removeStopsOfMinCost(removedParcels, lmt, false);
 				}
 				
 				//here each stops in tour should have more parcels than overflow!
-				if (lmt.volume() > lmt.maxVolume()) {
+				if (lmt.volume() > lmt.maxVolume() || lmt.parcelCount() > maxNumParcels(lmt.chain.lastMileVehicle())) {
 					takeParcelsFromFirstStop(removedParcels, lmt);
 				}
 				
@@ -346,11 +357,13 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 
 		List<IParcel> parcels = cluster.getParcels();
 		double overflowCapacity = lmt.volume() - lmt.maxVolume();
+		double overflowCount = lmt.parcelCount() - maxNumParcels(lmt.chain.lastMileVehicle());
 		
-		while (overflowCapacity > 0 && parcels.size() > 1) {
+		while (parcels.size() > 1 && (overflowCount > 0 || overflowCapacity > 0)) {
 			IParcel removedParcel = parcels.remove(0);
 			removedParcels.add(removedParcel);
 			overflowCapacity -= removedParcel.getVolume();
+			overflowCount--;
 		}
 
 		lmt.tour.insertAtMinPosition(cluster);
@@ -361,10 +374,12 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		TimedTransportChain chain = lmt.chain;
 		
 		double overflowCapacity = lmt.volume() - lmt.maxVolume();
+		int overflowCount = lmt.parcelCount() - maxNumParcels(lmt.chain.lastMileVehicle());
+
 		List<ParcelCluster> sortedStops = lmt.tour.getElements().stream().sorted(Comparator.comparing(lmt.tour::getRemovalCost)).collect(toList());
 		
 		int i = 0;
-		while (overflowCapacity > 0 && i < sortedStops.size()) {
+		while ((overflowCapacity > 0 || overflowCount > 0) && i < sortedStops.size()) {
 			ParcelCluster stop = sortedStops.get(i);
 			
 			if (	stop.volume() <= overflowCapacity
@@ -374,6 +389,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				lmt.tour.remove(stop);
 				lmt.accessEgress = lmt.tour.selectMinInsertionStart(chain.last().getZoneAndLocation());
 				overflowCapacity -= stop.volume();
+				overflowCount--;
 			}
 			
 			i++;
@@ -435,6 +451,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				System.out.println("      og time: " + lmt.tour.getTravelTime() + " min > " + workTime + " min!");
 				System.out.println("      og clusters: " + lmt.tour.size());
 				System.out.println("      og volume: " + lmt.volume() + " !< " + lmt.maxVolume() + " = max");
+				System.out.println("      og count: " + lmt.parcelCount() + " !< " + maxNumParcels(lmt.chain.lastMileVehicle()) + " = max");
 				emptiedTours.get(chain).add(lmt);
 
 
@@ -452,6 +469,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				System.out.println("      fixed time: " + copy.getTravelTime() + " min > " + workTime + " min!");
 				System.out.println("      fixed clusters: " + copy.size());
 				System.out.println("      fixed volume: " + copy.getElements().stream().mapToDouble(ParcelCluster::volume).sum());
+				System.out.println("      fixed count: " + copy.getElements().stream().mapToInt(c -> c.getParcels().size()).sum());
 
 				break;
 			}
@@ -472,7 +490,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		lmt.accessEgress = accessEgress;
 		lmt.tour = copy;
 
-		if (lmt.volume() > lmt.maxVolume()) {
+		if (lmt.volume() > lmt.maxVolume() || lmt.parcelCount() > maxNumParcels(lmt.chain.lastMileVehicle())) {
 			capacityViolated.get(chain).add(lmt);
 
 		} else if (!lmt.tour.isEmpty()) {
@@ -491,9 +509,10 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			validTours.put(chain, new ArrayList<>());
 			
 			for (LastMileTour tour: lastMileTours.get(chain)) {
+				int maxParcels = maxNumParcels(chain.lastMileVehicle());
 				
 				boolean timeValid = (tour.tour.getTravelTime() + tour.accessEgress) < 8*60; 
-				boolean capacityValid = tour.volume() <= tour.maxVolume();
+				boolean capacityValid = tour.volume() <= tour.maxVolume() && tour.parcelCount() <= maxParcels;
 				
 				if (!capacityValid && !timeValid) {
 					timeAndCapacityViolated.get(chain).add(tour);
@@ -527,7 +546,8 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		
 		Map<TimedTransportChain, List<TimedTransportChain>> identicalChains = chains.stream().collect(groupingBy(identity()));
 		for (TimedTransportChain chain: identicalChains.keySet()) {
-			
+			int maxCount = maxNumParcels(chain.lastMileVehicle());
+
 			if (identicalChains.get(chain).size() == 1) {
 				Tour<ParcelCluster> tour = initialTours.get(chain);
 				float accessEgress = tour.selectMinInsertionStart(chain.last().getZoneAndLocation());
@@ -550,8 +570,8 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 					subTour.insertAtMinPosition(iter.next());
 					
 					float tourTime = subTour.getTravelTime() + subTour.selectMinInsertionStart(chain.last().getZoneAndLocation());
-					
-					if (violatesTourConstraints(volume, tourTime, subTour) && remainingChainCopies.size() > 1) {
+
+					if (violatesTourConstraints(volume, maxCount, tourTime, subTour) && remainingChainCopies.size() > 1) {
 						TimedTransportChain copy = remainingChainCopies.remove(0);
 						float accessEgress = tour.selectMinInsertionStart(copy.last().getZoneAndLocation());
 						subTours.add(new LastMileTour(copy, subTour, accessEgress));
@@ -579,8 +599,10 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 		return lastMileTours;
 	}
 	
-	private boolean violatesTourConstraints(double maxVolume, float tourTime, Tour<ParcelCluster> tour) {
-		return tour.getElements().stream().mapToDouble(ParcelCluster::volume).sum() >= maxVolume || tourTime > 8*0.8;
+	private boolean violatesTourConstraints(double maxVolume, int maxCount, float tourTime, Tour<ParcelCluster> tour) {
+		return tour.getElements().stream().mapToDouble(ParcelCluster::volume).sum() >= maxVolume
+				|| tourTime > 8*0.8
+				|| (tour.getElements().stream().mapToInt(c -> c.getParcels().size()).sum() >= maxCount);
 		//TODO factor of travel time vs total tour time incl delivery time
 	}
 
@@ -646,7 +668,7 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 				 .stream()
 				 .collect(Collectors.toMap(
 						 Map.Entry::getKey,
-						 e -> clustering.cluster(e.getValue(), e.getKey().last().getFleet().getVehicleVolume())
+						 e -> clustering.cluster(e.getValue(), maxNumParcels(e.getKey().lastMileVehicle()))
 				 ));
 	}
 

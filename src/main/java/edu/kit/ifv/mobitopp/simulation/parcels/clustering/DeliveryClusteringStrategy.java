@@ -14,24 +14,24 @@ public interface DeliveryClusteringStrategy {
 	
 	public boolean canBeGrouped(IParcel a, IParcel b);
 	
-	public default Collection<ParcelCluster> cluster(List<IParcel> parcels, double maxVolume) {
+	public default Collection<ParcelCluster> cluster(List<IParcel> parcels, int maxCount) {
 		return CollectionsUtil.groupBy(parcels, this::canBeGrouped)
 							  .stream()
-							  .flatMap(cluster -> partition(cluster, maxVolume).stream())
+							  .flatMap(cluster -> partition(cluster, maxCount).stream())
 							  .map(cluster -> new ParcelCluster(cluster, this))
 							  .collect(toList());
 	}
 	
-	private static List<List<IParcel>> partition(List<IParcel> cluster, double maxVolume) {
+	private static List<List<IParcel>> partition(List<IParcel> cluster, int maxCount) {
 		if (cluster.isEmpty()) {return List.of();}
 
-		double totalVolume = cluster.stream().mapToDouble(IParcel::getVolume).sum();
+		int totalCount = cluster.size();
 
-		if (totalVolume <= maxVolume) {
+		if (totalCount <= maxCount) {
 			return List.of(cluster);
 		}
 		
-		int numParts = (int) Math.ceil(totalVolume / maxVolume);
+		int numParts = (int) Math.ceil((double) totalCount / maxCount);
 		int averageClusterSize = (int) Math.round( (cluster.size() * 1.0) / (numParts * 1.0));
 
 		List<List<IParcel>> partitions = new ArrayList<>(numParts);
