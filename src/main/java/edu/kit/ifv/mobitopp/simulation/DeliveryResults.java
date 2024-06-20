@@ -354,7 +354,8 @@ public class DeliveryResults {
 		msg += parcel.getDeliveryAttempts() + SEP;
 		msg += String.valueOf(parcel.getDeliveryTime()) + SEP;
 		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + SEP;
-		msg += parcel.getZone().getId();
+		msg += parcel.getZone().getId() + SEP;
+		msg += parcel.isPickUp();
 
 		this.results.write(resultCategoryStatePrivate, msg);
 	}
@@ -369,7 +370,7 @@ public class DeliveryResults {
 		return new Category("parcel-states",
 				Arrays.asList("Time", "ParcelID", "RecipientID", "DestinationType", "State", "IsDeliveryAttempt",
 						"DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "RecipientType",
-						"ParcelDestinationZone"));
+						"ParcelDestinationZone", "IsPickup"));
 	}
 
 	/**
@@ -394,7 +395,8 @@ public class DeliveryResults {
 		msg += parcel.getDeliveryAttempts() + SEP;
 		msg += String.valueOf(parcel.getDeliveryTime()) + SEP;
 		msg += ((parcel.getRecipientType() != null) ? parcel.getRecipientType().name() : "NULL") + SEP;
-		msg += parcel.getZone().getId();
+		msg += parcel.getZone().getId() + SEP;
+		msg += parcel.isPickUp();
 
 		this.results.write(resultCategoryStateBusiness, msg);
 	}
@@ -409,7 +411,7 @@ public class DeliveryResults {
 		return new Category("business-parcel-states",
 				Arrays.asList("Time", "ParcelID", "ZoneId", "Location", "State", "IsDeliveryAttempt", "DeliveryGuyID",
 						"Producer", "Consumer", "DeliveryAttempts", "DeliveryTime", "RecipientType",
-						"ParcelDestinationZone"));
+						"ParcelDestinationZone", "IsPickup"));
 	}
 
 	/**
