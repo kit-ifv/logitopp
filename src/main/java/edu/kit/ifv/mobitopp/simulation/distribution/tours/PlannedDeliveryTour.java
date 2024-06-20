@@ -51,7 +51,12 @@ public class PlannedDeliveryTour implements PlannedTour {
 		this(vehicleType, plannedDuration, plannedAt, replan, impedance, depot);
 		addStops(plannedStops);
 	}
-	
+
+	@Override
+	public List<ParcelActivityBuilder> getPlannedStops() {
+		return stops;
+	}
+
 	public void addStop(ParcelActivityBuilder plannedStop) {
 		this.stops.add(plannedStop);
 	}

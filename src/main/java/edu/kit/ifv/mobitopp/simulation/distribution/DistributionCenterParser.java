@@ -3,18 +3,17 @@ package edu.kit.ifv.mobitopp.simulation.distribution;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 
-import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.data.ZoneRepository;
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
-import edu.kit.ifv.mobitopp.simulation.Location;
 import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceArea;
@@ -35,28 +34,32 @@ public class DistributionCenterParser {
 	private final Map<String, CEPServiceProvider> serviceProviders;
 	private final ServiceAreaFactory serviceAreaFactory;
 	private final DeliveryResults result;
+
+	private final Function<VehicleType, Integer> maxParcelCountPerVehicle;
 	
 	/**
 	 * Instantiates a new distribution center parser.
 	 *
-	 * @param zoneRepo           the zone repository for assigning depot location
-	 * @param scaleFactor        the scale factor to scale the fleet
-	 * @param locationProvider	 a factory for creating {@link edu.kit.ifv.mobitopp.simulation.ZoneAndLocation} from x/y coordinate
-	 * @param serviceAreaFactory a factory to create service areas
-	 * @param result             the results logger
+	 * @param zoneRepo                 the zone repository for assigning depot location
+	 * @param scaleFactor              the scale factor to scale the fleet
+	 * @param locationProvider         a factory for creating {@link ZoneAndLocation} from x/y coordinate
+	 * @param serviceAreaFactory       a factory to create service areas
+	 * @param result                   the results logger
+	 * @param maxParcelCountPerVehicle
 	 */
-	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, LocationProvider locationProvider, ServiceAreaFactory serviceAreaFactory, DeliveryResults result) {
+	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, LocationProvider locationProvider, ServiceAreaFactory serviceAreaFactory, DeliveryResults result, Function<VehicleType, Integer> maxParcelCountPerVehicle) {
 		this.zoneRepo = zoneRepo;
 		this.scaleFactor = scaleFactor;
 		this.locationProvider = locationProvider;
 		this.serviceAreaFactory = serviceAreaFactory;
-		
+		this.maxParcelCountPerVehicle = maxParcelCountPerVehicle;
+
 		this.serviceProviders = new LinkedHashMap<>();
 		this.result = result;
 	}
 	
-	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance, DeliveryResults result, LocationProvider locationProvider) {
-		this(zoneRepo, scaleFactor, locationProvider, new ServiceAreaFactory(zoneRepo, impedance), result);
+	public DistributionCenterParser(ZoneRepository zoneRepo, double scaleFactor, ImpedanceIfc impedance, DeliveryResults result, LocationProvider locationProvider, Function<VehicleType, Integer> maxParcelCountPerVehicle) {
+		this(zoneRepo, scaleFactor, locationProvider, new ServiceAreaFactory(zoneRepo, impedance), result, maxParcelCountPerVehicle);
 	}
 	
 	public Collection<DistributionCenter> parse(File file) {
@@ -108,8 +111,10 @@ public class DistributionCenterParser {
 		int serviceAreaCode = row.valueAsInteger("service_area");
 		ServiceArea serviceArea = serviceAreaFactory.fromIntCode(zone, serviceAreaCode);
 
+		int maxParcelCount = maxParcelCountPerVehicle.apply(type);
+
 		DistributionCenter center = new DistributionCenter(id, name, cepsp, zone, location.location(), scaleVehicles(vehicles),
-				volume, attempts, type, serviceArea, result);
+				volume, attempts, type, serviceArea, result, maxParcelCount);
 		addCenterToServiceProvider(center, cepsp);
 
 		System.out.println(name + " (" + id + ") serves " + serviceArea.size() + " zones!");

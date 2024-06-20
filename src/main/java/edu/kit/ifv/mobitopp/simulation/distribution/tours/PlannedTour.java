@@ -7,6 +7,7 @@ import java.util.Optional;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
+import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
@@ -42,6 +43,8 @@ public interface PlannedTour {
 	public Time prepare(Time currentTime, DeliveryVehicle vehicle, ImpedanceIfc impedance);
 	
 	public List<ParcelActivity> getPreparedStops();
+
+	public List<ParcelActivityBuilder> getPlannedStops();
 
 	public VehicleType getVehicleType();
 

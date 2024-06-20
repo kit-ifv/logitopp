@@ -133,7 +133,7 @@ public class TestChainTimeTableIntegration {
 	private Map<Integer, DistributionCenter> depotMap;
 
 	private void readFiles() {
-		DistributionCenterParser parser = new DistributionCenterParser(zoneRepo , 1.0, new DummyLocationProvider(), serviceAreaFactory, results);
+		DistributionCenterParser parser = new DistributionCenterParser(zoneRepo , 1.0, new DummyLocationProvider(), serviceAreaFactory, results, v -> 150);
 
 		Collection<DistributionCenter> depots = new ArrayList<>(parser.parse(DC_FILE));
 		depots.addAll(parser.parse(HUB_FILE));

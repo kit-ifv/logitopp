@@ -24,18 +24,20 @@ public class Fleet {
 	private final VehicleType vehicleType;
 	private final DeliveryResults results;
 	private final double vehicleVolume;
+	private final int vehicleParcelCount;
 	
 	public Fleet(
 			VehicleType vehicleType,
 			int numVehicles,
 			double vehicleVolume,
 			DistributionCenter distributionCenter,
-			DeliveryResults results
-	) {
+			DeliveryResults results,
+			int vehicleParcelCount) {
 		this.distributionCenter = distributionCenter;
 		this.numVehicles = numVehicles;
 		this.vehicleVolume = vehicleVolume;
 		this.results = results;
+		this.vehicleParcelCount = vehicleParcelCount;
 
 		this.returnTimes = new LinkedHashMap<>();
 		this.vehicleType = vehicleType;
@@ -49,7 +51,7 @@ public class Fleet {
 			
 		for (int i = 0; i < numVehicles; i++) {
 			addVehicle(
-					new DeliveryVehicle(vehicleType, vehicleVolume, distributionCenter)
+					new DeliveryVehicle(vehicleType, vehicleVolume, distributionCenter, vehicleParcelCount)
 			);
 		}
 		

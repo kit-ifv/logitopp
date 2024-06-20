@@ -30,7 +30,7 @@ public interface DispatchStrategy {
 						.findFirst();
 			}
 
-			return Optional.of(new DeliveryVehicle(mode, 1, dc));
+			return Optional.of(new DeliveryVehicle(mode, 1, dc, 1));
 		}	
 		
 		return dc.getFleet().getAvailableVehicle();

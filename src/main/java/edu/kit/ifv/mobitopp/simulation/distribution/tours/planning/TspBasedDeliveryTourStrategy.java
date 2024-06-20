@@ -39,7 +39,11 @@ public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 
 	private final ImpedanceIfc impedance;
 	
-	public TspBasedDeliveryTourStrategy(ImpedanceIfc impedance, DeliveryClusteringStrategy clusteringStrategy, DeliveryDurationModel durationModel) {
+	public TspBasedDeliveryTourStrategy(
+			ImpedanceIfc impedance,
+			DeliveryClusteringStrategy clusteringStrategy,
+			DeliveryDurationModel durationModel
+	) {
 		super(clusteringStrategy, durationModel);
 		this.impedance = impedance;
 	}
@@ -62,7 +66,8 @@ public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 			Time currentTime, RelativeTime maxTourDuration) {
 		
 		Mode mode = vehicle.getType().getMode();
-		double volume = vehicle.getVolume();
+		double maxVolume = vehicle.getVolume();
+		int maxCount = vehicle.getMaxParcelCount();
 		
 		List<PlannedTour> plannedTours = new ArrayList<>();
 		List<ParcelActivityBuilder> giantTour = planGiantTour(vehicle.getOwner(), deliveries, currentTime, mode);
@@ -73,22 +78,31 @@ public class TspBasedDeliveryTourStrategy extends ClusterTourPlanningStrategy {
 			Time time = currentTime;
 			Time endOfTour = currentTime.plus(maxTourDuration);
 		
-			double remainingVolume = volume;
-			for (int i = 0; i < giantTour.size() && remainingVolume > 0; i++) { //TODO check capacity computation/restriction
+			double remainingVolume = maxVolume;
+			int remainingCount = maxCount;
+			for (int i = 0; i < giantTour.size() && remainingVolume > 0 && remainingCount > 0; i++) { //TODO check capacity computation/restriction
 				ParcelActivityBuilder delivery = giantTour.get(i).by(vehicle);
 		
 				float tripDuration = travelTime(lastZone, delivery.getZone(), time, mode);		
 				float deliveryDuration = delivery.withDuration(durationModel).getDeliveryMinutes();
 				float returnTime = travelTime(delivery.getZone(), vehicle.getOwner().getZone(), time, mode);
 				
-				if (assigned.isEmpty() || ( sufficientTime(time, endOfTour, tripDuration + deliveryDuration + returnTime) && remainingVolume >= delivery.size() ) ) {
+				if (
+					assigned.isEmpty()
+					|| (
+							sufficientTime(time, endOfTour, tripDuration + deliveryDuration + returnTime)
+							&& remainingVolume >= delivery.volume()
+							&& remainingCount >= delivery.size()
+					)
+				) {
 					//TODO find any with fitting size in zone??
 					time = time.plusMinutes(round(tripDuration));
 					assigned.add(delivery.plannedAt(time));
 					time = time.plusMinutes(round(deliveryDuration));
 					lastZone = delivery.getZone();
 					
-					remainingVolume-= delivery.volume();
+					remainingVolume -= delivery.volume();
+					remainingCount -= delivery.size();
 					
 				} else {
 					returnTime = travelTime(lastZone, vehicle.getOwner().getZone(), time, mode);

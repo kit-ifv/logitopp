@@ -73,6 +73,11 @@ public class TimedTransportChain extends TransportChain {
 				.collect(joining());
 	}
 
+	public String forLogging() {
+		return getHubs().stream().map(h -> h + " dep=" + departures.get(h) + " +(" + durations.get(h) + " min)")
+				.collect(joining(" -- "));
+	}
+
 	public void bookConnections() {
 		if (this.isDeliveryDirection()) { //TODO INFO: pickup direction are handeled first come first serve
 			this.connections.forEach(c -> c.book(this));

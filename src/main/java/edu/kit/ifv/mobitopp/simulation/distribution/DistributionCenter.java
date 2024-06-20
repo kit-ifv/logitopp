@@ -49,19 +49,20 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 	/**
 	 * Instantiates a new distribution center.
 	 *
-	 * @param id           the id
-	 * @param name         the distribution centers name
-	 * @param organization the organizations name
-	 * @param zone         the zone
-	 * @param location     the location
-	 * @param numVehicles  the number of vehicles
-	 * @param attempts     the maximum number of delivery attempts
-	 * @param vehicleType  the vehicle type
-	 * @param serviceArea  the center's service area
-	 * @param results		results logger
+	 * @param id                 the id
+	 * @param name               the distribution centers name
+	 * @param organization       the organizations name
+	 * @param zone               the zone
+	 * @param location           the location
+	 * @param numVehicles        the number of vehicles
+	 * @param attempts           the maximum number of delivery attempts
+	 * @param vehicleType        the vehicle type
+	 * @param serviceArea        the center's service area
+	 * @param results            results logger
+	 * @param vehicleParcelCount
 	 */
 	public DistributionCenter(int id, String name, String organization, Zone zone, Location location, int numVehicles, double vehicleVolume,
-							  int attempts, VehicleType vehicleType, ServiceArea serviceArea, DeliveryResults results) {
+							  int attempts, VehicleType vehicleType, ServiceArea serviceArea, DeliveryResults results, int vehicleParcelCount) {
 		this.id = id;
 		this.name = name;
 		this.organization = organization;
@@ -73,7 +74,7 @@ public class DistributionCenter implements NullParcelProducer, Hook {
 		
 		this.storage = new DepotStorage(this);
 		this.regionalStructure = new RegionalReach(this, serviceArea);
-		this.fleet = new Fleet(vehicleType, numVehicles, vehicleVolume, this, results);
+		this.fleet = new Fleet(vehicleType, numVehicles, vehicleVolume, this, results, vehicleParcelCount);
 		
 		this.random = new Random(id);
 

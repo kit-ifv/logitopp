@@ -12,6 +12,7 @@ import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
+import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
@@ -57,6 +58,11 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 		this.impedance = impedance;
 		this.transferTime = transferTime;
 //		this.timeTable = timeTable;
+	}
+
+	@Override
+	public List<ParcelActivityBuilder> getPlannedStops() {
+		return List.of();
 	}
 
 	@Override
