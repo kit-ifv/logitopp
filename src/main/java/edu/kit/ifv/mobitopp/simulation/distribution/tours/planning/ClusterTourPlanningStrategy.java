@@ -29,7 +29,7 @@ public abstract class ClusterTourPlanningStrategy implements TourPlanningStrateg
 	public List<PlannedTour> planTours(Collection<IParcel> deliveries, Collection<IParcel> pickUps,
 			Fleet fleet, Time time) {
 		
-		List<ParcelActivityBuilder> activities = getDeliveryActivities(deliveries, pickUps);
+		List<ParcelActivityBuilder> activities = getDeliveryActivities(deliveries, pickUps, fleet.getVehicleParcelCount());
 		DeliveryVehicle vehicle = fleet.getVehicles().iterator().next();
 		
 		return planTours(activities, vehicle, time, RelativeTime.ofHours(8));
@@ -43,7 +43,7 @@ public abstract class ClusterTourPlanningStrategy implements TourPlanningStrateg
 	}
 
 	
-	protected List<ParcelActivityBuilder> getDeliveryActivities(Collection<IParcel> deliveries, Collection<IParcel> pickUps) {
+	protected List<ParcelActivityBuilder> getDeliveryActivities(Collection<IParcel> deliveries, Collection<IParcel> pickUps, int parcelCount) {
 		List<ParcelActivityBuilder> activities = new ArrayList<>();
 	
 		List<IParcel> available = new ArrayList<>(deliveries);
@@ -53,7 +53,7 @@ public abstract class ClusterTourPlanningStrategy implements TourPlanningStrateg
 			return activities;
 		}
 
-		clusteringStrategy.cluster(available, 150) //TODO replace by vehicle type capacity
+		clusteringStrategy.cluster(available, parcelCount) //TODO replace by vehicle type capacity
 						  .stream()
 						  .map(cluster -> new ParcelActivityBuilder(cluster.getParcels(), cluster.getZoneAndLocation()))
 						  .map(a -> a.withDuration(durationModel))

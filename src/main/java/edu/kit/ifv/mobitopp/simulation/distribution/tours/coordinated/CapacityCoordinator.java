@@ -23,7 +23,7 @@ import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class CapacityCoordinator {
-	private final static double BOX_CAPACITY = 50.0d; //TODO make configurable
+	private final static double BOX_CAPACITY = 57.0d; //TODO make configurable
 	
 	private final Collection<DistributionCenter> distributionCenters;
 	private final PreferredChainModel chainPreference;

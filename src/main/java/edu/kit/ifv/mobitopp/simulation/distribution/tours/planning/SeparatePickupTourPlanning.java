@@ -32,14 +32,14 @@ public class SeparatePickupTourPlanning extends ClusterTourPlanningStrategy {
 		List<PlannedTour> tours = new ArrayList<>();
 		
 		System.out.print(vehicle.getOwner().getName() + " plans delivery: ");
-		List<ParcelActivityBuilder> delActivities = getDeliveryActivities(deliveries, List.of());
+		List<ParcelActivityBuilder> delActivities = getDeliveryActivities(deliveries, List.of(), fleet.getVehicleParcelCount());
 		tours.addAll(
 				delegate.planTours(delActivities, vehicle, time, RelativeTime.ofHours(6))
 		);
 		System.out.println(" -> " + tours.size());
 		
 		System.out.print(vehicle.getOwner().getName() + " plans pickup: ");
-		List<ParcelActivityBuilder> pickActivities = getDeliveryActivities(List.of(), pickUps);
+		List<ParcelActivityBuilder> pickActivities = getDeliveryActivities(List.of(), pickUps, fleet.getVehicleParcelCount());
 		tours.addAll(
 				delegate.planTours(pickActivities, vehicle, time.startOfDay().plusHours(14), RelativeTime.ofHours(6))
 		);
