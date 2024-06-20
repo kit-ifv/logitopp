@@ -49,12 +49,27 @@ public class CostFunction { //TODO abstract class
 				)
 		);
 	}
+
+	public double estimateLastMileTime(TimedTransportChain chain, IParcel parcel, ImpedanceIfc impedance) {
+		Time lastMileDeparture = chain.getLastMileDeparture();
+		ZoneId originZoneId = chain.last().getZone().getId();
+		ZoneId parcelZoneId = parcel.getZone().getId();
+
+		return impedance.getTravelTime(originZoneId, parcelZoneId, chain.lastMileVehicle().getMode(), lastMileDeparture);
+	}
+
+	public double estimateLastMileDistance(TimedTransportChain chain, IParcel parcel, ImpedanceIfc impedance) {
+		ZoneId originZoneId = chain.last().getZone().getId();
+		ZoneId parcelZoneId = parcel.getZone().getId();
+
+		return impedance.getDistance(originZoneId, parcelZoneId);
+	}
 	
 	private double estimateCost(DistributionCenter origin, Zone zone,
 				Time time, VehicleType vehicle, double travelTime, double transferTime, double distance) {
 		
 		double cost = getCost(origin, zone, time) * vehicleCostFactor(origin);
-		cost += (transferTime + transferTime) * timeCostFactor(origin);
+		cost += (travelTime + transferTime) * timeCostFactor(origin);
 		
 		return cost;
 	}

@@ -74,10 +74,12 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 		int capacity = getVehicleCapacity(chain.last());
 		
 		double lastMileCost = costFunction.estimateLastMileCost(chain, parcel, impedance);
+		double lastMileTime = costFunction.estimateLastMileTime(chain, parcel, impedance);
+		double lastMileDist = costFunction.estimateLastMileDistance(chain, parcel, impedance);
 		
 		double cost = (chain.getCost() + lastMileCost)/ capacity;
-		double time = (double) chain.getTotalDuration() / capacity;
-		double dist = chain.getDistance() / capacity;
+		double time = (chain.getTotalDuration() + lastMileTime) / capacity;
+		double dist = (chain.getDistance() + lastMileDist) / capacity;
 		
 		String mode = chain.last().getVehicleType().asString().toLowerCase();
 
