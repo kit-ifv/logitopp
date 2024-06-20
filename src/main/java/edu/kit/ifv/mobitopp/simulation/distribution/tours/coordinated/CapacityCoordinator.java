@@ -16,6 +16,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChainFactory;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.timetable.Connection;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference.PreferredChainModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference.TransportPreferences;
@@ -68,24 +69,34 @@ public class CapacityCoordinator {
 		//First collect delivery chains, and delivery chain preferences
 		//for tram chains, assign slots to distribution centers
 		List<Request> requests = new ArrayList<>();
+		Map<TimedTransportChain, List<TimedTransportChain>> tramChainCopiesOfDay = new LinkedHashMap<>();
 		for (DistributionCenter dc : distributionCenters) {
 			System.out.println("Collect chains and requests for " + dc.getName() + "[" + dc.getId() + "]");
 			
 			List<TimedTransportChain> chains = getChainsFor(dc, earliestTramDeparture);
 			List<TimedTransportChain> nonTramChains = getNonTramChains(chains, earliestNonTramDeparture);
 			assignment.assign(dc, nonTramChains);
-			
+
 			List<TransportPreferences> preferences = getPreferences(dc, chains, date);
 			assignment.register(dc, preferences);
 
 			List<Request> dcRequests = getRequests(dc, preferences);
 			requests.addAll(dcRequests);
 
-			System.out.println("    - chains: " + chains.size());
-			System.out.println("    - non-tram chains: " + nonTramChains.size());
 			System.out.println("    - requests: " + dcRequests.size());
+
+			System.out.println("    - non-tram chains: " + nonTramChains.size());
+
+
+			Map<TimedTransportChain, List<TimedTransportChain>> dcTramChains = getTramChainCopiesOfDay(earliestTramDeparture, chains);
+			tramChainCopiesOfDay.putAll(dcTramChains);
+
+			System.out.println("    - tram chains: " + dcTramChains.size());
+			System.out.println("    - tram chains copies over time: " + dcTramChains.values().stream().mapToInt(List::size).sum());
 		}
-		assignment.assignAll(assignRequests(requests));
+
+
+		assignment.assignAll(assignRequests(requests, tramChainCopiesOfDay));
 		
 		//for assigned delivery chains, obtain reversed direction
 		// (here first come, first served applies)
@@ -140,8 +151,13 @@ public class CapacityCoordinator {
 		
 		return result;
 	}
-		
-	private Map<DistributionCenter, List<TimedTransportChain>> assignRequests(List<Request> requests) {
+
+	private Map<DistributionCenter, List<TimedTransportChain>> assignRequests(
+			List<Request> requests,
+			Map<TimedTransportChain, List<TimedTransportChain>> tramChainCopiesOfDay
+	) {
+
+
 		// pick random request until all requests have been handled
 		// 
 		Map<DistributionCenter, List<TimedTransportChain>> tramChains = new LinkedHashMap<>();
@@ -150,8 +166,22 @@ public class CapacityCoordinator {
 		while (!openRequests.isEmpty()) {
 			Request req = openRequests.remove(random.nextInt(openRequests.size()));
 			DistributionCenter dc = req.dc;
+
+			tramChainCopiesOfDay.getOrDefault(req.chain, List.of())
+					.stream()
+					.filter(TimedTransportChain::canBookConnections)
+					.findFirst()
+					.ifPresent(c -> {
+						c.bookConnections();
+
+						if (!tramChains.containsKey(dc)) {
+							tramChains.put(dc, new ArrayList<>());
+						}
+
+						tramChains.get(dc).add(c.copyWithId(req.chain.getId()));
+			});
 			
-			if (req.chain.canBookConnections()) {
+/*			if (req.chain.canBookConnections()) {
 				TimedTransportChain bookedChain = req.chain.copy(); //Why copy here?
 				bookedChain.bookConnections();
 				
@@ -160,7 +190,7 @@ public class CapacityCoordinator {
 				}
 				
 				tramChains.get(dc).add(bookedChain);
-			}
+			}*/
 			
 		}
 		
@@ -188,7 +218,7 @@ public class CapacityCoordinator {
 		List<Request> requests = new ArrayList<>();
 		
 		for (TimedTransportChain chain : demandPerChain.keySet()) {
-			int demand = (int) Math.ceil(demandPerChain.get(chain).size()*1.0d / BOX_CAPACITY);
+			int demand = (int) Math.ceil(demandPerChain.get(chain).size()*2.0d / BOX_CAPACITY);
 			for (int i = 0; i < demand; i++) {
 				requests.add(new Request(dc, chain));
 			}			
@@ -242,6 +272,40 @@ public class CapacityCoordinator {
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.collect(toList());
+	}
+
+	private Map<TimedTransportChain, List<TimedTransportChain>> getTramChainCopiesOfDay(Time earliestDeparture, List<TimedTransportChain> chains) {
+		List<TimedTransportChain> tramChains =
+					chains.stream()
+					.filter(c -> c.uses(VehicleType.TRAM))
+					.collect(toList());
+
+		Map<TimedTransportChain, List<TimedTransportChain>> timedTramChains = new LinkedHashMap<>();
+
+		for (TimedTransportChain chain : tramChains) {
+			timedTramChains.put(chain, new ArrayList<>());
+
+			Optional<List<Connection>> connections = chain.legsOfType(VehicleType.TRAM)
+					.stream()
+					.findFirst()
+					.map(l ->
+							timeTable.getConnectionsOnDay(l.getFirst(), l.getSecond(), earliestDeparture).collect(toList())
+					);
+
+			if (connections.isPresent()) {
+				for (Connection conn : connections.get()) {
+					Time dep = conn.getDeparture().minusMinutes(30);
+					dep = (dep.isBefore(Time.start)) ? Time.start : dep;
+					timedChainFactory.create(chain, dep).ifPresent(
+						timedTramChains.get(chain)::add
+					);
+				}
+			}
+
+
+		}
+
+		return timedTramChains;
 	}
 
 }

@@ -138,6 +138,48 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 
 		System.out.println("    - planned parcels: " + validTours.values().stream().flatMapToInt(l -> l.stream().mapToInt(LastMileTour::parcelCount)).sum());
 		System.out.println("    - unplanned parcels: " + overflowParcelsForTruck.size());
+		System.out.println("    - bike tour parcel count: " +
+				validTours.entrySet()
+						  .stream()
+						  .filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.BIKE))
+						  .flatMap(e -> e.getValue().stream())
+						  .map(LastMileTour::parcelCount).map(Object::toString).collect(joining(", "))
+		);
+		System.out.println("    - bike tour duration: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.BIKE))
+						.flatMap(e -> e.getValue().stream())
+						.map(t -> t.tour.getTravelTime()).map(Object::toString).collect(joining(", "))
+		);
+		System.out.println("    - bike tour stops: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.BIKE))
+						.flatMap(e -> e.getValue().stream())
+						.map(t -> t.tour.size()).map(Object::toString).collect(joining(", "))
+		);
+		System.out.println("    - truck tour parcel count: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.TRUCK))
+						.flatMap(e -> e.getValue().stream())
+						.map(LastMileTour::parcelCount).map(Object::toString).collect(joining(", "))
+		);
+		System.out.println("    - truck tour duration: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.TRUCK))
+						.flatMap(e -> e.getValue().stream())
+						.map(t -> t.tour.getTravelTime()).map(Object::toString).collect(joining(", "))
+		);
+		System.out.println("    - truck tour stops: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.TRUCK))
+						.flatMap(e -> e.getValue().stream())
+						.map(t -> t.tour.size()).map(Object::toString).collect(joining(", "))
+		);
 
 		List<PlannedTour> plannedTours = createPlannedTours(time, dc, validTours);
 		return plannedTours;
@@ -187,9 +229,10 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 			List<PlannedTour> chainTours = lastMilePlanning.planTours(
 					chainDeliveries,
 					chainPickups,
-					dc.getFleet(),
+					chain.last().getFleet(),
 					chain.getDeparture(chain.first())
 			);
+			System.out.println("        - tour sizes " + mode + ": " + chainTours.stream().map(p -> " " + p.getAllParcels().size()).collect(joining(",")) );
 
 			List<TimedTransportChain> chainCopies = identicalChains.getOrDefault(chain, List.of());
 

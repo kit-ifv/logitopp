@@ -92,6 +92,10 @@ public class TimedTransportChain extends TransportChain {
 	public TimedTransportChain copy() {
 		return new TimedTransportChain(id, hubs, deliveryDirection, departures, durations, connections, distance, cost);
 	}
+
+	public TimedTransportChain copyWithId(int newId) {
+		return new TimedTransportChain(newId, hubs, deliveryDirection, departures, durations, connections, distance, cost);
+	}
 	
 	public TimedTransportChain copyNexId() {
 		return new TimedTransportChain(idCount++, hubs, deliveryDirection, departures, durations, connections, distance, cost);

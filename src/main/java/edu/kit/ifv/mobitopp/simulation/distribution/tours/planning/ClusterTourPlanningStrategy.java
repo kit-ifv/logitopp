@@ -53,7 +53,7 @@ public abstract class ClusterTourPlanningStrategy implements TourPlanningStrateg
 			return activities;
 		}
 
-		clusteringStrategy.cluster(available, parcelCount) //TODO replace by vehicle type capacity
+		clusteringStrategy.cluster(available, parcelCount)
 						  .stream()
 						  .map(cluster -> new ParcelActivityBuilder(cluster.getParcels(), cluster.getZoneAndLocation()))
 						  .map(a -> a.withDuration(durationModel))
