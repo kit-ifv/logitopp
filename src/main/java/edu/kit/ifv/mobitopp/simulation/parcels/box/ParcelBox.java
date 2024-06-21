@@ -61,6 +61,11 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 	}
 
 	@Override
+	public Optional<Time> latestDeparture() {
+		return Optional.ofNullable(chain.getFirstMileDeparture());
+	}
+
+	@Override
 	public List<ParcelActivityBuilder> getPlannedStops() {
 		return List.of();
 	}
@@ -205,8 +210,10 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 	
 	@Override
 	public String toString() {
-		return "Box[" + getId() + "] " + depot().getName() + "->" + nextHub().get().getName();
+		return "Box[" + getId() + "] " + depot().getName() + "-> (" + chain.getFirstMileDeparture() + ") " + nextHub().get().getName();
 	}
+
+
 
 	@Override
 	public Optional<Connection> usedConnection() {

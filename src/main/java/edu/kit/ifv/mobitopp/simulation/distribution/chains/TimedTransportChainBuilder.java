@@ -11,6 +11,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.CostFunction;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.TransferTimeModel;
 import edu.kit.ifv.mobitopp.time.Time;
+import edu.kit.ifv.mobitopp.util.collections.Pair;
 
 public class TimedTransportChainBuilder {
 	private final CostFunction costFunction;
@@ -28,6 +29,8 @@ public class TimedTransportChainBuilder {
 	
 	private boolean valid = true;
 
+	private Connection suggestedFirstConnection;
+
 
 	public TimedTransportChainBuilder(TransportChain chain, CostFunction costFunction, TransferTimeModel transferTime) {
 		this.costFunction = costFunction;
@@ -42,6 +45,11 @@ public class TimedTransportChainBuilder {
 		durations.put(chain.last(), 0);// TODO default value
 		transfers.put(chain.last(), 0);// TODO default value
 
+	}
+
+	public TimedTransportChainBuilder suggestFirstConnection(Connection connection) {
+		this.suggestedFirstConnection = connection;
+		return this;
 	}
 
 	public TimedTransportChainBuilder setDuration(DistributionCenter hub, int durMinutes, int transferMinutes, double distance) {
@@ -186,11 +194,24 @@ public class TimedTransportChainBuilder {
 		if(firstTram.isPresent() && hubAfterFirstTram.isPresent()) {
 
 			Time firstTramEarliestDeparture = departure.plusMinutes((int) Math.round(durBeforeFirstTram));
-			Optional<Connection> maybeConnection = timeTable.getFreeConnectionsOnDay(
-					firstTram.get(),
-					hubAfterFirstTram.get(),
-					firstTramEarliestDeparture
-			).findFirst();
+
+			Optional<Connection> maybeConnection;
+			if (
+				suggestedFirstConnection != null
+				&& suggestedFirstConnection.getDeparture().isAfterOrEqualTo(firstTramEarliestDeparture)
+				&& suggestedFirstConnection.hasFreeCapacity()
+			) {
+				maybeConnection = Optional.of(suggestedFirstConnection);
+
+			} else {
+				maybeConnection = timeTable.getFreeConnectionsOnDay(
+						firstTram.get(),
+						hubAfterFirstTram.get(),
+						firstTramEarliestDeparture
+				).findFirst();
+			}
+
+
 
 			if (maybeConnection.isEmpty()) {
 				this.valid = false;
@@ -206,6 +227,7 @@ public class TimedTransportChainBuilder {
 			}
 
 			departure = connection.getDeparture().minusMinutes((int) Math.ceil(durBeforeFirstTram));
+			start = departure;
 		}
 
 		DistributionCenter predecessor = null;
@@ -238,6 +260,7 @@ public class TimedTransportChainBuilder {
 				duration = connection.getDurationMinutes();
 
 				int wait = Math.max(0, connection.getDeparture().differenceTo(time).toMinutes());
+				time = connection.getDeparture();
 				if (predecessor != null) {
 					int transferUpdate = transfers.get(predecessor) + wait;
 					transfers.put(predecessor, transferUpdate);
@@ -369,6 +392,38 @@ public class TimedTransportChainBuilder {
 					.useDurationsFromStats(timeTable, impedance, time)
 					.defaultDeparture(time)
 					.build();
+	}
+
+	public static ConnectionChainsFactory asConnectionsChainFactory(
+			CostFunction costFunction,
+			TransferTimeModel transferTime,
+			TimeTable timeTable,
+			ImpedanceIfc impedance
+	) {
+
+		return (chain, time) -> {
+
+
+			Optional<Pair<DistributionCenter, DistributionCenter>> firstTramLeg =
+					chain.legsOfType(VehicleType.TRAM).stream().findFirst();
+
+			if (firstTramLeg.isPresent()) {
+				DistributionCenter from = firstTramLeg.get().getFirst();
+				DistributionCenter to = firstTramLeg.get().getSecond();
+
+				return timeTable.getFreeConnectionsOnDay(from, to, time).map(c ->
+
+					new TimedTransportChainBuilder(chain, costFunction, transferTime).suggestFirstConnection(c)
+							.useDurationsFromStats(timeTable, impedance, time)
+							.defaultDeparture(time)
+							.build()
+
+				).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+			}
+
+			return List.of();
+		};
+
 	}
 
 }

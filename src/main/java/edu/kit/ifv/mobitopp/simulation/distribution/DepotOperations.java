@@ -60,6 +60,14 @@ public class DepotOperations {
 			for (PlannedTour t : plannedTours()) {
 				if (t.isReplanningAllowed()) {
 					storage.deletePlannedTour(t);
+				} else {
+
+					if (!center.getName().contains("HUB")) {
+						System.out.println(center + " found and deleted planned tran tour from previous day?:\n    " + t);
+						storage.deletePlannedTour(t);
+					}
+
+
 				}
 			}
 

@@ -48,4 +48,6 @@ public interface PlannedTour {
 
 	public VehicleType getVehicleType();
 
+	public Optional<Time> latestDeparture();
+
 }

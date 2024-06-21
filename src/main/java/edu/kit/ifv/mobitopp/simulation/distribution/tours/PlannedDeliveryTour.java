@@ -183,4 +183,10 @@ public class PlannedDeliveryTour implements PlannedTour {
 	public boolean usesTram() {
 		return vehicleType.equals(VehicleType.TRAM);
 	}
+
+
+	@Override
+	public Optional<Time> latestDeparture() {
+		return Optional.empty();
+	}
 }

@@ -34,6 +34,7 @@ public class ReturningParcelBox extends ParcelBox {
 		
 		returning.forEach(p -> p.unload(currentTime, vehicle));
 		returning.forEach(consumer::addParcel);
+
 		pickedUp.forEach(p -> p.tryDelivery(currentTime, vehicle));
 		pickedUp.forEach(consumer::addDelivered);
 		

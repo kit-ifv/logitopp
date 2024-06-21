@@ -159,6 +159,13 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 						.flatMap(e -> e.getValue().stream())
 						.map(t -> t.tour.size()).map(Object::toString).collect(joining(", "))
 		);
+		System.out.println("    - bike tour departures: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.BIKE))
+						.flatMap(e -> e.getValue().stream())
+						.map(t -> t.chain.getFirstMileDeparture()).map(t -> t.getHour()+":"+t.getMinute()).collect(joining(", "))
+		);
 		System.out.println("    - truck tour parcel count: " +
 				validTours.entrySet()
 						.stream()
@@ -179,6 +186,13 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.TRUCK))
 						.flatMap(e -> e.getValue().stream())
 						.map(t -> t.tour.size()).map(Object::toString).collect(joining(", "))
+		);
+		System.out.println("    - truck tour departures: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.TRUCK))
+						.flatMap(e -> e.getValue().stream())
+						.map(t -> t.chain.getFirstMileDeparture()).map(t -> t.getHour()+":"+t.getMinute()).collect(joining(", "))
 		);
 
 		List<PlannedTour> plannedTours = createPlannedTours(time, dc, validTours);
@@ -340,14 +354,22 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 
 	private List<PlannedTour> createPlannedTours(Time time, DistributionCenter dc, Map<TimedTransportChain, List<LastMileTour>> validTours) {
 		List<PlannedTour> plannedTours = new ArrayList<>();
-		validTours.keySet().forEach(chain -> {
+		validTours.keySet().forEach(chainArchetype -> {
 
-			for (LastMileTour tour: validTours.get(chain)) {
+			for (LastMileTour tour: validTours.get(chainArchetype)) {
+				TimedTransportChain chain = tour.chain;
 
 				if (!tour.tour.isEmpty()) {
 					float accessEgress = tour.tour.selectMinInsertionStart(chain.last().getZoneAndLocation());
 
-					PlannedDeliveryTour plannedLastMile = new PlannedDeliveryTour(chain.lastMileVehicle(), RelativeTime.ofMinutes((int) ceil(tour.tour.getTravelTime() + accessEgress)), time, false, impedance, chain.last());
+					PlannedDeliveryTour plannedLastMile = new PlannedDeliveryTour(
+							chain.lastMileVehicle(),
+							RelativeTime.ofMinutes((int) ceil(tour.tour.getTravelTime() + accessEgress)),
+							chain.getFirstMileDeparture(),
+							false,
+							impedance,
+							chain.last()
+					);
 
 					PlannedTour planned;
 					if (chain.uses(VehicleType.BIKE)) { //Encode return tour here
