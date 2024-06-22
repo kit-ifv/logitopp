@@ -112,10 +112,10 @@ public class CapacityCoordinator {
 //		}
 
 		for (DistributionCenter dc: distributionCenters) {
-			System.out.println("    - " + dc  + ": ");
-			System.out.println("        - all chains: " + assignment.getChains(dc).size());
-			System.out.println("        - bike chains: " + assignment.getChains(dc).stream().filter(c -> c.lastMileVehicle().equals(VehicleType.BIKE)).count());
-			System.out.println("        - truck chains: " + assignment.getChains(dc).stream().filter(c -> c.lastMileVehicle().equals(VehicleType.TRUCK)).count());
+			System.out.println("- " + dc  + ": ");
+			System.out.println("    - all chains: " + assignment.getChains(dc).size());
+			System.out.println("    - bike chains: " + assignment.getChains(dc).stream().filter(c -> c.lastMileVehicle().equals(VehicleType.BIKE)).count());
+			System.out.println("    - truck chains: " + assignment.getChains(dc).stream().filter(c -> c.lastMileVehicle().equals(VehicleType.TRUCK)).count());
 		}
 		
 		return assignment;
@@ -315,6 +315,12 @@ public class CapacityCoordinator {
 			preferences.add(
 				chainPreference.selectPreference(parcel, chains, dc.getRandom().nextDouble(), time)
 			); 
+		}
+
+		for (IParcel parcel: dc.getStorage().getRequests()) {
+			preferences.add(
+					chainPreference.selectPreference(parcel, chains, dc.getRandom().nextDouble(), time)
+			);
 		}
 		
 		return preferences;

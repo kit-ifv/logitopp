@@ -95,7 +95,12 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 		System.out.println("Plan tours for " + dc.getName() + "[" + dc.getId() + "]");
 		System.out.println("    - chains: " + chains.size());
 		System.out.println("    - unique chains: " + identicalChains.keySet().size());
-		System.out.println("    - unique parcels: " + preferences.keySet().size());
+		System.out.println("    - unique parcels: " + (deliveries.size() + pickUps.size()));
+		System.out.println("    - unique parcels with preferences: " + preferences.keySet().size());
+		System.out.println("    - unique deliveries: " + deliveries.size());
+		System.out.println("    - unique deliveries with preferences: " + preferences.keySet().stream().filter(p -> !p.isPickUp()).count());
+		System.out.println("    - unique pickups: " + pickUps.size());
+		System.out.println("    - unique parcels with preferences: " + preferences.keySet().stream().filter(IParcel::isPickUp).count());
 
 
 		Map<TimedTransportChain, List<LastMileTour>> validTours = new LinkedHashMap<>();
@@ -145,6 +150,22 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 						  .flatMap(e -> e.getValue().stream())
 						  .map(LastMileTour::parcelCount).map(Object::toString).collect(joining(", "))
 		);
+		System.out.println("    - bike tour delivery count: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.BIKE))
+						.flatMap(e -> e.getValue().stream())
+						.mapToLong(lmt -> lmt.tour.getElements().stream().flatMap(c -> c.getParcels().stream()).filter(p -> !p.isPickUp()).count())
+						.mapToObj(String::valueOf).collect(joining(", "))
+		);
+		System.out.println("    - bike tour pickup count: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.BIKE))
+						.flatMap(e -> e.getValue().stream())
+						.mapToLong(lmt -> lmt.tour.getElements().stream().flatMap(c -> c.getParcels().stream()).filter(IParcel::isPickUp).count())
+						.mapToObj(String::valueOf).collect(joining(", "))
+		);
 		System.out.println("    - bike tour duration: " +
 				validTours.entrySet()
 						.stream()
@@ -172,6 +193,22 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.TRUCK))
 						.flatMap(e -> e.getValue().stream())
 						.map(LastMileTour::parcelCount).map(Object::toString).collect(joining(", "))
+		);
+		System.out.println("    - truck tour delivery count: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.TRUCK))
+						.flatMap(e -> e.getValue().stream())
+						.mapToLong(lmt -> lmt.tour.getElements().stream().flatMap(c -> c.getParcels().stream()).filter(p -> !p.isPickUp()).count())
+						.mapToObj(String::valueOf).collect(joining(", "))
+		);
+		System.out.println("    - truck tour pickup count: " +
+				validTours.entrySet()
+						.stream()
+						.filter(e -> e.getKey().lastMileVehicle().equals(VehicleType.TRUCK))
+						.flatMap(e -> e.getValue().stream())
+						.mapToLong(lmt -> lmt.tour.getElements().stream().flatMap(c -> c.getParcels().stream()).filter(IParcel::isPickUp).count())
+						.mapToObj(String::valueOf).collect(joining(", "))
 		);
 		System.out.println("    - truck tour duration: " +
 				validTours.entrySet()
@@ -227,8 +264,7 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 
 			if (useTruckOverflow) {
 				System.out.println("        - include overflow parcels " + overflowParcelsForTruck.size());
-				System.out.println("        - effective deliveries " + chainDeliveries.size());
-				System.out.println("        - effective pickups " + chainPickups.size());
+
 
 				chainDeliveries.addAll(
 					overflowParcelsForTruck.stream().filter(p -> !p.isPickUp()).collect(toList())
@@ -238,6 +274,8 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 				);
 				overflowParcelsForTruck.clear();
 
+				System.out.println("        - effective deliveries " + chainDeliveries.size());
+				System.out.println("        - effective pickups " + chainPickups.size());
 			}
 
 			List<PlannedTour> chainTours = lastMilePlanning.planTours(
