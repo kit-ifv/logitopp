@@ -100,7 +100,7 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 		System.out.println("    - unique deliveries: " + deliveries.size());
 		System.out.println("    - unique deliveries with preferences: " + preferences.keySet().stream().filter(p -> !p.isPickUp()).count());
 		System.out.println("    - unique pickups: " + pickUps.size());
-		System.out.println("    - unique parcels with preferences: " + preferences.keySet().stream().filter(IParcel::isPickUp).count());
+		System.out.println("    - unique pickups with preferences: " + preferences.keySet().stream().filter(IParcel::isPickUp).count());
 
 
 		Map<TimedTransportChain, List<LastMileTour>> validTours = new LinkedHashMap<>();
@@ -439,6 +439,8 @@ public class SimpleCoordinatedTourStrategy implements TourPlanningStrategy {
 
 		System.out.println("    - planned " + plannedTours.size() + " tours for " + dc.getName() + "[" + dc.getId() + "]");
 		System.out.println("      tour parcel cnt: " + plannedTours.stream().map(t -> t.getAllParcels().size() + ", ").collect(joining()));
+		System.out.println("      tour pickup cnt: " + plannedTours.stream().map(t -> t.getPickUpRequests().size() + ", ").collect(joining()));
+		System.out.println("      tour delivery cnt: " + plannedTours.stream().map(t -> t.getDeliveryParcels().size() + ", ").collect(joining()));
 		System.out.println("      tour durations: " + plannedTours.stream().map(t -> t.getPlannedDuration().toMinutes() + ", ").collect(joining()));
 		return plannedTours;
 	}
