@@ -1,8 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.distribution;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
@@ -82,11 +80,14 @@ public class DepotOperations {
 		
 	}
 
-
-
 	protected void dispatchAvailableTours(Time currentTime) {
-		
-		for (PlannedTour tour : plannedTours()) {
+		Collection<PlannedTour> plannedTours = plannedTours();
+
+		if(plannedTours.size() > 0) {
+			System.out.println(center.getName() + ": " + plannedTours.size());
+		}
+
+		for (PlannedTour tour : plannedTours) {
 			if (dispatchStrategy.canDispatch(tour, center, currentTime)) {
 
 				Optional<DeliveryVehicle> vehicle = dispatchStrategy.getVehicleForTour(tour, center, currentTime);
@@ -99,6 +100,8 @@ public class DepotOperations {
 		}
 
 	}
+
+
 
 	protected void dispatchTour(Time currentTime, PlannedTour tour, DeliveryVehicle vehicle) {
 		

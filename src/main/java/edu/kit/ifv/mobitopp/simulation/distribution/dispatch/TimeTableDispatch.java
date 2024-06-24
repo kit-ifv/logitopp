@@ -27,7 +27,7 @@ public class TimeTableDispatch implements DispatchStrategy {
 			
 			Optional<Connection> nextConnection = timeTable.getNextConnection(origin, destination, time);
 			
-			return nextConnection.isPresent() && nextConnection.get().getDeparture().equals(time);
+			return nextConnection.isPresent() && nextConnection.get().getDeparture().isBeforeOrEqualTo(time);
 			
 			
 		} else {

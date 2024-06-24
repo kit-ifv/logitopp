@@ -29,7 +29,7 @@ public interface DispatchStrategy {
 			Optional<Connection> connection = tour.usedConnection();
 			if (connection.isPresent()) {
 
-				if (connection.get().getDeparture().isBefore(time)) {
+				if (connection.get().getDeparture().isAfter(time)) {
 					return Optional.empty();
 				}
 
