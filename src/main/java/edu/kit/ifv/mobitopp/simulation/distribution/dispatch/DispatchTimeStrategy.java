@@ -64,7 +64,7 @@ public class DispatchTimeStrategy {
             case BIKE: return hoursBike(tour, time);
 
             case TRAM:
-                return isInTramDispatchHours(time) && endsBeforeEndOfDeliveryTime(time, tour);
+                return true;//isInTramDispatchHours(time); //&& endsBeforeEndOfDeliveryTime(time, tour);
 
             case OTHER:
             default:
@@ -75,11 +75,11 @@ public class DispatchTimeStrategy {
     private boolean hoursTruck(PlannedTour tour, Time time) {
         if (tour.isReturning()) { return true; }
 
-        return isInVehicleDispatchHours(time) && !isSunday(time) && endsBeforeEndOfDeliveryTime(time, tour);
+        return isInTruckDispatchHours(time) && !isSunday(time);// && endsBeforeEndOfDeliveryTime(time, tour);
     }
 
     private boolean hoursBike(PlannedTour tour, Time time) {
-        return isInVehicleDispatchHours(time) && !isSunday(time) && endsBeforeEndOfDeliveryTime(time, tour);
+        return isInBikeDispatchHours(time) && !isSunday(time);// && endsBeforeEndOfDeliveryTime(time, tour);
     }
 
 
@@ -90,15 +90,23 @@ public class DispatchTimeStrategy {
         if (mode.equals(VehicleType.TRAM)) {
 
             Optional<Connection> connection = tour.usedConnection();
-            if (connection.isPresent()) {
 
-                String tag = connection.get().getTag();
-                return dc.getFleet().getVehicles().stream()
-                        .filter(v -> Objects.equals(v.getTag(), tag))
-                        .findFirst();
-            }
 
-            return Optional.of(new DeliveryVehicle(mode, 1, dc, 1));
+            DeliveryVehicle veh = connection.flatMap(c ->
+                    dc.getFleet().getVehicles().stream()
+                            .filter(v -> Objects.equals(v.getTag(), c.getTag()))
+                            .findFirst()
+            ).orElse(
+                    new DeliveryVehicle(mode, 1, dc, 2)
+            );
+
+            return Optional.of(veh);
+        }
+
+        if (tour.isReturning()) {
+            return Optional.of(
+                    new DeliveryVehicle(mode, dc.getFleet().getVehicleVolume(), dc, dc.getFleet().getVehicleParcelCount())
+            );
         }
 
         return dc.getFleet().getAvailableVehicle();
@@ -125,15 +133,20 @@ public class DispatchTimeStrategy {
     }
 
 
-    private boolean isInVehicleDispatchHours(Time time) {
+    private boolean isInBikeDispatchHours(Time time) {
         int hour=time.getHour();
-        return 7 <= hour && hour <= 18;
+        return 7 <= hour && hour <= 20;
     }
 
-    private boolean isInTramDispatchHours(Time time) {
+    private boolean isInTruckDispatchHours(Time time) {
         int hour=time.getHour();
-        return 4 <= hour && hour <= 18;
+        return 7 <= hour && hour <= 19;
     }
+
+/*    private boolean isInTramDispatchHours(PlannedTour tour, Time time) {
+        int hour=time.getHour();
+        return hour <= ;
+    }*/
 
     private boolean isSunday(Time time) {
         return time.weekDay().equals(SUNDAY);

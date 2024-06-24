@@ -105,7 +105,7 @@ public class DepotOperations {
 			if (!plannedDispatch.contains(tour)) {
 
 				Time dispatch = dispatchTimeStrategy.dispatchTimeFor(tour, center, currentTime);
-				dispatch = (dispatch.isBeforeOrEqualTo(currentTime)) ? Time.start : dispatch;
+				dispatch = (dispatch.isBeforeOrEqualTo(currentTime)) ? currentTime : dispatch;
 
 				if (!dispatchTimes.containsKey(dispatch)) {
 					dispatchTimes.put(dispatch, new ArrayList<>());
@@ -130,6 +130,7 @@ public class DepotOperations {
 						System.out.println(this.center.getName() + "  dispatches " + tour);
 						dispatchTour(currentTime, tour, vehicle.get());
 						dispatched.add(tour);
+						plannedDispatch.remove(tour);
 					}
 				}
 			}
