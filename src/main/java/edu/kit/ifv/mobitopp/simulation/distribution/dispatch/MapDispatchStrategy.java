@@ -53,11 +53,7 @@ public class MapDispatchStrategy implements DispatchStrategy {
 
     @Override
     public boolean canDispatch(PlannedTour tour, DistributionCenter origin, Time time) {
-        if (!tourDispatchTime.containsKey(tour)) {
-            recordTourDispatch(tour, origin, time);
-        }
-
-        return tourDispatchTime.get(tour).isBeforeOrEqualTo(time);
+        return tour.latestDeparture().orElse(time.startOfDay().plusHours(7)).isBeforeOrEqualTo(time);
     }
 
     private boolean useTimeTable(PlannedTour tour, DistributionCenter origin) {
