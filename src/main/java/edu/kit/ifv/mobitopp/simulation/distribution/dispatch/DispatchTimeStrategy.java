@@ -30,9 +30,9 @@ public class DispatchTimeStrategy {
         VehicleType vehicle = handler.getVehicleType();
 
         switch (vehicle) {
-            case BIKE:
-            case TRUCK:
-                return time.startOfDay().plusHours(7);
+
+            case TRUCK: return timeTruck(tour, time);
+            case BIKE: return timeBike(time);
 
             case TRAM:
                 return tramDispatchTime(tour, origin, time);
@@ -44,15 +44,24 @@ public class DispatchTimeStrategy {
 
     }
 
+    private Time timeTruck(PlannedTour tour, Time time) {
+        if (tour.isReturning()) { return time; }
+
+        return time.startOfDay().plusHours(7);
+    }
+
+    private Time timeBike(Time time) {
+        return time.startOfDay().plusHours(7);
+    }
+
     public boolean dispatchHours(PlannedTour tour, DistributionCenter origin, Time time) {
         DistributionCenter handler = (tour.isReturning()) ? tour.nextHub().get() : origin;
 
         VehicleType vehicle = handler.getVehicleType();
 
         switch (vehicle) {
-            case BIKE:
-            case TRUCK:
-                return isInVehicleDispatchHours(time) && !isSunday(time) && endsBeforeEndOfDeliveryTime(time, tour);
+            case TRUCK: return hoursTruck(tour, time);
+            case BIKE: return hoursBike(tour, time);
 
             case TRAM:
                 return isInTramDispatchHours(time) && endsBeforeEndOfDeliveryTime(time, tour);
@@ -61,6 +70,16 @@ public class DispatchTimeStrategy {
             default:
                 return true;
         }
+    }
+
+    private boolean hoursTruck(PlannedTour tour, Time time) {
+        if (tour.isReturning()) { return true; }
+
+        return isInVehicleDispatchHours(time) && !isSunday(time) && endsBeforeEndOfDeliveryTime(time, tour);
+    }
+
+    private boolean hoursBike(PlannedTour tour, Time time) {
+        return isInVehicleDispatchHours(time) && !isSunday(time) && endsBeforeEndOfDeliveryTime(time, tour);
     }
 
 
