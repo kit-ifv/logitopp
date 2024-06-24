@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.util.*;
 
+import edu.kit.ifv.mobitopp.simulation.distribution.dispatch.DispatchTimeStrategy;
 import edu.kit.ifv.mobitopp.util.location.DummyLocationProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -145,9 +146,9 @@ public class TestChainTimeTableIntegration {
 			new DepotOperations(
 					tourChainStrategy,
 					policy,
-					new TimeWindowDispatchStrategy(),
+					//new TimeWindowDispatchStrategy(),
 					d,
-					results,
+                    new DispatchTimeStrategy(timeTable), results,
 					impedance);
 
 		});
