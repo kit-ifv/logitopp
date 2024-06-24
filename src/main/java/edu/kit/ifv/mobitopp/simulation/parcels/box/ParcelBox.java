@@ -111,7 +111,7 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 		
 		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, getId(), 1, 1, 0, vehicle.getOwner().getZoneAndLocation(), distance, duration, transfer);
 
-        return departure.plusMinutes(duration).plusMinutes(duration);
+        return departure.plusMinutes(duration).plusMinutes(transfer);
 	}
 
 	@Override
