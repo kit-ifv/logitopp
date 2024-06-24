@@ -16,9 +16,9 @@ public interface DispatchStrategy {
 	
 	default public Optional<DeliveryVehicle> getVehicleForTour(PlannedTour tour, DistributionCenter origin, Time time) {
 
-		if (!tour.isReturning() && tour.latestDeparture().orElse(time).minusMinutes(1).isAfter(time)) {
+/*		if (!tour.isReturning() && tour.latestDeparture().orElse(time).minusMinutes(1).isAfter(time)) {
 			return Optional.empty();
-		}
+		}*/
 
 		DistributionCenter dc = (tour.isReturning()) ? tour.nextHub().get() : origin;
 		
@@ -29,9 +29,9 @@ public interface DispatchStrategy {
 			Optional<Connection> connection = tour.usedConnection();
 			if (connection.isPresent()) {
 
-				if (connection.get().getDeparture().isAfter(time)) {
+				/*if (connection.get().getDeparture().isAfter(time)) {
 					return Optional.empty();
-				}
+				}*/
 
 				String tag = connection.get().getTag();
 				return dc.getFleet().getVehicles().stream()

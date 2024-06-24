@@ -80,6 +80,8 @@ public class DepotOperations {
 		
 	}
 
+
+
 	protected void dispatchAvailableTours(Time currentTime) {
 		Collection<PlannedTour> plannedTours = plannedTours();
 
@@ -88,7 +90,9 @@ public class DepotOperations {
 		}
 
 		for (PlannedTour tour : plannedTours) {
-			if (dispatchStrategy.canDispatch(tour, center, currentTime)) {
+//			if (dispatchStrategy.canDispatch(tour, center, currentTime)) {
+
+			if (tour.latestDeparture().orElse(currentTime.startOfDay().plusHours(7)).isBeforeOrEqualTo(currentTime)) {
 
 				Optional<DeliveryVehicle> vehicle = dispatchStrategy.getVehicleForTour(tour, center, currentTime);
 				if (vehicle.isPresent()) {
