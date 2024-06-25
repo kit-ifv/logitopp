@@ -77,6 +77,8 @@ public class DispatchTimeStrategy {
     private boolean hoursTruck(PlannedTour tour, Time time) {
         if (tour.isReturning()) { return true; }
 
+        if (tour.usesTram()) {return true; }
+
         return isInTruckDispatchHours(time) && !isSunday(time);// && endsBeforeEndOfDeliveryTime(time, tour);
     }
 
