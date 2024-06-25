@@ -47,6 +47,8 @@ public class DispatchTimeStrategy {
     private Time timeTruck(PlannedTour tour, Time time) {
         if (tour.isReturning()) { return time; }
 
+        if (tour.usesTram()) { return time.startOfDay().plusHours(4); }
+
         return time.startOfDay().plusHours(7);
     }
 
