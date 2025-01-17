@@ -352,7 +352,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <enumeration id="34" language="java" name="edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize" project="logitopp" 
+  <enumeration id="34" language="java" name="edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize" project="logitopp"
     file="/logitopp/src/main/java/edu/kit/ifv/mobitopp/simulation/parcels/ShipmentSize.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="2053" y="2115"/>    
@@ -556,7 +556,7 @@
   </association>  
   <association id="93">    
     <end type="SOURCE" refId="28" navigable="false">      
-      <attribute id="94" name="shipmentSize"/>      
+      <attribute id="94" name="parcelSize"/>
       <multiplicity id="95" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="34" navigable="true"/>    

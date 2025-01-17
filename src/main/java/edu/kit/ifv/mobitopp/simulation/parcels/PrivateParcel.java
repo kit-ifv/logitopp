@@ -36,18 +36,29 @@ public class PrivateParcel extends BaseParcel {
 	 * delivery service can be used as a tag to assign a parcel to a specific
 	 * delivery service company.
 	 *
+	 * @param bundleId			 the id of parcel shipment bundle, this parcel is shipped in
 	 * @param person             the recipient
 	 * @param destination        the destination type
 	 * @param location           the location
 	 * @param plannedArrival     the planned arrival date
 	 * @param distributionCenter the distribution center
-	 * @param shipmentSize       the shipment size
+	 * @param parcelSize       the shipment size
 	 * @param isPickUp           whether the parcel is to be picked up
 	 * @param results            the results to log state changes
 	 */
-	public PrivateParcel(PickUpParcelPerson person, ParcelDestinationType destination, ZoneAndLocation location,
-			Time plannedArrival, DistributionCenter distributionCenter, ShipmentSize shipmentSize, double volume, boolean isPickUp, DeliveryResults results) {
-		super(location, plannedArrival, distributionCenter, results, shipmentSize, volume, isPickUp);
+	public PrivateParcel(
+			int bundleId,
+			PickUpParcelPerson person,
+			ParcelDestinationType destination,
+			ZoneAndLocation location,
+			Time plannedArrival,
+			DistributionCenter distributionCenter,
+			ParcelSize parcelSize,
+			double volume,
+			boolean isPickUp,
+			DeliveryResults results
+	) {
+		super(bundleId, location, plannedArrival, distributionCenter, results, parcelSize, volume, isPickUp);
 		this.destinationType = destination;
 		this.setPerson(person);
 

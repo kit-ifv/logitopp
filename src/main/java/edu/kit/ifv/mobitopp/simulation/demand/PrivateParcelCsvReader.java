@@ -11,8 +11,8 @@ import edu.kit.ifv.mobitopp.simulation.demand.attributes.InstantValueProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcelBuilder;
-import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.dataimport.CsvFile;
@@ -85,7 +85,7 @@ public class PrivateParcelCsvReader implements ParcelDemandModel<PickUpParcelPer
 			CEPServiceProvider serviceProvider = this.serviceProviders.get(distributionCenter);
 			builder.setServiceProvider(new InstantValueProvider<CEPServiceProvider>(serviceProvider));
 			
-			ShipmentSize size = ShipmentSize.valueOf(row.get(SIZE));
+			ParcelSize size = ParcelSize.valueOf(row.get(SIZE));
 			builder.setSize(new InstantValueProvider<>(size));
 			
 			

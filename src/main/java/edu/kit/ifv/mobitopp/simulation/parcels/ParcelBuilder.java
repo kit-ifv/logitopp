@@ -14,13 +14,14 @@ public abstract class ParcelBuilder<P extends ParcelAgent> {
 	
 	@Getter private final P agent;
 	@Getter private final DeliveryResults results;
-	
+
+	@Getter @Setter private ValueProvider<Integer> bundleId;
 	@Getter @Setter private ValueProvider<CEPServiceProvider> serviceProvider;
 	@Getter @Setter private ValueProvider<DistributionCenter> distributionCenter;
 	@Getter @Setter private ValueProvider<ParcelAgent> consumer;
 	@Getter @Setter private ValueProvider<ParcelAgent> producer;
 	@Setter private ValueProvider<Time> arrivalDate;
-	@Getter @Setter private ValueProvider<ShipmentSize> size;
+	@Getter @Setter private ValueProvider<ParcelSize> size;
 	@Getter @Setter private ValueProvider<Boolean> isPickUp;
 	@Getter @Setter private ValueProvider<Double> volume;
 	

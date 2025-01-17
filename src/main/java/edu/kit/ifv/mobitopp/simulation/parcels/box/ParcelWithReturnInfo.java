@@ -8,13 +8,18 @@ import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelState;
-import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize;
+import edu.kit.ifv.mobitopp.simulation.parcels.BundleIdProvider;
 import edu.kit.ifv.mobitopp.time.Time;
+import lombok.Getter;
 
 public class ParcelWithReturnInfo implements IParcel {
 	
 	private final BoxOnBike returnTour;
 	private final IParcel delegate;
+
+	@Getter
+	private final int bundleId = BundleIdProvider.nextId();
 	
 	public ParcelWithReturnInfo(BoxOnBike returnTour, IParcel delegate) {
 		this.returnTour = returnTour;
@@ -78,8 +83,8 @@ public class ParcelWithReturnInfo implements IParcel {
 	}
 	
 	@Override
-	public ShipmentSize getShipmentSize() {
-		return delegate.getShipmentSize();
+	public ParcelSize getParcelSize() {
+		return delegate.getParcelSize();
 	}
 
 	@Override

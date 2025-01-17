@@ -16,6 +16,7 @@ import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.util.collections.Pair;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class Business implements ParcelAgent {
@@ -23,7 +24,10 @@ public class Business implements ParcelAgent {
 	private static final Pair<Time, Time> empty = new Pair<>(Time.future, Time.start);
 	private final long id;
 	private final String name;
-	
+
+	@Getter @Setter private double sendFrequency = 0.0;
+	@Getter @Setter private double receiveFrequency = 0.0;
+
 	private final Branch branch;
 	private final BuildingType buildingType;
 	

@@ -24,9 +24,12 @@ import lombok.ToString;
 public abstract class BaseParcel implements IParcel {
 
 	public static int OID_CNT = 0;
+	public static int BUNDLE_ID_CNT = 0;
 
 	@Getter
 	protected final int oId = OID_CNT++;
+	@Getter
+	protected final int bundleId;
 
 	@Getter	@Setter	protected Time plannedArrivalDate;
 	@Getter	protected ParcelAgent producer;
@@ -34,24 +37,33 @@ public abstract class BaseParcel implements IParcel {
 	@Getter	protected Time deliveryTime = Time.future;
 	@Getter	protected ZoneAndLocation zoneAndLocation;
 	@Getter protected RecipientType recipientType;
-	@Getter protected ShipmentSize shipmentSize;
+	@Getter protected ParcelSize parcelSize;
 	@Getter protected double volume;
 	@Getter protected boolean isPickUp;
 
 	protected final DeliveryResults results;
 	@Getter protected ParcelState state = ParcelState.UNDEFINED;
 
-	public BaseParcel(ZoneAndLocation location, Time plannedArrival, ParcelAgent producer,
-			DeliveryResults results, ShipmentSize shipmentSize, double volume, boolean isPickUp) {
+	public BaseParcel(
+			int bundleId,
+			ZoneAndLocation location,
+			Time plannedArrival,
+			ParcelAgent producer,
+			DeliveryResults results,
+			ParcelSize parcelSize,
+			double volume,
+			boolean isPickUp
+	) {
+		this.bundleId = bundleId;
 		this.results = results;
 		this.plannedArrivalDate = plannedArrival;
 		this.setProducer(producer);
 		this.zoneAndLocation = location;
-		this.shipmentSize = shipmentSize;
+		this.parcelSize = parcelSize;
 		this.volume = volume;
 		this.isPickUp = isPickUp;
 	}
-	
+
 	protected abstract void logChange(Time currentTime, DeliveryVehicle deliveryVehicle, boolean isAttempt);
 	protected abstract Optional<RecipientType> canDeliver(Time currentTime, DeliveryVehicle deliveryVehicle);
 	protected abstract boolean updateParcelDelivery(Time currentTime, DeliveryVehicle deliveryVehicle);

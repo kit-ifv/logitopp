@@ -9,18 +9,20 @@ public class BusinessParcelBuilder extends ParcelBuilder<Business> {
 		super(agent, results);
 	}
 
-
 	@Override
 	public IParcel doBuild() {
-		return new BusinessParcel(getAgent().location(),
-								  getAgent(),
-								  getConsumer().getValue(),
-								  getArrivalDate(),
-								  getProducer().getValue(),
-								  getSize().getValue(),
-								  getVolume().getValue(),
-								  getIsPickUp().getValue(),
-								  getResults());
+		return new BusinessParcel(
+				getBundleId().getValue(),
+				getAgent().location(),
+				getAgent(),
+				getConsumer().getValue(),
+				getArrivalDate(),
+				getProducer().getValue(),
+				getSize().getValue(),
+				getVolume().getValue(),
+				getIsPickUp().getValue(),
+				getResults()
+		);
 	}
 
 }

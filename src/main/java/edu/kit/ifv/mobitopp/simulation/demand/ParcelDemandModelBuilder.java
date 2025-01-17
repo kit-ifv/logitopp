@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.*;
+import edu.kit.ifv.mobitopp.simulation.demand.bundling.ParcelBundlingModel;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.FilteredNumberOfParcelsSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.NormalDistributedNumberOfParcelsSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.NullNumerOfParcelsSelector;
@@ -22,12 +23,13 @@ import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
-import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBuilder<A>> {
 
 	private ParcelQuantityModel<A> numberOfParcelsSelector;
+	private ParcelBundlingModel<A> bundlingModel;
 	private Function<A, DoubleSupplier> randomProvider;
 	private Function<A, P> parcelFactory;
 	
@@ -71,10 +73,15 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 		this.numberOfParcelsSelector = new NormalDistributedNumberOfParcelsSelector<>(mean, stdDev, capMax);
 		return this;
 	}
+
+	public ParcelDemandModelBuilder<A,P> useBundlingModel(ParcelBundlingModel<A> bundlingModel) {
+		this.bundlingModel = bundlingModel;
+		return this;
+	}
 	
 	public ParcelDemandModelBuilder<A,P> filterRecipients(Predicate<A> filter) {
 		if (this.numberOfParcelsSelector == null) {
-			throw new IllegalStateException("A NumberOfParcelsSelector has to be selected, before filtering recipients.");
+			throw new IllegalStateException("A ParcelQuantityModel has to be selected, before filtering recipients.");
 		}
 		
 		this.numberOfParcelsSelector = new FilteredNumberOfParcelsSelector<>(this.numberOfParcelsSelector, filter);
@@ -89,24 +96,31 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 		}
 		
 		if (numberOfParcelsSelector==null) {
-			throw new IllegalStateException("A NumberOfParcelsSelector should be selected before adding ParcelOrderSteps.");
+			throw new IllegalStateException("A ParcelQuantityModel should be selected before adding ParcelDemandModelStep.");
+		}
+		if (bundlingModel==null) {
+			throw new IllegalStateException("A ParcelBundlingModel should be selected before adding ParcelDemandModelStep.");
 		}
 		if (randomProvider==null) {
-			throw new IllegalStateException("A randomProvider (Function<R, DoubleSupplier>) should be selected before adding ParcelOrderSteps.");
+			throw new IllegalStateException("A randomProvider (Function<R, DoubleSupplier>) should be selected before adding ParcelDemandModelStep.");
 		}
 		if (parcelFactory==null) {
-			throw new IllegalStateException("A parcelFactory (Function<ParcelBuilder, R>) should be selected before adding ParcelOrderSteps.");
+			throw new IllegalStateException("A parcelFactory (Function<ParcelBuilder, R>) should be selected before adding ParcelDemandModelStep.");
 		}
 		
-		this.parcelOrderModel = new GenericParcelDemandModel<>(numberOfParcelsSelector, randomProvider, parcelFactory);
+		this.parcelOrderModel = new GenericParcelDemandModel<>(numberOfParcelsSelector, bundlingModel, randomProvider, parcelFactory);
 	}
 	
 	
 	
 	public ParcelDemandModelBuilder<A,P> asLatent() {
-		this.nextIsLatent  = true;
+		this.nextIsLatent = true;
 		return this;
 	}
+
+	// TODO -> withBundleCopy
+
+
 	
 	public <T> ParcelDemandModelBuilder<A,P> addStep(ParcelDemandModelStep<A, P, T> step, BiConsumer<P, ValueProvider<T>> propertySetter) {
 		verifyAndInitialize();
@@ -305,15 +319,15 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 	
 	
 	
-	public ParcelDemandModelBuilder<A,P> customShipmentSizeSelection(ParcelDemandModelStep<A, P, ShipmentSize> step) {
+	public ParcelDemandModelBuilder<A,P> customShipmentSizeSelection(ParcelDemandModelStep<A, P, ParcelSize> step) {
 		return this.addStep(step, ParcelBuilder::setSize);
 	}
 	
 	public ParcelDemandModelBuilder<A,P> equalShipmentSizeSelection() {
-		return this.selectShareBased(Arrays.asList(ShipmentSize.values()), ParcelBuilder::setSize);
+		return this.selectShareBased(Arrays.asList(ParcelSize.values()), ParcelBuilder::setSize);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> shareBasedShipmentSizeSelection(Map<ShipmentSize, Double> shares) {
+	public ParcelDemandModelBuilder<A,P> shareBasedShipmentSizeSelection(Map<ParcelSize, Double> shares) {
 		return this.selectShareBased(shares, ParcelBuilder::setSize);
 	}
 

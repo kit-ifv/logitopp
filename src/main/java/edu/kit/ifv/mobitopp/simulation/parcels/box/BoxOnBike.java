@@ -7,9 +7,11 @@ import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.RecipientType;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelState;
-import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
+import edu.kit.ifv.mobitopp.simulation.parcels.BundleIdProvider;
 import edu.kit.ifv.mobitopp.time.Time;
+import lombok.Getter;
 
 /**
  *  This is a wrapper of a return tour to represent the box while it is on the bike during the delivery tour.
@@ -19,6 +21,9 @@ import edu.kit.ifv.mobitopp.time.Time;
 public class BoxOnBike implements IParcel {
 
     private final ParcelBox returnTour;
+
+    @Getter
+    private final int bundleId = BundleIdProvider.nextId();
 
     public BoxOnBike(ParcelBox returnTour) {
         this.returnTour = returnTour;
@@ -80,8 +85,8 @@ public class BoxOnBike implements IParcel {
     }
 
     @Override
-    public ShipmentSize getShipmentSize() {
-        return ShipmentSize.CONTAINER;
+    public ParcelSize getParcelSize() {
+        return ParcelSize.CONTAINER;
     }
 
     @Override

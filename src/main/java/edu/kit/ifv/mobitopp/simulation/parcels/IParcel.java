@@ -14,6 +14,7 @@ import edu.kit.ifv.mobitopp.time.Time;
 public interface IParcel {
 
 	public int getOId();
+	public int getBundleId();
 	
 	public int getDeliveryAttempts();
 	public Time getDeliveryTime();
@@ -29,7 +30,7 @@ public interface IParcel {
 	public ParcelAgent getConsumer();
 	public void setConsumer(ParcelAgent producer);
 
-	public ShipmentSize getShipmentSize();
+	public ParcelSize getParcelSize();
 
 	public double getVolume();
 	

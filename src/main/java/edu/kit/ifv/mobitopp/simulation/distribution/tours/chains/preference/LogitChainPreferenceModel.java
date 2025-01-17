@@ -1,7 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference;
 
 import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.BIKE;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize.EXTRA_LARGE;
+import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize.EXTRA_LARGE;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
@@ -137,7 +137,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 	}
 
 	private boolean isXL(IParcel parcel) {
-		return parcel.getShipmentSize().equals(EXTRA_LARGE);
+		return parcel.getParcelSize().equals(EXTRA_LARGE);
 	}
 
 	

@@ -19,8 +19,8 @@ import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
-import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.visum.VisumNode;
 import edu.kit.ifv.mobitopp.visum.VisumOrientedLink;
@@ -422,7 +422,7 @@ public class DeliveryResults {
 	public void logPrivateOrder(PrivateParcel parcel) {
 		int person = parcel.getPerson().getOid();
 		int household = parcel.getPerson().household().getOid();
-		this.logPrivateOrder(parcel.getOId(), person, household, parcel.getShipmentSize(), parcel.getVolume(),
+		this.logPrivateOrder(parcel.getOId(), person, household, parcel.getParcelSize(), parcel.getVolume(),
 				parcel.getDestinationType().name(), parcel.getPlannedArrivalDate().getDay() + "",
                 (DistributionCenter) parcel.getProducer(), parcel.getPlannedArrivalDate(), parcel.getZoneAndLocation()
 		);
@@ -433,18 +433,18 @@ public class DeliveryResults {
 	 *
 	 * @param pid                the pid
 	 * @param person          	 the recipient
-	 * @param shipmentSize       the shipment size
+	 * @param parcelSize       the shipment size
 	 * @param destination        the destination
 	 * @param day                the day
 	 * @param distributionCenter the distribution center
 	 * @param currentTime        the current time
 	 */
-	private void logPrivateOrder(int pid, int person, int household, ShipmentSize shipmentSize, double volume, String destination, String day,
-			DistributionCenter distributionCenter, Time currentTime, ZoneAndLocation recipientLoc) {
+	private void logPrivateOrder(int pid, int person, int household, ParcelSize parcelSize, double volume, String destination, String day,
+								 DistributionCenter distributionCenter, Time currentTime, ZoneAndLocation recipientLoc) {
 		String msg = "";
 
 		msg += pid + SEP;
-		msg += shipmentSize + SEP;
+		msg += parcelSize + SEP;
 		msg += volume + SEP;
 		msg += person + SEP;
 		msg += household + SEP;
@@ -504,15 +504,15 @@ public class DeliveryResults {
 			toId = ((DistributionCenter) parcel.getConsumer()).getId()+"";
 		}
 
-		this.logBusinessOrder(parcel.getOId(), parcel.getShipmentSize(), parcel.getVolume(), fromName,
+		this.logBusinessOrder(parcel.getOId(), parcel.getParcelSize(), parcel.getVolume(), fromName,
 				toName, fromId, toId, producerLoc.zone().getId().getExternalId(), producerLoc.location(),
 				consumerLoc.zone().getId().getExternalId(), consumerLoc.location(),
 				parcel.getPlannedArrivalDate().getDay() + "", parcel.getPlannedArrivalDate(), category);
 	}
 
-	private void logBusinessOrder(int pid, ShipmentSize size, double volume, String from, String to, String fromId, String toId,
-			String zoneIdFrom, Location locationFrom, String zoneIdTo, Location locationTo,
-			String day, Time currentTime, Category category) {
+	private void logBusinessOrder(int pid, ParcelSize size, double volume, String from, String to, String fromId, String toId,
+								  String zoneIdFrom, Location locationFrom, String zoneIdTo, Location locationTo,
+								  String day, Time currentTime, Category category) {
 		String msg = "";
 
 		msg += pid + SEP;
