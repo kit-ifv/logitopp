@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -60,12 +61,12 @@ public class ParcelDemandModelStepTest {
 	public void predeterminedStep() {
 		this.predetermine = true;
 		
-		this.spiedStep.set(null, null, 2, 1.7, propertySetter);
+		this.spiedStep.set(null, List.of(), 2, 1.7, propertySetter);
 		
 		assertTrue(this.result instanceof InstantValueProvider);
 		assertTrue(this.result.isDetermined());
 		assertEquals("hello", this.result.getValue());
-		verify(this.spiedStep, times(1)).select(null, null, 2, 1.7);
+		verify(this.spiedStep, times(1)).select(null, List.of(), 2, 1.7);
 		
 	}
 	
@@ -74,14 +75,14 @@ public class ParcelDemandModelStepTest {
 	public void latentStep() {
 		this.predetermine = false;
 		
-		this.spiedStep.set(null, null, 1, 4.2, propertySetter);
+		this.spiedStep.set(null, List.of(), 1, 4.2, propertySetter);
 		
 		verify(this.spiedStep, times(0)).select(any(), any(), anyInt(), anyDouble());
 		assertTrue(this.result instanceof LatentValueProvider);
 		assertFalse(this.result.isDetermined());
 		assertEquals("hello", this.result.getValue());
 		assertTrue(this.result.isDetermined());
-		verify(this.spiedStep, times(1)).select(null, null, 1, 4.2);
+		verify(this.spiedStep, times(1)).select(null, List.of(), 1, 4.2);
 		
 	}
 	

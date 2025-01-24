@@ -14,6 +14,7 @@ import edu.kit.ifv.mobitopp.simulation.demand.attributes.ActiveDeliveryPartnerSe
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.LatentModelStepWarpper;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
+import edu.kit.ifv.mobitopp.simulation.demand.bundling.NoBundlingModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
@@ -37,8 +38,14 @@ public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<B
 	 */
 	public <T> BusinessParcelDemandModelBuilder addBusinessStep(
 			ParcelDemandModelStep<Business, BusinessParcelBuilder, T> step,
-			BiConsumer<BusinessParcelBuilder, ValueProvider<T>> propertySetter) {
+			BiConsumer<BusinessParcelBuilder, ValueProvider<T>> propertySetter,
+			Function<BusinessParcelBuilder, ValueProvider<T>> copyGetter
+	) {
 		verifyAndInitialize();
+
+		if (copyGetter!= null) {
+			step.setBundleCopy(copyGetter);
+		}
 
 		ParcelDemandModelStep<Business, BusinessParcelBuilder, T> nextStep;
 		if (nextIsLatent) {
@@ -54,14 +61,22 @@ public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<B
 		return this;
 	}
 
+	private Function<BusinessParcelBuilder, ValueProvider<CEPServiceProvider>> createCepspCopyGetter(boolean copyInBundle) {
+		if (copyInBundle) {
+			return BusinessParcelBuilder::getServiceProvider;
+		} else {
+			return null;
+		}
+	}
+
 	/**
 	 * Add the {@link ActiveDeliveryPartnerSelector} step for shipping.
 	 *
 	 * @param expectedCapacity the expected capacity per vehicle type
 	 * @return the private parcel demand model builder
 	 */
-	public BusinessParcelDemandModelBuilder selectActiveShippingPartner(Function<VehicleType, Integer> expectedCapacity) {
-		return this.addBusinessStep(ActiveDeliveryPartnerSelector.forShipping(expectedCapacity), BusinessParcelBuilder::setServiceProvider);
+	public BusinessParcelDemandModelBuilder selectActiveShippingPartner(Function<VehicleType, Integer> expectedCapacity, boolean copyInBundle) {
+		return this.addBusinessStep(ActiveDeliveryPartnerSelector.forShipping(expectedCapacity), BusinessParcelBuilder::setServiceProvider, createCepspCopyGetter(copyInBundle));
 	}
 	
 	/**
@@ -70,8 +85,8 @@ public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<B
 	 * @param expectedCapacity the expected capacity per vehicle type
 	 * @return the private parcel demand model builder
 	 */
-	public BusinessParcelDemandModelBuilder selectActiveDeliveryPartner(Function<VehicleType, Integer> expectedCapacity) {
-		return this.addBusinessStep(ActiveDeliveryPartnerSelector.forDelivery(expectedCapacity), BusinessParcelBuilder::setServiceProvider);
+	public BusinessParcelDemandModelBuilder selectActiveDeliveryPartner(Function<VehicleType, Integer> expectedCapacity, boolean copyInBundle) {
+		return this.addBusinessStep(ActiveDeliveryPartnerSelector.forDelivery(expectedCapacity), BusinessParcelBuilder::setServiceProvider, createCepspCopyGetter(copyInBundle));
 	}
 	
 	
@@ -88,6 +103,7 @@ public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<B
 
 		builder.useRandom(b -> b::getNextRandom);
 		builder.useParcelFactory(a -> new BusinessParcelBuilder(a, results));
+		builder.useBundlingModel(new NoBundlingModel<>());
 
 		return builder;
 	}
@@ -116,13 +132,14 @@ public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<B
 	 */
 	public static ParcelDemandModel<Business, BusinessParcelBuilder> defaultBusinessParcelOrderModel(
 			Map<CEPServiceProvider, Double> shares, Predicate<Zone> zoneFilter, DeliveryResults results) {
+
 		return forBusinessParcels(results).useRandomNumberSelector(0, 3, 0.01)
 				.filterRecipients(o -> zoneFilter.test(o.location().zone()))
-				.shareBasedCepspSelection(shares)
-				.distributionCenterSelectionInCepspByFleetsize()
-				.equalShipmentSizeSelection()
-				.selectVolumeBasedOnShipmentSize()
-				.randomArrivalDaySelectionExcludeSunday().build();
+				.shareBasedCepspSelection(shares, false)
+				.distributionCenterSelectionInCepspByFleetsize(false)
+				.equalShipmentSizeSelection(false)
+				.selectVolumeBasedOnShipmentSize(false)
+				.randomArrivalDaySelectionExcludeSunday(false).build();
 	}
 
 	/**

@@ -2,6 +2,7 @@ package edu.kit.ifv.mobitopp.simulation.demand;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.data.Zone;
@@ -11,6 +12,7 @@ import edu.kit.ifv.mobitopp.simulation.demand.attributes.LatentModelStepWarpper;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ShareBasedParcelDestinationSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
+import edu.kit.ifv.mobitopp.simulation.demand.bundling.NoBundlingModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelDestinationType;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
@@ -38,6 +40,7 @@ public class PrivateParcelDemandModelBuilder
 
 		builder.useRandom(p -> p::getNextRandom);
 		builder.useParcelFactory(a -> new PrivateParcelBuilder(a, results));
+		builder.useBundlingModel(new NoBundlingModel<>());
 
 		return builder;
 	}
@@ -52,8 +55,14 @@ public class PrivateParcelDemandModelBuilder
 	 */
 	public <T> PrivateParcelDemandModelBuilder addPrivateStep(
 			ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, T> step,
-			BiConsumer<PrivateParcelBuilder, ValueProvider<T>> propertySetter) {
+			BiConsumer<PrivateParcelBuilder, ValueProvider<T>> propertySetter,
+			Function<PrivateParcelBuilder, ValueProvider<T>> copyGetter
+	) {
 		verifyAndInitialize();
+
+		if (copyGetter!=null) {
+			step.setBundleCopy(copyGetter);
+		}
 
 		ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, T> nextStep;
 		if (nextIsLatent) {
@@ -69,6 +78,14 @@ public class PrivateParcelDemandModelBuilder
 		return this;
 	}
 
+	private Function<PrivateParcelBuilder, ValueProvider<ParcelDestinationType>> createParcelDestinationTypeCopyGetter(boolean copyInBundle) {
+		if (copyInBundle) {
+			return PrivateParcelBuilder::getDestinationType;
+		} else {
+			return null;
+		}
+	}
+
 	/**
 	 * Add a custom {@link ParcelDestinationType parcel destination} selection model
 	 * step.
@@ -77,8 +94,10 @@ public class PrivateParcelDemandModelBuilder
 	 * @return the private parcel demand model builder
 	 */
 	public PrivateParcelDemandModelBuilder customParcelDestinationSelection(
-			ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, ParcelDestinationType> step) {
-		return this.addPrivateStep(step, PrivateParcelBuilder::setDestinationType);
+			ParcelDemandModelStep<PickUpParcelPerson, PrivateParcelBuilder, ParcelDestinationType> step,
+			boolean copyInBundle
+	) {
+		return this.addPrivateStep(step, PrivateParcelBuilder::setDestinationType, createParcelDestinationTypeCopyGetter(copyInBundle));
 	}
 
 	/**
@@ -90,8 +109,8 @@ public class PrivateParcelDemandModelBuilder
 	 *                       option
 	 * @return the private parcel demand model builder
 	 */
-	public PrivateParcelDemandModelBuilder equalParcelDestinationSelection(Predicate<Zone> workZoneFilter) {
-		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector(workZoneFilter));
+	public PrivateParcelDemandModelBuilder equalParcelDestinationSelection(Predicate<Zone> workZoneFilter, boolean copyInBundle) {
+		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector(workZoneFilter), copyInBundle);
 	}
 
 	/**
@@ -101,8 +120,8 @@ public class PrivateParcelDemandModelBuilder
 	 *
 	 * @return the private parcel demand model builder
 	 */
-	public PrivateParcelDemandModelBuilder equalParcelDestinationSelection() {
-		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector());
+	public PrivateParcelDemandModelBuilder equalParcelDestinationSelection(boolean copyInBundle) {
+		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector(), copyInBundle);
 	}
 
 	/**
@@ -114,8 +133,10 @@ public class PrivateParcelDemandModelBuilder
 	 * @return the private parcel demand model builder
 	 */
 	public PrivateParcelDemandModelBuilder shareBasedParcelDestinationSelection(
-			Map<ParcelDestinationType, Double> shares) {
-		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector(shares));
+			Map<ParcelDestinationType, Double> shares,
+			boolean copyInBundle
+	) {
+		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector(shares), copyInBundle);
 	}
 
 	/**
@@ -129,8 +150,11 @@ public class PrivateParcelDemandModelBuilder
 	 * @return the private parcel demand model builder
 	 */
 	public PrivateParcelDemandModelBuilder shareBasedParcelDestinationSelection(
-			Map<ParcelDestinationType, Double> shares, Predicate<Zone> workZoneFilter) {
-		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector(shares, workZoneFilter));
+			Map<ParcelDestinationType, Double> shares,
+			Predicate<Zone> workZoneFilter,
+			boolean copyInBundle
+	) {
+		return this.customParcelDestinationSelection(new ShareBasedParcelDestinationSelector(shares, workZoneFilter), copyInBundle);
 	}
 
 	/**
@@ -163,15 +187,15 @@ public class PrivateParcelDemandModelBuilder
 
 		builder.useNormalDistributionNumberSelector(0.65, 0.5, 1, 10);
 
-		return builder.equalParcelDestinationSelection(workZoneFilter)
-				.shareBasedCepspSelection(shares)
-				.distributionCenterSelectionInCepspByFleetsize().useDistributionCenterAsProducer()
+		return builder.equalParcelDestinationSelection(workZoneFilter, false)
+				.shareBasedCepspSelection(shares, false)
+				.distributionCenterSelectionInCepspByFleetsize(false).useDistributionCenterAsProducer()
 //				.privateShareBasedDistributionCenterSelection(distributionCenters).useDistributionCenterAsProducer()
 				.useAgentAsConsumer()
-				.equalShipmentSizeSelection()
-				.selectVolumeBasedOnShipmentSize()
+				.equalShipmentSizeSelection(false)
+				.selectVolumeBasedOnShipmentSize(false)
 				// .equalServiceProviderSelection(List.of("Dummy Delivery Service"))
-				.randomArrivalDaySelectionExcludeSunday().build();
+				.randomArrivalDaySelectionExcludeSunday(false).build();
 	}
 
 	/**
