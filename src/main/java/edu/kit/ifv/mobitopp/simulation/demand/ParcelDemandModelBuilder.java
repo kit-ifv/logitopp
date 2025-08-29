@@ -6,7 +6,6 @@ import static java.util.stream.Collectors.toMap;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -411,15 +410,15 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 		}
 	}
 	
-	public ParcelDemandModelBuilder<A,P> customShipmentSizeSelection(ParcelDemandModelStep<A, P, ParcelSize> step, boolean copyInBundle) {
+	public ParcelDemandModelBuilder<A,P> customParcelSizeSelection(ParcelDemandModelStep<A, P, ParcelSize> step, boolean copyInBundle) {
 		return this.addStep(step, ParcelBuilder::setSize, createParcelSizeCopyGetter(copyInBundle));
 	}
 	
-	public ParcelDemandModelBuilder<A,P> equalShipmentSizeSelection(boolean copyInBundle) {
+	public ParcelDemandModelBuilder<A,P> equalParcelSizeSelection(boolean copyInBundle) {
 		return this.selectShareBased(Arrays.asList(ParcelSize.values()), ParcelBuilder::setSize, createParcelSizeCopyGetter(copyInBundle));
 	}
 	
-	public ParcelDemandModelBuilder<A,P> shareBasedShipmentSizeSelection(Map<ParcelSize, Double> shares, boolean copyInBundle) {
+	public ParcelDemandModelBuilder<A,P> shareBasedParcelSizeSelection(Map<ParcelSize, Double> shares, boolean copyInBundle) {
 		return this.selectShareBased(shares, ParcelBuilder::setSize, createParcelSizeCopyGetter(copyInBundle));
 	}
 

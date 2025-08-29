@@ -192,7 +192,7 @@ public class PrivateParcelDemandModelBuilder
 				.distributionCenterSelectionInCepspByFleetsize(false).useDistributionCenterAsProducer()
 //				.privateShareBasedDistributionCenterSelection(distributionCenters).useDistributionCenterAsProducer()
 				.useAgentAsConsumer()
-				.equalShipmentSizeSelection(false)
+				.equalParcelSizeSelection(false)
 				.selectVolumeBasedOnShipmentSize(false)
 				// .equalServiceProviderSelection(List.of("Dummy Delivery Service"))
 				.randomArrivalDaySelectionExcludeSunday(false).build();

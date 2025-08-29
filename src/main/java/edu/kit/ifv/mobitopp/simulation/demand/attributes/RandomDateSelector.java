@@ -14,7 +14,7 @@ import edu.kit.ifv.mobitopp.time.Time;
  * The Class RandomDeliveryDateSelector is a {@link ParcelDemandModelStep}.
  * A date is selected randomly from a time interval and then cast to a certain precision (e.g. hour or day).
  */
-public class RandomDateSelector<A extends ParcelAgent, P extends ParcelBuilder<A>> implements ParcelDemandModelStep<A, P, Time> {
+public class RandomDateSelector<A extends ParcelAgent, P extends ParcelBuilder<A>> extends CopyModelStep<A, P, Time> implements ParcelDemandModelStep<A, P, Time> {
 	
 	public static final Function<Time, Time> DAY_PRECISION = time -> Time.start.plusDays(time.getDay());
 	public static final Function<Time, Time> HOUR_PRECISION = time -> DAY_PRECISION.apply(time).plusHours(time.getHour());

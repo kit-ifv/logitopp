@@ -1,6 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.demand.attributes;
 
 import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Function;
 
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
@@ -23,4 +25,13 @@ public class LatentModelStepWarpper<A extends ParcelAgent, P extends ParcelBuild
 		return step.select(parcel, otherParcels, numOfParcels, randomNumber);
 	}
 
+	@Override
+	public void setBundleCopy(Function<P, ValueProvider<T>> copyGetter) {
+		this.step.setBundleCopy(copyGetter);
+	}
+
+	@Override
+	public Optional<Function<P, ValueProvider<T>>> isBundleCopyActive() {
+		return this.step.isBundleCopyActive();
+	}
 }

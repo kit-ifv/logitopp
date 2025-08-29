@@ -7,7 +7,7 @@ import edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize;
 import java.util.Collection;
 import java.util.Random;
 
-public class VolumeSelector<A extends ParcelAgent, P extends ParcelBuilder<A>> implements ParcelDemandModelStep<A, P, Double> {
+public class VolumeSelector<A extends ParcelAgent, P extends ParcelBuilder<A>> extends CopyModelStep<A, P, Double> implements ParcelDemandModelStep<A, P, Double> {
 
     @Override
     public Double select(P parcel, Collection<P> otherParcels, int numOfParcels, double randomNumber) {

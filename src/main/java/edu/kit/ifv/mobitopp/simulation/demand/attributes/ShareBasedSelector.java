@@ -16,7 +16,7 @@ import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
  *
  * @param <T> the generic type of the alternatives to be selected
  */
-public class ShareBasedSelector<A extends ParcelAgent, P extends ParcelBuilder<A>, T> implements ParcelDemandModelStep<A, P, T> {
+public class ShareBasedSelector<A extends ParcelAgent, P extends ParcelBuilder<A>, T> extends CopyModelStep<A, P, T> implements ParcelDemandModelStep<A, P, T> {
 
 	private final Map<T, Double> probabilities;
 

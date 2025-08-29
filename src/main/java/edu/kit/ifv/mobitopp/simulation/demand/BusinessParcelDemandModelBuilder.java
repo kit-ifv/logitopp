@@ -16,7 +16,6 @@ import edu.kit.ifv.mobitopp.simulation.demand.attributes.ParcelDemandModelStep;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.ValueProvider;
 import edu.kit.ifv.mobitopp.simulation.demand.bundling.NoBundlingModel;
 import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
-import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
@@ -137,7 +136,7 @@ public class BusinessParcelDemandModelBuilder extends ParcelDemandModelBuilder<B
 				.filterRecipients(o -> zoneFilter.test(o.location().zone()))
 				.shareBasedCepspSelection(shares, false)
 				.distributionCenterSelectionInCepspByFleetsize(false)
-				.equalShipmentSizeSelection(false)
+				.equalParcelSizeSelection(false)
 				.selectVolumeBasedOnShipmentSize(false)
 				.randomArrivalDaySelectionExcludeSunday(false).build();
 	}

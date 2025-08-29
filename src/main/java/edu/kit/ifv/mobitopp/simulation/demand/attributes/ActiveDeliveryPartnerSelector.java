@@ -14,14 +14,15 @@ import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
 import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
 
-public class ActiveDeliveryPartnerSelector implements ParcelDemandModelStep<Business, BusinessParcelBuilder, CEPServiceProvider> {
+public class ActiveDeliveryPartnerSelector
+		extends CopyModelStep<Business, BusinessParcelBuilder, CEPServiceProvider>
+		implements ParcelDemandModelStep<Business, BusinessParcelBuilder, CEPServiceProvider> {
 
 	private final Function<Business, Collection<CEPServiceProvider>> partnerProvider;
 	private final Function<VehicleType, Integer> expectedCapacity;
 	
 	private ActiveDeliveryPartnerSelector(Function<Business, Collection<CEPServiceProvider>> partnerProvider,
 										  Function<VehicleType, Integer> expectedCapacity) {
-		
 		this.partnerProvider = partnerProvider;
 		this.expectedCapacity = expectedCapacity;
 	}
@@ -35,8 +36,12 @@ public class ActiveDeliveryPartnerSelector implements ParcelDemandModelStep<Busi
 	}
 	
 	@Override
-	public CEPServiceProvider select(BusinessParcelBuilder parcel, Collection<BusinessParcelBuilder> otherParcels,
-			int numOfParcels, double randomNumber) {
+	public CEPServiceProvider select(
+			BusinessParcelBuilder parcel,
+			Collection<BusinessParcelBuilder> otherParcels,
+			int numOfParcels,
+			double randomNumber
+	) { //TODO consider bundle size?
 		
 		Collection<CEPServiceProvider> choiceSet = partnerProvider.apply(parcel.getAgent());
 		
@@ -44,10 +49,11 @@ public class ActiveDeliveryPartnerSelector implements ParcelDemandModelStep<Busi
 			choiceSet.stream()
 				 	 .collect(toMap(Function.identity(), this::estimateRemainingCapacity));
 
+		int additionalParcels = numOfParcels - 1;
 		
-		boolean allMaxed = capacities.values().stream().allMatch(v -> v <= 0);
-		for (CEPServiceProvider dc : choiceSet) {
-			capacities.computeIfPresent(dc, (w, prev) -> (prev > 0 || allMaxed) ? abs(prev) : 0);
+		boolean allMaxed = capacities.values().stream().allMatch(v -> v <= additionalParcels);
+		for (CEPServiceProvider cepsp : choiceSet) {
+			capacities.computeIfPresent(cepsp, (c, prev) -> (prev-additionalParcels > 0 || allMaxed) ? abs(prev) : 0); //TODO check abs(prev) -> does that mean the one with highest surplus more likely to get parcels?
 		}
 
 		DiscreteRandomVariable<CEPServiceProvider> randVar = new DiscreteRandomVariable<>(capacities); //TODO logit model, other parcels at same day
