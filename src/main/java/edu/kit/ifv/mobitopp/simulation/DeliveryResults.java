@@ -345,6 +345,7 @@ public class DeliveryResults {
 		String msg = "";
 		msg += currentTime.toString() + SEP;
 		msg += parcel.getOId() + SEP;
+		msg += parcel.getBundleId() + SEP;
 		msg += parcel.getPerson().getOid() + SEP;
 		msg += parcel.getDestinationType().name() + SEP;
 		msg += parcel.getState().name() + SEP;
@@ -368,7 +369,7 @@ public class DeliveryResults {
 	 */
 	public static Category createResultCategoryStatePrivate() {
 		return new Category("parcel-states",
-				Arrays.asList("Time", "ParcelID", "RecipientID", "DestinationType", "State", "IsDeliveryAttempt",
+				Arrays.asList("Time", "ParcelID", "BundleID", "RecipientID", "DestinationType", "State", "IsDeliveryAttempt",
 						"DeliveryGuyID", "DistributionCenter", "DeliveryAttempts", "DeliveryTime", "RecipientType",
 						"ParcelDestinationZone", "IsPickup"));
 	}
@@ -385,6 +386,7 @@ public class DeliveryResults {
 		String msg = "";
 		msg += currentTime.toString() + SEP;
 		msg += parcel.getOId() + SEP;
+		msg += parcel.getBundleId() + SEP;
 		msg += parcel.getZone().getId().getExternalId() + SEP;
 		msg += parcel.getLocation().coordinates() + SEP;
 		msg += parcel.getState().name() + SEP;
@@ -409,7 +411,7 @@ public class DeliveryResults {
 	 */
 	public static Category createResultCategoryStateBusiness() {
 		return new Category("business-parcel-states",
-				Arrays.asList("Time", "ParcelID", "ZoneId", "Location", "State", "IsDeliveryAttempt", "DeliveryGuyID",
+				Arrays.asList("Time", "ParcelID", "BundleID", "ZoneId", "Location", "State", "IsDeliveryAttempt", "DeliveryGuyID",
 						"Producer", "Consumer", "DeliveryAttempts", "DeliveryTime", "RecipientType",
 						"ParcelDestinationZone", "IsPickup"));
 	}
@@ -422,7 +424,7 @@ public class DeliveryResults {
 	public void logPrivateOrder(PrivateParcel parcel) {
 		int person = parcel.getPerson().getOid();
 		int household = parcel.getPerson().household().getOid();
-		this.logPrivateOrder(parcel.getOId(), person, household, parcel.getParcelSize(), parcel.getVolume(),
+		this.logPrivateOrder(parcel.getOId(), parcel.getBundleId(), person, household, parcel.getParcelSize(), parcel.getVolume(),
 				parcel.getDestinationType().name(), parcel.getPlannedArrivalDate().getDay() + "",
                 (DistributionCenter) parcel.getProducer(), parcel.getPlannedArrivalDate(), parcel.getZoneAndLocation()
 		);
@@ -439,11 +441,12 @@ public class DeliveryResults {
 	 * @param distributionCenter the distribution center
 	 * @param currentTime        the current time
 	 */
-	private void logPrivateOrder(int pid, int person, int household, ParcelSize parcelSize, double volume, String destination, String day,
+	private void logPrivateOrder(int pid, int bundleId, int person, int household, ParcelSize parcelSize, double volume, String destination, String day,
 								 DistributionCenter distributionCenter, Time currentTime, ZoneAndLocation recipientLoc) {
 		String msg = "";
 
 		msg += pid + SEP;
+		msg += bundleId + SEP;
 		msg += parcelSize + SEP;
 		msg += volume + SEP;
 		msg += person + SEP;
@@ -466,7 +469,7 @@ public class DeliveryResults {
 	 */
 	public static Category createResultCategoryPrivateOrder() {
 		return new Category("parcel-orders-private",
-				Arrays.asList("ParcelID", "Size", "Volume", "RecipientID", "HouseholdID", "DestinationType",
+				Arrays.asList("ParcelID", "BundleID", "Size", "Volume", "RecipientID", "HouseholdID", "DestinationType",
 						"DistributionCenter", "DistributionCenterID",
 						"DestinationZone", "DestinationX", "DestinationY", "DestinationEdge", "DestinationEdgePos",
 						"ArrivalDay", "ArrivalTime",
@@ -504,18 +507,19 @@ public class DeliveryResults {
 			toId = ((DistributionCenter) parcel.getConsumer()).getId()+"";
 		}
 
-		this.logBusinessOrder(parcel.getOId(), parcel.getParcelSize(), parcel.getVolume(), fromName,
+		this.logBusinessOrder(parcel.getOId(), parcel.getBundleId(), parcel.getParcelSize(), parcel.getVolume(), fromName,
 				toName, fromId, toId, producerLoc.zone().getId().getExternalId(), producerLoc.location(),
 				consumerLoc.zone().getId().getExternalId(), consumerLoc.location(),
 				parcel.getPlannedArrivalDate().getDay() + "", parcel.getPlannedArrivalDate(), category);
 	}
 
-	private void logBusinessOrder(int pid, ParcelSize size, double volume, String from, String to, String fromId, String toId,
+	private void logBusinessOrder(int pid, int bundleId, ParcelSize size, double volume, String from, String to, String fromId, String toId,
 								  String zoneIdFrom, Location locationFrom, String zoneIdTo, Location locationTo,
 								  String day, Time currentTime, Category category) {
 		String msg = "";
 
 		msg += pid + SEP;
+		msg += bundleId + SEP;
 		msg += size.name() + SEP;
 		msg += volume + SEP;
 		msg += from + SEP;
@@ -545,7 +549,7 @@ public class DeliveryResults {
 	 */
 	public static Category createResultCategoryBusinessOrder() {
 		return new Category("parcel-orders-business",
-				Arrays.asList("ParcelID", "Size", "Volume",
+				Arrays.asList("ParcelID", "BundleID", "Size", "Volume",
 						"From", "FromId", "To", "ToId",
 						"FromZoneId", "FromLocationX", "FromLocationY", "FromEdge", "FromEdgePos",
 						"ToZoneId", "ToLocationX", "ToLocationY", "ToEdge", "ToEdgePos",
@@ -559,7 +563,7 @@ public class DeliveryResults {
 	 */
 	public static Category createResultCategoryBusinessProduction() {
 		return new Category("parcel-production-business",
-				Arrays.asList("ParcelID", "Size", "Volume",
+				Arrays.asList("ParcelID", "BundleID", "Size", "Volume",
 						"From", "FromId", "To", "ToId",
 						"FromZoneId", "FromLocationX", "FromLocationY", "FromEdge", "FromEdgePos",
 						"ToZoneId", "ToLocationX", "ToLocationY", "ToEdge", "ToEdgePos",
@@ -703,7 +707,7 @@ public class DeliveryResults {
 	
 	private static Category createResultCategoryChainPreference() {
 		return new Category("chain_preferences", Arrays.asList("choice_id", "time", "sim_second",
-				"parcel_id", "is_pickup",
+				"parcel_id", "bundle_id", "is_pickup",
 				"from_hub", "to_hub", "modes",
 				"probability", "utility", "cost", "duration", "distance", "capacity", "selected"));
 	}
@@ -715,6 +719,7 @@ public class DeliveryResults {
 		msg += time.toString() + SEP;
 		msg += time.toSeconds() + SEP;
 		msg += parcel.getOId() + SEP;
+		msg += parcel.getBundleId() + SEP;
 		msg += parcel.isPickUp() + SEP;
 		
 		msg += chain.first().getName() + SEP;

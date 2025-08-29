@@ -81,7 +81,6 @@ public class GenericParcelDemandModel<A extends ParcelAgent, P extends ParcelBui
 			);
 		}
 
-
 		for (int bundleSize : bundleSizes) {
 			logBundleSize(bundleSize);
 
@@ -102,7 +101,7 @@ public class GenericParcelDemandModel<A extends ParcelAgent, P extends ParcelBui
 				}
 
 				parcel.notifyAgents();
-				parcels.add(parcel);
+				bundleParcels.add(parcel);
 
 				logDay(parcel.getArrivalDate().weekDay());
 			}
@@ -149,13 +148,13 @@ public class GenericParcelDemandModel<A extends ParcelAgent, P extends ParcelBui
 
 		int totalBundleCount = this.bundleSizeStatistics.values().stream().mapToInt(i -> i).sum();
 		System.out.println("\nGenerated " + totalBundleCount + " " + label + " bundles for " + this.agents + " agents." );
-		System.out.println("\nParcel bundle count per agent distribution:");
+		System.out.println("\n" +  label + " parcel bundle count per agent distribution:");
 		List<Integer> counts = this.bundleCountStatistics.keySet().stream().sorted().collect(Collectors.toList());
 		for (int c: counts) {
 			System.out.println("Bundle count " + c + ": " + this.bundleCountStatistics.get(c));
 		}
 
-		System.out.println("\nParcel bundle count per agent distribution (total: " + totalBundleCount + ")");
+		System.out.println("\n" + label + " parcel bundle size distribution (total: " + totalBundleCount + ")");
 		List<Integer> sizes = this.bundleSizeStatistics.keySet().stream().sorted().collect(Collectors.toList());
 		for (int s: sizes) {
 			System.out.println("Bundle size " + s + ": " + this.bundleSizeStatistics.get(s));

@@ -43,7 +43,7 @@ public class QuantityAndBundlingCsvReader implements ParcelQuantityModel<Busines
 
 			int sum = bundling.stream().mapToInt(i -> i).sum();
 			if (sum != quantity) {
-				System.out.println("Warning: the bundling given for " + id + " does not match the given quantity (using sum instead):\n" +
+				System.out.println("WARN: the bundling given for " + id + " does not match the given quantity (using sum instead):\n" +
 						" - Bundling: " + bundling.stream().map(Object::toString).collect(Collectors.joining(", ")) + "\n" +
 						" - actual sum = " + sum + "\n" +
 						" - expected quantity = " + quantity + "\n"
@@ -72,10 +72,6 @@ public class QuantityAndBundlingCsvReader implements ParcelQuantityModel<Busines
 			System.out.println("Warning: quantity/bundling csv does not contain key: " + agent.getId());
 		}
 
-		List<Integer> bundles = this.bundlesById.getOrDefault(agent.getId(), Collections.emptyList());
-
-
-
-		return List.of();
+        return this.bundlesById.getOrDefault(agent.getId(), Collections.emptyList());
 	}
 }

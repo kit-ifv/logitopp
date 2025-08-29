@@ -51,7 +51,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 		Map<TimedTransportChain, Double> probabilities = new DefaultLogitModel<TimedTransportChain>().calculateProbabilities(util);
 
 		long seed = Math.round(randomNumber * Long.MAX_VALUE);
-		TransportPreferences transportPreferences = new TransportPreferences(choiceId, parcel, probabilities, seed);
+		TransportPreferences transportPreferences = new TransportPreferenceProbabilities(choiceId, parcel, probabilities, seed);
 
 		probabilities.forEach((c, p) ->
 			logUtility(choiceId, c, parcel, utility.get(c), p, transportPreferences.getSelected().equals(c), time)
@@ -128,10 +128,9 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 	
 	private boolean canBeUsed(TransportChain chain, IParcel parcel) {
 		return chain.canTransport(parcel)
-			&& !(isXL(parcel)
-			&& chain.uses(BIKE))
+			&& !(isXL(parcel) && chain.uses(BIKE))
 			&& (
-					chain.last().getOrganization().equals("ALL")
+				chain.last().getOrganization().equals("ALL")
 				|| chain.last().getOrganization().equals(chain.first().getOrganization())
 			);
 	}
