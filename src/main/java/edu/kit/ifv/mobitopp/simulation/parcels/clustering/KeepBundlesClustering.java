@@ -53,13 +53,20 @@ public class KeepBundlesClustering implements DeliveryClusteringStrategy {
                 // Oversized bundle: warn and place it alone
                 System.out.println(
                         "Warning: bundle size " + size + " exceeds maxCount " + maxCount + ".\n" +
-                                "Parcel ids: " + bundle.stream().map(p -> p.getOId() + "").collect(Collectors.joining(", "))
+                                "Parcel ids: " + bundle.stream().map(p -> p.getOId() + "").collect(Collectors.joining(", ")) + "\n" +
+                        "It is now split into separate bundles!"
                 );
-                List<IParcel> part = new ArrayList<>(size);
-                part.addAll(bundle);
-                partitions.add(part);
-                remaining.add(0); // no remaining capacity enforced here
-                continue;
+
+                List<IParcel> rest;
+                do {
+                    List<IParcel> full = bundle.stream().limit(maxCount).collect(Collectors.toList());
+                    rest = bundle.stream().filter(p -> !full.contains(p)).collect(Collectors.toList());
+
+                    partitions.add(full);
+                    remaining.add(0); // no remaining capacity enforced here
+
+                    bundle = rest;
+                } while (rest.size() > maxCount);
             }
 
             // First-fit: place into first partition with enough remaining capacity
