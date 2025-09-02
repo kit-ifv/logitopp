@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ public class LatentModelStepWrapperTest {
 				
 		this.step = new LatentModelStepWarpper<>(s);
 				
-		this.step.set(null, null, 1, 1, (p,v) -> this.provider=v);
+		this.step.set(null, List.of(), 1, 1, (p, v) -> this.provider=v);
 	}
 	
 	@Test

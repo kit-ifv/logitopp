@@ -1,14 +1,14 @@
 package edu.kit.ifv.mobitopp.simulation.parcels.clustering;
 
-import static java.util.stream.Collectors.toList;
+import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
+import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
+import edu.kit.ifv.mobitopp.util.collections.CollectionsUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
-import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
-import edu.kit.ifv.mobitopp.util.collections.CollectionsUtil;
+import static java.util.stream.Collectors.toList;
 
 public interface DeliveryClusteringStrategy {
 	
@@ -48,7 +48,7 @@ public interface DeliveryClusteringStrategy {
 		return partitions.stream()
 						 .filter(c -> !c.isEmpty())
 						 .collect(toList());
-	};
+	}
 
 	public ZoneAndLocation getStopLocation(List<IParcel> deliveryCluster);
 	

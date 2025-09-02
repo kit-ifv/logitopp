@@ -11,15 +11,18 @@ import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.TransferTimeModel;
+import edu.kit.ifv.mobitopp.simulation.parcels.BundleIdProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
+import lombok.Getter;
 
 public class ReturningParcelBox extends ParcelBox {
 	
 	private final Collection<IParcel> returning;
 	private final Collection<IParcel> pickedUp;
 	private final int journeyId;
+	@Getter	private final int bundleId = BundleIdProvider.nextId();
 
 	public ReturningParcelBox(TimedTransportChain remainingChain, ImpedanceIfc impedance, TransferTimeModel transferTime, Collection<IParcel> returning, Collection<IParcel> pickedUp, int journeyId) {
 		super(remainingChain, impedance, transferTime);

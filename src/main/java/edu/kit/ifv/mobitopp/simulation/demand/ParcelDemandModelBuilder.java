@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 
 import edu.kit.ifv.mobitopp.simulation.ParcelAgent;
 import edu.kit.ifv.mobitopp.simulation.demand.attributes.*;
+import edu.kit.ifv.mobitopp.simulation.demand.bundling.ParcelBundlingModel;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.FilteredNumberOfParcelsSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.NormalDistributedNumberOfParcelsSelector;
 import edu.kit.ifv.mobitopp.simulation.demand.quantity.NullNumerOfParcelsSelector;
@@ -22,18 +23,18 @@ import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
-import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBuilder<A>> {
 
 	private ParcelQuantityModel<A> numberOfParcelsSelector;
+	private ParcelBundlingModel<A> bundlingModel;
 	private Function<A, DoubleSupplier> randomProvider;
 	private Function<A, P> parcelFactory;
 	
 	protected GenericParcelDemandModel<A, P> parcelOrderModel;
 	protected boolean nextIsLatent = false;
-
 
 	public ParcelDemandModelBuilder<A,P> useRandom(Function<A, DoubleSupplier> randomProvider) {
 		this.randomProvider = randomProvider;		
@@ -71,10 +72,15 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 		this.numberOfParcelsSelector = new NormalDistributedNumberOfParcelsSelector<>(mean, stdDev, capMax);
 		return this;
 	}
+
+	public ParcelDemandModelBuilder<A,P> useBundlingModel(ParcelBundlingModel<A> bundlingModel) {
+		this.bundlingModel = bundlingModel;
+		return this;
+	}
 	
 	public ParcelDemandModelBuilder<A,P> filterRecipients(Predicate<A> filter) {
 		if (this.numberOfParcelsSelector == null) {
-			throw new IllegalStateException("A NumberOfParcelsSelector has to be selected, before filtering recipients.");
+			throw new IllegalStateException("A ParcelQuantityModel has to be selected, before filtering recipients.");
 		}
 		
 		this.numberOfParcelsSelector = new FilteredNumberOfParcelsSelector<>(this.numberOfParcelsSelector, filter);
@@ -89,27 +95,45 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 		}
 		
 		if (numberOfParcelsSelector==null) {
-			throw new IllegalStateException("A NumberOfParcelsSelector should be selected before adding ParcelOrderSteps.");
+			throw new IllegalStateException("A ParcelQuantityModel should be selected before adding ParcelDemandModelStep.");
+		}
+		if (bundlingModel==null) {
+			throw new IllegalStateException("A ParcelBundlingModel should be selected before adding ParcelDemandModelStep.");
 		}
 		if (randomProvider==null) {
-			throw new IllegalStateException("A randomProvider (Function<R, DoubleSupplier>) should be selected before adding ParcelOrderSteps.");
+			throw new IllegalStateException("A randomProvider (Function<R, DoubleSupplier>) should be selected before adding ParcelDemandModelStep.");
 		}
 		if (parcelFactory==null) {
-			throw new IllegalStateException("A parcelFactory (Function<ParcelBuilder, R>) should be selected before adding ParcelOrderSteps.");
+			throw new IllegalStateException("A parcelFactory (Function<ParcelBuilder, R>) should be selected before adding ParcelDemandModelStep.");
 		}
 		
-		this.parcelOrderModel = new GenericParcelDemandModel<>(numberOfParcelsSelector, randomProvider, parcelFactory);
+		this.parcelOrderModel = new GenericParcelDemandModel<>(numberOfParcelsSelector, bundlingModel, randomProvider, parcelFactory);
 	}
 	
 	
 	
 	public ParcelDemandModelBuilder<A,P> asLatent() {
-		this.nextIsLatent  = true;
+		this.nextIsLatent = true;
 		return this;
 	}
-	
-	public <T> ParcelDemandModelBuilder<A,P> addStep(ParcelDemandModelStep<A, P, T> step, BiConsumer<P, ValueProvider<T>> propertySetter) {
+
+	public <T> ParcelDemandModelBuilder<A,P> addStep(
+			ParcelDemandModelStep<A, P, T> step,
+			BiConsumer<P, ValueProvider<T>> propertySetter
+	) {
+		return this.addStep(step, propertySetter, null);
+	}
+
+	public <T> ParcelDemandModelBuilder<A,P> addStep(
+			ParcelDemandModelStep<A, P, T> step,
+			BiConsumer<P, ValueProvider<T>> propertySetter,
+			Function<P, ValueProvider<T>> copyGetter
+	) {
 		verifyAndInitialize();
+
+		if (copyGetter!=null) {
+			step.setBundleCopy(copyGetter);
+		}
 		
 		ParcelDemandModelStep<A, P, T> nextStep;
 		if (nextIsLatent) {
@@ -119,99 +143,168 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 			nextStep = step;
 		}
 		nextIsLatent = false;
-		
+
 		this.parcelOrderModel.add(nextStep, propertySetter);
 		
 		return this;
 	}
-	
-	
-	public <T> ParcelDemandModelBuilder<A,P> selectShareBased(ShareBasedSelector<A, P, T> selector, BiConsumer<P, ValueProvider<T>> propertySetter) {
+
+
+	public <T> ParcelDemandModelBuilder<A,P> selectShareBased(
+			ShareBasedSelector<A, P, T> selector,
+			BiConsumer<P, ValueProvider<T>> propertySetter
+	) {
 		return this.addStep(selector, propertySetter);
 	}
+
+	public <T> ParcelDemandModelBuilder<A,P> selectShareBased(
+			ShareBasedSelector<A, P, T> selector,
+			BiConsumer<P, ValueProvider<T>> propertySetter,
+			Function<P, ValueProvider<T>> copyGetter
+	) {
+		return this.addStep(selector, propertySetter, copyGetter);
+	}
 	
-	public <T> ParcelDemandModelBuilder<A,P> selectShareBased(Collection<T> values, BiConsumer<P, ValueProvider<T>> propertySetter) {
+	public <T> ParcelDemandModelBuilder<A,P> selectShareBased(
+			Collection<T> values,
+			BiConsumer<P, ValueProvider<T>> propertySetter,
+			Function<P, ValueProvider<T>> copyGetter
+	) {
+		return this.selectShareBased(new ShareBasedSelector<>(values), propertySetter, copyGetter);
+	}
+
+	public <T> ParcelDemandModelBuilder<A,P> selectShareBased(
+			Collection<T> values,
+			BiConsumer<P, ValueProvider<T>> propertySetter
+	) {
 		return this.selectShareBased(new ShareBasedSelector<>(values), propertySetter);
 	}
 	
-	public <T> ParcelDemandModelBuilder<A,P> selectShareBased(Map<T, Double> shares, BiConsumer<P, ValueProvider<T>> propertySetter) {
+	public <T> ParcelDemandModelBuilder<A,P> selectShareBased(
+			Map<T, Double> shares,
+			BiConsumer<P, ValueProvider<T>> propertySetter
+	) {
 		return this.selectShareBased(new ShareBasedSelector<>(shares), propertySetter);
 	}
-	
-	
-	
+
+	public <T> ParcelDemandModelBuilder<A,P> selectShareBased(
+			Map<T, Double> shares,
+			BiConsumer<P, ValueProvider<T>> propertySetter,
+			Function<P, ValueProvider<T>> copyGetter
+	) {
+		return this.selectShareBased(new ShareBasedSelector<>(shares), propertySetter, copyGetter);
+	}
+
+
 	@SuppressWarnings("unchecked")
-	public  <T> ParcelDemandModelBuilder<A,P> equalDistributionStepOptions(BiConsumer<P, ValueProvider<T>> propertySetter, ParcelDemandModelStep<A, P, T> ... steps) {
+	public  <T> ParcelDemandModelBuilder<A,P> equalDistributionStepOptions(
+			BiConsumer<P, ValueProvider<T>> propertySetter,
+			Function<P, ValueProvider<T>> copyGetter,
+			ParcelDemandModelStep<A, P, T> ... steps
+	) {
 		Map<ParcelDemandModelStep<A, P, T>, Double> shares = Arrays.asList(steps).stream().collect(toMap(identity(), e -> 1.0));
-		
+		return this.addStep(new ShareBasedMultipleModelOptionsStep<>(shares), propertySetter, copyGetter);
+	}
+
+	@SuppressWarnings("unchecked")
+	public  <T> ParcelDemandModelBuilder<A,P> equalDistributionStepOptions(
+			BiConsumer<P, ValueProvider<T>> propertySetter,
+			ParcelDemandModelStep<A, P, T> ... steps
+	) {
+		return this.equalDistributionStepOptions(propertySetter, null, steps);
+	}
+
+
+	public  <T> ParcelDemandModelBuilder<A,P> shareBasedStepOptions(
+			Map<ParcelDemandModelStep<A, P, T>, Double> shares,
+			BiConsumer<P, ValueProvider<T>> propertySetter,
+			Function<P, ValueProvider<T>> copyGetter
+	) {
+		return this.addStep(new ShareBasedMultipleModelOptionsStep<>(shares), propertySetter, copyGetter);
+	}
+
+	public  <T> ParcelDemandModelBuilder<A,P> shareBasedStepOptions(
+			Map<ParcelDemandModelStep<A, P, T>, Double> shares,
+			BiConsumer<P, ValueProvider<T>> propertySetter
+	) {
 		return this.addStep(new ShareBasedMultipleModelOptionsStep<>(shares), propertySetter);
 	}
+
+
+	private Function<P, ValueProvider<CEPServiceProvider>> createCepspCopyGetter(boolean copy) {
+		if(copy) {
+			return ParcelBuilder::getServiceProvider;
+		} else {
+			return null;
+		}
+	}
+
+	public ParcelDemandModelBuilder<A,P> customCepspSelection(ParcelDemandModelStep<A, P, CEPServiceProvider> step, boolean copyInBundle) {
+		return this.addStep(step, ParcelBuilder::setServiceProvider, createCepspCopyGetter(copyInBundle));
+	}
 	
-	public  <T> ParcelDemandModelBuilder<A,P> shareBasedStepOptions(Map<ParcelDemandModelStep<A, P, T>, Double> shares, BiConsumer<P, ValueProvider<T>> propertySetter) {		
-		return this.addStep(new ShareBasedMultipleModelOptionsStep<>(shares), propertySetter);
+	public ParcelDemandModelBuilder<A,P> equalDistributionCepspSelection(Collection<CEPServiceProvider> serviceProviders, boolean copyInBundle) {
+		return this.selectShareBased(serviceProviders, ParcelBuilder::setServiceProvider, createCepspCopyGetter(copyInBundle));
+	}
+	
+	public ParcelDemandModelBuilder<A,P> shareBasedCepspSelection(Map<CEPServiceProvider, Double> shares, boolean copyInBundle) {
+		return this.selectShareBased(shares, ParcelBuilder::setServiceProvider, createCepspCopyGetter(copyInBundle));
+	}
+	
+	public ParcelDemandModelBuilder<A,P> privateConsumptionShareBasedCepspSelection(MarketShareProvider shareProvider, boolean copyInBundle) {
+		return this.shareBasedCepspSelection(shareProvider.getPrivateConsumptionShare(), copyInBundle);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> privateProductionShareBasedCepspSelection(MarketShareProvider shareProvider, boolean copyInBundle) {
+		return this.shareBasedCepspSelection(shareProvider.getPrivateProductionShare(), copyInBundle);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> privateOverallShareBasedCepspSelection(MarketShareProvider shareProvider, boolean copyInBundle) {
+		return this.shareBasedCepspSelection(shareProvider.getPrivateShare(), copyInBundle);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> businessConsumptionShareBasedCepspSelection(MarketShareProvider shareProvider, boolean copyInBundle) {
+		return this.shareBasedCepspSelection(shareProvider.getBusinessConsumptionShare(), copyInBundle);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> businessProductionShareBasedCepspSelection(MarketShareProvider shareProvider, boolean copyInBundle) {
+		return this.shareBasedCepspSelection(shareProvider.getBusinessProductionShare(), copyInBundle);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> businessOverallShareBasedCepspSelection(MarketShareProvider shareProvider, boolean copyInBundle) {
+		return this.shareBasedCepspSelection(shareProvider.getBusinessShare(), copyInBundle);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> overallConsumptionShareBasedCepspSelection(MarketShareProvider shareProvider, boolean copyInBundle) {
+		return this.shareBasedCepspSelection(shareProvider.getConsumptionShare(), copyInBundle);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> overallProductionShareBasedCepspSelection(MarketShareProvider shareProvider, boolean copyInBundle) {
+		return this.shareBasedCepspSelection(shareProvider.getProductionShare(), copyInBundle);
+	}
+	
+	public ParcelDemandModelBuilder<A,P> totalMarketShareBasedCepspSelection(MarketShareProvider shareProvider, boolean copyInBundle) {
+		return this.shareBasedCepspSelection(shareProvider.getTotalShare(), copyInBundle);
 	}
 	
 	
 	
+
+	private Function<P, ValueProvider<DistributionCenter>> createDcCopyGetter(boolean copyInBundle) {
+		if(copyInBundle) {
+			return ParcelBuilder::getDistributionCenter;
+		} else {
+			return null;
+		}
+	}
+
 	
-	public ParcelDemandModelBuilder<A,P> customCepspSelection(ParcelDemandModelStep<A, P, CEPServiceProvider> step) {
-		return this.addStep(step, ParcelBuilder::setServiceProvider);
+	public ParcelDemandModelBuilder<A,P> customDistributionCenterSelection(ParcelDemandModelStep<A, P, DistributionCenter> step, boolean copyInBundle) {
+		return this.addStep(step, ParcelBuilder::setDistributionCenter, createDcCopyGetter(copyInBundle));
 	}
 	
-	public ParcelDemandModelBuilder<A,P> equalDistributionCepspSelection(Collection<CEPServiceProvider> serviceProviders) {
-		return this.selectShareBased(serviceProviders, ParcelBuilder::setServiceProvider);
-	}
-	
-	public ParcelDemandModelBuilder<A,P> shareBasedCepspSelection(Map<CEPServiceProvider, Double> shares) {
-		return this.selectShareBased(shares, ParcelBuilder::setServiceProvider);
-	}
-	
-	public ParcelDemandModelBuilder<A,P> privateConsumptionShareBasedCepspSelection(MarketShareProvider shareProvider) {
-		return this.shareBasedCepspSelection(shareProvider.getPrivateConsumptionShare());
-	}
-	
-	public ParcelDemandModelBuilder<A,P> privateProductionShareBasedCepspSelection(MarketShareProvider shareProvider) {
-		return this.shareBasedCepspSelection(shareProvider.getPrivateProductionShare());
-	}
-	
-	public ParcelDemandModelBuilder<A,P> privateOverallShareBasedCepspSelection(MarketShareProvider shareProvider) {
-		return this.shareBasedCepspSelection(shareProvider.getPrivateShare());
-	}
-	
-	public ParcelDemandModelBuilder<A,P> businessConsumptionShareBasedCepspSelection(MarketShareProvider shareProvider) {
-		return this.shareBasedCepspSelection(shareProvider.getBusinessConsumptionShare());
-	}
-	
-	public ParcelDemandModelBuilder<A,P> businessProductionShareBasedCepspSelection(MarketShareProvider shareProvider) {
-		return this.shareBasedCepspSelection(shareProvider.getBusinessProductionShare());
-	}
-	
-	public ParcelDemandModelBuilder<A,P> businessOverallShareBasedCepspSelection(MarketShareProvider shareProvider) {
-		return this.shareBasedCepspSelection(shareProvider.getBusinessShare());
-	}
-	
-	public ParcelDemandModelBuilder<A,P> overallConsumptionShareBasedCepspSelection(MarketShareProvider shareProvider) {
-		return this.shareBasedCepspSelection(shareProvider.getConsumptionShare());
-	}
-	
-	public ParcelDemandModelBuilder<A,P> overallProductionShareBasedCepspSelection(MarketShareProvider shareProvider) {
-		return this.shareBasedCepspSelection(shareProvider.getProductionShare());
-	}
-	
-	public ParcelDemandModelBuilder<A,P> totalMarketShareBasedCepspSelection(MarketShareProvider shareProvider) {
-		return this.shareBasedCepspSelection(shareProvider.getTotalShare());
-	}
-	
-	
-	
-	
-	
-	public ParcelDemandModelBuilder<A,P> customDistributionCenterSelection(ParcelDemandModelStep<A, P, DistributionCenter> step) {
-		return this.addStep(step, ParcelBuilder::setDistributionCenter);
-	}
-	
-	public ParcelDemandModelBuilder<A,P> distributionCenterSelectionInCepspByFleetsize() {
-		return this.addStep(new DistributionCenterSelectorByFleetSize<>(), ParcelBuilder::setDistributionCenter);
+	public ParcelDemandModelBuilder<A,P> distributionCenterSelectionInCepspByFleetsize(boolean copyInBundle) {
+		return this.addStep(new DistributionCenterSelectorByFleetSize<>(), ParcelBuilder::setDistributionCenter, createDcCopyGetter(copyInBundle));
 	}
 	
 	
@@ -252,73 +345,95 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 	}
 	
 	
-	
-	
-	public ParcelDemandModelBuilder<A,P> customArrivalDateSelection(ParcelDemandModelStep<A, P, Time> step) {
-		return this.addStep(step, ParcelBuilder::setArrivalDate);
+	private Function<P, ValueProvider<Time>> createArrivalDateCopyGetter(boolean copyInBundle) {
+		if(copyInBundle) {
+			return p -> new InstantValueProvider<>(p.getArrivalDate()); //TODO check if first parcel time is initialized when second parcel calls get
+		} else {
+			return null;
+		}
 	}
 	
-	public ParcelDemandModelBuilder<A,P> shareBasedArrivalDateSelection(Map<Time,Double> shares) {
-		return this.selectShareBased(shares, ParcelBuilder::setArrivalDate);
+	public ParcelDemandModelBuilder<A,P> customArrivalDateSelection(ParcelDemandModelStep<A, P, Time> step, boolean copyInBundle) {
+		return this.addStep(step, ParcelBuilder::setArrivalDate, createArrivalDateCopyGetter(copyInBundle));
 	}
 	
-	public ParcelDemandModelBuilder<A,P> randomArrivalDateSelection(Time from, Time untilExclusive, Function<Time, Time> precision) {
-		return this.customArrivalDateSelection(new RandomDateSelector<>(from, untilExclusive, precision));
+	public ParcelDemandModelBuilder<A,P> shareBasedArrivalDateSelection(Map<Time,Double> shares, boolean copyInBundle) {
+		return this.selectShareBased(shares, ParcelBuilder::setArrivalDate, createArrivalDateCopyGetter(copyInBundle));
 	}
 	
-	public ParcelDemandModelBuilder<A,P> randomArrivalDateSelectionExcludeSunday(Function<Time, Time> precision) {
-		return this.customArrivalDateSelection(new RandomDateSelector<>(precision));
+	public ParcelDemandModelBuilder<A,P> randomArrivalDateSelection(Time from, Time untilExclusive, Function<Time, Time> precision, boolean copyInBundle) {
+		return this.customArrivalDateSelection(new RandomDateSelector<>(from, untilExclusive, precision), copyInBundle);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> randomArrivalDaySelection(Time from, Time untilExclusive) {
-		return this.randomArrivalDateSelection(from, untilExclusive, RandomDateSelector.DAY_PRECISION);
+	public ParcelDemandModelBuilder<A,P> randomArrivalDateSelectionExcludeSunday(Function<Time, Time> precision, boolean copyInBundle) {
+		return this.customArrivalDateSelection(new RandomDateSelector<>(precision), copyInBundle);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> randomArrivalDaySelectionExcludeSunday() {
-		return this.randomArrivalDateSelectionExcludeSunday(RandomDateSelector.DAY_PRECISION);
+	public ParcelDemandModelBuilder<A,P> randomArrivalDaySelection(Time from, Time untilExclusive, boolean copyInBundle) {
+		return this.randomArrivalDateSelection(from, untilExclusive, RandomDateSelector.DAY_PRECISION, copyInBundle);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> randomArrivalHourSelection(Time from, Time untilExclusive) {
-		return this.randomArrivalDateSelection(from, untilExclusive, RandomDateSelector.HOUR_PRECISION);
+	public ParcelDemandModelBuilder<A,P> randomArrivalDaySelectionExcludeSunday(boolean copyInBundle) {
+		return this.randomArrivalDateSelectionExcludeSunday(RandomDateSelector.DAY_PRECISION, copyInBundle);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> randomArrivalHourSelectionExcludeSunday() {
-		return this.randomArrivalDateSelectionExcludeSunday(RandomDateSelector.HOUR_PRECISION);
+	public ParcelDemandModelBuilder<A,P> randomArrivalHourSelection(Time from, Time untilExclusive, boolean copyInBundle) {
+		return this.randomArrivalDateSelection(from, untilExclusive, RandomDateSelector.HOUR_PRECISION, copyInBundle);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> randomArrivalMinuteSelection(Time from, Time untilExclusive) {
-		return this.randomArrivalDateSelection(from, untilExclusive, RandomDateSelector.MINUTE_PRECISION);
+	public ParcelDemandModelBuilder<A,P> randomArrivalHourSelectionExcludeSunday(boolean copyInBundle) {
+		return this.randomArrivalDateSelectionExcludeSunday(RandomDateSelector.HOUR_PRECISION, copyInBundle);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> randomArrivalMinuteSelectionExcludeSunday() {
-		return this.randomArrivalDateSelectionExcludeSunday(RandomDateSelector.MINUTE_PRECISION);
+	public ParcelDemandModelBuilder<A,P> randomArrivalMinuteSelection(Time from, Time untilExclusive, boolean copyInBundle) {
+		return this.randomArrivalDateSelection(from, untilExclusive, RandomDateSelector.MINUTE_PRECISION, copyInBundle);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> randomArrivalSecondSelection(Time from, Time untilExclusive) {
-		return this.randomArrivalDateSelection(from, untilExclusive, RandomDateSelector.SECOND_PRECISION);
+	public ParcelDemandModelBuilder<A,P> randomArrivalMinuteSelectionExcludeSunday(boolean copyInBundle) {
+		return this.randomArrivalDateSelectionExcludeSunday(RandomDateSelector.MINUTE_PRECISION, copyInBundle);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> randomArrivalSecondSelectionExcludeSunday() {
-		return this.randomArrivalDateSelectionExcludeSunday(RandomDateSelector.SECOND_PRECISION);
+	public ParcelDemandModelBuilder<A,P> randomArrivalSecondSelection(Time from, Time untilExclusive, boolean copyInBundle) {
+		return this.randomArrivalDateSelection(from, untilExclusive, RandomDateSelector.SECOND_PRECISION, copyInBundle);
 	}
 	
-	
-	
-	
-	public ParcelDemandModelBuilder<A,P> customShipmentSizeSelection(ParcelDemandModelStep<A, P, ShipmentSize> step) {
-		return this.addStep(step, ParcelBuilder::setSize);
+	public ParcelDemandModelBuilder<A,P> randomArrivalSecondSelectionExcludeSunday(boolean copyInBundle) {
+		return this.randomArrivalDateSelectionExcludeSunday(RandomDateSelector.SECOND_PRECISION, copyInBundle);
 	}
 	
-	public ParcelDemandModelBuilder<A,P> equalShipmentSizeSelection() {
-		return this.selectShareBased(Arrays.asList(ShipmentSize.values()), ParcelBuilder::setSize);
+
+	private Function<P, ValueProvider<ParcelSize>> createParcelSizeCopyGetter(boolean copyInBundle) {
+		if(copyInBundle) {
+			return ParcelBuilder::getSize;
+		} else {
+			return null;
+		}
 	}
 	
-	public ParcelDemandModelBuilder<A,P> shareBasedShipmentSizeSelection(Map<ShipmentSize, Double> shares) {
-		return this.selectShareBased(shares, ParcelBuilder::setSize);
+	public ParcelDemandModelBuilder<A,P> customParcelSizeSelection(ParcelDemandModelStep<A, P, ParcelSize> step, boolean copyInBundle) {
+		return this.addStep(step, ParcelBuilder::setSize, createParcelSizeCopyGetter(copyInBundle));
+	}
+	
+	public ParcelDemandModelBuilder<A,P> equalParcelSizeSelection(boolean copyInBundle) {
+		return this.selectShareBased(Arrays.asList(ParcelSize.values()), ParcelBuilder::setSize, createParcelSizeCopyGetter(copyInBundle));
+	}
+	
+	public ParcelDemandModelBuilder<A,P> shareBasedParcelSizeSelection(Map<ParcelSize, Double> shares, boolean copyInBundle) {
+		return this.selectShareBased(shares, ParcelBuilder::setSize, createParcelSizeCopyGetter(copyInBundle));
 	}
 
-	public ParcelDemandModelBuilder<A,P> selectVolumeBasedOnShipmentSize() {
-		return this.addStep(new VolumeSelector<>(), ParcelBuilder::setVolume);
+
+
+	private Function<P, ValueProvider<Double>> createVolumeCopyGetter(boolean copyInBundle) {
+		if(copyInBundle) {
+			return ParcelBuilder::getVolume;
+		} else {
+			return null;
+		}
+	}
+
+	public ParcelDemandModelBuilder<A,P> selectVolumeBasedOnShipmentSize(boolean copyInBundle) {
+		return this.addStep(new VolumeSelector<>(), ParcelBuilder::setVolume, createVolumeCopyGetter(copyInBundle));
 	}
 	
 	
@@ -338,9 +453,17 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 //		return this.customServiceProviderSelection((parcel, otherParcels, numOfParcels, rand) -> parcel.getDistributionCenter().getServiceProvider());
 //	}
 
-	
-	public ParcelDemandModelBuilder<A,P> customPickupOrDeliverySelection(ParcelDemandModelStep<A, P, Boolean> step) {
-		return this.addStep(step, ParcelBuilder::setIsPickUp);
+
+	private Function<P, ValueProvider<Boolean>> createIsPickupCopyGetter(boolean copyInBundle) {
+		if(copyInBundle) {
+			return ParcelBuilder::getIsPickUp;
+		} else {
+			return null;
+		}
+	}
+
+	public ParcelDemandModelBuilder<A,P> customPickupOrDeliverySelection(ParcelDemandModelStep<A, P, Boolean> step, boolean copyInBundle) {
+		return this.addStep(step, ParcelBuilder::setIsPickUp, createIsPickupCopyGetter(copyInBundle));
 	}
 	
 	public ParcelDemandModelBuilder<A, P> allAsPickup() {

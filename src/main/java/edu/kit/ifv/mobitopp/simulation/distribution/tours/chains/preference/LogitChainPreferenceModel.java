@@ -1,7 +1,8 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference;
 
+import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.BIKE;
+import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize.EXTRA_LARGE;
 import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.*;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize.EXTRA_LARGE;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
@@ -48,7 +49,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 	private final double b_transfers_more_than_one;
 	private final double b_environmental_impact;
 	private final double b_business_recipient_tram;
-	
+
 	public LogitChainPreferenceModel(ImpedanceIfc impedance, CostFunction costFunction, DeliveryResults results, LogitParameters parameters) {
 		this.impedance = impedance;
 		this.costFunction = costFunction;
@@ -102,7 +103,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 		Map<TimedTransportChain, Double> probabilities = new DefaultLogitModel<TimedTransportChain>().calculateProbabilities(util);
 
 		long seed = Math.round(randomNumber * Long.MAX_VALUE);
-		TransportPreferences transportPreferences = new TransportPreferences(choiceId, parcel, probabilities, seed);
+		TransportPreferences transportPreferences = new TransportPreferenceProbabilities(choiceId, parcel, probabilities, seed);
 
 		probabilities.forEach((c, p) ->
 			logUtility(choiceId, c, parcel, utility.get(c), p, transportPreferences.getSelected().equals(c), time)
@@ -214,16 +215,15 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 	
 	private boolean canBeUsed(TransportChain chain, IParcel parcel) {
 		return chain.canTransport(parcel)
-			&& !(isXL(parcel)
-			&& chain.uses(BIKE))
+			&& !(isXL(parcel) && chain.uses(BIKE))
 			&& (
-					chain.last().getOrganization().equals("ALL")
+				chain.last().getOrganization().equals("ALL")
 				|| chain.last().getOrganization().equals(chain.first().getOrganization())
 			);
 	}
 
 	private boolean isXL(IParcel parcel) {
-		return parcel.getShipmentSize().equals(EXTRA_LARGE);
+		return parcel.getParcelSize().equals(EXTRA_LARGE);
 	}
 
 	

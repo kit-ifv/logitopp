@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -19,7 +20,7 @@ public class ShareBasedMultipleModelOptionsStepTest extends MultipleModelOptions
 	public void getValues() {
 		for (int i = 0; i < 100; i++) {
 			
-			options.set(null, null, 1, randValue(), (p,v) -> res1 = v);
+			options.set(null, List.of(), 1, randValue(), (p,v) -> res1 = v);
 			
 			if (res1.isDetermined()) {
 				validateInstant("instant", res1);
@@ -36,7 +37,7 @@ public class ShareBasedMultipleModelOptionsStepTest extends MultipleModelOptions
 		for (int i = 0; i < 100; i++) {
 			this.element.setName("val");
 			
-			options.set(null, null, 1, randValue(), (p,v) -> res1 = v);
+			options.set(null, List.of(), 1, randValue(), (p,v) -> res1 = v);
 
 			if (res1.isDetermined()) {
 				validateInstant("instant", res1);
@@ -53,7 +54,7 @@ public class ShareBasedMultipleModelOptionsStepTest extends MultipleModelOptions
 		for (int i = 0; i < 100; i++) {
 			this.element.setName("val");
 			
-			options.set(null, null, 1, randValue(), (p,v) -> res1 = v);
+			options.set(null, List.of(), 1, randValue(), (p,v) -> res1 = v);
 
 			if (res1.isDetermined()) {
 				validateInstant("instant", res1);
@@ -73,7 +74,7 @@ public class ShareBasedMultipleModelOptionsStepTest extends MultipleModelOptions
 		for (int i = 0; i < 100; i++) {
 			this.element.setName("val");
 			
-			options.set(null, null, 1, randValue(), (p,v) -> res1 = v);
+			options.set(null, List.of(), 1, randValue(), (p, v) -> res1 = v);
 
 			if (res1.isDetermined()) {
 				validateInstant("instant", res1);
@@ -87,7 +88,7 @@ public class ShareBasedMultipleModelOptionsStepTest extends MultipleModelOptions
 			
 			this.element.setName("val2");
 			
-			options.set(null, null, 1, randValue(), (p,v) -> res1 = v);
+			options.set(null, List.of(), 1, randValue(), (p,v) -> res1 = v);
 
 			if (res1.isDetermined()) {
 				validateInstant("instant", res1);

@@ -38,8 +38,7 @@ public class QuantityCsvReader implements ParcelQuantityModel<Business> {
 		if (!quantityById.containsKey(recipient.getId())) {
 			System.out.println("Warning: quantity csv does not contain key: " + recipient.getId());
 		}
-		
-		
+
 		return this.quantityById.getOrDefault(recipient.getId(), 0);
 	}
 

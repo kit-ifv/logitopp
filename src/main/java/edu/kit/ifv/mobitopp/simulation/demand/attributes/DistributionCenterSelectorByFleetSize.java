@@ -13,6 +13,7 @@ import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 //This step evaluates the serviceProvider attribute, which should be set prior to this step!!!
 //Can be evaluated during simulation
 public class DistributionCenterSelectorByFleetSize<A extends ParcelAgent, P extends ParcelBuilder<A>>
+	extends CopyModelStep<A, P, DistributionCenter>
 	implements ParcelDemandModelStep<A, P, DistributionCenter> {
 
 	@Override

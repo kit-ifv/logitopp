@@ -6,7 +6,7 @@ import static java.lang.Math.round;
 
 import java.util.Random;
 
-public enum ShipmentSize {
+public enum ParcelSize {
 
 	SMALL(1, 10, 20, 8, 60, 40),
 	MEDIUM(8, 10, 20, 17, 60, 40),
@@ -22,7 +22,7 @@ public enum ShipmentSize {
 	private final int maxY;
 	private final int maxZ;
 	
-	private ShipmentSize(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+	private ParcelSize(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
 		this.minX = minX;
 		this.minY = minY;
 		this.minZ = minZ;

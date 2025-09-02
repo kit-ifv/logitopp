@@ -23,6 +23,8 @@ public class CopyProviderModelStep<A extends ParcelAgent, P extends ParcelBuilde
 	@Override
 	public void set(P parcel, Collection<P> otherParcels, int numOfParcels, double randomNumber,
 			BiConsumer<P, ValueProvider<T>> propertySetter) {
+
+		//TODO check copy logic here as well?
 		
 		ValueProvider<? extends T> source = getter.apply(parcel);
 		

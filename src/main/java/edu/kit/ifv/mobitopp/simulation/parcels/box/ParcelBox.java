@@ -22,7 +22,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.TransferTimeModel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelState;
-import edu.kit.ifv.mobitopp.simulation.parcels.ShipmentSize;
+import edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize;
 import edu.kit.ifv.mobitopp.time.Time;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,7 +32,7 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 	@Getter protected final int id = PlannedDeliveryTour.tourIdCnt--;
 	
 	@Getter protected final boolean isPickUp = false;
-	@Getter protected final ShipmentSize shipmentSize = ShipmentSize.CONTAINER;
+	@Getter protected final ParcelSize parcelSize = ParcelSize.CONTAINER;
 	protected final TransferTimeModel transferTime;
 	@Getter protected RecipientType recipientType = RecipientType.DISTRIBUTION_CENTER;
 		

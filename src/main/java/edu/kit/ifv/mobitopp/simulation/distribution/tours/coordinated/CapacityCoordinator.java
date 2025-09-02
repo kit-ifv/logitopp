@@ -1,7 +1,6 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours.coordinated;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
@@ -9,6 +8,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.chains.*;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.timetable.TimeTable;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference.PreferredChainModel;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference.TransportPreferenceProbabilities;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference.TransportPreferences;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -304,20 +304,26 @@ public class CapacityCoordinator {
 		
 		return requests;
 	} //TODO requests for secondary choices
-	
+
+	private List<IParcel> sortSizeDescending(Collection<IParcel> parcels) {
+		Comparator<IParcel> comparator = Comparator.comparing(p -> p.getParcelSize().ordinal());
+		return parcels.stream().sorted(comparator.reversed()).collect(toList());
+	}
+
 	private List<TransportPreferences> getPreferences(DistributionCenter dc, List<TimedTransportChain> chains, Time time) {
 		//only in delivery direction, returning boxes are handled first come first serve
 		//BUT: picked up parcels may also have preferences and hard rule based filter might apply (xxl not in bike)!!
 		
 		List<TransportPreferences> preferences = new ArrayList<>();
-	
-		for (IParcel parcel: dc.getStorage().getParcels()) {
+
+		//TODO sort by size descending is only temporary fix!!!
+		for (IParcel parcel: sortSizeDescending(dc.getStorage().getParcels())) {
 			preferences.add(
 				chainPreference.selectPreference(parcel, chains, dc.getRandom().nextDouble(), time)
 			); 
 		}
 
-		for (IParcel parcel: dc.getStorage().getRequests()) {
+		for (IParcel parcel: sortSizeDescending(dc.getStorage().getRequests())) {
 			preferences.add(
 					chainPreference.selectPreference(parcel, chains, dc.getRandom().nextDouble(), time)
 			);
@@ -341,7 +347,7 @@ public class CapacityCoordinator {
 			));
 
 			preferences.add(
-				new TransportPreferences(returnPreferences.getChoiceId(), parcel, probabilities, dc.getRandom().nextLong())
+				new TransportPreferenceProbabilities(returnPreferences.getChoiceId(), parcel, probabilities, dc.getRandom().nextLong())
 			); 
 		}
 		

@@ -268,13 +268,13 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 		this.businesses.stream().filter(businessDemandFilter).forEach(b -> {
 			createBusinessParcelDemand(b).forEach(schedulerHook::addParcel);
 		});
-		this.businessDemandModel.printStatistics("business");
+		this.businessDemandModel.printStatistics("business_recv");
 
 		
 		this.businesses.stream().filter(businessProductionFilter).forEach(b -> {
 			createBusinessParcelProduction(b).forEach(schedulerHook::addParcel);
 		});
-		this.businessProductionModel.printStatistics("produced");
+		this.businessProductionModel.printStatistics("business_prod");
 
 		
 		Comparator<Business> compareConsumptionDemand = comparingInt(b -> b.getDemandQuantity().getConsumption());

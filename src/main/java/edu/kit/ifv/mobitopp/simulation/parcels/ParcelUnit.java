@@ -21,7 +21,7 @@ public class ParcelUnit {
 		return this;
 	}
 	
-	public ParcelUnit add(ShipmentSize size) {
+	public ParcelUnit add(ParcelSize size) {
 		return this;
 	}
 

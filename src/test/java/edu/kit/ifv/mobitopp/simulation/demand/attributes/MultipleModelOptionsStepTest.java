@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +46,8 @@ public class MultipleModelOptionsStepTest {
 		
 		element = new Element("latent");
 		
-		options.set(null, null, 1, randValue(), (p,v) -> res1 = v);
-		options.set(null, null, 1, randValue(), (p,v) -> res2 = v);
+		options.set(null, List.of(), 1, randValue(), (p, v) -> res1 = v);
+		options.set(null, List.of(), 1, randValue(), (p,v) -> res2 = v);
 	}
 	
 	@Test
@@ -85,8 +86,8 @@ public class MultipleModelOptionsStepTest {
 		assertNotEquals("latent", this.res2.getValue());
 		assertNotEquals("!", this.res2.getValue());
 		
-		options.set(null, null, 2, 2, (p,v) -> res1 = v);
-		options.set(null, null, 2, 2, (p,v) -> res2 = v);
+		options.set(null, List.of(), 2, 2, (p,v) -> res1 = v);
+		options.set(null, List.of(), 2, 2, (p,v) -> res2 = v);
 		
 		assertTrue(this.res1.isDetermined());
 		assertFalse(this.res2.isDetermined());
@@ -103,7 +104,7 @@ public class MultipleModelOptionsStepTest {
 	public void unsupportedSelect() {
 		assertThrows(UnsupportedOperationException.class,
 				() -> {
-						this.options.select(null, null, 0, randValue());
+						this.options.select(null, List.of(), 0, randValue());
 					}
 			);
 	}
@@ -116,7 +117,7 @@ public class MultipleModelOptionsStepTest {
 	public void determinePreSimulation() {
 		assertThrows(UnsupportedOperationException.class,
 				() -> {
-						this.options.determinePreSimulation(null, null, 0, randValue());
+						this.options.determinePreSimulation(null, List.of(), 0, randValue());
 					}
 			);
 	}

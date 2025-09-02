@@ -18,15 +18,18 @@ public class PrivateParcelBuilder extends ParcelBuilder<PickUpParcelPerson> {
 	public IParcel doBuild() {
 		ParcelDestinationType destination = this.destinationType.getValue();
 		
-		return new PrivateParcel(getAgent(),
-								 destination,
-								 destination.getZoneAndLocation(getAgent()),
-								 getArrivalDate(),
-								 getDistributionCenter().getValue(),
-								 getSize().getValue(),
-								 getVolume().getValue(),
-								 getIsPickUp().getValue(),
-								 getResults());
+		return new PrivateParcel(
+				getBundleId().getValue(),
+				getAgent(),
+				destination,
+				destination.getZoneAndLocation(getAgent()),
+				getArrivalDate(),
+				getDistributionCenter().getValue(),
+				getSize().getValue(),
+				getVolume().getValue(),
+				getIsPickUp().getValue(),
+				getResults()
+		);
 	}
 
 

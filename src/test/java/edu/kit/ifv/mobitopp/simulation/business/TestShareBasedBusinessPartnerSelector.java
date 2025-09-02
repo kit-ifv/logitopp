@@ -69,7 +69,7 @@ public class TestShareBasedBusinessPartnerSelector {
 		this.rand = new Random(42);
 		demandProvider = b -> demand(rand);
 
-		business = new Business(1L, "", Branch.A, BuildingType.HOSPITAL, 12, 42.0, Map.of(), null, null, rand);
+		business = new Business(1L, Branch.A.getSector(), Map.of(), null, null, rand);
 		
 		shareProvider = mock(MarketShareProvider.class);
 		when(shareProvider.getBusinessConsumptionShare()).thenReturn(sharesConsumption);
