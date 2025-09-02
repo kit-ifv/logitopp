@@ -1,7 +1,7 @@
 package edu.kit.ifv.mobitopp.simulation.distribution.tours.chains.preference;
 
 import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.BIKE;
-import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize.EXTRA_LARGE;
+import static edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize.*;
 import static edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType.*;
 import static java.util.stream.Collectors.toList;
 
