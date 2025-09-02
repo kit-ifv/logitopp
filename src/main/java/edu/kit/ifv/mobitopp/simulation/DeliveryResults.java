@@ -241,7 +241,7 @@ public class DeliveryResults {
 
 		String msg = "";
 
-		msg += business.getName() + SEP;
+//		msg += business.getName() + SEP;
 		msg += business.getId() + SEP;
 		msg += zoneAndLocation.zone().getId().getExternalId() + SEP;
 		msg += coordinates.getX() + SEP;
@@ -254,7 +254,7 @@ public class DeliveryResults {
 
 	public static Category createResultCategoryBusinessLocation() {
 		return new Category("business-location",
-				Arrays.asList("business","id", "zone", "x", "y", "edge", "pos"));
+				Arrays.asList("id", "zone", "x", "y", "edge", "pos"));
 	}
 
 	public void logDepotPosition(DistributionCenter dc) {
@@ -494,26 +494,25 @@ public class DeliveryResults {
 
 		if (parcel.getConsumer().equals(parcel.getBusiness())) {
 			category = resultCategoryBusinessOrder;
-			toName = parcel.getBusiness().getName();
+//			toName = parcel.getBusiness().getName();
 			toId = parcel.getBusiness().getId()+"";
 			fromName = ((DistributionCenter) parcel.getProducer()).getName();
 			fromId = ((DistributionCenter) parcel.getProducer()).getId()+"";
 
 		} else {
 			category = resultCategoryBusinessProduction;
-			fromName = parcel.getBusiness().getName();
+//			fromName = parcel.getBusiness().getName();
 			fromId = parcel.getBusiness().getId()+"";
 			toName = ((DistributionCenter) parcel.getConsumer()).getName();
 			toId = ((DistributionCenter) parcel.getConsumer()).getId()+"";
 		}
 
-		this.logBusinessOrder(parcel.getOId(), parcel.getBundleId(), parcel.getParcelSize(), parcel.getVolume(), fromName,
-				toName, fromId, toId, producerLoc.zone().getId().getExternalId(), producerLoc.location(),
+		this.logBusinessOrder(parcel.getOId(), parcel.getBundleId(), parcel.getParcelSize(), parcel.getVolume(), fromId, toId, producerLoc.zone().getId().getExternalId(), producerLoc.location(),
 				consumerLoc.zone().getId().getExternalId(), consumerLoc.location(),
 				parcel.getPlannedArrivalDate().getDay() + "", parcel.getPlannedArrivalDate(), category);
 	}
 
-	private void logBusinessOrder(int pid, int bundleId, ParcelSize size, double volume, String from, String to, String fromId, String toId,
+	private void logBusinessOrder(int pid, int bundleId, ParcelSize size, double volume, String fromId, String toId,
 								  String zoneIdFrom, Location locationFrom, String zoneIdTo, Location locationTo,
 								  String day, Time currentTime, Category category) {
 		String msg = "";
@@ -522,9 +521,7 @@ public class DeliveryResults {
 		msg += bundleId + SEP;
 		msg += size.name() + SEP;
 		msg += volume + SEP;
-		msg += from + SEP;
 		msg += fromId + SEP;
-		msg += to + SEP;
 		msg += toId + SEP;
 		msg += zoneIdFrom + SEP;
 		msg += locationFrom.coordinate.getX() + SEP;
@@ -550,7 +547,7 @@ public class DeliveryResults {
 	public static Category createResultCategoryBusinessOrder() {
 		return new Category("parcel-orders-business",
 				Arrays.asList("ParcelID", "BundleID", "Size", "Volume",
-						"From", "FromId", "To", "ToId",
+						"FromId", "ToId",
 						"FromZoneId", "FromLocationX", "FromLocationY", "FromEdge", "FromEdgePos",
 						"ToZoneId", "ToLocationX", "ToLocationY", "ToEdge", "ToEdgePos",
 						"ArrivalDay", "ArrivalTime"));

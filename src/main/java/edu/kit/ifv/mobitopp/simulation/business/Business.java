@@ -23,16 +23,19 @@ public class Business implements ParcelAgent {
 
 	private static final Pair<Time, Time> empty = new Pair<>(Time.future, Time.start);
 	private final long id;
-	private final String name;
+//	private final String name;
 
 	@Getter @Setter private double sendFrequency = 0.0;
 	@Getter @Setter private double receiveFrequency = 0.0;
 
-	private final Branch branch;
-	private final BuildingType buildingType;
-	
-	private final int employees;
-	private final double area;
+	private final Sector sector;
+
+//	private final Branch branch;
+//	private final BuildingType buildingType;
+
+//	private final int employees;
+//	private final double area;
+
 	private final Map<DayOfWeek, Pair<Time, Time>> openingHours;
 	private final ZoneAndLocation location;
 	
@@ -46,18 +49,20 @@ public class Business implements ParcelAgent {
 	private final Collection<IParcel> delivered;
 	
 	private final DemandQuantity demandQuantity;
-	
-	public Business(long id, String name, Branch branch, BuildingType buildingType, int employees, double area,
+
+	//String name, Branch branch, BuildingType buildingType, int employees, double area,
+	public Business(long id, Sector sector,
 			Map<DayOfWeek, Pair<Time, Time>> openingHours, ZoneAndLocation location,
 			ParcelPolicyProvider policyProvider, Random random) {
 		this.id = id;
-		this.name = name;
-
-		this.branch = branch;
-		this.buildingType = buildingType;
-		this.employees = employees;
-
-		this.area = area;
+		this.sector = sector;
+//		this.name = name;
+//
+//		this.branch = branch;
+//		this.buildingType = buildingType;
+//		this.employees = employees;
+//
+//		this.area = area;
 		this.openingHours = openingHours;
 		this.location = location;
 
@@ -136,11 +141,8 @@ public class Business implements ParcelAgent {
 	public ZoneAndLocation getZoneAndLocation() {
 		return this.location();
 	}
-	
-	public Sector getSector() {
-		return this.branch.getSector();
-	}
-	
+
+
 	@Override
 	public String carrierTag() {
 		return "Business";

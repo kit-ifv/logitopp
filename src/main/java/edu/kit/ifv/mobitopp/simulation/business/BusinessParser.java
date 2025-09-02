@@ -30,13 +30,22 @@ public class BusinessParser {
 	
 	public BusinessBuilder parse(Row row, long seed) {
 		long id = Long.parseLong(row.get("id"));
-		String name = row.get("name");
-		
-		Branch branch = Branch.fromInt(row.valueAsInteger("branch"));
-		BuildingType building = BuildingType.fromInt(row.valueAsInteger("building"));
-		
-		int employees = row.valueAsInteger("employees");
-		double area = row.valueAsDouble("area");		
+
+		Sector sector;
+		if (row.containsAttribute("sector")) {
+			sector = Sector.fromInt(row.valueAsInteger("sector"));
+		} else if (row.containsAttribute("branch")) {
+			sector = Branch.fromInt(row.valueAsInteger("branch")).getSector();
+		} else {
+			throw new IllegalArgumentException("Cannot parse row to business, as neither sector not branch is given:" + row);
+		}
+
+//		String name = row.get("name");
+
+//		Branch branch = Branch.fromInt(row.valueAsInteger("branch"));
+//		BuildingType building = BuildingType.fromInt(row.valueAsInteger("building"));
+//		int employees = row.valueAsInteger("employees");
+//		double area = row.valueAsDouble("area");
 		
 		double x = row.valueAsDouble("loc_x");
 		double y = row.valueAsDouble("loc_y");
@@ -48,11 +57,12 @@ public class BusinessParser {
 
 		BusinessBuilder builder = new BusinessBuilder(seed)
 				.id(id)
-				.called(name)
-				.with(branch)
-				.with(building)
-				.with(employees)
-				.with(area)
+				.inSector(sector)
+//				.called(name)
+//				.with(branch)
+//				.with(building)
+//				.with(employees)
+//				.with(area)
 				.at(location);
 
 		for (DayOfWeek day : DayOfWeek.values()) {
@@ -65,31 +75,39 @@ public class BusinessParser {
 	}
 
 
-
 	private Optional<Pair<Time,Time>> parseOpeningHours(DayOfWeek day, Row row) {
-		String column = "open:"+day.name();
-		
-		if (!row.containsAttribute(column)) {
-			return Optional.empty();
+		if (day != DayOfWeek.SUNDAY) {
+			Time start = Time.start.plusDays(day.getTypeAsInt()).plusHours(8);
+			Time end = Time.start.plusDays(day.getTypeAsInt()).plusHours(18);
+			return Optional.of(new Pair<>(start, end));
 		}
-		
-		
-		String range = row.get(column);
-		
-		if (!range.strip().isEmpty()) {
-			String[] parts = range.split(",");
-			
-			Time from = Time.start.plusDays(day.getTypeAsInt())
-								  .plusHours(Integer.parseInt(parts[0]));
-			
-			Time to = Time.start.plusDays(day.getTypeAsInt())
-					  			.plusHours(Integer.parseInt(parts[1]));
-			
-			return Optional.of(new Pair<>(from, to));
-			
-		} else {
-			return Optional.empty();
-		}
+		return Optional.empty();
 	}
+
+//	private Optional<Pair<Time,Time>> parseOpeningHours(DayOfWeek day, Row row) {
+//		String column = "open:"+day.name();
+//
+//		if (!row.containsAttribute(column)) {
+//			return Optional.empty();
+//		}
+//
+//
+//		String range = row.get(column);
+//
+//		if (!range.strip().isEmpty()) {
+//			String[] parts = range.split(",");
+//
+//			Time from = Time.start.plusDays(day.getTypeAsInt())
+//								  .plusHours(Integer.parseInt(parts[0]));
+//
+//			Time to = Time.start.plusDays(day.getTypeAsInt())
+//					  			.plusHours(Integer.parseInt(parts[1]));
+//
+//			return Optional.of(new Pair<>(from, to));
+//
+//		} else {
+//			return Optional.empty();
+//		}
+//	}
 
 }

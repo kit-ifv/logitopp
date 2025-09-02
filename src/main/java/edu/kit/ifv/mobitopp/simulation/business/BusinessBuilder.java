@@ -13,13 +13,13 @@ import edu.kit.ifv.mobitopp.util.collections.Pair;
 public class BusinessBuilder {
 	
 	private long id;
-	private String name;
+	private Sector sector;
+//	private String name;
+//	private Branch branch;
+//	private BuildingType buildingType;
+//	private int employees;
+//	private double area;
 	
-	private Branch branch;
-	private BuildingType buildingType;
-	
-	private int employees;
-	private double area;
 	private Map<DayOfWeek, Pair<Time, Time>> openingHours;
 	private ZoneAndLocation location;
 	
@@ -35,31 +35,36 @@ public class BusinessBuilder {
 		this.id = id;
 		return this;
 	}
-	
-	public BusinessBuilder called(String name) {
-		this.name = name;
+
+	public BusinessBuilder inSector(Sector sector) {
+		this.sector = sector;
 		return this;
 	}
-	
-	public BusinessBuilder with(Branch branch) {
-		this.branch = branch;
-		return this;
-	}
-	
-	public BusinessBuilder with(BuildingType buildingType) {
-		this.buildingType = buildingType;
-		return this;
-	}
-	
-	public BusinessBuilder with(int employees) {
-		this.employees = employees;
-		return this;
-	}
-	
-	public BusinessBuilder with(double area) {
-		this.area = area;
-		return this;
-	}
+
+//	public BusinessBuilder called(String name) {
+//		this.name = name;
+//		return this;
+//	}
+//
+//	public BusinessBuilder with(Branch branch) {
+//		this.branch = branch;
+//		return this;
+//	}
+//
+//	public BusinessBuilder with(BuildingType buildingType) {
+//		this.buildingType = buildingType;
+//		return this;
+//	}
+//
+//	public BusinessBuilder with(int employees) {
+//		this.employees = employees;
+//		return this;
+//	}
+//
+//	public BusinessBuilder with(double area) {
+//		this.area = area;
+//		return this;
+//	}
 	
 	public BusinessBuilder openBetween(DayOfWeek day, Pair<Time, Time> interval) {
 		this.openingHours.put(day, interval);
@@ -82,7 +87,8 @@ public class BusinessBuilder {
 	
 	public Business build() {
 		validate();
-		return new Business(id, name, branch, buildingType, employees, area, openingHours, location, policyProvider, random);
+		//name, branch, buildingType, employees, area,
+		return new Business(id, sector, openingHours, location, policyProvider, random);
 	}
 	
 
