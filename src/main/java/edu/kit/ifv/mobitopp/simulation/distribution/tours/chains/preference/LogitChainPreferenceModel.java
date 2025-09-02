@@ -163,7 +163,7 @@ public class LogitChainPreferenceModel implements PreferredChainModel {
 	}
 
 	private double getParcelFactor(IParcel parcel) {
-		switch (parcel.getShipmentSize()) {
+		switch (parcel.getParcelSize()) {
             case SMALL:
                 return 0.0;
             case MEDIUM:
