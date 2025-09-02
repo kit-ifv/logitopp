@@ -47,13 +47,15 @@ dependencies {
 	compile 'edu.kit.ifv.mobitopp:mobitopp:0.3+',
 			'org.jgrapht:jgrapht-core:1.5.1'
 	 
-	testCompile 'org.projectlombok:lombok:1.18.34'
+	testCompile 'org.projectlombok:lombok:1.18.8'
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0',
                        'org.junit.jupiter:junit-jupiter-migrationsupport:5.7.0',
                        'org.junit.vintage:junit-vintage-engine:5.7.0',
                        'org.mockito:mockito-core:3.0.0',
                        'org.assertj:assertj-core:3.13.2'
 }
+
+print("Java version: " + JavaVersion.current())
 
 //def choiceModelsDirectory = "${rootDir}/choice-models"
 //apply plugin: 'edu.kit.ifv.codegen.gradle.plugin'
