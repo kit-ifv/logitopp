@@ -108,8 +108,13 @@ public class DistributionCenterParser {
 		int vehicleType = row.valueAsInteger("vehicle_type");
 		VehicleType type = VehicleType.fromInt(vehicleType);
 		
-		int serviceAreaCode = row.valueAsInteger("service_area");
-		ServiceArea serviceArea = serviceAreaFactory.fromIntCode(zone, serviceAreaCode);
+		String serviceAreaCode = row.get("service_area");
+		ServiceArea serviceArea;
+		if (serviceAreaCode.contains(",")) {
+			serviceArea = serviceAreaFactory.serviceAreaFromList(serviceAreaCode);
+		} else {
+			serviceArea = serviceAreaFactory.fromIntCode(zone, Integer.parseInt(serviceAreaCode));
+		}
 
 		int maxParcelCount = maxParcelCountPerVehicle.apply(type);
 

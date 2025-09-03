@@ -2,7 +2,10 @@ package edu.kit.ifv.mobitopp.simulation.distribution.region;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.data.ZoneId;
@@ -32,6 +35,14 @@ public class ServiceAreaFactory {
 						 	 .filter(z -> impedance.getDistance(centerId, z.getId()) <= distance)
 						 	 .collect(toList());
 		
+		return new ServiceArea(zones);
+	}
+
+	public ServiceArea serviceAreaFromList(String zonesSting) {
+		List<Zone> zones = Arrays.stream(zonesSting.split(","))
+							.filter(s -> !s.trim().isEmpty())
+							.map(zoneRepository::getByExternalId)
+							.collect(Collectors.toList());
 		return new ServiceArea(zones);
 	}
 	
