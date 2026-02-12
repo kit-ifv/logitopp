@@ -79,7 +79,7 @@ public class QuantityAndBundlingCsvReader implements ParcelQuantityModel<Busines
         return this.bundlesById.getOrDefault(agent.getId(), Collections.emptyList());
 	}
 
-    private List<Integer> repairBundling(List<Integer> bundling, int expectedQuantity) {
+    private static List<Integer> repairBundling(List<Integer> bundling, int expectedQuantity) {
         if (expectedQuantity < 0) {
             throw new IllegalArgumentException("cannot repair bundling for expected quantity < 0: " + expectedQuantity);
         }
@@ -106,7 +106,7 @@ public class QuantityAndBundlingCsvReader implements ParcelQuantityModel<Busines
         int excess = sum - expectedQuantity;
         int i = repaired.size() - 1;
 
-        while (i > 0 && excess > 0) {
+        while (i >= 0 && excess > 0) {
             int value = repaired.get(i);
 
             if (value > excess) {
@@ -135,7 +135,8 @@ public class QuantityAndBundlingCsvReader implements ParcelQuantityModel<Busines
         int copyIndex = 0;
         int missing = expectedQuantity - sum;
         while (missing > 0) {
-            int value = repaired.get(copyIndex++);
+            int value = repaired.get(copyIndex);
+            copyIndex++;
 
             if (value <= missing) {
                 repaired.add(value);
