@@ -24,6 +24,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelBuilder;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize;
+import edu.kit.ifv.mobitopp.time.DayOfWeek;
 import edu.kit.ifv.mobitopp.time.Time;
 
 public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBuilder<A>> {
@@ -352,7 +353,11 @@ public class ParcelDemandModelBuilder<A extends ParcelAgent, P extends ParcelBui
 			return null;
 		}
 	}
-	
+
+    public ParcelDemandModelBuilder<A,P> useBundleAwareDaySelector(Map<DayOfWeek, Double> expectedDayShares, boolean copyInBundle) {
+        return this.customArrivalDateSelection(new BundleAwareDaySelector<>(expectedDayShares), copyInBundle);
+    }
+
 	public ParcelDemandModelBuilder<A,P> customArrivalDateSelection(ParcelDemandModelStep<A, P, Time> step, boolean copyInBundle) {
 		return this.addStep(step, ParcelBuilder::setArrivalDate, createArrivalDateCopyGetter(copyInBundle));
 	}

@@ -25,6 +25,7 @@ import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.visum.VisumNode;
 import edu.kit.ifv.mobitopp.visum.VisumOrientedLink;
 import lombok.Getter;
+import lombok.val;
 
 /**
  * The Class DeliveryResults provides methods for logging results concerned with
@@ -50,6 +51,7 @@ public class DeliveryResults {
 	private final static Category resultCategoryNode = createResultCategoryNode();
 	private final static Category resultCategoryEdge = createResultCategoryEdge();
 	private final static Category resultCategoryDepotLocation = createResultCategoryDepotLocation();
+    private final static Category getResultCategoryUnifiedParcelDemand = createResultCategoryUnifiedParcelDemand();
 
 	private final Results results;
 
@@ -424,6 +426,19 @@ public class DeliveryResults {
 	public void logPrivateOrder(PrivateParcel parcel) {
 		int person = parcel.getPerson().getOid();
 		int household = parcel.getPerson().household().getOid();
+        ZoneAndLocation consumerLoc = parcel.getConsumer().getZoneAndLocation();
+
+        DistributionCenter producer = (DistributionCenter) parcel.getProducer();
+        ZoneAndLocation producerLoc = producer.getZoneAndLocation();
+
+        this.logParcel(
+                parcel.getOId(), parcel.getBundleId(), parcel.getParcelSize(), parcel.getVolume(),
+                parcel.getPlannedArrivalDate().getDay() + "", parcel.getPlannedArrivalDate(),
+                parcel.getDestinationType().name(), "CEP2C",
+                producer.getName(), producer.getId()+"",  producerLoc.zone().getId().getExternalId(), producerLoc.location(),
+                "P"+person, person+"", consumerLoc.zone().getId().getExternalId(), consumerLoc.location()
+        );
+
 		this.logPrivateOrder(parcel.getOId(), parcel.getBundleId(), person, household, parcel.getParcelSize(), parcel.getVolume(),
 				parcel.getDestinationType().name(), parcel.getPlannedArrivalDate().getDay() + "",
                 (DistributionCenter) parcel.getProducer(), parcel.getPlannedArrivalDate(), parcel.getZoneAndLocation()
@@ -490,29 +505,51 @@ public class DeliveryResults {
 		String toName;
 		String fromId;
 		String toId;
+        String sector;
+        String deliveryType;
 
 
 		if (parcel.getConsumer().equals(parcel.getBusiness())) {
 			category = resultCategoryBusinessOrder;
-//			toName = parcel.getBusiness().getName();
 			toId = parcel.getBusiness().getId()+"";
+            toName = "B" + toId;
 			fromName = ((DistributionCenter) parcel.getProducer()).getName();
 			fromId = ((DistributionCenter) parcel.getProducer()).getId()+"";
 
+            sector = "CEP2B";
+            deliveryType = "BUSINESS";
+
 		} else {
 			category = resultCategoryBusinessProduction;
-//			fromName = parcel.getBusiness().getName();
 			fromId = parcel.getBusiness().getId()+"";
+            fromName = "B" + fromId;
 			toName = ((DistributionCenter) parcel.getConsumer()).getName();
 			toId = ((DistributionCenter) parcel.getConsumer()).getId()+"";
+
+            sector = "B2CEP";
+            deliveryType = "PICKUP";
+
 		}
 
-		this.logBusinessOrder(parcel.getOId(), parcel.getBundleId(), parcel.getParcelSize(), parcel.getVolume(), fromId, toId, producerLoc.zone().getId().getExternalId(), producerLoc.location(),
+        this.logParcel(
+            parcel.getOId(), parcel.getBundleId(), parcel.getParcelSize(), parcel.getVolume(),
+            parcel.getPlannedArrivalDate().getDay() + "", parcel.getPlannedArrivalDate(),
+            deliveryType, sector,
+            fromName, fromId,  producerLoc.zone().getId().getExternalId(), producerLoc.location(),
+            toName, toId, consumerLoc.zone().getId().getExternalId(), consumerLoc.location()
+        );
+
+		this.logBusinessOrder(
+                parcel.getOId(), parcel.getBundleId(), parcel.getParcelSize(), parcel.getVolume(),
+                fromName, fromId, toName, toId,
+                producerLoc.zone().getId().getExternalId(), producerLoc.location(),
 				consumerLoc.zone().getId().getExternalId(), consumerLoc.location(),
-				parcel.getPlannedArrivalDate().getDay() + "", parcel.getPlannedArrivalDate(), category);
+				parcel.getPlannedArrivalDate().getDay() + "", parcel.getPlannedArrivalDate(), category
+        );
 	}
 
-	private void logBusinessOrder(int pid, int bundleId, ParcelSize size, double volume, String fromId, String toId,
+	private void logBusinessOrder(int pid, int bundleId, ParcelSize size, double volume,
+                                  String from, String fromId, String to, String toId,
 								  String zoneIdFrom, Location locationFrom, String zoneIdTo, Location locationTo,
 								  String day, Time currentTime, Category category) {
 		String msg = "";
@@ -521,7 +558,9 @@ public class DeliveryResults {
 		msg += bundleId + SEP;
 		msg += size.name() + SEP;
 		msg += volume + SEP;
+        msg += from + SEP;
 		msg += fromId + SEP;
+        msg += to + SEP;
 		msg += toId + SEP;
 		msg += zoneIdFrom + SEP;
 		msg += locationFrom.coordinate.getX() + SEP;
@@ -547,7 +586,7 @@ public class DeliveryResults {
 	public static Category createResultCategoryBusinessOrder() {
 		return new Category("parcel-orders-business",
 				Arrays.asList("ParcelID", "BundleID", "Size", "Volume",
-						"FromId", "ToId",
+                        "From", "FromId", "To", "ToId",
 						"FromZoneId", "FromLocationX", "FromLocationY", "FromEdge", "FromEdgePos",
 						"ToZoneId", "ToLocationX", "ToLocationY", "ToEdge", "ToEdgePos",
 						"ArrivalDay", "ArrivalTime"));
@@ -566,6 +605,61 @@ public class DeliveryResults {
 						"ToZoneId", "ToLocationX", "ToLocationY", "ToEdge", "ToEdgePos",
 						"ArrivalDay", "ArrivalTime"));
 	}
+
+    private void logParcel(
+            int pid, int bundleId, ParcelSize size, double volume, String day, Time currentTime,
+            String deliveryType, String sector,
+            String from, String fromId, String zoneIdFrom, Location locationFrom,
+            String to, String toId, String zoneIdTo, Location locationTo
+    ) {
+        String msg = "";
+
+        msg += pid + SEP;
+        msg += bundleId + SEP;
+        msg += size.name() + SEP;
+        msg += volume + SEP;
+        msg += day + SEP;
+        msg += currentTime + SEP;
+        msg += currentTime.fromStart().seconds() + SEP;
+
+        msg += deliveryType + SEP;
+        msg += sector + SEP;
+
+        msg += from + SEP;
+        msg += fromId + SEP;
+        msg += zoneIdFrom + SEP;
+        msg += locationFrom.coordinate.getX() + SEP;
+        msg += locationFrom.coordinate.getY() + SEP;
+        msg += locationFrom.roadAccessEdgeId() + SEP;
+        msg += locationFrom.roadPosition() + SEP;
+
+        msg += to + SEP;
+        msg += toId + SEP;
+        msg += zoneIdTo + SEP;
+        msg += locationTo.coordinate.getX() + SEP;
+        msg += locationTo.coordinate.getY() + SEP;
+        msg += locationTo.roadAccessEdgeId() + SEP;
+        msg += locationTo.roadPosition() + SEP;
+
+
+        this.results.write(getResultCategoryUnifiedParcelDemand, msg);
+    }
+
+    /**
+     * Creates the result category order for unified parcel demand.
+     *
+     * @return the category
+     */
+    public static Category createResultCategoryUnifiedParcelDemand() {
+        return new Category("parcel-demand",
+                Arrays.asList(
+                    "ParcelID", "BundleID", "Size", "Volume", "ArrivalDay", "ArrivalTime", "ArrivalSimSec",
+                    "DeliveryType", "Category",
+                    "From", "FromId", "FromZoneId", "FromLocationX", "FromLocationY", "FromEdge", "FromEdgePos",
+                    "To", "ToId", "ToZoneId", "ToLocationX", "ToLocationY", "ToEdge", "ToEdgePos"
+                )
+        );
+    }
 
 	/**
 	 * Log neighbor parcel delivery.

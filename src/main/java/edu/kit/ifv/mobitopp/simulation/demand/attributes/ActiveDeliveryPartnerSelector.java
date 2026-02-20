@@ -1,18 +1,17 @@
 package edu.kit.ifv.mobitopp.simulation.demand.attributes;
 
-import static java.lang.Math.abs;
-import static java.util.stream.Collectors.toMap;
+import edu.kit.ifv.mobitopp.simulation.business.Business;
+import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
+import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
+import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 
-import edu.kit.ifv.mobitopp.simulation.business.Business;
-import edu.kit.ifv.mobitopp.simulation.distribution.CEPServiceProvider;
-import edu.kit.ifv.mobitopp.simulation.distribution.MarketShareProvider;
-import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
-import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcelBuilder;
-import edu.kit.ifv.mobitopp.util.randomvariable.DiscreteRandomVariable;
+import static java.lang.Math.abs;
+import static java.util.stream.Collectors.toMap;
 
 public class ActiveDeliveryPartnerSelector
 		extends CopyModelStep<Business, BusinessParcelBuilder, CEPServiceProvider>
@@ -45,16 +44,25 @@ public class ActiveDeliveryPartnerSelector
 		
 		Collection<CEPServiceProvider> choiceSet = partnerProvider.apply(parcel.getAgent());
 		
-		Map<CEPServiceProvider, Integer> capacities = 
+		Map<CEPServiceProvider, Number> capacities =
 			choiceSet.stream()
 				 	 .collect(toMap(Function.identity(), this::estimateRemainingCapacity));
 
 		int additionalParcels = numOfParcels - 1;
 		
-		boolean allMaxed = capacities.values().stream().allMatch(v -> v <= additionalParcels);
+		boolean allMaxed = capacities.values().stream().allMatch(v -> v.doubleValue() < additionalParcels);
+
+        Function<Double, Number> eval;
+        if (allMaxed) {
+            eval = i -> 1.0 / abs(i);
+        } else {
+            eval = Math::abs;
+        }
+
 		for (CEPServiceProvider cepsp : choiceSet) {
-			capacities.computeIfPresent(cepsp, (c, prev) -> (prev-additionalParcels > 0 || allMaxed) ? abs(prev) : 0); //TODO check abs(prev) -> does that mean the one with highest surplus more likely to get parcels?
+			capacities.computeIfPresent(cepsp, (c, prev) -> (prev.doubleValue()-additionalParcels >= 0 || allMaxed) ? eval.apply(prev.doubleValue()) : 0);
 		}
+        //TODO check abs(prev) -> does that mean the one with highest surplus more likely to get parcels?
 
 		DiscreteRandomVariable<CEPServiceProvider> randVar = new DiscreteRandomVariable<>(capacities); //TODO logit model, other parcels at same day
 
