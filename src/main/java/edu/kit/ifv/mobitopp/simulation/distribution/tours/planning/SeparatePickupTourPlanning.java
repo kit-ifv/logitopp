@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenter;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivityBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.Fleet;
@@ -14,13 +15,11 @@ import edu.kit.ifv.mobitopp.simulation.parcels.clustering.DeliveryClusteringStra
 import edu.kit.ifv.mobitopp.time.RelativeTime;
 import edu.kit.ifv.mobitopp.time.Time;
 
-public class SeparatePickupTourPlanning extends ClusterTourPlanningStrategy {
+public class SeparatePickupTourPlanning implements TourPlanningStrategy {
 	
-	private final ClusterTourPlanningStrategy delegate;
+	private final TourPlanningStrategy delegate;
 
-	public SeparatePickupTourPlanning(DeliveryClusteringStrategy clusteringStrategy,
-			DeliveryDurationModel durationModel, ClusterTourPlanningStrategy delegate) {
-		super(clusteringStrategy, durationModel);
+	public SeparatePickupTourPlanning(TourPlanningStrategy delegate) {
 		this.delegate = delegate;
 	}
 
@@ -29,29 +28,21 @@ public class SeparatePickupTourPlanning extends ClusterTourPlanningStrategy {
 			Time time) {
 		
 		DeliveryVehicle vehicle = fleet.getVehicles().iterator().next();
-		List<PlannedTour> tours = new ArrayList<>();
-		
-		System.out.print(vehicle.getOwner().getName() + " plans delivery: ");
-		List<ParcelActivityBuilder> delActivities = getDeliveryActivities(deliveries, List.of(), fleet.getVehicleParcelCount());
-		tours.addAll(
-				delegate.planTours(delActivities, vehicle, time, RelativeTime.ofHours(6))
-		);
+
+        System.out.print(vehicle.getOwner().getName() + " plans delivery: ");
+        List<PlannedTour> tours = new ArrayList<>(delegate.planTours(deliveries, List.of(), fleet, time));
 		System.out.println(" -> " + tours.size());
 		
 		System.out.print(vehicle.getOwner().getName() + " plans pickup: ");
-		List<ParcelActivityBuilder> pickActivities = getDeliveryActivities(List.of(), pickUps, fleet.getVehicleParcelCount());
-		tours.addAll(
-				delegate.planTours(pickActivities, vehicle, time.startOfDay().plusHours(14), RelativeTime.ofHours(6))
-		);
+		tours.addAll(delegate.planTours(List.of(), pickUps, fleet, time));
 		System.out.println(" -> " + tours.size());
 		
 		return tours;
 	}
 
 	@Override
-	protected List<PlannedTour> planTours(Collection<ParcelActivityBuilder> activities, DeliveryVehicle vehicle,
-			Time time, RelativeTime duration) {
-		throw new UnsupportedOperationException("planTours(clusters) Should not be called on decorator " + this.getClass().getSimpleName());
+	public boolean shouldReplanTours(DistributionCenter center, Time time) {
+		return delegate.shouldReplanTours(center, time);
 	}
 
 }

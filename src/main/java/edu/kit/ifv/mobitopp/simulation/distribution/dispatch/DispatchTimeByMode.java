@@ -14,15 +14,16 @@ import java.util.Optional;
 
 import static edu.kit.ifv.mobitopp.time.DayOfWeek.SUNDAY;
 
-public class DispatchTimeStrategy {
+public class DispatchTimeByMode implements IDispatchTimeStrategy {
 
     private final TimeTable timeTable;
 
-    public DispatchTimeStrategy(TimeTable timeTable) {
+    public DispatchTimeByMode(TimeTable timeTable) {
         this.timeTable = timeTable;
     }
 
 
+    @Override
     public Time dispatchTimeFor(PlannedTour tour, DistributionCenter origin, Time time) {
 
         DistributionCenter handler = (tour.isReturning()) ? tour.nextHub().get() : origin;
@@ -56,6 +57,7 @@ public class DispatchTimeStrategy {
         return time.startOfDay().plusHours(7);
     }
 
+    @Override
     public boolean dispatchHours(PlannedTour tour, DistributionCenter origin, Time time) {
         DistributionCenter handler = (tour.isReturning()) ? tour.nextHub().get() : origin;
 
@@ -86,7 +88,7 @@ public class DispatchTimeStrategy {
         return isInBikeDispatchHours(time) && !isSunday(time);// && endsBeforeEndOfDeliveryTime(time, tour);
     }
 
-
+    @Override
     public Optional<DeliveryVehicle> getVehicleForTour(PlannedTour tour, DistributionCenter origin, Time time) {
         DistributionCenter dc = (tour.isReturning()) ? tour.nextHub().get() : origin;
         VehicleType mode = dc.getVehicleType();

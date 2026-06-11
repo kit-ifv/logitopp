@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.util.*;
 
-import edu.kit.ifv.mobitopp.simulation.distribution.dispatch.DispatchTimeStrategy;
+import edu.kit.ifv.mobitopp.simulation.distribution.dispatch.DispatchTimeByMode;
 import edu.kit.ifv.mobitopp.util.location.DummyLocationProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,6 @@ import edu.kit.ifv.mobitopp.simulation.distribution.DistributionCenterParser;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TimedTransportChainBuilder;
 import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
-import edu.kit.ifv.mobitopp.simulation.distribution.dispatch.TimeWindowDispatchStrategy;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.region.ServiceArea;
@@ -148,7 +147,7 @@ public class TestChainTimeTableIntegration {
 					policy,
 					//new TimeWindowDispatchStrategy(),
 					d,
-                    new DispatchTimeStrategy(timeTable), results,
+                    new DispatchTimeByMode(timeTable), results,
 					impedance);
 
 		});

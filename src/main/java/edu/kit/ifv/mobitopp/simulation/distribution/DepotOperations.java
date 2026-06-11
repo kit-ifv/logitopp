@@ -5,8 +5,7 @@ import java.util.stream.Collectors;
 
 import edu.kit.ifv.mobitopp.simulation.DeliveryResults;
 import edu.kit.ifv.mobitopp.simulation.ImpedanceIfc;
-import edu.kit.ifv.mobitopp.simulation.distribution.dispatch.DispatchStrategy;
-import edu.kit.ifv.mobitopp.simulation.distribution.dispatch.DispatchTimeStrategy;
+import edu.kit.ifv.mobitopp.simulation.distribution.dispatch.IDispatchTimeStrategy;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.policies.ParcelPolicyProvider;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
@@ -22,7 +21,7 @@ public class DepotOperations {
 	private final TourPlanningStrategy tourStrategy;
 	private final ParcelPolicyProvider policyProvider;
 //	protected final DispatchStrategy dispatchStrategy;
-	protected final DispatchTimeStrategy dispatchTimeStrategy;
+	protected final IDispatchTimeStrategy dispatchTimeStrategy;
 	
 	protected final ParcelArrivalScheduler scheduler;
 	
@@ -30,7 +29,7 @@ public class DepotOperations {
 	protected final DeliveryResults results;
 
 	
-	public DepotOperations(TourPlanningStrategy tourStrategy, ParcelPolicyProvider policyProvider, /*DispatchStrategy dispatchStrategy,*/ DistributionCenter center, DispatchTimeStrategy dispatchTimeStrategy, DeliveryResults results, ImpedanceIfc impedance) {
+	public DepotOperations(TourPlanningStrategy tourStrategy, ParcelPolicyProvider policyProvider, /*DispatchStrategy dispatchStrategy,*/ DistributionCenter center, IDispatchTimeStrategy dispatchTimeStrategy, DeliveryResults results, ImpedanceIfc impedance) {
 		this.center = center;
 		
 		this.tourStrategy = tourStrategy;
