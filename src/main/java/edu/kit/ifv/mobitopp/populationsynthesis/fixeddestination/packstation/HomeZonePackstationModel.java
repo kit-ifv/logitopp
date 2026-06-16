@@ -2,6 +2,8 @@ package edu.kit.ifv.mobitopp.populationsynthesis.fixeddestination.packstation;
 
 import edu.kit.ifv.mobitopp.data.Zone;
 import edu.kit.ifv.mobitopp.populationsynthesis.PersonBuilder;
+import edu.kit.ifv.mobitopp.simulation.Person;
+import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 
 /**
  * The Class HomeZonePackstationModel is an exemplary implementation of the {@link PackStationModel} interface.
@@ -16,8 +18,8 @@ public class HomeZonePackstationModel implements PackStationModel {
 	 * @return the person's home zone
 	 */
 	@Override
-	public Zone select(PersonBuilder person) {
-		return person.homeZone();
+	public ZoneAndLocation select(Person person) {
+		return new ZoneAndLocation(person.homeZone(), person.homeZone().centroidLocation());
 	}
 
 }

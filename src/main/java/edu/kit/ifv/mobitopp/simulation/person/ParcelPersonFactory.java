@@ -3,6 +3,7 @@ package edu.kit.ifv.mobitopp.simulation.person;
 import java.util.List;
 import java.util.Set;
 
+import edu.kit.ifv.mobitopp.populationsynthesis.fixeddestination.packstation.PackStationModel;
 import edu.kit.ifv.mobitopp.simulation.Mode;
 import edu.kit.ifv.mobitopp.simulation.Person;
 import edu.kit.ifv.mobitopp.simulation.PersonListener;
@@ -16,9 +17,11 @@ import edu.kit.ifv.mobitopp.time.Time;
 public class ParcelPersonFactory implements SimulationPersonFactory {
 	
 	private final SimulationPersonFactory defaultFactory;
+	private final PackStationModel packStationModel;
 	
-	public ParcelPersonFactory(SimulationPersonFactory defaultFactory) {
+	public ParcelPersonFactory(SimulationPersonFactory defaultFactory, PackStationModel packStationModel) {
 		this.defaultFactory = defaultFactory;
+		this.packStationModel = packStationModel;
 	}
 
 	@Override
@@ -27,9 +30,11 @@ public class ParcelPersonFactory implements SimulationPersonFactory {
 			PersonState initialState, PublicTransportBehaviour boarder, long seed, PersonListener listener) {
 		
 		SimulationOptionsCustomization customSimulationOptions = new SimulationOptionsCustomization(options);
-		SimulationPerson simulationPerson = defaultFactory.create(person, queue, options, simulationDays, modesInSimulation, tourFactory, tripFactory, initialState, boarder, seed, listener);
+		SimulationPerson simulationPerson = defaultFactory.create(
+			person, queue, options, simulationDays, modesInSimulation, tourFactory, tripFactory, initialState, boarder, seed, listener
+		);
 				
-		PickUpParcelPerson parcelPerson = new PickUpParcelPerson(simulationPerson, seed);
+		PickUpParcelPerson parcelPerson = new PickUpParcelPerson(simulationPerson, packStationModel.select(person),  seed);
 		
 		PickUpParcelReschedulingStrategy pickUpReschedulingStrategy = new PickUpParcelReschedulingStrategy(parcelPerson, options.rescheduling());
 		customSimulationOptions.customize(pickUpReschedulingStrategy);

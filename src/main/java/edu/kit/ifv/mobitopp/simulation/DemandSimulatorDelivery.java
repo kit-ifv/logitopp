@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import edu.kit.ifv.mobitopp.populationsynthesis.fixeddestination.packstation.PackStationModel;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.ActivityPeriodFixer;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.randomizer.ActivityStartAndDurationRandomizer;
 import edu.kit.ifv.mobitopp.simulation.business.Business;
@@ -81,26 +82,29 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 	 * @param productionPartnerSelector  the shipping cep-partner selector for businesses
 	 * @param distributionCenters 		 the distribution centers
 	 */
-	public DemandSimulatorDelivery(final DestinationChoiceModel destinationChoiceModel,
-			final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
-			final ActivityPeriodFixer activityPeriodFixer,
-			final ActivityStartAndDurationRandomizer activityDurationRandomizer, final TripFactory tripFactory,
-			final ReschedulingStrategy rescheduling, final Set<Mode> modesInSimulation, final PersonState initialState,
-			final SimulationContext context, final SimulationPersonFactory personFactory,
-			
-			final ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> privateDemandModel,
-			final ParcelDemandModel<Business, BusinessParcelBuilder> businessDemandModel,
-			final ParcelDemandModel<Business, BusinessParcelBuilder> businessProductionModel,
-			final DeliveryResults results, final Predicate<Person> personFilter,
-			final Predicate<Business> businessDemandFilter, final Predicate<Business> businessProductionFilter,
-			final Collection<Business> businesses, final BusinessPartnerSelector consumptionPartnerSelector,
-			final BusinessPartnerSelector productionPartnerSelector,
-			final Collection<DistributionCenter> distributionCenters) {
+	public DemandSimulatorDelivery(
+			final DestinationChoiceModel destinationChoiceModel,
+	        final TourBasedModeChoiceModel modeChoiceModel, final ZoneBasedRouteChoice routeChoice,
+	        final ActivityPeriodFixer activityPeriodFixer,
+		    final ActivityStartAndDurationRandomizer activityDurationRandomizer, final TripFactory tripFactory,
+		    final ReschedulingStrategy rescheduling, final Set<Mode> modesInSimulation, final PersonState initialState,
+		    final SimulationContext context, final SimulationPersonFactory personFactory,
+
+		    final ParcelDemandModel<PickUpParcelPerson, PrivateParcelBuilder> privateDemandModel,
+		    final ParcelDemandModel<Business, BusinessParcelBuilder> businessDemandModel,
+		    final ParcelDemandModel<Business, BusinessParcelBuilder> businessProductionModel,
+		    final DeliveryResults results, final Predicate<Person> personFilter,
+		    final Predicate<Business> businessDemandFilter, final Predicate<Business> businessProductionFilter,
+		    final Collection<Business> businesses, final BusinessPartnerSelector consumptionPartnerSelector,
+		    final BusinessPartnerSelector productionPartnerSelector,
+		    final Collection<DistributionCenter> distributionCenters,
+		    final PackStationModel packStationModel
+	) {
 
 		super(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
 				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory);
 		
-		this.parcelPersonFactory = new ParcelPersonFactory(personFactory());
+		this.parcelPersonFactory = new ParcelPersonFactory(personFactory(), packStationModel);
 		
 		this.businessDemandFilter = businessDemandFilter;
 		this.businessProductionFilter = businessProductionFilter;
@@ -154,12 +158,14 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			final ParcelDemandModel<Business, BusinessParcelBuilder> businessProductionModel,
 			final DeliveryResults results, final Predicate<Person> personFilter, final Collection<Business> businesses,
 			final BusinessPartnerSelector consumptionPartnerSelector, final BusinessPartnerSelector productionPartnerSelector,
-			final Collection<DistributionCenter> distributionCenters) {
+			final Collection<DistributionCenter> distributionCenters,
+			final PackStationModel packStationModel
+	) {
 
 		this(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
 				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory,
 				PrivateParcelDemandModelBuilder.nullPrivateParcelModel(results), businessDemandModel,
-				businessProductionModel, results, personFilter, b -> true, b -> true, businesses, consumptionPartnerSelector, productionPartnerSelector, distributionCenters);
+				businessProductionModel, results, personFilter, b -> true, b -> true, businesses, consumptionPartnerSelector, productionPartnerSelector, distributionCenters, packStationModel);
 	}
 
 	/**
@@ -193,14 +199,16 @@ public class DemandSimulatorDelivery extends DemandSimulatorPassenger {
 			final SimulationPersonFactory personFactory, final DeliveryResults results,
 			final Predicate<Person> personFilter, Collection<Business> businesses,
 			final BusinessPartnerSelector consumptionPartnerSelector, final BusinessPartnerSelector productionPartnerSelector,
-			final Collection<DistributionCenter> distributionCenters) {
+			final Collection<DistributionCenter> distributionCenters,
+		    final PackStationModel packStationModel
+	) {
 
 		this(destinationChoiceModel, modeChoiceModel, routeChoice, activityPeriodFixer, activityDurationRandomizer,
 				tripFactory, rescheduling, modesInSimulation, initialState, context, personFactory,
 				PrivateParcelDemandModelBuilder.nullPrivateParcelModel(results),
 				BusinessParcelDemandModelBuilder.nullBusinessParcelOrderModel(results),
 				BusinessParcelDemandModelBuilder.nullBusinessParcelOrderModel(results), results, personFilter,
-				b -> true, b -> true, businesses, consumptionPartnerSelector, productionPartnerSelector, distributionCenters);
+				b -> true, b -> true, businesses, consumptionPartnerSelector, productionPartnerSelector, distributionCenters, packStationModel);
 	}
 
 	/**
