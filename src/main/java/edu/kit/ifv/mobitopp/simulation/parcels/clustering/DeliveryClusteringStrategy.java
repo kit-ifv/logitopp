@@ -22,7 +22,7 @@ public interface DeliveryClusteringStrategy {
 							  .collect(toList());
 	}
 	
-	private static List<List<IParcel>> partition(List<IParcel> cluster, int maxCount) {
+	public default List<List<IParcel>> partition(List<IParcel> cluster, int maxCount) {
 		if (cluster.isEmpty()) {return List.of();}
 
 		int totalCount = cluster.size();

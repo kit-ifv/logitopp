@@ -237,6 +237,11 @@ public class CoordinatedChainTourStrategy implements TourPlanningStrategy {
 			}
 
 			@Override
+			public List<List<IParcel>> partition(List<IParcel> cluster, int maxCount) {
+				return clustering.partition(cluster, maxCount);
+			}
+
+			@Override
 			public ZoneAndLocation getStopLocation(List<IParcel> deliveryCluster) {
 				return clustering.getStopLocation(deliveryCluster);
 			}
