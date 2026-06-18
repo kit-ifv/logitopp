@@ -18,29 +18,29 @@ public class RoadLocationMatcher implements LocationProvider {
     private final SimpleRoadNetwork roadNetwork;
     private final DeliveryResults results;
 
-    public RoadLocationMatcher(SimulationContext context, DeliveryResults results) {
+    public RoadLocationMatcher(SimulationContext context, VisumNetwork network, DeliveryResults results) {
         this.results = results;
-        this.roadNetwork = initRoadNetwork(context);
+        this.roadNetwork = initRoadNetwork(context, network);
     }
 
-    private SimpleRoadNetwork initRoadNetwork(SimulationContext context) {
+    private SimpleRoadNetwork initRoadNetwork(SimulationContext context, VisumNetwork visum) {
         WrittenConfiguration configuration = context.configuration();
-
-        String carSystem = configuration.getVisumToMobitopp().getCarTransportSystemCode();
-        String individualWalkSystem = configuration.getVisumToMobitopp().getIndividualWalkTransportSystemCode();
-        String publicTransportWalkSystem = configuration.getVisumToMobitopp().getPtWalkTransportSystemCode();
-        StandardNetfileLanguages builder = StandardNetfileLanguages
-                .builder()
-                .carSystem(carSystem)
-                .individualWalkSystem(individualWalkSystem)
-                .publicTransportWalkSystem(publicTransportWalkSystem)
-                .build();
-        LanguageFactory factory = StandardNetfileLanguages::english;
-        NetfileLanguage language = factory.createFrom(builder);
-
-        File visumFile = Convert.asFile(configuration.getVisumFile());
+//
+//        String carSystem = configuration.getVisumToMobitopp().getCarTransportSystemCode();
+//        String individualWalkSystem = configuration.getVisumToMobitopp().getIndividualWalkTransportSystemCode();
+//        String publicTransportWalkSystem = configuration.getVisumToMobitopp().getPtWalkTransportSystemCode();
+//        StandardNetfileLanguages builder = StandardNetfileLanguages
+//                .builder()
+//                .carSystem(carSystem)
+//                .individualWalkSystem(individualWalkSystem)
+//                .publicTransportWalkSystem(publicTransportWalkSystem)
+//                .build();
+//        LanguageFactory factory = StandardNetfileLanguages::english;
+//        NetfileLanguage language = factory.createFrom(builder);
+//
+//        File visumFile = Convert.asFile(configuration.getVisumFile());
         String carSystemCode = configuration.getVisumToMobitopp().getCarTransportSystemCode();
-        VisumNetwork visum = new VisumNetworkReader(language).readNetwork(visumFile, carSystemCode);
+//        VisumNetwork visum = new VisumNetworkReader(language).readNetwork(visumFile, carSystemCode);
 
         visum.nodes.values().forEach(results::logNode);
 
