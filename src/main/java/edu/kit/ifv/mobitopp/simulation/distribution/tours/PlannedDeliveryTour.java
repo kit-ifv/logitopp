@@ -74,25 +74,25 @@ public class PlannedDeliveryTour implements PlannedTour {
 		Zone position = depot(vehicle);
 		
 		int stopNo = 1;
-		int totalTripTime = 0;
-		int totalDeliveryTime = 0;
-		int totalDistance = 0;
+		float totalTripTime = 0;
+		float totalDeliveryTime = 0;
+		float totalDistance = 0;
 		int totalDeliveries = 0;
 		int totalPickups = 0;
 		
 		for (ParcelActivityBuilder stop : stops) {
 			Zone destination = stop.getZone();
-			
-			int tripDuration = travelTime(position, destination, time);
-			double distance = distance(position, destination);
+
+			float tripDuration = travelTime(position, destination, time);
+			float distance = distance(position, destination);
 			int deliveryDuration = stop.getDeliveryMinutes();
 			
-			time = time.plusMinutes(tripDuration);
+			time = time.plusSeconds((int) tripDuration * 60);
 			stop.by(vehicle)
 				.plannedAt(time)
 				.asStopNo(stopNo++)
 				.onTour(id)
-				.afterTrip(distance, tripDuration);
+				.afterTrip(distance, Math.round(tripDuration));
 			actualStops.add(stop.buildWorkerActivity());
 
 			time = time.plusMinutes(deliveryDuration);
@@ -107,13 +107,13 @@ public class PlannedDeliveryTour implements PlannedTour {
 		
 		this.preparedStops.addAll(actualStops);
 		
-		int returnDuration = travelTime(position, depot(vehicle), time);
+		float returnDuration = travelTime(position, depot(vehicle), time);
 		totalTripTime += returnDuration;
 		totalDistance += distance(position, depot(vehicle));
 		
-		Time returnTime = time.plusMinutes(returnDuration); 
+		Time returnTime = time.plusMinutes(Math.round(returnDuration));
 		
-		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, id, stops.size(),  totalDeliveries, totalPickups, vehicle.getOwner().getZoneAndLocation(), totalDistance, totalTripTime, totalDeliveryTime);
+		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, id, stops.size(),  totalDeliveries, totalPickups, vehicle.getOwner().getZoneAndLocation(), totalDistance, Math.round(totalTripTime), Math.round(totalDeliveryTime));
 
 		return returnTime;
 	}
@@ -126,8 +126,8 @@ public class PlannedDeliveryTour implements PlannedTour {
 		return impedance.getDistance(position.getId(), destination.getId());
 	}
 
-	private int travelTime(Zone origin, Zone destination, Time time) {
-		return Math.round(impedance.getTravelTime(origin.getId(), destination.getId(), vehicleType.getMode(), time));
+	private float travelTime(Zone origin, Zone destination, Time time) {
+		return impedance.getTravelTime(origin.getId(), destination.getId(), vehicleType.getMode(), time);
 	}
 	
 	private void validate(DeliveryVehicle vehicle) {

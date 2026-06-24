@@ -108,7 +108,13 @@ public abstract class ParcelBox implements IParcel, PlannedTour { //TODO console
 		Time arrival = departure.plusMinutes(duration);
 		int transfer = transferTime.estimateTransferTimeMinutes(null, veh, nextVeh, currentTime);
 		preparedStop = new ParcelActivity(1, getId(), consumer.getZoneAndLocation(), List.of(this), List.of(), vehicle, arrival, distance, duration, transfer); //TODO transfer time model
-		
+
+		if (vehicle.getType()==VehicleType.TRUCK) {
+			Time returnDeparture = arrival.plusMinutes(transfer);
+			distance += impedance.getDistance(consumer.getZone().getId(), producer.getZone().getId());
+			duration += (int) impedance.getTravelTime(consumer.getZone().getId(), producer.getZone().getId(), veh.getMode(), returnDeparture);
+		}
+
 		vehicle.getOwner().getResults().logLoadEvent(vehicle, currentTime, getId(), 1, 1, 0, vehicle.getOwner().getZoneAndLocation(), distance, duration, transfer);
 
         return departure.plusMinutes(duration).plusMinutes(transfer);

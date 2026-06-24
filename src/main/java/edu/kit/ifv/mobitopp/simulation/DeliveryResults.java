@@ -16,6 +16,7 @@ import edu.kit.ifv.mobitopp.simulation.distribution.chains.TransportChain;
 import edu.kit.ifv.mobitopp.simulation.distribution.delivery.ParcelActivity;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.DeliveryVehicle;
 import edu.kit.ifv.mobitopp.simulation.distribution.fleet.VehicleType;
+import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedDeliveryTour;
 import edu.kit.ifv.mobitopp.simulation.distribution.tours.PlannedTour;
 import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
@@ -26,6 +27,8 @@ import edu.kit.ifv.mobitopp.visum.VisumNode;
 import edu.kit.ifv.mobitopp.visum.VisumOrientedLink;
 import lombok.Getter;
 import lombok.val;
+
+import static edu.kit.ifv.mobitopp.simulation.StandardMode.TRUCK;
 
 /**
  * The Class DeliveryResults provides methods for logging results concerned with
@@ -195,7 +198,43 @@ public class DeliveryResults {
 			start = destination;
 		}
 
-		//TODO return trip
+		if (tour instanceof PlannedDeliveryTour) {
+			String row = "";
+
+			row += tour.getId() + SEP;
+			row += tour.journeyId() + SEP;
+			row += tour + SEP;
+			row += true + SEP;
+
+			row += center.getName() + SEP;
+			row += center.getId() + SEP;
+			row += currentTime + SEP;
+			row += currentTime.toMinutes() + SEP;
+
+			row += vehicle.getId() + SEP;
+			row += vehicle.getTag() + SEP;
+			row += vehicle.getType().asInt() + SEP;
+
+			row += locationDataLog(start, null);
+			row += locationDataLog(tour.depot().getZoneAndLocation(), tour.depot());
+
+			List<ParcelActivity> stops = tour.getPreparedStops();
+			ParcelActivity lastStop = stops.get(stops.size() - 1);
+
+			Time departure = lastStop.getPlannedTime().plusMinutes(lastStop.getDeliveryDuration());
+			float distance = ((PlannedDeliveryTour) tour).getImpedance().getDistance(start.zone().getId(), tour.depot().getZone().getId());
+			float duration = ((PlannedDeliveryTour) tour).getImpedance().getTravelTime(start.zone().getId(), tour.depot().getZone().getId(), TRUCK, departure);
+			Time arrival = departure.plusMinutes(Math.round(duration));
+
+			row += (lastStop.getNo() + 1) + SEP;
+			row += arrival + SEP;
+			row += arrival.toMinutes() + SEP;
+			row += distance + SEP;
+			row += duration + SEP;
+			row += 0 + SEP;
+
+			results.write(resultCategoryPlannedTour, row);
+		}
 
 	}
 

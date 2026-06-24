@@ -159,6 +159,7 @@ public class GenericParcelDemandModel<A extends ParcelAgent, P extends ParcelBui
 		for (int s: sizes) {
 			System.out.println("Bundle size " + s + ": " + this.bundleSizeStatistics.get(s));
 		}
+		System.out.println("\n");
 	}
 
 }
