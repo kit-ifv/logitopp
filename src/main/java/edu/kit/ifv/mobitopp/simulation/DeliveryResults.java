@@ -233,6 +233,15 @@ public class DeliveryResults {
 			row += duration + SEP;
 			row += 0 + SEP;
 
+			//"deliveries", "pickups", "nestedDeliveries", "nestedPickups", "plannedLastMilePickups"
+			row += tour.getPickUpRequests().size() + SEP + SEP + SEP + SEP + SEP;
+
+			double totalPickupVolume = tour.getPickUpRequests().stream().mapToDouble(IParcel::getVolume).sum();
+			row += currentVolume + SEP;
+			row += totalPickupVolume + SEP;
+			row += 0.0 + SEP;
+			row += vehicle.getVolume();
+
 			results.write(resultCategoryPlannedTour, row);
 		}
 
