@@ -234,7 +234,8 @@ public class DeliveryResults {
 			row += 0 + SEP;
 
 			//"deliveries", "pickups", "nestedDeliveries", "nestedPickups", "plannedLastMilePickups"
-			row += tour.getPickUpRequests().size() + SEP + SEP + SEP + SEP + SEP;
+			String pickups = tour.getPickUpRequests().stream().map(p -> p.getOId()+"").collect(Collectors.joining(","));
+			row += pickups + SEP + SEP + SEP + SEP + SEP;
 
 			double totalPickupVolume = tour.getPickUpRequests().stream().mapToDouble(IParcel::getVolume).sum();
 			row += currentVolume + SEP;
