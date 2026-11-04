@@ -1,13 +1,13 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-- family-names: "Kübler"
+- family-names: "KÃ¼bler"
   given-names: "Jelle"
   orcid: "https://orcid.org/0000-0001-8095-1815"
 - family-names: "Barthelmes"
   given-names: "Lukas"
   orcid: "https://orcid.org/0000-0003-1122-853X"
-- family-names: "Görgülü"
+- family-names: "GÃ¶rgÃ¼lÃ¼"
   given-names: "Mehmet Emre"
   orcid: "https://orcid.org/0000-0001-5845-5073"
 - family-names: "Reiffer"
@@ -15,6 +15,6 @@ authors:
   orcid: "https://orcid.org/0000-0003-1764-0154"
 title: "logitopp"
 version: 1.0.0
-doi: 10.5281/zenodo.1234
+doi: 10.5281/zenodo.11204481
 date-released: 2022-03-01
 url: "https://github.com/kit-ifv/logitopp"
