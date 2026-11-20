@@ -31,7 +31,7 @@ public class ParcelPersonFactory implements SimulationPersonFactory {
 		
 		SimulationOptionsCustomization customSimulationOptions = new SimulationOptionsCustomization(options);
 		SimulationPerson simulationPerson = defaultFactory.create(
-			person, queue, options, simulationDays, modesInSimulation, tourFactory, tripFactory, initialState, boarder, seed, listener
+			person, queue, customSimulationOptions, simulationDays, modesInSimulation, tourFactory, tripFactory, initialState, boarder, seed, listener
 		);
 				
 		PickUpParcelPerson parcelPerson = new PickUpParcelPerson(simulationPerson, packStationModel.select(person),  seed);
