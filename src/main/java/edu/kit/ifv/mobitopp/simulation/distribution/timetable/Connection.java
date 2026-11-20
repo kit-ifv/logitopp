@@ -21,18 +21,43 @@ public class Connection {
 	private final int capacity;
 	
 	private Collection<TimedTransportChain> bookings;
-	
+
+	/**
+	 * Number of slots claimed by returning boxes. Unlike delivery chains, returning boxes do not
+	 * book a connection in advance: they claim a free slot when they are dispatched, first come
+	 * first served.
+	 */
+	private int returningClaims;
+
 	public Connection(DistributionCenter from, DistributionCenter to, Time departure, int durationMinutes, int capacity) {
 		assert from != null;
 		assert to != null;
-		
+
 		this.from = from;
 		this.to = to;
 		this.departure = departure;
 		this.durationMinutes = durationMinutes;
 		this.capacity = capacity;
-		
+
 		this.bookings = new ArrayList<>();
+		this.returningClaims = 0;
+	}
+
+	/**
+	 * Claims one free slot of this connection for a returning box, if one is available.
+	 *
+	 * Returning boxes are handled first come first served: they are not booked in advance by the
+	 * capacity coordination, but claim a remaining slot when they are actually dispatched.
+	 *
+	 * @return whether a slot was claimed
+	 */
+	public boolean claimForReturning() {
+		if (!hasFreeCapacity()) {
+			return false;
+		}
+
+		this.returningClaims++;
+		return true;
 	}
 	
 	public Time getArrival() {
@@ -43,20 +68,30 @@ public class Connection {
 		if (!chainUsesThisConnection(chain)) {
 			throw new IllegalArgumentException("The given transport chain " + chain + "does not seem to use this connection: " + this.toString());
 		}
-		
-		if (this.bookings.size() >= capacity) {
+
+		if (!hasFreeCapacity()) {
 			throw new IllegalStateException("This connections booking capacity  of " + capacity + "is already reached!");
 		}
-		
+
 		bookings.add(chain);
 	}
-	
+
 	public boolean hasFreeCapacity() {
-		return this.bookings.size() < this.capacity;
+		return usedCapacity() < this.capacity;
 	}
-	
+
 	public int freeCapacity() {
-		return  this.capacity - this.bookings.size();
+		return  this.capacity - usedCapacity();
+	}
+
+	/**
+	 * Gets the number of occupied slots: the connections booked in advance by delivery chains plus
+	 * the slots claimed by returning boxes on dispatch.
+	 *
+	 * @return the number of occupied slots
+	 */
+	public int usedCapacity() {
+		return this.bookings.size() + this.returningClaims;
 	}
 	
 	private boolean chainUsesThisConnection(TimedTransportChain chain) {

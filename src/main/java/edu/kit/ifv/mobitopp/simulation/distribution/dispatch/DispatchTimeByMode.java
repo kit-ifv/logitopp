@@ -119,6 +119,46 @@ public class DispatchTimeByMode implements IDispatchTimeStrategy {
     }
 
 
+    @Override
+    public boolean canDispatch(PlannedTour tour, DistributionCenter origin, Time time) {
+        if (!tour.isReturning()) {
+            return true;
+        }
+
+        return claimReturnConnection(tour, origin, time);
+    }
+
+    /**
+     * Claims a free connection slot for the given returning tour, first come first served.
+     *
+     * Unlike delivery chains, returning boxes are not booked in advance by the capacity
+     * coordination: they take a remaining slot of the next free connection when they are actually
+     * dispatched. If the returning tour does not use a tram, no slot is needed.
+     *
+     * The claimed slot is consumed even though the caller may still fail to obtain a vehicle. On
+     * tram connections {@link #getVehicleForTour(PlannedTour, DistributionCenter, Time)} always
+     * returns a vehicle, so a claimed slot is always used.
+     *
+     * @return whether the tour may depart
+     */
+    private boolean claimReturnConnection(PlannedTour tour, DistributionCenter origin, Time time) {
+        DistributionCenter handler = tour.nextHub().get();
+
+        if (!handler.getVehicleType().equals(VehicleType.TRAM)) {
+            return true;
+        }
+
+        Optional<Connection> connection = timeTable
+                .getFreeConnectionsOnDay(origin, handler, time)
+                .findFirst();
+
+        if (connection.isEmpty()) {
+            return false; //no free slot left today, retry when a later connection has capacity
+        }
+
+        return connection.get().claimForReturning();
+    }
+
     private Time tramDispatchTime(PlannedTour tour, DistributionCenter origin, Time time) {
 
         if (tour.isReturning()) {

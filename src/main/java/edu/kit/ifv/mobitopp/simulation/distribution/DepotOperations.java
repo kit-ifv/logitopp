@@ -123,7 +123,8 @@ public class DepotOperations {
 			List<PlannedTour> dispatched = new ArrayList<>();
 
 			for (PlannedTour tour: tours) {
-				if (dispatchTimeStrategy.dispatchHours(tour, center, currentTime)) {
+				if (dispatchTimeStrategy.dispatchHours(tour, center, currentTime)
+						&& dispatchTimeStrategy.canDispatch(tour, center, currentTime)) {
 					Optional<DeliveryVehicle> vehicle = dispatchTimeStrategy.getVehicleForTour(tour, center, currentTime);
 					if (vehicle.isPresent()) {
 						System.out.println(this.center.getName() + "  dispatches " + tour);

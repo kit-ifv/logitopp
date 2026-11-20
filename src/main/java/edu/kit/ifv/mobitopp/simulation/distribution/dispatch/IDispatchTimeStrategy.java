@@ -11,4 +11,8 @@ public interface IDispatchTimeStrategy {
     public Time dispatchTimeFor(PlannedTour tour, DistributionCenter origin, Time time);
     public boolean dispatchHours(PlannedTour tour, DistributionCenter origin, Time time);
     public Optional<DeliveryVehicle> getVehicleForTour(PlannedTour tour, DistributionCenter origin, Time time);
+
+    default boolean canDispatch(PlannedTour tour, DistributionCenter origin, Time time) {
+        return true;
+    }
 }
