@@ -24,6 +24,10 @@ public class TransportChainBox extends ParcelBox {
 	protected final PlannedTour preplannedTour;
 	@Getter private final int bundleId = BundleIdProvider.nextId();
 
+	public PlannedTour getPreplannedTour() {
+		return preplannedTour;
+	}
+
 	public TransportChainBox(TimedTransportChain remainingChain, ImpedanceIfc impedance, TransferTimeModel transferTime, PlannedTour remainingTour) {
 		super(remainingChain, impedance, transferTime);
 		this.preplannedTour = remainingTour;

@@ -22,6 +22,8 @@ import edu.kit.ifv.mobitopp.simulation.parcels.BusinessParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.IParcel;
 import edu.kit.ifv.mobitopp.simulation.parcels.ParcelSize;
 import edu.kit.ifv.mobitopp.simulation.parcels.PrivateParcel;
+import edu.kit.ifv.mobitopp.simulation.parcels.box.ReturningParcelBox;
+import edu.kit.ifv.mobitopp.simulation.parcels.box.TransportChainBox;
 import edu.kit.ifv.mobitopp.time.Time;
 import edu.kit.ifv.mobitopp.visum.VisumNode;
 import edu.kit.ifv.mobitopp.visum.VisumOrientedLink;
@@ -119,6 +121,12 @@ public class DeliveryResults {
 		ZoneAndLocation start = owner.getZoneAndLocation();
 		ZoneAndLocation destination;
 
+		// A leg starts when the vehicle leaves: at dispatch, then after the previous stop's service.
+		Time legStart = currentTime;
+		String lastLegMode = lastLegMode(tour);
+		// The vehicle covering this tour's leg, for boxes taken from the chain.
+		String currentLegMode = tour.getVehicleType().name().toLowerCase();
+
 		double totalDeliveryVolume = tour.getPreparedStops().stream().mapToDouble(
 				s -> s.getParcels().stream().mapToDouble(IParcel::getVolume).sum()
 		).sum();
@@ -188,7 +196,14 @@ public class DeliveryResults {
 			row += currentVolume + SEP;
 			row += (deliverVolume+pickupVolume) + SEP;
 			row += (currentVolume - deliverVolume + pickupVolume) + SEP;
-			row += vehicle.getVolume();
+			row += vehicle.getVolume() + SEP;
+
+			Time legEnd = stop.getPlannedTime();
+			row += simMinutes(legStart) + SEP;
+			row += simMinutes(legEnd) + SEP;
+			row += lastLegMode + SEP;
+			row += currentLegMode;
+			legStart = (legEnd == null) ? null : legEnd.plusMinutes(stop.getDeliveryDuration());
 
 			currentVolume = currentVolume - deliverVolume + pickupVolume;
 
@@ -241,7 +256,12 @@ public class DeliveryResults {
 			row += currentVolume + SEP;
 			row += totalPickupVolume + SEP;
 			row += 0.0 + SEP;
-			row += vehicle.getVolume();
+			row += vehicle.getVolume() + SEP;
+
+			row += departure.toMinutes() + SEP;
+			row += arrival.toMinutes() + SEP;
+			row += lastLegMode + SEP;
+			row += currentLegMode;
 
 			results.write(resultCategoryPlannedTour, row);
 		}
@@ -258,9 +278,38 @@ public class DeliveryResults {
 					"toDepot", "toDepotId", "toZone", "toX", "toY", "toEdge", "toEdgePos",
 					"stopNo", "plannedTime", "plannedTimeSimMin", "distance", "tripDur", "deliveryDur",
 					"deliveries", "pickups", "nestedDeliveries", "nestedPickups", "plannedLastMilePickups",
-					"volumeBefore", "volumeChange", "volumeAfter", "maxVolume"
+					"volumeBefore", "volumeChange", "volumeAfter", "maxVolume",
+					"legStartSimMin", "legEndSimMin", "lastLegMode", "currentLegMode"
 			)
 		);
+	}
+
+	/**
+	 * Classifies a tour by how its parcels make the last leg to the recipient: "truck" or
+	 * "bike_box". A box travelling through hubs wraps the tour of its next leg, so
+	 * the innermost tour decides; a bike tour dispatched at a hub delivers the contents of a bike
+	 * box. Returning boxes are classified like the box they bring back.
+	 */
+	private static String lastLegMode(PlannedTour tour) {
+		if (tour instanceof TransportChainBox) { // includes ReturningBoxChain
+			return lastLegMode(((TransportChainBox) tour).getPreplannedTour());
+		}
+		if (tour instanceof ReturningParcelBox) {
+			return "bike_box";
+		}
+
+		switch (tour.getVehicleType()) {
+			case TRUCK:
+				return "truck";
+			case BIKE:
+				return "bike_box";
+			default:
+				return tour.getVehicleType().name().toLowerCase();
+		}
+	}
+
+	private static String simMinutes(Time time) {
+		return (time == null) ? "" : String.valueOf(time.toMinutes());
 	}
 
 
