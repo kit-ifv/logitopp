@@ -86,7 +86,7 @@ public class BaseDeliveryPolicyTest {
 	public void canDeliverWorkWhileHome() {
 		personIsHome();
 		
-		assertTrue(policy.canDeliver(parcelWork, null).isEmpty());
+		assertTrue(policy.canDeliver(parcelWork, null).isPresent());
 	}
 	
 	@Test
@@ -100,7 +100,7 @@ public class BaseDeliveryPolicyTest {
 	public void canDeliverWorkWhileElsewhere() {
 		personIsElsewhere();
 		
-		assertTrue(policy.canDeliver(parcelWork, null).isEmpty());
+		assertTrue(policy.canDeliver(parcelWork, null).isPresent());
 	}
 	
 	@Test

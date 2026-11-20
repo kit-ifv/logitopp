@@ -41,7 +41,7 @@ public class BaseDeliveryPolicy implements ParcelDeliveryPolicy<PrivateParcel> {
 			
 		} else if (parcel.getDestinationType().equals(WORK)) {
 			
-			return optionalRecipient(isWorking(parcel.getPerson()), RecipientType.PERSONAL);
+			return Optional.of(RecipientType.PERSONAL);
 
 			
 			
