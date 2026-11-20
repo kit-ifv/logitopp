@@ -123,6 +123,15 @@ public class PickUpParcelPerson extends SimulationPersonDecorator implements Nul
 
 
 
+	/**
+	 * Gets the location at which the person picks up their parcels: the selected pack station.
+	 *
+	 * @return the pick up location
+	 */
+	public ZoneAndLocation getActualPickUpLocation() {
+		return this.packStation;
+	}
+
 	@Override
 	public ZoneAndLocation getZoneAndLocation() {
 		return new ZoneAndLocation(person.homeZone(), person.household().homeLocation());

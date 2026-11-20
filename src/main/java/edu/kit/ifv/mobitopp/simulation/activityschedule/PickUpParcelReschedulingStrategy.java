@@ -3,6 +3,7 @@ package edu.kit.ifv.mobitopp.simulation.activityschedule;
 import edu.kit.ifv.mobitopp.simulation.ActivityType;
 import edu.kit.ifv.mobitopp.simulation.ModifiableActivitySchedule;
 import edu.kit.ifv.mobitopp.simulation.ReschedulingStrategy;
+import edu.kit.ifv.mobitopp.simulation.ZoneAndLocation;
 import edu.kit.ifv.mobitopp.simulation.activityschedule.linkedlist.ActivityAsLinkedListElement;
 import edu.kit.ifv.mobitopp.simulation.person.PickUpParcelPerson;
 import edu.kit.ifv.mobitopp.time.Time;
@@ -68,7 +69,7 @@ public class PickUpParcelReschedulingStrategy implements ReschedulingStrategy  {
 			if (nextHome != null && activitySchedule.hasPrevActivity(nextHome)) {
 				
 				ActivityIfc prev = activitySchedule.prevActivity(nextHome);
-				ActivityIfc pickUpActivity = createPickUpParcelsActivity(prev, 15, 3);//TODO trip/pick up duration
+				ActivityIfc pickUpActivity = createPickUpParcelsActivity(prev, 15, 3, this.person.getActualPickUpLocation());//TODO trip/pick up duration
 				activitySchedule.insertActivityAfter(prev, pickUpActivity);
 				
 				this.isPickupPlanned = true;
@@ -87,15 +88,25 @@ public class PickUpParcelReschedulingStrategy implements ReschedulingStrategy  {
 	 * Creates a new pick up parcel Activity with the given trip and pick up
 	 * duration.
 	 *
+	 * The activity's location is set right away, so the destination choice model is skipped for
+	 * pick up activities: it has no model for {@link ActivityType#PICK_UP_PARCEL} and would fall
+	 * back to its default model. The person's fixed zone for the activity type is not consulted
+	 * either, because the destination choice model is asked about the undecorated person, which
+	 * knows nothing about parcel pick ups.
+	 *
 	 * @param current        the current activity
 	 * @param tripDuration   the trip duration
 	 * @param pickUpDuration the pick up duration
+	 * @param pickUpLocation the location at which the parcels are picked up
 	 * @return the pick up parcel activity
 	 */
-	public static ActivityIfc createPickUpParcelsActivity(ActivityIfc current, int tripDuration, int pickUpDuration) {
+	public static ActivityIfc createPickUpParcelsActivity(ActivityIfc current, int tripDuration, int pickUpDuration,
+			ZoneAndLocation pickUpLocation) {
 		ActivityIfc activity = new ActivityAsLinkedListElement(activityCounter--, current.getActivityNrOfWeek(),
 				ActivityType.PICK_UP_PARCEL, current.startDate().plusMinutes(current.duration()), tripDuration,
 				pickUpDuration, current.startFlexibility(), current.endFlexibility(), current.durationFlexibility());
+
+		activity.setLocation(pickUpLocation);
 
 		return activity;
 	}
